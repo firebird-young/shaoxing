@@ -1,0 +1,148 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>文化故事</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; justify-content: center; }
+.page { max-width: 430px; min-height: 100vh; background: #f6f7fb; padding: 0 16px 100px; position: relative; }
+@media(max-width:430px) { .page { max-width: 100%; } }
+
+/* ── 顶部导航 ── */
+.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; background: #f6f7fb; }
+.nav-back { width: 32px; height: 32px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.nav-back svg { width: 18px; height: 18px; color: #555; display: block; }
+.nav-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+.nav-placeholder { width: 32px; }
+
+/* ── 页面标题 ── */
+.page-title { display: flex; align-items: center; gap: 8px; padding: 16px 0 10px; }
+.page-title::before { content: ''; width: 3px; height: 14px; background: #D70C1F; border-radius: 2px; }
+.page-title span { font-size: 15px; font-weight: 700; color: #1a1a2e; }
+
+/* ── 故事卡片 ── */
+.story-card { background: #fff; border-radius: 16px; overflow: hidden; margin-bottom: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); cursor: pointer; transition: transform 0.15s; }
+.story-card:active { transform: scale(0.98); }
+.sc-cover { height: 160px; background-position: center; background-size: cover; position: relative; }
+.sc-cover .sc-overlay { position: absolute; bottom: 0; left: 0; right: 0; height: 50%; background: linear-gradient(transparent, rgba(0,0,0,0.5)); }
+.sc-cover .sc-title { position: absolute; bottom: 14px; left: 16px; right: 16px; color: #fff; font-size: 17px; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,0.4); z-index: 1; }
+.sc-body { padding: 12px 16px 14px; }
+.sc-body .publisher { font-size: 12px; color: #999; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.sc-body .publisher .ava { width: 22px; height: 22px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; color: #fff; font-weight: 600; flex-shrink: 0; }
+.sc-body .desc { font-size: 12px; color: #666; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* ── 底部TabBar ── */
+.bnav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; height: 64px; background: rgba(255,255,255,.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(0,0,0,.05); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; padding-bottom: env(safe-area-inset-bottom, 4px); z-index: 100; }
+.bnav .ni { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; border: none; background: none; padding: 4px 10px; font-size: 10px; color: #999; transition: color .2s; }
+.bnav .ni .ico { width: 22px; height: 22px; transition: transform .15s; }
+.bnav .ni .ico svg { display: block; width: 100%; height: 100%; }
+.bnav .ni:active .ico { transform: scale(.8); }
+.bnav .ni.on { color: #D70C1F; }
+.bnav .ni.on .ico { transform: scale(1.05); }
+.bnav .ni span:last-child { font-size: 10px; display: block; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- 顶部导航 -->
+<div class="top-bar">
+  <div class="nav-back" onclick="window.location.href='user-index.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </div>
+  <div class="nav-title">文化故事</div>
+  <div class="nav-placeholder"></div>
+</div>
+
+<div class="page-title"><span>精彩故事</span></div>
+
+<!-- 茅台百年酱香 -->
+<div class="story-card" onclick="window.location.href='story_detail.html'">
+  <div class="sc-cover" style="background-image:url('贵州茅台封面海报.png')">
+    <div class="sc-overlay"></div>
+    <div class="sc-title">茅台的百年酱香密码</div>
+  </div>
+  <div class="sc-body">
+    <div class="publisher"><span class="ava" style="background:#D70C1F">茅</span> 贵州茅台 · 3天前</div>
+    <div class="desc">从赤水河畔的古老酒坊到今天的数字化酒庄，探寻茅台百年酱香背后的文化脉络与酿造传奇。每一滴酱香都凝聚着时光的沉淀。</div>
+  </div>
+</div>
+
+<!-- 王者荣耀元宇宙 -->
+<div class="story-card">
+  <div class="sc-cover" style="background-image:url('王者荣耀.jpeg')">
+    <div class="sc-overlay"></div>
+    <div class="sc-title">王者荣耀的元宇宙进化</div>
+  </div>
+  <div class="sc-body">
+    <div class="publisher"><span class="ava" style="background:#6c5ce7">王</span> 王者荣耀 · 5天前</div>
+    <div class="desc">从MOBA王者到数字资产平台，王者荣耀如何构建自己的元宇宙版图？虚拟皮肤资产化与区块链结合的新篇章。</div>
+  </div>
+</div>
+
+<!-- 杜甫草堂 -->
+<div class="story-card">
+  <div class="sc-cover" style="background-image:url('杜甫草堂·文旅数字藏品.png')">
+    <div class="sc-overlay"></div>
+    <div class="sc-title">杜甫草堂的文化数字化</div>
+  </div>
+  <div class="sc-body">
+    <div class="publisher"><span class="ava" style="background:#00b894">杜</span> 杜甫草堂 · 1周前</div>
+    <div class="desc">千年诗圣故居借助数字技术焕发新生，通过区块链技术发行文旅数字藏品，让传统文化走进年轻人的数字世界。</div>
+  </div>
+</div>
+
+<!-- 五粮液 -->
+<div class="story-card">
+  <div class="sc-cover" style="background-image:url('五粮液·数字珍藏.png')">
+    <div class="sc-overlay"></div>
+    <div class="sc-title">五粮液的数字窖池</div>
+  </div>
+  <div class="sc-body">
+    <div class="publisher"><span class="ava" style="background:#d4a547">五</span> 五粮液 · 2周前</div>
+    <div class="desc">传统酿造工艺遇上数字技术，五粮液如何用数字化手段守护千年窖池？每一瓶数字珍藏都承载着真实的酿造故事。</div>
+  </div>
+</div>
+
+<!-- 海底捞 -->
+<div class="story-card">
+  <div class="sc-cover" style="background-image:url('海底捞·黑海会员数字卡.png')">
+    <div class="sc-overlay"></div>
+    <div class="sc-title">海底捞的数字化服务</div>
+  </div>
+  <div class="sc-body">
+    <div class="publisher"><span class="ava" style="background:#3949ab">海</span> 海底捞 · 1个月前</div>
+    <div class="desc">从极致服务到数字会员体系，海底捞如何将餐饮服务与数字资产结合？黑海会员体系的全新数字化升级。</div>
+  </div>
+</div>
+
+</div>
+
+<!-- 底部TabBar -->
+<div class="bnav">
+  <button class="ni on" onclick="window.location.href='user-index.html'">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+    <span>首页</span>
+  </button>
+  <button class="ni">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+    <span>发现</span>
+  </button>
+  <button class="ni" onclick="window.location.href='my_assets.html'">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 16 7 12 15 8 7 12 2"/><line x1="12" y1="15" x2="12" y2="22"/><line x1="8" y1="19" x2="16" y2="19"/></svg></span>
+    <span>资产</span>
+  </button>
+  <button class="ni" onclick="window.location.href='asset_market.html'">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><line x1="6" y1="16" x2="6" y2="20"/><line x1="10" y1="12" x2="10" y2="20"/><line x1="14" y1="8" x2="14" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/></svg></span>
+    <span>市场</span>
+  </button>
+  <button class="ni" onclick="window.location.href='my.html'">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+    <span>我的</span>
+  </button>
+</div>
+
+</body>
+</html>

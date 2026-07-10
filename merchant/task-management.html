@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>任务管理 - 商家中心</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:#f5f7fa;color:#333}
+    .header{background:#fff;padding:16px 24px;box-shadow:0 2px 4px rgba(0,0,0,.05);display:flex;justify-content:space-between;align-items:center}
+    .header-left h1{font-size:18px;font-weight:600}
+    .header-right{display:flex;align-items:center;gap:12px}
+    .merchant-name{font-weight:500;color:#667eea;cursor:pointer}
+    .verify-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:50%;color:#fff}
+    .btn-logout{padding:8px 16px;background:#f5f5f5;border:none;border-radius:6px;cursor:pointer;font-size:13px;color:#666}
+    .btn-logout:hover{background:#e8ecf0}
+
+    .sidebar{position:fixed;left:0;top:60px;bottom:0;width:200px;background:#2c3e50;padding:20px 0;z-index:10}
+    .sidebar-menu{list-style:none;padding:0;margin:0}
+    .menu-title{display:flex;align-items:center;gap:10px;padding:12px 20px;color:#b8c7ce;font-size:14px;text-decoration:none;transition:all .2s}
+    .menu-title svg{width:18px;height:18px;flex-shrink:0}
+    a.menu-title:hover{background:rgba(255,255,255,.1);color:#fff}
+    .menu-title.active{background:rgba(102,126,234,.3);color:#fff}
+    .submenu{list-style:none;padding:0;margin:0;display:block}
+    .submenu-item{display:block;padding:10px 20px 10px 50px;color:#8a9aa8;font-size:13px;text-decoration:none;transition:all .2s}
+    .submenu-item:hover{background:rgba(255,255,255,.1);color:#fff}
+    .submenu-item.active{background:rgba(102,126,234,.3);color:#fff}
+
+    .main-content{margin-left:200px;padding:24px}
+    .page-title{font-size:20px;font-weight:600;color:#1a1a2e;margin-bottom:24px}
+
+    .card{background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:20px}
+    .card-title{font-size:16px;font-weight:600;color:#1a1a2e;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+
+    .btn{padding:8px 16px;border-radius:6px;font-size:13px;cursor:pointer;border:none;transition:all .2s;font-weight:500}
+    .btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
+    .btn-primary:hover{opacity:.9}
+    .btn-sm{padding:4px 10px;font-size:11px}
+    .btn-default{background:#f5f5f5;color:#666}
+    .btn-default:hover{background:#e8ecf0}
+    .btn-danger{background:#fff5f5;color:#D70C1F;border:1px solid #ffcccc}
+    .btn-danger:hover{background:#ffeaea}
+    .btn-success{background:#e6f9ee;color:#20bf6b;border:1px solid #c6f0d4}
+    .btn-success:hover{background:#d4f5e2}
+
+    .form-group{margin-bottom:14px}
+    .form-label{display:block;font-size:13px;color:#666;margin-bottom:5px;font-weight:500}
+    .form-input{width:100%;height:40px;padding:0 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;outline:none;transition:border .2s}
+    .form-input:focus{border-color:#667eea}
+    .form-select{width:100%;height:40px;padding:0 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;outline:none;background:#fff;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+    .form-textarea{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;outline:none;resize:vertical;min-height:60px}
+    .form-row{display:flex;gap:14px}
+    .form-row .form-group{flex:1}
+
+    .status-tag{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:500}
+    .status-tag.active{background:#e6f7ff;color:#1890ff;border:1px solid #bae7ff}
+    .status-tag.inactive{background:#f5f5f5;color:#999;border:1px solid #eee}
+
+    table{width:100%;border-collapse:collapse}
+    th{text-align:left;padding:12px 10px;font-size:12px;color:#999;border-bottom:2px solid #f0f0f0;font-weight:600;background:#fafafa;white-space:nowrap}
+    td{padding:12px 10px;border-bottom:1px solid #f5f5f5;font-size:13px}
+    tr:hover td{background:#fafafa}
+
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+    .modal-overlay.show{display:flex}
+    .modal-box{background:#fff;border-radius:16px;width:100%;max-width:640px;max-height:85vh;overflow-y:auto}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #f0f0f0}
+    .modal-title{font-size:16px;font-weight:600}
+    .modal-close{width:28px;height:28px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:#666}
+    .modal-close:hover{background:#e8e8e8}
+    .modal-body{padding:20px}
+    .modal-footer{padding:16px 20px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;gap:12px}
+
+    /* 触发动作标签 */
+    .trigger-label{display:inline-flex;align-items:center;gap:5px}
+    .trigger-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .trigger-dot.duration{background:#f0ad4e}
+    .trigger-dot.draw{background:#667eea}
+    .trigger-dot.browse{background:#d9534f}
+    .trigger-dot.click{background:#5bc0de}
+
+    /* 多选项目组 */
+    .checkbox-group{display:flex;flex-wrap:wrap;gap:8px;padding:10px;border:1px solid #eee;border-radius:8px;background:#fafafa}
+    .checkbox-group label{display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;padding:6px 12px;border-radius:6px;background:#fff;border:1px solid #e8e8e8;white-space:nowrap;transition:all .15s}
+    .checkbox-group label:hover{border-color:#667eea;background:#f0f2ff}
+    .checkbox-group input{accent-color:#667eea}
+    .checkbox-group label:has(input:checked){border-color:#667eea;background:#eef0ff;color:#667eea;font-weight:500}
+
+    /* 热区选择区 */
+    .hotspot-select-area{
+      position:relative;background:#1a1a2e;border-radius:0 0 10px 10px;overflow:hidden;
+      margin-top:0;user-select:none;max-height:260px;
+    }
+    .hotspot-select-area img{width:100%;display:block}
+    .hs-img-tabs{
+      display:flex;gap:4px;overflow-x:auto;padding:6px 6px 0;background:#1a1a2e;border-radius:10px 10px 0 0;
+      scrollbar-width:none;
+    }
+    .hs-img-tabs::-webkit-scrollbar{display:none}
+    .hs-img-tab{
+      flex-shrink:0;padding:5px 12px;border-radius:8px 8px 0 0;
+      font-size:11px;color:rgba(255,255,255,.5);cursor:pointer;
+      border:1px solid transparent;border-bottom:none;
+      background:rgba(255,255,255,.04);white-space:nowrap;
+      transition:all .2s;
+    }
+    .hs-img-tab:hover{color:rgba(255,255,255,.8);background:rgba(255,255,255,.08)}
+    .hs-img-tab.active{color:#fff;background:rgba(32,191,107,.15);border-color:rgba(32,191,107,.3)}
+    .hs-img-tab .tab-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#20bf6b;margin-right:5px;vertical-align:middle}
+    .hs-box{
+      position:absolute;border:2px solid rgba(32,191,107,.35);
+      background:rgba(32,191,107,.06);cursor:pointer;z-index:5;
+      display:flex;align-items:center;justify-content:center;
+      transition:border .2s,background .2s;
+    }
+    .hs-box:hover{border-color:rgba(32,191,107,.8);background:rgba(32,191,107,.18)}
+    .hs-box.selected{border:2px solid #20bf6b;background:rgba(32,191,107,.3);box-shadow:0 0 10px rgba(32,191,107,.4)}
+    .hs-box .hs-num{font-size:14px;font-weight:700;color:#20bf6b;pointer-events:none}
+    .hs-box.selected .hs-num{color:#fff}
+    .hs-hint{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.5);font-size:11px;z-index:6;background:rgba(0,0,0,.5);padding:2px 10px;border-radius:10px;pointer-events:none}
+
+    /* 预览卡片 */
+    .preview-card{
+      background:linear-gradient(180deg,#1e1e3a,#12122a);
+      border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,.1);
+      margin-top:8px;
+    }
+    .preview-card .pc-item{
+      display:flex;align-items:center;gap:8px;padding:8px 10px;
+      background:rgba(255,255,255,.05);border-radius:8px;
+      border:1px solid rgba(255,255,255,.06);
+    }
+    .preview-card .pc-icon{
+      width:26px;height:26px;border-radius:6px;
+      display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;
+    }
+    .preview-card .pc-name{color:#ddd;font-size:12px;flex:1;line-height:1.3}
+    .preview-card .pc-num{font-size:10px;color:#aaa;white-space:nowrap}
+    .preview-card .pc-reward{font-size:10px;color:#ffcc66}
+
+    .stat-num{font-weight:600;color:#333}
+    .stat-label{font-size:10px;color:#999;margin-left:2px}
+
+    /* 多选奖励 */
+    .reward-check-list{display:flex;flex-direction:column;gap:10px}
+    .reward-row{border:1px solid #eee;border-radius:8px;padding:10px 12px;background:#fff;transition:border .2s}
+    .reward-row.active{border-color:#667eea;background:#f8f9ff}
+    .reward-row-header{display:flex;align-items:center;gap:8px}
+    .reward-row-header label{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-weight:500;color:#555}
+    .reward-row-header input[type=checkbox]{accent-color:#667eea;width:15px;height:15px}
+    .reward-row-body{display:none;margin-top:8px;padding-top:8px;border-top:1px dashed #eee}
+    .reward-row.active .reward-row-body{display:block}
+    .reward-row-body .form-row{margin-bottom:0}
+    .reward-claim-stat{font-size:11px;color:#667eea;margin-left:8px}
+
+    /* 奖励卡片上传 */
+    .rcard-upload{display:inline-flex;align-items:center;gap:6px;margin-top:6px}
+    .rcard-btn{padding:4px 10px;font-size:11px;border:1px dashed #ccc;border-radius:4px;background:#fff;cursor:pointer;color:#999;white-space:nowrap}
+    .rcard-btn:hover{border-color:#667eea;color:#667eea}
+    .rcard-btn.has-img{border-style:solid;border-color:#20bf6b;color:#20bf6b}
+    .rcard-preview{width:36px;height:36px;border-radius:4px;object-fit:cover;display:none;border:1px solid #eee}
+    .rcard-preview.show{display:block}
+    .rcard-del{font-size:11px;color:#D70C1F;cursor:pointer;display:none}
+    .rcard-del.show{display:inline}
+
+    /* 奖励逻辑切换（或/且） */
+    .logic-toggle{display:flex;gap:0;margin-top:10px}
+    .logic-btn{flex:1;padding:8px 12px;font-size:12px;border:1px solid #ddd;background:#fff;cursor:pointer;text-align:center;transition:all .2s}
+    .logic-btn:first-child{border-radius:6px 0 0 6px}
+    .logic-btn:last-child{border-radius:0 6px 6px 0}
+    .logic-btn.active{background:#667eea;color:#fff;border-color:#667eea}
+    .logic-btn:hover:not(.active){background:#f5f5f5}
+    .logic-field{display:none;margin-top:10px}
+    .logic-field.show{display:block}
+
+    .toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.78);color:#fff;font-size:14px;padding:14px 28px;border-radius:8px;z-index:2000;pointer-events:none;opacity:0;transition:opacity .3s}
+    .toast.show{opacity:1}
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="header-left"><h1>商家中心</h1></div>
+  <div class="header-right">
+    <span class="merchant-name">贵州茅台集团</span>
+    <span class="verify-badge">V</span>
+    <button class="btn-logout">退出登录</button>
+  </div>
+</div>
+
+<div class="sidebar" id="sidebar">
+  <ul class="sidebar-menu">
+    <li><a class="menu-title" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>首页</a></li>
+    <li><div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><polyline points="21 15 16 10 5 21"/></svg>数字资产</div><ul class="submenu"><li><a class="submenu-item" href="asset-management.html">数字资产管理</a></li>
+        <li><a class="submenu-item" href="digital-asset-detail.html">数字资产详情</a></li></ul></li>
+    <li><div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>订单管理</div><ul class="submenu"><li><a class="submenu-item" href="order-management.html">订单管理</a></li><li><a class="submenu-item" href="delivery-management.html">发货管理</a></li></ul></li>
+    <li><div class="menu-title active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>营销管理</div><ul class="submenu"><li><a class="submenu-item" href="marketing.html">空间管理</a></li><li><a class="submenu-item active" href="task-management.html">任务管理</a></li></ul></li>
+    <li><div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>内容管理</div><ul class="submenu"><li><a class="submenu-item" href="story-admin.html">文化故事管理</a></li></ul></li>
+    <li><div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>系统管理</div><ul class="submenu"><li><a class="submenu-item" href="operator-management.html">操作员管理</a></li><li><a class="submenu-item" href="role-management.html">角色管理</a></li></ul></li>
+  </ul>
+</div>
+
+<div class="main-content">
+  <div class="page-title">📋 任务管理</div>
+
+  <!-- ======== 任务列表 ======== -->
+  <div class="card">
+    <div class="card-title">
+      <span>📋 任务列表</span>
+      <button class="btn btn-primary" onclick="openTaskModal()">+ 新建任务</button>
+    </div>
+    <table>
+      <thead><tr>
+        <th style="width:30px">#</th>
+        <th>任务名称</th>
+        <th>触发动作</th>
+        <th>每人每天最多获奖</th>
+        <th>奖励内容（领取统计）</th>
+        <th>状态</th>
+        <th style="width:180px">操作</th>
+      </tr></thead>
+      <tbody id="taskTbody"></tbody>
+    </table>
+    <div id="emptyTasks" style="text-align:center;padding:40px;color:#999;font-size:13px;display:none">
+      <div style="font-size:40px;margin-bottom:10px">📋</div>
+      <div>暂无任务，点击"新建任务"开始创建</div>
+      <div style="font-size:11px;color:#bbb;margin-top:4px">任务将显示在用户的任务中心面板中</div>
+    </div>
+
+    <!-- 快速预览 -->
+    <div style="margin-top:20px;padding:14px 16px;background:#f9fafc;border-radius:10px">
+      <div style="font-size:13px;font-weight:600;color:#667eea;margin-bottom:10px">📱 用户端任务中心预览</div>
+      <div class="preview-card" id="previewCard">
+        <div style="text-align:center;padding:16px;color:rgba(255,255,255,.4);font-size:12px">暂无任务数据</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 新建/编辑任务弹窗 -->
+<div class="modal-overlay" id="taskModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="taskModalTitle">新建任务</div>
+      <div class="modal-close" onclick="closeTaskModal()">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">任务名称 *</label>
+        <input class="form-input" id="taskName" placeholder="例如：茅台空间停留10s获取茅台积分10">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">触发动作 *</label>
+          <select class="form-select" id="taskTrigger" onchange="onTriggerChange()">
+            <option value="">请选择触发动作</option>
+            <option value="stay_duration">⏱️ 空间停留</option>
+            <option value="lottery_draw">🏺 元素抽奖</option>
+            <option value="product_browse">📄 详情浏览</option>
+            <option value="hotspot_click">👆 点击项目</option>
+          </select>
+        </div>
+        <div class="form-group" id="triggerValueGroup" style="display:none">
+          <label class="form-label" id="triggerValueLabel">触发值</label>
+          <input class="form-input" id="taskTriggerValue" type="number" min="1" placeholder="请输入">
+        </div>
+      </div>
+
+      <!-- 元素抽奖专属：选择热区 + 命中概率 -->
+      <div id="lotteryGroup" style="display:none">
+        <div class="form-group">
+          <label class="form-label">选择空间热区（多选，点击热区框选中）</label>
+          <div class="hs-img-tabs" id="hsImgTabs" style="display:none"></div>
+          <div class="hotspot-select-area" id="hotspotSelectArea">
+            <img id="hotspotSelectImg" src="" alt="空间图片">
+            <div class="hs-hint">点击热区框进行多选</div>
+          </div>
+          <div id="noHotspotMsg" style="display:none;text-align:center;padding:20px;color:#999;font-size:12px;background:#f9f9f9;border-radius:8px;margin-top:6px">
+            ⚠️ 暂无热区数据，请先在<a href="marketing.html" style="color:#667eea">空间管理</a>中为空间图片标注热区
+          </div>
+          <div style="font-size:11px;color:#999;margin-top:4px">已选热区：<strong id="selectedHotspotsText">无</strong></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">命中概率（%）*</label>
+            <input class="form-input" id="taskHitProb" type="number" min="1" max="100" value="40" placeholder="用户每次抽奖命中奖励的概率">
+            <div style="font-size:11px;color:#999;margin-top:3px">用户点击抽奖热区后，有该概率获得奖励</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">每个热区最多点击次数</label>
+            <input class="form-input" id="taskHotspotMaxClick" type="number" min="1" max="99" value="5" placeholder="每个热区可抽奖点击次数上限">
+            <div style="font-size:11px;color:#999;margin-top:3px">到达次数后该热区不可再点击</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 点击项目专属：选择空间项目（多选） -->
+      <div id="projectGroup" style="display:none">
+        <div class="form-group">
+          <label class="form-label">选择空间项目（多选）</label>
+          <div class="checkbox-group" id="projectCheckboxes">
+          </div>
+          <div id="noProjectMsg" style="display:none;text-align:center;padding:16px;color:#999;font-size:12px;background:#f9f9f9;border-radius:8px;margin-top:6px">
+            ⚠️ 暂无空间项目数据
+          </div>
+          <div style="font-size:11px;color:#999;margin-top:4px">已选项目：<strong id="selectedProjectsText">无</strong></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">每人每天最多获奖次数 *</label>
+        <input class="form-input" id="taskMaxCount" type="number" min="1" max="99" value="5" placeholder="例如：5（表示每人每天最多获奖 5 次）">
+      </div>
+      <div class="form-group">
+        <label class="form-label">奖励类型 *（可多选）</label>
+        <div class="reward-check-list" id="rewardCheckList">
+          <div class="reward-row active" data-type="points">
+            <div class="reward-row-header">
+              <label><input type="checkbox" checked onchange="onRewardCheck(this)">💰 茅台积分</label>
+            </div>
+            <div class="reward-row-body">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">数值</label><input class="form-input" type="number" min="1" value="10" placeholder="例如：10" data-field="value" data-rt="points"></div>
+                <div class="form-group"><label class="form-label">展示描述</label><input class="form-input" placeholder="例如：茅台积分 +10" data-field="desc" data-rt="points"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">领取总次数上限（0=不限）</label><input class="form-input" type="number" min="0" value="0" placeholder="0表示不限" data-field="maxTotal" data-rt="points"></div>
+                <div class="form-group"><label class="form-label">奖励卡片</label><div class="rcard-upload"><input type="file" accept="image/*" onchange="uploadRewardCard(this)" data-rt="points" style="display:none"><button class="rcard-btn" onclick="this.previousElementSibling.click();return false">📷 上传卡片</button><img class="rcard-preview" data-rt="points" src=""><span class="rcard-del" data-rt="points" onclick="clearRewardCard(this)">✕ 移除</span><input type="hidden" data-field="cardImg" data-rt="points" value=""></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="reward-row" data-type="priority">
+            <div class="reward-row-header">
+              <label><input type="checkbox" onchange="onRewardCheck(this)">⭐ 新品优先权</label>
+            </div>
+            <div class="reward-row-body">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">数值（可选）</label><input class="form-input" type="number" min="1" value="1" placeholder="可不填" data-field="value" data-rt="priority"></div>
+                <div class="form-group"><label class="form-label">展示描述</label><input class="form-input" placeholder="例如：新品优先购买权" data-field="desc" data-rt="priority"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">领取总次数上限（0=不限）</label><input class="form-input" type="number" min="0" value="0" placeholder="0表示不限" data-field="maxTotal" data-rt="priority"></div>
+                <div class="form-group"><label class="form-label">奖励卡片</label><div class="rcard-upload"><input type="file" accept="image/*" onchange="uploadRewardCard(this)" data-rt="priority" style="display:none"><button class="rcard-btn" onclick="this.previousElementSibling.click();return false">📷 上传卡片</button><img class="rcard-preview" data-rt="priority" src=""><span class="rcard-del" data-rt="priority" onclick="clearRewardCard(this)">✕ 移除</span><input type="hidden" data-field="cardImg" data-rt="priority" value=""></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="reward-row" data-type="coupon">
+            <div class="reward-row-header">
+              <label><input type="checkbox" onchange="onRewardCheck(this)">🎫 优惠券</label>
+            </div>
+            <div class="reward-row-body">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">数值</label><input class="form-input" type="number" min="1" value="1" placeholder="例如：1" data-field="value" data-rt="coupon"></div>
+                <div class="form-group"><label class="form-label">展示描述</label><input class="form-input" placeholder="例如：满100减20优惠券" data-field="desc" data-rt="coupon"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">领取总次数上限（0=不限）</label><input class="form-input" type="number" min="0" value="0" placeholder="0表示不限" data-field="maxTotal" data-rt="coupon"></div>
+                <div class="form-group"><label class="form-label">奖励卡片</label><div class="rcard-upload"><input type="file" accept="image/*" onchange="uploadRewardCard(this)" data-rt="coupon" style="display:none"><button class="rcard-btn" onclick="this.previousElementSibling.click();return false">📷 上传卡片</button><img class="rcard-preview" data-rt="coupon" src=""><span class="rcard-del" data-rt="coupon" onclick="clearRewardCard(this)">✕ 移除</span><input type="hidden" data-field="cardImg" data-rt="coupon" value=""></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="reward-row" data-type="other">
+            <div class="reward-row-header">
+              <label><input type="checkbox" onchange="onRewardCheck(this)">🎁 其他</label>
+            </div>
+            <div class="reward-row-body">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">数值（可选）</label><input class="form-input" type="number" min="1" value="1" placeholder="可不填" data-field="value" data-rt="other"></div>
+                <div class="form-group"><label class="form-label">展示描述</label><input class="form-input" placeholder="例如：神秘礼物一份" data-field="desc" data-rt="other"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">领取总次数上限（0=不限）</label><input class="form-input" type="number" min="0" value="0" placeholder="0表示不限" data-field="maxTotal" data-rt="other"></div>
+                <div class="form-group"><label class="form-label">奖励卡片</label><div class="rcard-upload"><input type="file" accept="image/*" onchange="uploadRewardCard(this)" data-rt="other" style="display:none"><button class="rcard-btn" onclick="this.previousElementSibling.click();return false">📷 上传卡片</button><img class="rcard-preview" data-rt="other" src=""><span class="rcard-del" data-rt="other" onclick="clearRewardCard(this)">✕ 移除</span><input type="hidden" data-field="cardImg" data-rt="other" value=""></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="logic-field show" id="logicField">
+          <label class="form-label">领取逻辑（多奖励时生效）</label>
+          <div class="logic-toggle">
+            <div class="logic-btn active" onclick="switchLogic('and')" id="logicBtnAnd">✅ 全部获得（且）</div>
+            <div class="logic-btn" onclick="switchLogic('or')" id="logicBtnOr">🎲 随机一种（或）</div>
+          </div>
+          <div style="font-size:11px;color:#999;margin-top:4px" id="logicHint">用户完成任务后，同时获得所有勾选的奖励</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-default" onclick="closeTaskModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveTask()">确认保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 启用时间设置弹窗 ===== -->
+<div class="modal-overlay" id="activeModal">
+  <div class="modal-box" style="max-width:400px">
+    <div class="modal-header">
+      <div class="modal-title">设置生效时间段</div>
+      <div class="modal-close" onclick="closeActiveModal()">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">生效开始时间 *</label>
+          <input class="form-input" type="datetime-local" id="activeFrom">
+        </div>
+        <div class="form-group">
+          <label class="form-label">生效结束时间 *</label>
+          <input class="form-input" type="datetime-local" id="activeUntil">
+        </div>
+      </div>
+      <div style="font-size:11px;color:#999;margin-top:4px">任务在此时间段内对用户可见并可参与，到期自动停用</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-default" onclick="closeActiveModal()">取消</button>
+      <button class="btn btn-primary" onclick="confirmActive()">确认启用</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  var STORAGE_KEY = 'merchantTaskCenter';
+  var tasks = [];
+  var editingTaskId = null;
+  var activatingTaskId = null;     // 正在设置启用时间的任务ID
+  var selectedHotspotNums = [];   // 当前弹窗中选中的热区编号
+  var selectedProjectIds = [];    // 当前弹窗中选中的项目ID
+
+  // 加载任务
+  function loadTasks() {
+    var saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) { try { tasks = JSON.parse(saved); } catch(e) { tasks = []; } }
+    // 数据迁移 & 补全
+    var typeNames = { points: '茅台积分', priority: '新品优先权', coupon: '优惠券', other: '神秘奖励' };
+    tasks.forEach(function(t){
+      if (typeof t.totalClaims === 'undefined') t.totalClaims = 0;
+      if (typeof t.totalClaimers === 'undefined') t.totalClaimers = 0;
+      if (typeof t.hitProbability === 'undefined') t.hitProbability = 0;
+      if (typeof t.rewardLogic === 'undefined') t.rewardLogic = 'and';
+      if (typeof t.activeFrom === 'undefined') t.activeFrom = '';
+      if (typeof t.activeUntil === 'undefined') t.activeUntil = '';
+      // 旧单奖励迁移为多奖励数组
+      if (!t.rewards || !t.rewards.length) {
+        var oldType = t.rewardType || 'points';
+        var oldVal = t.rewardValue || 10;
+        var oldDesc = t.rewardDesc || (typeNames[oldType] + (oldVal > 0 ? ' +' + oldVal : ''));
+        t.rewards = [{ type: oldType, value: oldVal, desc: oldDesc, claimCount: 0, claimerCount: 0 }];
+      } else {
+        // 补全每个奖励的 claimerCount 和 maxTotal
+        t.rewards.forEach(function(r){
+          if (typeof r.claimerCount === 'undefined') r.claimerCount = 0;
+          if (typeof r.maxTotal === 'undefined') r.maxTotal = 0;
+          if (typeof r.cardImg === 'undefined') r.cardImg = '';
+        });
+      }
+    });
+    renderTaskList();
+    renderPreview();
+  }
+
+  function saveTasks() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    syncToUserTasks();
+    renderTaskList();
+    renderPreview();
+  }
+
+  function syncToUserTasks() {
+    var meta = { tasks: [], maxCounts: {} };
+    tasks.forEach(function(t, i){
+      var key = 't' + (i + 1);
+      var rewardDescs = (t.rewards || []).map(function(r){ return r.desc; }).join(' + ');
+      meta.tasks.push({
+        key: key, name: t.name,
+        trigger: t.trigger, triggerValue: t.triggerValue,
+        maxCount: t.maxCount, rewardDesc: rewardDescs,
+        rewards: t.rewards || [],
+        rewardLogic: t.rewardLogic || 'and',
+        activeFrom: t.activeFrom || '',
+        activeUntil: t.activeUntil || '',
+        hotspotIds: t.hotspotIds || [],
+        projectIds: t.projectIds || [],
+        hitProbability: t.hitProbability || 0,
+        hotspotMaxClick: t.hotspotMaxClick || 5
+      });
+      meta.maxCounts[key] = t.maxCount;
+    });
+    localStorage.setItem('metaTaskCenterMeta', JSON.stringify(meta));
+  }
+
+  window.onload = function(){ loadTasks(); };
+
+  // ======== 渲染任务列表 ========
+  function renderTaskList() {
+    var tbody = document.getElementById('taskTbody');
+    var empty = document.getElementById('emptyTasks');
+    if (tasks.length === 0) {
+      tbody.innerHTML = ''; empty.style.display = 'block'; return;
+    }
+    empty.style.display = 'none';
+    var triggerLabels = {
+      stay_duration: '<span class="trigger-label"><span class="trigger-dot duration"></span>空间停留</span>',
+      lottery_draw: '<span class="trigger-label"><span class="trigger-dot draw"></span>元素抽奖</span>',
+      product_browse: '<span class="trigger-label"><span class="trigger-dot browse"></span>详情浏览</span>',
+      hotspot_click: '<span class="trigger-label"><span class="trigger-dot click"></span>点击项目</span>'
+    };
+    var rewardIcons = { points: '💰', priority: '⭐', coupon: '🎫', other: '🎁' };
+    var rewardTypeNames = { points: '茅台积分', priority: '新品优先权', coupon: '优惠券', other: '神秘奖励' };
+    tbody.innerHTML = tasks.map(function(t, i){
+      var statusClass = t.status === 'active' ? 'active' : 'inactive';
+      var statusText = t.status === 'active' ? '生效中' : '已停用';
+      // 时间范围
+      var timeInfo = '';
+      if (t.activeFrom && t.activeUntil) {
+        var fmt = function(iso){ if(!iso) return ''; var d=new Date(iso); return (d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+':'+('0'+d.getMinutes()).slice(-2); };
+        timeInfo = '<div style="font-size:10px;color:#999;margin-top:2px">' + fmt(t.activeFrom) + ' ~ ' + fmt(t.activeUntil) + '</div>';
+      }
+      // 逻辑标记
+      var logicLabel = '';
+      if (t.rewards && t.rewards.length >= 2) {
+        logicLabel = ' <span style="font-size:10px;color:#999">(' + (t.rewardLogic === 'or' ? '随机一种' : '全部获得') + ')</span>';
+      }
+      // 构建奖励列：类型名 + 数量 + 领取统计（次/人）+ 总限
+      var rewardCells = '';
+      if (t.rewards && t.rewards.length) {
+        rewardCells = t.rewards.map(function(r){
+          var icon = rewardIcons[r.type] || '🎁';
+          var typeName = rewardTypeNames[r.type] || r.type;
+          var valStr = r.value > 0 ? ' ×' + r.value : '';
+          var limitStr = ' <span style="font-size:10px;color:#e6a23c">总限' + (r.maxTotal > 0 ? r.maxTotal + '次' : '不限') + '</span>';
+          return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;font-size:12px;white-space:nowrap">' +
+            '<span style="flex-shrink:0">' + icon + ' ' + htmlEscape(typeName) + '</span>' +
+            '<span style="color:#667eea;font-weight:600">' + htmlEscape(valStr) + limitStr + '</span>' +
+            '<span style="color:#999">|</span>' +
+            '<span style="color:#667eea;font-weight:600">' + (r.claimCount || 0) + '次</span>' +
+            '<span style="color:#999">/</span>' +
+            '<span style="color:#e6a23c;font-weight:600">' + (r.claimerCount || 0) + '人</span>' +
+          '</div>';
+        }).join('');
+      } else {
+        rewardCells = '—';
+      }
+      return '<tr>' +
+        '<td>' + (i + 1) + '</td>' +
+        '<td><strong>' + htmlEscape(t.name) + '</strong></td>' +
+        '<td>' + (triggerLabels[t.trigger] || t.trigger) + '</td>' +
+        '<td>' + t.maxCount + '次/天</td>' +
+        '<td style="line-height:1.8">' + rewardCells + logicLabel + '</td>' +
+        '<td><span class="status-tag ' + statusClass + '">' + statusText + '</span>' + timeInfo + '</td>' +
+        '<td style="white-space:nowrap">' +
+          '<button class="btn btn-default btn-sm" onclick="editTask(\'' + t.id + '\')">编辑</button> ' +
+          '<button class="btn btn-sm ' + (t.status === 'active' ? 'btn-default' : 'btn-success') + '" onclick="toggleTask(\'' + t.id + '\')">' + (t.status === 'active' ? '停用' : '启用') + '</button> ' +
+          '<button class="btn btn-sm ' + (t.status === 'active' ? 'btn-default' : 'btn-success') + '" onclick="resetTaskStats(\'' + t.id + '\')" title="重置领取统计">↺</button> ' +
+          '<button class="btn btn-danger btn-sm" onclick="deleteTask(\'' + t.id + '\')">删除</button>' +
+        '</td></tr>';
+    }).join('');
+  }
+
+  // ======== 渲染预览 ========
+  function renderPreview() {
+    var card = document.getElementById('previewCard');
+    var activeTasks = tasks.filter(function(t){ return t.status === 'active'; });
+    if (activeTasks.length === 0) {
+      card.innerHTML = '<div style="text-align:center;padding:16px;color:rgba(255,255,255,.4);font-size:12px">暂无启用的任务</div>';
+      return;
+    }
+    var iconColors = {stay_duration:'rgba(255,200,50,.2)',lottery_draw:'rgba(100,180,255,.2)',product_browse:'rgba(255,130,130,.2)',hotspot_click:'rgba(100,230,150,.2)'};
+    var triggerIcons = {stay_duration:'⏱️',lottery_draw:'🏺',product_browse:'📄',hotspot_click:'👆'};
+    card.innerHTML = activeTasks.slice(0, 5).map(function(t){
+      var rewardStr = '🎁 ' + (t.rewards || []).map(function(r){ return r.desc; }).join(' + ');
+      return '<div class="pc-item">' +
+        '<div class="pc-icon" style="background:' + (iconColors[t.trigger] || 'rgba(255,255,255,.1)') + '">' + (triggerIcons[t.trigger] || '📋') + '</div>' +
+        '<div class="pc-name">' + htmlEscape(t.name) + '</div>' +
+        '<div class="pc-num">' + t.maxCount + '次/天</div>' +
+        '<div class="pc-reward">' + htmlEscape(rewardStr) + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // ======== 热区数据 ========
+  var hsCurrentImgIdx = 0;  // 当前显示的图片索引
+
+  function loadHotspotData() {
+    var images = [];
+    var hotspotsMap = {};
+    var savedImg = localStorage.getItem('merchantSpaceImages_v2');
+    var savedHs = localStorage.getItem('merchantHotspotsMap_v2');
+    if (savedImg) { try { images = JSON.parse(savedImg); } catch(e) {} }
+    if (savedHs) { try { hotspotsMap = JSON.parse(savedHs); } catch(e) {} }
+    return { images: images, hotspotsMap: hotspotsMap };
+  }
+
+  function renderHotspotSelection(selectedNums) {
+    var data = loadHotspotData();
+    var images = data.images;
+    var hotspotsMap = data.hotspotsMap;
+    var tabsEl = document.getElementById('hsImgTabs');
+    var area = document.getElementById('hotspotSelectArea');
+    var img = document.getElementById('hotspotSelectImg');
+    var noMsg = document.getElementById('noHotspotMsg');
+
+    // 筛选有热区的图片
+    var validImages = [];
+    for (var i = 0; i < images.length; i++) {
+      var hs = hotspotsMap[images[i].id] || [];
+      if (hs.length > 0) validImages.push(images[i]);
+    }
+    if (validImages.length === 0) {
+      tabsEl.style.display = 'none';
+      area.style.display = 'none'; noMsg.style.display = 'block';
+      document.getElementById('selectedHotspotsText').textContent = '无';
+      return;
+    }
+
+    // 修正当前索引
+    if (hsCurrentImgIdx >= validImages.length) hsCurrentImgIdx = 0;
+
+    // 渲染图片切换 tabs
+    if (validImages.length > 1) {
+      tabsEl.style.display = 'flex';
+      area.style.borderRadius = '0 0 10px 10px';
+      tabsEl.innerHTML = validImages.map(function(img, idx){
+        return '<div class="hs-img-tab' + (idx === hsCurrentImgIdx ? ' active' : '') + '" onclick="switchHotspotImage(' + idx + ')">' +
+          '<span class="tab-dot"></span>' + htmlEscape(img.name) +
+        '</div>';
+      }).join('');
+    } else {
+      tabsEl.style.display = 'none';
+      area.style.borderRadius = '10px';
+    }
+
+    area.style.display = 'block'; noMsg.style.display = 'none';
+    var activeImg = validImages[hsCurrentImgIdx];
+    img.src = activeImg.src;
+    var activeHotspots = hotspotsMap[activeImg.id] || [];
+
+    // 清除旧热区框
+    area.querySelectorAll('.hs-box').forEach(function(b){ b.remove(); });
+
+    // 绘制热区框
+    area.onload = null;
+    img.onload = function(){
+      activeHotspots.forEach(function(h){
+        var box = document.createElement('div');
+        box.className = 'hs-box';
+        box.style.left = h.x + '%';
+        box.style.top = h.y + '%';
+        box.style.width = (h.w || 8) + '%';
+        box.style.height = (h.h || 12) + '%';
+        box.dataset.num = h.num;
+        if (selectedNums.indexOf(h.num) >= 0) box.classList.add('selected');
+        box.innerHTML = '<span class="hs-num">' + h.num + '</span>';
+        box.onclick = function(e){
+          e.stopPropagation();
+          var n = parseInt(this.dataset.num);
+          if (selectedNums.indexOf(n) >= 0) {
+            selectedNums.splice(selectedNums.indexOf(n), 1);
+          } else {
+            selectedNums.push(n);
+          }
+          this.classList.toggle('selected');
+          updateSelectedText();
+        };
+        area.appendChild(box);
+      });
+    };
+    if (img.complete) img.onload();
+  }
+
+  function switchHotspotImage(idx) {
+    hsCurrentImgIdx = idx;
+    renderHotspotSelection(selectedHotspotNums);
+  }
+
+  function updateSelectedText() {
+    var el = document.getElementById('selectedHotspotsText');
+    if (selectedHotspotNums.length === 0) {
+      el.textContent = '无';
+    } else {
+      el.textContent = selectedHotspotNums.sort(function(a,b){ return a-b; }).join('、') + ' 号热区';
+    }
+  }
+
+  // ======== 空间项目数据 ========
+  function loadSpaceProjects() {
+    var saved = localStorage.getItem('merchantSpaceProjects');
+    if (saved) { try { return JSON.parse(saved); } catch(e) {} }
+    // 默认项目列表（与营销管理保持一致）
+    return [
+      { id: 'si1', name: 'VR云参观' },
+      { id: 'si2', name: '数字资产商城' },
+      { id: 'si3', name: '酿酒工艺演示' },
+      { id: 'si4', name: '茅小美·数字人' }
+    ];
+  }
+
+  function renderProjectSelection(selectedIds) {
+    var projects = loadSpaceProjects();
+    var group = document.getElementById('projectCheckboxes');
+    var noMsg = document.getElementById('noProjectMsg');
+    if (projects.length === 0) {
+      group.innerHTML = ''; noMsg.style.display = 'block';
+    } else {
+      noMsg.style.display = 'none';
+      group.innerHTML = projects.map(function(p){
+        var checked = selectedIds.indexOf(p.id) >= 0 ? ' checked' : '';
+        return '<label><input type="checkbox" value="' + p.id + '"' + checked + ' onchange="onProjectCheckChange()">' + p.name + '</label>';
+      }).join('');
+    }
+    updateSelectedProjectsText();
+  }
+
+  function onProjectCheckChange() {
+    var cbs = document.querySelectorAll('#projectCheckboxes input[type=checkbox]');
+    selectedProjectIds = [];
+    cbs.forEach(function(cb){ if(cb.checked) selectedProjectIds.push(cb.value); });
+    updateSelectedProjectsText();
+  }
+
+  function updateSelectedProjectsText() {
+    var projects = loadSpaceProjects();
+    var nameMap = {};
+    projects.forEach(function(p){ nameMap[p.id] = p.name; });
+    var el = document.getElementById('selectedProjectsText');
+    if (selectedProjectIds.length === 0) {
+      el.textContent = '无';
+    } else {
+      el.textContent = selectedProjectIds.map(function(id){ return nameMap[id] || id; }).join('、');
+    }
+  }
+
+  // ======== 弹窗 ========
+  function openTaskModal() {
+    editingTaskId = null;
+    selectedHotspotNums = [];
+    selectedProjectIds = [];
+    hsCurrentImgIdx = 0;
+    document.getElementById('taskModalTitle').textContent = '新建任务';
+    document.getElementById('taskName').value = '';
+    document.getElementById('taskTrigger').value = '';
+    document.getElementById('taskTriggerValue').value = '';
+    document.getElementById('taskMaxCount').value = '5';
+    document.getElementById('taskHitProb').value = '40';
+    document.getElementById('taskHotspotMaxClick').value = '5';
+    document.getElementById('triggerValueGroup').style.display = 'none';
+    document.getElementById('lotteryGroup').style.display = 'none';
+    document.getElementById('projectGroup').style.display = 'none';
+    // 默认只勾选茅台积分
+    resetRewardForm();
+    switchLogic('and');
+    var pointsRow = document.querySelector('#rewardCheckList .reward-row[data-type="points"]');
+    if (pointsRow) {
+      pointsRow.querySelector('input[type=checkbox]').checked = true;
+      pointsRow.classList.add('active');
+      var vInp = pointsRow.querySelector('input[data-field=value]');
+      var dInp = pointsRow.querySelector('input[data-field=desc]');
+      if (vInp) vInp.value = '10';
+      if (dInp) dInp.value = '';
+    }
+    updateSelectedText();
+    document.getElementById('taskModal').classList.add('show');
+  }
+
+  function closeTaskModal() {
+    document.getElementById('taskModal').classList.remove('show');
+    editingTaskId = null;
+  }
+
+  function onTriggerChange() {
+    var trigger = document.getElementById('taskTrigger').value;
+    var valGroup = document.getElementById('triggerValueGroup');
+    var valLabel = document.getElementById('triggerValueLabel');
+    var lotteryGroup = document.getElementById('lotteryGroup');
+    var projectGroup = document.getElementById('projectGroup');
+
+    valGroup.style.display = 'none';
+    lotteryGroup.style.display = 'none';
+    projectGroup.style.display = 'none';
+    document.getElementById('taskTriggerValue').value = '';
+
+    if (trigger === 'stay_duration') {
+      valGroup.style.display = 'block';
+      valLabel.textContent = '停留时长（秒）';
+      document.getElementById('taskTriggerValue').placeholder = '例如：10';
+    } else if (trigger === 'product_browse') {
+      valGroup.style.display = 'block';
+      valLabel.textContent = '浏览时长（秒）';
+      document.getElementById('taskTriggerValue').placeholder = '例如：10';
+    } else if (trigger === 'lottery_draw') {
+      lotteryGroup.style.display = 'block';
+      renderHotspotSelection(selectedHotspotNums);
+    } else if (trigger === 'hotspot_click') {
+      projectGroup.style.display = 'block';
+      renderProjectSelection(selectedProjectIds);
+    }
+  }
+
+  function onRewardCheck(cb) {
+    var row = cb.closest('.reward-row');
+    row.classList.toggle('active', cb.checked);
+    // 计数勾选数量，>=2 时显示逻辑选择
+    var checked = document.querySelectorAll('#rewardCheckList input[type=checkbox]:checked').length;
+    document.getElementById('logicField').classList.toggle('show', checked >= 2);
+  }
+
+  function switchLogic(logic) {
+    document.getElementById('logicBtnAnd').classList.toggle('active', logic === 'and');
+    document.getElementById('logicBtnOr').classList.toggle('active', logic === 'or');
+    document.getElementById('logicHint').textContent = logic === 'and'
+      ? '用户完成任务后，同时获得所有勾选的奖励'
+      : '用户完成任务后，随机获得其中一种奖励';
+  }
+
+  // 上传奖励卡片
+  function uploadRewardCard(input) {
+    var rt = input.dataset.rt;
+    var f = input.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var row = input.closest('.reward-row');
+      var hidden = row.querySelector('input[data-field=cardImg]');
+      var btn = row.querySelector('.rcard-btn');
+      var preview = row.querySelector('.rcard-preview');
+      var del = row.querySelector('.rcard-del');
+      if (hidden) hidden.value = e.target.result;
+      if (preview) { preview.src = e.target.result; preview.classList.add('show'); }
+      if (btn) { btn.textContent = '✓ 已上传'; btn.classList.add('has-img'); }
+      if (del) del.classList.add('show');
+    };
+    reader.readAsDataURL(f);
+    input.value = '';
+  }
+
+  // 移除奖励卡片
+  function clearRewardCard(el) {
+    var rt = el.dataset.rt;
+    var row = el.closest('.reward-row');
+    var hidden = row.querySelector('input[data-field=cardImg]');
+    var btn = row.querySelector('.rcard-btn');
+    var preview = row.querySelector('.rcard-preview');
+    if (hidden) hidden.value = '';
+    if (preview) { preview.src = ''; preview.classList.remove('show'); }
+    if (btn) { btn.textContent = '📷 上传卡片'; btn.classList.remove('has-img'); }
+    el.classList.remove('show');
+  }
+
+  // 重置所有奖励表单为空
+  function resetRewardForm() {
+    document.querySelectorAll('#rewardCheckList .reward-row').forEach(function(row){
+      var cb = row.querySelector('input[type=checkbox]');
+      cb.checked = false;
+      row.classList.remove('active');
+    });
+    document.querySelectorAll('#rewardCheckList input[type=number]').forEach(function(inp){ inp.value = ''; });
+    document.querySelectorAll('#rewardCheckList input[data-field=desc]').forEach(function(inp){ inp.value = ''; });
+    document.querySelectorAll('#rewardCheckList input[data-field=maxTotal]').forEach(function(inp){ inp.value = '0'; });
+    document.querySelectorAll('#rewardCheckList input[data-field=cardImg]').forEach(function(inp){ inp.value = ''; });
+    document.querySelectorAll('#rewardCheckList .rcard-preview').forEach(function(img){ img.src = ''; img.classList.remove('show'); });
+    document.querySelectorAll('#rewardCheckList .rcard-btn').forEach(function(b){ b.textContent = '📷 上传卡片'; b.classList.remove('has-img'); });
+    document.querySelectorAll('#rewardCheckList .rcard-del').forEach(function(d){ d.classList.remove('show'); });
+    switchLogic('and');
+    document.getElementById('logicField').classList.remove('show');
+  }
+
+  // 根据 rewards 数组填充奖励表单
+  function populateRewardForm(rewards, rewardLogic) {
+    resetRewardForm();
+    if (!rewards || !rewards.length) return;
+    rewards.forEach(function(r){
+      var row = document.querySelector('#rewardCheckList .reward-row[data-type="' + r.type + '"]');
+      if (!row) return;
+      row.querySelector('input[type=checkbox]').checked = true;
+      row.classList.add('active');
+      var valInp = row.querySelector('input[data-field=value]');
+      var descInp = row.querySelector('input[data-field=desc]');
+      var maxInp = row.querySelector('input[data-field=maxTotal]');
+      var cardInp = row.querySelector('input[data-field=cardImg]');
+      var preview = row.querySelector('.rcard-preview');
+      var btn = row.querySelector('.rcard-btn');
+      var del = row.querySelector('.rcard-del');
+      if (valInp) valInp.value = r.value || '';
+      if (descInp) descInp.value = r.desc || '';
+      if (maxInp) maxInp.value = (typeof r.maxTotal !== 'undefined') ? r.maxTotal : 0;
+      if (cardInp && r.cardImg) {
+        cardInp.value = r.cardImg;
+        if (preview) { preview.src = r.cardImg; preview.classList.add('show'); }
+        if (btn) { btn.textContent = '✓ 已上传'; btn.classList.add('has-img'); }
+        if (del) del.classList.add('show');
+      }
+    });
+    // 显示逻辑选择
+    var logic = rewardLogic || 'and';
+    switchLogic(logic);
+    var checked = rewards.length;
+    document.getElementById('logicField').classList.toggle('show', checked >= 2);
+  }
+
+  // 从表单收集已选的奖励
+  function collectRewards() {
+    var result = [];
+    document.querySelectorAll('#rewardCheckList .reward-row').forEach(function(row){
+      var cb = row.querySelector('input[type=checkbox]');
+      if (!cb.checked) return;
+      var type = row.dataset.type;
+      var val = parseInt(row.querySelector('input[data-field=value]').value) || 1;
+      var desc = row.querySelector('input[data-field=desc]').value.trim();
+      var maxTotal = parseInt(row.querySelector('input[data-field=maxTotal]').value) || 0;
+      var cardImg = row.querySelector('input[data-field=cardImg]').value || '';
+      result.push({ type: type, value: val, desc: desc, maxTotal: maxTotal, cardImg: cardImg, claimCount: 0, claimerCount: 0 });
+    });
+    return result;
+  }
+
+  // ======== 编辑任务 ========
+  function editTask(id) {
+    var t = tasks.find(function(x){ return x.id === id; });
+    if (!t) return;
+    editingTaskId = id;
+    selectedHotspotNums = (t.hotspotIds || []).slice();
+    selectedProjectIds = (t.projectIds || []).slice();
+    document.getElementById('taskModalTitle').textContent = '编辑任务';
+    document.getElementById('taskName').value = t.name;
+    document.getElementById('taskTrigger').value = t.trigger;
+    document.getElementById('taskTriggerValue').value = t.triggerValue || '';
+    document.getElementById('taskMaxCount').value = t.maxCount;
+    document.getElementById('taskHitProb').value = t.hitProbability || 40;
+    document.getElementById('taskHotspotMaxClick').value = t.hotspotMaxClick || 5;
+    // 填充奖励
+    if (t.rewards && t.rewards.length) {
+      populateRewardForm(t.rewards, t.rewardLogic);
+    } else {
+      // 兼容旧数据：单奖励 → 多奖励
+      resetRewardForm();
+      switchLogic('and');
+      var oldType = t.rewardType || 'points';
+      var row = document.querySelector('#rewardCheckList .reward-row[data-type="' + oldType + '"]');
+      if (row) {
+        row.querySelector('input[type=checkbox]').checked = true;
+        row.classList.add('active');
+        var vInp = row.querySelector('input[data-field=value]');
+        var dInp = row.querySelector('input[data-field=desc]');
+        if (vInp) vInp.value = t.rewardValue || '';
+        if (dInp) dInp.value = t.rewardDesc || '';
+      }
+    }
+    updateSelectedText();
+    onTriggerChange();
+    document.getElementById('taskModal').classList.add('show');
+  }
+
+  // ======== 保存任务 ========
+  function saveTask() {
+    var name = document.getElementById('taskName').value.trim();
+    var trigger = document.getElementById('taskTrigger').value;
+    var triggerValue = parseInt(document.getElementById('taskTriggerValue').value) || 0;
+    var maxCount = parseInt(document.getElementById('taskMaxCount').value) || 5;
+    var hitProb = parseInt(document.getElementById('taskHitProb').value) || 40;
+    var hotspotMaxClick = parseInt(document.getElementById('taskHotspotMaxClick').value) || 5;
+    var rewards = collectRewards();
+    var rewardLogic = document.getElementById('logicBtnAnd').classList.contains('active') ? 'and' : 'or';
+
+    if (!name) { toast('请输入任务名称'); return; }
+    if (!trigger) { toast('请选择触发动作'); return; }
+    if (maxCount < 1 || maxCount > 99) { toast('每人每天最多获奖次数需在 1~99 之间'); return; }
+    if (trigger === 'lottery_draw' && selectedHotspotNums.length === 0) {
+      toast('请至少选择一个热区'); return;
+    }
+    if (trigger === 'hotspot_click' && selectedProjectIds.length === 0) {
+      toast('请至少选择一个项目'); return;
+    }
+    if (rewards.length === 0) { toast('请至少选择一种奖励类型'); return; }
+
+    // 自动补全描述
+    var typeNames = { points: '茅台积分', priority: '新品优先权', coupon: '优惠券', other: '神秘奖励' };
+    rewards.forEach(function(r){
+      if (!r.desc) r.desc = typeNames[r.type] + (r.value > 0 ? ' +' + r.value : '');
+    });
+
+    var existing = editingTaskId ? tasks.find(function(x){ return x.id === editingTaskId; }) : null;
+
+    // 保留已有奖励的 claimCount
+    if (existing && existing.rewards) {
+      rewards.forEach(function(r){
+        var old = existing.rewards.find(function(or){ return or.type === r.type; });
+        if (old) r.claimCount = old.claimCount || 0;
+      });
+    }
+
+    var taskData = {
+      id: editingTaskId || 'task_' + Date.now(),
+      name: name,
+      trigger: trigger,
+      triggerValue: triggerValue,
+      maxCount: maxCount,
+      rewards: rewards,
+      rewardLogic: rewards.length >= 2 ? rewardLogic : 'and',
+      hotspotIds: trigger === 'lottery_draw' ? selectedHotspotNums.slice() : [],
+      projectIds: trigger === 'hotspot_click' ? selectedProjectIds.slice() : [],
+      hitProbability: trigger === 'lottery_draw' ? hitProb : 0,
+      hotspotMaxClick: trigger === 'lottery_draw' ? hotspotMaxClick : 0,
+      status: existing ? existing.status : 'inactive',
+      activeFrom: existing ? existing.activeFrom || '' : '',
+      activeUntil: existing ? existing.activeUntil || '' : '',
+      totalClaims: existing ? existing.totalClaims || 0 : 0,
+      totalClaimers: existing ? existing.totalClaimers || 0 : 0,
+      updatedAt: new Date().toISOString()
+    };
+
+    if (editingTaskId) {
+      var idx = tasks.findIndex(function(x){ return x.id === editingTaskId; });
+      if (idx >= 0) { taskData.id = editingTaskId; tasks[idx] = taskData; }
+      toast('任务已更新！');
+    } else {
+      tasks.push(taskData);
+      toast('任务创建成功！');
+    }
+    editingTaskId = null;
+    saveTasks();
+    closeTaskModal();
+  }
+
+  // ======== 操作 ========
+  function deleteTask(id) {
+    if (!confirm('确定删除该任务？领取统计数据也将清除。')) return;
+    tasks = tasks.filter(function(t){ return t.id !== id; });
+    saveTasks();
+    toast('任务已删除');
+  }
+
+  function toggleTask(id) {
+    var t = tasks.find(function(x){ return x.id === id; });
+    if (!t) return;
+    if (t.status === 'active') {
+      // 停用
+      t.status = 'inactive';
+      saveTasks();
+      toast('任务已停用');
+    } else {
+      // 启动：弹出时间设置
+      activatingTaskId = id;
+      // 预填已有时间或默认今天起
+      if (t.activeFrom) document.getElementById('activeFrom').value = toDatetimeLocal(t.activeFrom);
+      else document.getElementById('activeFrom').value = toDatetimeLocal(new Date());
+      if (t.activeUntil) document.getElementById('activeUntil').value = toDatetimeLocal(t.activeUntil);
+      else document.getElementById('activeUntil').value = '';
+      document.getElementById('activeModal').classList.add('show');
+    }
+  }
+
+  function toDatetimeLocal(d) {
+    var date = new Date(d);
+    var pad = function(n){ return (n < 10 ? '0' : '') + n; };
+    return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) +
+      'T' + pad(date.getHours()) + ':' + pad(date.getMinutes());
+  }
+
+  function confirmActive() {
+    var fromVal = document.getElementById('activeFrom').value;
+    var untilVal = document.getElementById('activeUntil').value;
+    if (!fromVal) { toast('请选择生效开始时间'); return; }
+    if (!untilVal) { toast('请选择生效结束时间'); return; }
+    if (new Date(untilVal) <= new Date(fromVal)) { toast('结束时间必须大于开始时间'); return; }
+
+    var t = tasks.find(function(x){ return x.id === activatingTaskId; });
+    if (!t) return;
+    t.activeFrom = new Date(fromVal).toISOString();
+    t.activeUntil = new Date(untilVal).toISOString();
+    t.status = 'active';
+    activatingTaskId = null;
+    saveTasks();
+    closeActiveModal();
+    toast('任务已启用，生效时间：' + fromVal + ' ~ ' + untilVal);
+  }
+
+  function closeActiveModal() {
+    document.getElementById('activeModal').classList.remove('show');
+    activatingTaskId = null;
+  }
+
+  function resetTaskStats(id) {
+    if (!confirm('确定重置该任务的领取总量和领取人数为 0？')) return;
+    var t = tasks.find(function(x){ return x.id === id; });
+    if (!t) return;
+    t.totalClaims = 0;
+    t.totalClaimers = 0;
+    // 重置每种奖励的领取统计
+    if (t.rewards) {
+      t.rewards.forEach(function(r){ r.claimCount = 0; r.claimerCount = 0; });
+    }
+    saveTasks();
+    toast('领取统计已重置');
+  }
+
+  function htmlEscape(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function toast(msg) {
+    var t = document.createElement('div');
+    t.className = 'toast'; t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function(){ t.classList.add('show'); }, 10);
+    setTimeout(function(){ t.classList.remove('show'); setTimeout(function(){ t.remove(); }, 300); }, 1800);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>登录</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: #e8e9ee; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; justify-content: center; }
+.page { max-width: 430px; min-width: 320px; min-height: 100vh; background: #f5f6fa; padding: 40px 28px; width: 100%; display: flex; flex-direction: column; justify-content: center; }
+
+.logo-area { text-align: center; margin-bottom: 40px; }
+.logo-area .logo-icon { width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, #D70C1F, #F12B3D); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 30px; box-shadow: 0 8px 24px rgba(215,12,31,.25); }
+.logo-area h1 { font-size: 22px; font-weight: 700; color: #1a1a2e; }
+.logo-area p { font-size: 12px; color: #999; margin-top: 4px; }
+
+.card { background: #fff; border-radius: 20px; padding: 28px 24px; box-shadow: 0 4px 24px rgba(0,0,0,.04); }
+
+.phone-row { display: flex; align-items: center; gap: 10px; border-bottom: 1.5px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 18px; transition: border-color .3s; }
+.phone-row:focus-within { border-color: #D70C1F; }
+.phone-prefix { font-size: 15px; font-weight: 600; color: #1a1a2e; flex-shrink: 0; }
+.phone-row input { flex: 1; border: none; outline: none; font-size: 16px; color: #333; letter-spacing: 1px; background: transparent; }
+.phone-row input::placeholder { color: #ccc; font-size: 14px; letter-spacing: 0; }
+
+.sms-row { display: flex; align-items: center; gap: 10px; border-bottom: 1.5px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 24px; transition: border-color .3s; }
+.sms-row:focus-within { border-color: #D70C1F; }
+.sms-row input { flex: 1; border: none; outline: none; font-size: 16px; color: #333; letter-spacing: 4px; background: transparent; }
+.sms-row input::placeholder { color: #ccc; font-size: 14px; letter-spacing: 0; }
+.sms-btn { height: 34px; padding: 0 16px; border: 1.5px solid #D70C1F; border-radius: 17px; background: #fff; color: #D70C1F; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0; transition: all .2s; }
+.sms-btn:active { background: #FFF2F3; }
+.sms-btn.counting { color: #ccc; border-color: #ddd; pointer-events: none; }
+
+.btn-login { width: 100%; height: 50px; border: none; border-radius: 25px; background: linear-gradient(135deg, #D70C1F, #F12B3D); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; letter-spacing: 2px; box-shadow: 0 4px 16px rgba(215,12,31,.25); transition: all .2s; }
+.btn-login:active { opacity: .9; transform: scale(.98); }
+.btn-login:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; transform: none; }
+
+.agree-row { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 16px 0 0; font-size: 11px; color: #999; }
+.agree-row a { color: #D70C1F; text-decoration: none; }
+.checkbox { width: 14px; height: 14px; border: 1.5px solid #ddd; border-radius: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.checkbox.checked { background: #D70C1F; border-color: #D70C1F; }
+.checkbox svg { width: 10px; height: 10px; color: #fff; display: none; }
+.checkbox.checked svg { display: block; }
+
+.toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(0,0,0,.78); color: #fff; font-size: 14px; padding: 12px 24px; border-radius: 8px; z-index: 200; opacity: 0; pointer-events: none; transition: opacity .25s; }
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="logo-area">
+  <div class="logo-icon">🏛</div>
+  <h1>数字资产平台</h1>
+  <p>深圳文化产权交易所</p>
+</div>
+
+<div class="card">
+  <div class="phone-row">
+    <span class="phone-prefix">+86</span>
+    <input type="tel" id="phoneInput" placeholder="请输入手机号" maxlength="11" oninput="checkPhone()">
+  </div>
+  <div class="sms-row">
+    <input type="text" id="smsInput" placeholder="请输入验证码" maxlength="6" oninput="checkSubmit()">
+    <button class="sms-btn" id="smsBtn" onclick="sendSms()">获取验证码</button>
+  </div>
+  <button class="btn-login" id="loginBtn" onclick="doLogin()" disabled>登 录</button>
+  <div class="agree-row">
+    <div class="checkbox" id="agreeBox" onclick="toggleAgree()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    已阅读并同意 <a href="#">《用户协议》</a>和<a href="#">《隐私政策》</a>
+  </div>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var countdown = 0;
+var agreed = false;
+
+function checkPhone(){
+  var v = document.getElementById('phoneInput').value;
+  var btn = document.getElementById('smsBtn');
+  btn.disabled = v.length !== 11 || countdown > 0;
+  if(countdown > 0) btn.classList.add('counting');
+  checkSubmit();
+}
+
+function sendSms(){
+  var phone = document.getElementById('phoneInput').value;
+  if(phone.length !== 11){ showToast('请输入正确的手机号'); return; }
+  var btn = document.getElementById('smsBtn');
+  countdown = 60;
+  btn.classList.add('counting');
+  btn.textContent = countdown + 's';
+  btn.disabled = true;
+  var timer = setInterval(function(){
+    countdown--;
+    if(countdown <= 0){
+      clearInterval(timer);
+      btn.classList.remove('counting');
+      btn.textContent = '获取验证码';
+      btn.disabled = false;
+    } else {
+      btn.textContent = countdown + 's';
+    }
+  }, 1000);
+  showToast('验证码已发送');
+}
+
+function checkSubmit(){
+  var phone = document.getElementById('phoneInput').value;
+  var sms = document.getElementById('smsInput').value;
+  document.getElementById('loginBtn').disabled = phone.length !== 11 || sms.length !== 6 || !agreed;
+}
+
+function toggleAgree(){
+  agreed = !agreed;
+  document.getElementById('agreeBox').classList.toggle('checked', agreed);
+  checkSubmit();
+}
+
+function doLogin(){
+  if(document.getElementById('loginBtn').disabled) return;
+  var phone = document.getElementById('phoneInput').value;
+  showToast('登录成功');
+  setTimeout(function(){ location.href = 'user-index.html'; }, 800);
+}
+
+function showToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('show'); void t.offsetWidth;
+  t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(function(){ t.classList.remove('show'); }, 2000);
+}
+
+toggleAgree();
+</script>
+
+</body>
+</html>

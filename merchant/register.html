@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>商家登录注册 · 元宇宙商城</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:#f0f2f5;color:#333;display:flex;justify-content:center;align-items:center;min-height:100vh}
+.page{width:100%;max-width:420px;padding:40px 32px}
+
+.logo{text-align:center;margin-bottom:36px}
+.logo-icon{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#667eea,#764ba2);margin:0 auto 14px;display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:28px;height:28px;color:#fff}
+.logo h1{font-size:20px;font-weight:700;color:#1a1a2e;margin-bottom:4px}
+.logo p{font-size:12px;color:#999}
+
+.card{background:#fff;border-radius:16px;padding:32px 28px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+
+.form-group{margin-bottom:18px}
+.form-label{display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:500}
+.form-input{width:100%;height:46px;padding:0 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-size:14px;color:#333;outline:none;transition:border .25s;background:#fff}
+.form-input:focus{border-color:#667eea}
+.form-input::placeholder{color:#ccc}
+.submit-btn{width:100%;height:48px;border:none;border-radius:12px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:6px;transition:opacity .2s}
+.submit-btn:active{opacity:.9}
+
+.switch-hint{text-align:center;margin-top:18px;font-size:13px;color:#999}
+.switch-hint a{color:#667eea;cursor:pointer;font-weight:600;text-decoration:none}
+.switch-hint a:hover{text-decoration:underline}
+
+#registerForm{display:none}
+
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.78);color:#fff;font-size:14px;padding:14px 28px;border-radius:8px;z-index:200;pointer-events:none;opacity:0;transition:opacity .3s}
+.toast.show{opacity:1}
+
+/* ── 功能说明浮窗 ── */
+.f-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:480px;max-height:80vh;overflow-y:auto;background:#fff;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.2);z-index:9999;padding:24px;display:none}
+.f-modal.show{display:block}
+.f-modal .fm-title{font-size:16px;font-weight:600;color:#1a1a2e;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;cursor:grab}
+.f-modal .fm-title:active{cursor:grabbing}
+.f-modal .fm-close{width:28px;height:28px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:#666;border:none;flex-shrink:0}
+.f-modal .fm-close:hover{background:#e8e8e8}
+.f-modal .fm-body{font-size:13px;color:#555;line-height:1.8}
+.f-modal .fm-body h4{font-size:14px;font-weight:600;color:#1a1a2e;margin:16px 0 8px}
+.f-modal .fm-body h4:first-child{margin-top:0}
+.f-modal .fm-body ul{padding-left:18px;margin:0 0 12px}
+.f-modal .fm-body li{margin-bottom:4px}
+
+/* ── 功能说明按钮 ── */
+.func-btn{position:fixed;top:16px;right:16px;z-index:100;font-size:12px;padding:6px 14px;border-radius:9999px;background:rgba(255,255,255,.9);border:1px solid #e0e0e0;color:#666;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:all .15s}
+.func-btn:hover{background:#fff;border-color:#667eea;color:#667eea}
+
+/* ── 表单错误提示 ── */
+.form-error{display:none;background:#fff0ef;border:1px solid #ffc9c4;border-radius:10px;padding:10px 14px;font-size:13px;color:#d13b3b;margin-top:12px;text-align:center;line-height:1.5}
+.captcha-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9998;display:none;align-items:center;justify-content:center}
+.captcha-overlay.show{display:flex}
+.captcha-box{background:#fff;border-radius:16px;width:340px;padding:28px 24px 24px;box-shadow:0 8px 40px rgba(0,0,0,.18);text-align:center}
+.captcha-box .cb-title{font-size:15px;font-weight:600;color:#1a1a2e;margin-bottom:6px}
+.captcha-box .cb-sub{font-size:12px;color:#999;margin-bottom:20px}
+.captcha-box .cb-img{width:100%;height:140px;border-radius:10px;background:linear-gradient(135deg,#667eea,#764ba2);margin-bottom:16px;display:flex;align-items:center;justify-content:center;font-size:40px;color:rgba(255,255,255,.3);overflow:hidden;position:relative}
+.captcha-box .cb-slider-track{width:100%;height:42px;background:#f0f2f5;border-radius:21px;position:relative;overflow:hidden;user-select:none}
+.captcha-box .cb-slider-progress{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:21px;width:0;transition:none}
+.captcha-box .cb-slider-btn{position:absolute;left:2px;top:2px;width:38px;height:38px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.18);cursor:grab;display:flex;align-items:center;justify-content:center;font-size:16px;color:#667eea;z-index:2;transition:none}
+.captcha-box .cb-slider-btn:active{cursor:grabbing}
+.captcha-box .cb-hint{font-size:12px;color:#999;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:4px}
+.captcha-box .cb-success{color:#0d9e6e;font-weight:600}
+.captcha-box .cb-fail{color:#d13b3b;font-weight:600}
+</style>
+</head>
+<body>
+<button class="func-btn" onclick="toggleFuncModal()">📖 功能说明</button>
+<div class="page">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <h1>商家中心</h1>
+    <p>元宇宙商城 · 合作伙伴平台</p>
+  </div>
+
+  <div class="card">
+    <!-- 登录表单（默认） -->
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label class="form-label">商家简称</label>
+        <input class="form-input" id="loginName" placeholder="请输入商家简称" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">账号</label>
+        <input class="form-input" id="loginAccount" placeholder="请输入账号" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">密码</label>
+        <input class="form-input" id="loginPassword" type="password" placeholder="请输入密码" required>
+      </div>
+      <button class="submit-btn" type="submit">登录</button>
+      <div class="form-error" id="loginError"></div>
+    </form>
+
+    <!-- 注册表单（隐藏） -->
+    <form id="registerForm" onsubmit="handleRegister(event)">
+      <div class="form-group">
+        <label class="form-label">商家简称</label>
+        <input class="form-input" id="regName" placeholder="请输入商家简称" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">账号</label>
+        <input class="form-input" id="regAccount" placeholder="请输入账号" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">密码</label>
+        <input class="form-input" id="regPassword" type="password" placeholder="请输入密码（至少6位）" required minlength="6">
+      </div>
+      <div class="form-group">
+        <label class="form-label">确认密码</label>
+        <input class="form-input" id="regConfirm" type="password" placeholder="请再次输入密码" required minlength="6">
+      </div>
+      <button class="submit-btn" type="submit">注册入驻</button>
+      <div class="form-error" id="regError"></div>
+    </form>
+
+    <div class="switch-hint" id="switchHint">
+      没有账号？<a onclick="switchToRegister()">去注册</a>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ====== 拖动校验码弹窗 ====== -->
+<div class="captcha-overlay" id="captchaOverlay">
+  <div class="captcha-box">
+    <div class="cb-title">🔒 安全验证</div>
+    <div class="cb-sub">请拖动滑块完成校验</div>
+    <div class="cb-img" id="cbImg">🛡️</div>
+    <div class="cb-slider-track" id="cbTrack">
+      <div class="cb-slider-progress" id="cbProgress"></div>
+      <div class="cb-slider-btn" id="cbBtn">→</div>
+    </div>
+    <div class="cb-hint" id="cbHint">拖动滑块到最右侧完成验证</div>
+  </div>
+</div>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div class="fm-body">
+    <p style="margin:0 0 12px;color:#666">该功能是商家登录/注册入口，商家通过该页面登录后进入商家中心管理后台</p>
+    <h4>一、登录</h4>
+    <ul>
+      <li><strong>商家简称</strong>：输入商家注册时的简称</li>
+      <li><strong>账号</strong>：输入商家账号</li>
+      <li><strong>密码</strong>：输入密码</li>
+      <li><strong>校验码</strong>：点击登录后需要通过图形校验码</li>
+      <li style="list-style:none;margin-top:4px">验证通过后跳转到商家中心首页</li>
+    </ul>
+    <h4>二、注册</h4>
+    <ul>
+      <li><strong>商家简称</strong>：输入商家简称，15字以内。商家检查系统内唯一，不存在才可注册</li>
+      <li><strong>账号</strong>：输入账号，中英文数字都可，20字以内。</li>
+      <li><strong>密码</strong>：输入密码（6-20位）</li>
+      <li><strong>确认密码</strong>：再次输入密码确认</li>
+      <li><strong>校验码</strong>：点击注册后需要通过图形校验码</li>
+      <li style="list-style:none;margin-top:4px">注册成功后自动登录并跳转到商家中心首页</li>
+      <li style="list-style:none">注册默认认证状态为"未认证"</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function toggleFuncModal(){
+  var el=document.getElementById('funcModal');
+  el.classList.toggle('show');
+  if(el.classList.contains('show')&&!el.dataset.dragged){
+    el.style.left='50%';el.style.top='50%';el.style.transform='translate(-50%,-50%)';
+  }
+}
+(function(){
+  var modal,titleBar,offX,offY,dragging=false;
+  function init(){
+    modal=document.getElementById('funcModal');
+    titleBar=modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown',startDrag);
+    titleBar.addEventListener('touchstart',startDragTouch,{passive:true});
+    document.addEventListener('mousemove',onDrag);
+    document.addEventListener('mouseup',endDrag);
+    document.addEventListener('touchmove',onDragTouch,{passive:true});
+    document.addEventListener('touchend',endDrag);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+  function startDrag(e){modal.dataset.dragged='1';modal.style.transform='';var r=modal.getBoundingClientRect();offX=e.clientX-r.left;offY=e.clientY-r.top;dragging=true;titleBar.style.cursor='grabbing'}
+  function startDragTouch(e){var t=e.touches[0];modal.dataset.dragged='1';modal.style.transform='';var r=modal.getBoundingClientRect();offX=t.clientX-r.left;offY=t.clientY-r.top;dragging=true}
+  function onDrag(e){if(!dragging)return;modal.style.left=(e.clientX-offX)+'px';modal.style.top=(e.clientY-offY)+'px'}
+  function onDragTouch(e){if(!dragging)return;var t=e.touches[0];modal.style.left=(t.clientX-offX)+'px';modal.style.top=(t.clientY-offY)+'px'}
+  function endDrag(){dragging=false;if(titleBar)titleBar.style.cursor='grab'}
+})();
+
+var isRegister=false;
+var pendingAction=null;
+
+function switchToRegister(){
+  isRegister=true;
+  document.getElementById('loginForm').style.display='none';
+  document.getElementById('registerForm').style.display='block';
+  document.getElementById('switchHint').innerHTML='已有账号？<a onclick="switchToLogin()">去登录</a>';
+}
+function switchToLogin(){
+  isRegister=false;
+  document.getElementById('loginForm').style.display='block';
+  document.getElementById('registerForm').style.display='none';
+  document.getElementById('switchHint').innerHTML='没有账号？<a onclick="switchToRegister()">去注册</a>';
+}
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show')},2000)}
+
+// ── 拖动校验码 ──
+var captchaVerified=false;
+function resetSlider(){
+  captchaVerified=false;
+  var pr=document.getElementById('cbProgress');
+  var btn=document.getElementById('cbBtn');
+  var h=document.getElementById('cbHint');
+  if(pr)pr.style.width='0';
+  if(btn){btn.style.left='2px';btn.innerHTML='→';btn.style.color='#667eea';btn.style.background='#fff';btn.style.borderColor='#ddd';}
+  if(h){h.textContent='拖动滑块到最右侧完成验证';h.className='cb-hint';}
+}
+function showCaptcha(action){
+  pendingAction=action;
+  resetSlider();
+  document.getElementById('captchaOverlay').classList.add('show');
+}
+function closeCaptcha(){
+  document.getElementById('captchaOverlay').classList.remove('show');
+  pendingAction=null;
+}
+
+(function(){
+  var track,bBtn,bProgress,startX=0,btnLeft=0,dragging=false;
+  var btnW=38;
+
+  function init(){
+    track=document.getElementById('cbTrack');
+    bBtn=document.getElementById('cbBtn');
+    bProgress=document.getElementById('cbProgress');
+    if(!track||!bBtn||!bProgress)return;
+
+    bBtn.addEventListener('mousedown',function(e){
+      if(captchaVerified)return;
+      dragging=true;startX=e.clientX;
+      btnLeft=parseFloat(bBtn.style.left)||0;
+      e.preventDefault();
+    });
+    bBtn.addEventListener('touchstart',function(e){
+      if(captchaVerified)return;
+      dragging=true;startX=e.touches[0].clientX;
+      btnLeft=parseFloat(bBtn.style.left)||0;
+    },{passive:true});
+
+    document.addEventListener('mousemove',function(e){
+      if(!dragging)return;moveSlider(e.clientX);
+    });
+    document.addEventListener('touchmove',function(e){
+      if(!dragging)return;moveSlider(e.touches[0].clientX);
+    },{passive:true});
+
+    document.addEventListener('mouseup',function(){endDrag()});
+    document.addEventListener('touchend',function(){endDrag()});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
+  else init();
+
+  function moveSlider(cx){
+    var tw=track.offsetWidth;
+    var dx=cx-startX;
+    var nl=Math.max(2,Math.min(tw-btnW-2,btnLeft+dx));
+    var pct=((nl-2)/(tw-btnW-4))*100;
+    bBtn.style.left=nl+'px';
+    bProgress.style.width=pct+'%';
+  }
+
+  function endDrag(){
+    if(!dragging)return;
+    dragging=false;
+    var tw=track.offsetWidth;
+    var nl=parseFloat(bBtn.style.left)||2;
+    if(nl>=tw-btnW-10){
+      captchaVerified=true;
+      bBtn.style.left=(tw-btnW-2)+'px';
+      bProgress.style.width='100%';
+      bBtn.innerHTML='✓';
+      bBtn.style.color='#fff';
+      bBtn.style.background='#0d9e6e';
+      document.getElementById('cbHint').textContent='✓ 验证通过';
+      document.getElementById('cbHint').className='cb-hint cb-success';
+      var action=pendingAction;
+      setTimeout(function(){
+        closeCaptcha();
+        if(action==='login') doLogin();
+        else if(action==='register') doRegister();
+      },400);
+    }else{
+      bBtn.textContent='✕';
+      bBtn.style.color='#d13b3b';
+      bBtn.style.background='#fff';
+      bBtn.style.borderColor='#d13b3b';
+      document.getElementById('cbHint').textContent='❌ 验证失败，请重试';
+      document.getElementById('cbHint').className='cb-hint cb-fail';
+      setTimeout(function(){resetSlider()},700);
+    }
+  }
+})();
+
+// ── 字段验证 + 弹出校验码 ──
+function showFormError(id,msg){
+  var e=document.getElementById(id);
+  if(e){e.textContent=msg;e.style.display='block';}
+}
+function hideFormError(id){
+  var e=document.getElementById(id);
+  if(e)e.style.display='none';
+}
+
+function handleLogin(e){
+  e.preventDefault();
+  hideFormError('loginError');
+  var name=document.getElementById('loginName').value.trim();
+  var account=document.getElementById('loginAccount').value.trim();
+  var pwd=document.getElementById('loginPassword').value;
+  if(!name||!account||!pwd){showFormError('loginError','⚠️ 请填写所有字段');return}
+  window._loginData={name:name,account:account,pwd:pwd};
+  showCaptcha('login');
+}
+
+function doLogin(){
+  var d=window._loginData;
+  var users=JSON.parse(localStorage.getItem('merchants')||'[]');
+  var u=users.find(function(u){return u.name===d.name&&u.account===d.account&&u.password===d.pwd});
+  if(!u){showFormError('loginError','❌ 商家简称、账号或密码错误，请检查后重试');return}
+  localStorage.setItem('merchantLogin',JSON.stringify({name:u.name,account:u.account,certStatus:u.certStatus||'unauth',logo:u.logo||'',tag:u.tag||''}));
+  location.href='dashboard.html';
+}
+
+function handleRegister(e){
+  e.preventDefault();
+  hideFormError('regError');
+  var name=document.getElementById('regName').value.trim();
+  var account=document.getElementById('regAccount').value.trim();
+  var pwd=document.getElementById('regPassword').value;
+  var cfm=document.getElementById('regConfirm').value;
+  if(!name||!account||!pwd||!cfm){showFormError('regError','⚠️ 请填写所有字段');return}
+  if(name.length>15){showFormError('regError','⚠️ 商家简称不超过15字');return}
+  if(account.length>20){showFormError('regError','⚠️ 账号不超过20字');return}
+  if(pwd.length<6||pwd.length>20){showFormError('regError','⚠️ 密码需6-20位');return}
+  if(pwd!==cfm){showFormError('regError','⚠️ 两次密码不一致');return}
+  window._regData={name:name,account:account,pwd:pwd};
+  showCaptcha('register');
+}
+
+function doRegister(){
+  var d=window._regData;
+  var users=JSON.parse(localStorage.getItem('merchants')||'[]');
+  if(users.find(function(u){return u.name===d.name})){showFormError('regError','❌ 该商家简称已被注册，请更换');return}
+  users.push({name:d.name,account:d.account,password:d.pwd,certStatus:'unauth',certData:null,logo:'',tag:''});
+  localStorage.setItem('merchants',JSON.stringify(users));
+  localStorage.setItem('merchantLogin',JSON.stringify({name:d.name,account:d.account,certStatus:'unauth',logo:'',tag:''}));
+  location.href='dashboard.html';
+}
+</script>
+</body>
+</html>

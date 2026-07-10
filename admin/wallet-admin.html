@@ -1,0 +1,329 @@
+﻿﻿﻿﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title>钱包管理 - 元宇宙商城后台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f0f2f5; color: #333; }
+
+    /* ── 顶部导航 ── */
+    .header { background: linear-gradient(135deg, #D70C1F, #F12B3D); color: #fff; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .header-title { font-size: 18px; font-weight: 600; }
+    .header-user { font-size: 14px; }
+
+    /* ── 主布局 ── */
+    .main-container { display: flex; min-height: calc(100vh - 60px); }
+
+    /* ── 左侧菜单 ── */
+    .sidebar { width: 200px; background: #fff; border-right: 1px solid #e8e8e8; padding: 16px 0; }
+    .sidebar-group-title { padding: 8px 24px; font-size: 12px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .sidebar-item { padding: 10px 24px 10px 48px; font-size: 14px; color: #666; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+    .sidebar-item:hover { background: #f5f5f5; color: #D70C1F; }
+    .sidebar-item.active { background: rgba(215, 12, 31, 0.1); color: #D70C1F; font-weight: 600; }
+    .sidebar-item svg { width: 14px; height: 14px; }
+
+    /* ── 右侧内容区 ── */
+    .content { flex: 1; padding: 24px; overflow-y: auto; }
+    .content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .content-title { font-size: 18px; font-weight: 600; color: #1a1a2e; }
+    .btn { padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-primary { background: #D70C1F; color: #fff; }
+    .btn-primary:hover { background: #c60a1b; }
+    .btn-default { background: #fff; color: #666; border: 1px solid #ddd; }
+    .btn-default:hover { background: #f5f5f5; }
+
+    /* ── 表格样式 ── */
+    .table-container { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
+    .table-header { display: flex; background: #f8f9fa; padding: 12px 20px; font-weight: 600; font-size: 14px; color: #666; border-bottom: 1px solid #e8e8e8; }
+    .table-header div { flex: 1; display: flex; align-items: center; }
+    .table-header .col-serial { flex: 0.8; }
+    .table-header .col-logo { flex: 1; }
+    .table-header .col-name { flex: 2; }
+    .table-header .col-time { flex: 2; }
+    .table-header .col-action { flex: 2.5; display: flex; justify-content: flex-end; align-items: center; }
+    .table-row { display: flex; padding: 16px 20px; border-bottom: 1px solid #f0f0f0; align-items: center; transition: background 0.2s; }
+    .table-row:hover { background: #fafafa; }
+    .table-row:last-child { border-bottom: none; }
+    .table-row div { flex: 1; }
+    .table-row .col-serial { flex: 0.8; color: #999; font-size: 14px; }
+    .table-row .col-logo { flex: 1; }
+    .table-row .col-name { flex: 2; font-size: 14px; color: #333; }
+    .table-row .col-time { flex: 2; font-size: 14px; color: #999; }
+    .table-row .col-action { flex: 2.5; display: flex; justify-content: flex-end; gap: 8px; }
+    .logo-img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; background: #f5f5f5; }
+
+    /* ── 操作按钮 ── */
+    .btn-edit { padding: 6px 12px; background: #e8f5e9; color: #4caf50; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; }
+    .btn-edit:hover { background: #c8e6c9; }
+    .btn-view { padding: 6px 12px; background: #fff; color: #666; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; cursor: pointer; }
+    .btn-view:hover { background: #f5f5f5; }
+
+    /* ── 开关按钮 ── */
+    .toggle-switch { min-width: 40px; max-width: 40px; width: 40px; height: 22px; background: #e0e0e0; border-radius: 11px; position: relative; cursor: pointer; transition: background 0.3s; flex: none; }
+    .toggle-switch.on { background: #52c41a; }
+    .toggle-switch::after { content: ''; position: absolute; width: 18px; height: 18px; background: #fff; border-radius: 50%; top: 2px; left: 2px; transition: left 0.3s; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+    .toggle-switch.on::after { left: 20px; }
+
+    /* ── 弹窗样式 ── */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-overlay.show { display: flex; }
+    .modal-box { background: #fff; border-radius: 12px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #e8e8e8; }
+    .modal-title { font-size: 16px; font-weight: 600; color: #333; }
+    .modal-close { font-size: 20px; color: #999; cursor: pointer; padding: 0 8px; }
+    .modal-close:hover { color: #666; }
+    .modal-body { padding: 20px; }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 12px; padding: 16px 20px; border-top: 1px solid #e8e8e8; }
+
+    /* ── 表单样式 ── */
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: 14px; color: #666; margin-bottom: 8px; }
+    .form-input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .form-input:focus { border-color: #D70C1F; }
+
+    /* ── Logo上传区域 ── */
+    .logo-upload { width: 100px; height: 100px; border: 2px dashed #ddd; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+    .logo-upload:hover { border-color: #D70C1F; background: rgba(215, 12, 31, 0.02); }
+    .logo-upload svg { width: 24px; height: 24px; color: #999; margin-bottom: 4px; }
+    .logo-upload span { font-size: 12px; color: #999; }
+    .logo-preview { width: 100px; height: 100px; border-radius: 8px; object-fit: cover; }
+
+    /* ── 富文本编辑器样式 ── */
+    .editor-toolbar { display: flex; gap: 4px; padding: 8px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px 6px 0 0; flex-wrap: wrap; }
+    .editor-toolbar button { padding: 4px 8px; border: none; background: #fff; border-radius: 4px; cursor: pointer; font-size: 12px; color: #666; }
+    .editor-toolbar button:hover { background: #e8e8e8; }
+    .editor-content { width: 100%; min-height: 150px; padding: 12px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 6px 6px; font-size: 14px; outline: none; }
+
+    /* ── 空状态 ── */
+    .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+    .empty-state svg { width: 64px; height: 64px; margin-bottom: 16px; opacity: 0.5; }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <div class="header">
+    <div class="header-title">元宇宙商城后台管理</div>
+    <div class="header-user">管理员</div>
+  </div>
+
+  <!-- 主布局 -->
+  <div class="main-container">
+    <!-- 左侧菜单 -->
+        <div class="sidebar">
+      <div class="sidebar-group-title">元宇宙管理</div>
+      <div class="sidebar-item" onclick="navigateTo('hotspot-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>场景和热区</div>
+      <div class="sidebar-item" onclick="navigateTo('path-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="12 19 19 12 12 5 5 12"/><circle cx="12" cy="12" r="3"/></svg>跳转路径</div>
+      <div class="sidebar-item" onclick="navigateTo('map-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3 9 12 15 21 9"/></svg>主地图管理</div>
+      <div class="sidebar-item" onclick="navigateTo('space-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>商家元宇宙空间管理</div>
+      <div class="sidebar-item" onclick="navigateTo('role-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>角色管理</div>
+      <div class="sidebar-item" onclick="navigateTo('dashboard-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>元宇宙看板</div>
+      <div class="sidebar-group-title">数字资产</div>
+      <div class="sidebar-item" onclick="navigateTo('asset-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>数字资产管理</div>
+    <div class="sidebar-item" onclick="navigateTo('digital-asset-detail.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>数字资产详情</div>
+      <div class="sidebar-item" onclick="navigateTo('order-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>订单管理</div>
+      <div class="sidebar-group-title">会员管理</div>
+      <div class="sidebar-item" onclick="navigateTo('user-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>用户管理</div>
+      <div class="sidebar-item" onclick="navigateTo('merchant-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>商家管理</div>
+      <div class="sidebar-group-title">审核管理</div>
+      <div class="sidebar-item" onclick="navigateTo('cert-review.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>商家审核管理</div>
+    <div class="sidebar-item" onclick="navigateTo('story-review.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>文化故事审核</div>
+          <div class="sidebar-group-title">内容管理</div>
+    <div class="sidebar-item" onclick="navigateTo('message-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>消息管理</div>
+    <div class="sidebar-group-title">系统管理</div>
+      <div class="sidebar-item active" onclick="navigateTo('wallet-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>钱包管理</div>
+    </div>
+
+    <!-- 右侧内容区 -->
+    <div class="content">
+      <div class="content-header">
+        <div class="content-title">钱包管理</div>
+        <button class="btn btn-primary" onclick="openAddModal()">新增钱包</button>
+      </div>
+
+      <!-- 钱包列表 -->
+      <div class="table-container" id="walletList">
+        <div class="table-header">
+          <div class="col-serial">序号</div>
+          <div class="col-logo">logo</div>
+          <div class="col-name">钱包名称</div>
+          <div class="col-time">创建时间</div>
+          <div class="col-action">操作</div>
+        </div>
+        <div class="table-row" data-id="1">
+          <div class="col-serial">1</div>
+          <div class="col-logo"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='30' cy='50' r='20' fill='%23ff6b6b'/%3E%3Ccircle cx='50' cy='35' r='15' fill='%234ecdc4'/%3E%3Ccircle cx='70' cy='50' r='18' fill='%23ffe66d'/%3E%3Ccircle cx='45' cy='65' r='12' fill='%2395e1d3'/%3E%3Ccircle cx='65' cy='68' r='10' fill='%23f38181'/%3E%3C/svg%3E" class="logo-img"></div>
+          <div class="col-name">汇付钱包</div>
+          <div class="col-time">2025-05-14 15:18:37</div>
+          <div class="col-action">
+            <button class="btn-edit" onclick="editWallet(1)">修改</button>
+            <button class="btn-view" onclick="viewWallet(1)">查看</button>
+            <div class="toggle-switch on" onclick="toggleWallet(1)"></div>
+          </div>
+        </div>
+        <div class="table-row" data-id="2">
+          <div class="col-serial">2</div>
+          <div class="col-logo"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,10 90,50 50,90 10,50' fill='%23c0392b'/%3E%3Cpolygon points='50,25 75,50 50,75 25,50' fill='%23e74c3c'/%3E%3Cpolygon points='50,40 65,50 50,60 35,50' fill='%23fff'/%3E%3C/svg%3E" class="logo-img"></div>
+          <div class="col-name">中金钱包</div>
+          <div class="col-time">2025-05-14 15:18:37</div>
+          <div class="col-action">
+            <button class="btn-edit" onclick="editWallet(2)">修改</button>
+            <button class="btn-view" onclick="viewWallet(2)">查看</button>
+            <div class="toggle-switch on" onclick="toggleWallet(2)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新增钱包弹窗 -->
+  <div class="modal-overlay" id="walletModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">新增钱包</div>
+        <div class="modal-close" onclick="closeModal()">×</div>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="walletId">
+        <div class="form-group">
+          <label class="form-label">钱包名称</label>
+          <input class="form-input" id="walletName" placeholder="请输入">
+        </div>
+        <div class="form-group">
+          <label class="form-label">钱包平台logo</label>
+          <div id="logoUploadArea" class="logo-upload" onclick="document.getElementById('logoFile').click()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>上传</span>
+          </div>
+          <input type="file" id="logoFile" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">开通说明</label>
+          <div class="editor-toolbar">
+            <button onclick="formatText('bold')"><strong>B</strong></button>
+            <button onclick="formatText('italic')"><em>I</em></button>
+            <button onclick="formatText('underline')"><u>U</u></button>
+            <button onclick="formatText('strikeThrough')"><s>S</s></button>
+            <button onclick="formatText('insertUnorderedList')">☰</button>
+            <button onclick="formatText('insertOrderedList')">☷</button>
+            <button onclick="formatText('justifyLeft')">↵</button>
+            <button onclick="formatText('justifyCenter')">↔</button>
+            <button onclick="formatText('justifyRight')">↪</button>
+          </div>
+          <div class="editor-content" id="openDesc" contenteditable="true"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">限额说明</label>
+          <div class="editor-toolbar">
+            <button onclick="formatText('bold')"><strong>B</strong></button>
+            <button onclick="formatText('italic')"><em>I</em></button>
+            <button onclick="formatText('underline')"><u>U</u></button>
+            <button onclick="formatText('strikeThrough')"><s>S</s></button>
+            <button onclick="formatText('insertUnorderedList')">☰</button>
+            <button onclick="formatText('insertOrderedList')">☷</button>
+            <button onclick="formatText('justifyLeft')">↵</button>
+            <button onclick="formatText('justifyCenter')">↔</button>
+            <button onclick="formatText('justifyRight')">↪</button>
+          </div>
+          <div class="editor-content" id="limitDesc" contenteditable="true"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" onclick="closeModal()">取消</button>
+        <button class="btn btn-primary" onclick="saveWallet()">发放</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 导航
+    function navigateTo(url) {
+      window.location.href = url;
+    }
+
+    // 打开新增弹窗
+    function openAddModal() {
+      document.getElementById('modalTitle').textContent = '新增钱包';
+      document.getElementById('walletId').value = '';
+      document.getElementById('walletName').value = '';
+      document.getElementById('logoUploadArea').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>上传</span>';
+      document.getElementById('logoUploadArea').className = 'logo-upload';
+      document.getElementById('openDesc').innerHTML = '';
+      document.getElementById('limitDesc').innerHTML = '';
+      document.getElementById('walletModal').classList.add('show');
+    }
+
+    // 编辑钱包
+    function editWallet(id) {
+      openAddModal();
+      document.getElementById('modalTitle').textContent = '修改钱包';
+      document.getElementById('walletId').value = id;
+      if (id === 1) {
+        document.getElementById('walletName').value = '汇付钱包';
+        document.getElementById('openDesc').innerHTML = '<p>汇付钱包是第三方支付平台，支持多种支付方式。</p>';
+        document.getElementById('limitDesc').innerHTML = '<p>单笔限额：5000元</p><p>每日限额：50000元</p>';
+      } else if (id === 2) {
+        document.getElementById('walletName').value = '中金钱包';
+        document.getElementById('openDesc').innerHTML = '<p>中金钱包是金融级支付解决方案。</p>';
+        document.getElementById('limitDesc').innerHTML = '<p>单笔限额：10000元</p><p>每日限额：100000元</p>';
+      }
+    }
+
+    // 查看钱包
+    function viewWallet(id) {
+      editWallet(id);
+      document.getElementById('modalTitle').textContent = '查看钱包';
+      document.getElementById('walletName').disabled = true;
+      document.getElementById('logoUploadArea').style.pointerEvents = 'none';
+      document.getElementById('openDesc').contentEditable = false;
+      document.getElementById('limitDesc').contentEditable = false;
+    }
+
+    // 关闭弹窗
+    function closeModal() {
+      document.getElementById('walletModal').classList.remove('show');
+      document.getElementById('walletName').disabled = false;
+      document.getElementById('logoUploadArea').style.pointerEvents = '';
+      document.getElementById('openDesc').contentEditable = true;
+      document.getElementById('limitDesc').contentEditable = true;
+    }
+
+    // Logo上传
+    function handleLogoUpload(input) {
+      var file = input.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var area = document.getElementById('logoUploadArea');
+        area.innerHTML = '<img src="' + e.target.result + '" class="logo-preview">';
+        area.className = '';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // 富文本格式化
+    function formatText(command) {
+      document.execCommand(command, false, null);
+    }
+
+    // 保存钱包
+    function saveWallet() {
+      var name = document.getElementById('walletName').value.trim();
+      if (!name) {
+        alert('请输入钱包名称');
+        return;
+      }
+      alert('钱包信息已保存');
+      closeModal();
+    }
+
+    // 切换钱包状态
+    function toggleWallet(id) {
+      var row = document.querySelector('.table-row[data-id="' + id + '"]');
+      var toggle = row.querySelector('.toggle-switch');
+      toggle.classList.toggle('on');
+    }
+  </script>
+</body>
+</html>

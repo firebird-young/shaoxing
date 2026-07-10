@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>贵州茅台 · 商户空间</title>
+<style>
+  :root{--bg:#f5f6fa;--card:#fff;--pri:#c0392b;--txt:#1a1a2e;--txt2:#6b6b80;--txt3:#999;--shadow:0 2px 8px rgba(0,0,0,.06)}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:#e8e8ec;display:flex;justify-content:center}
+  .app{width:100%;max-width:420px;min-height:100vh;background:var(--bg);padding-bottom:20px;position:relative}
+  @media(max-width:430px){body{background:var(--bg)}.app{max-width:100%}}
+
+  /* ── 顶部横幅 ── */
+  .banner{height:170px;background:url('贵州茅台封面海报.png')center/cover no-repeat;position:relative}
+  .banner-overlay{position:absolute;bottom:0;left:0;right:0;height:60%;background:linear-gradient(transparent,rgba(0,0,0,.5))}
+  .back-btn{position:absolute;top:12px;left:12px;z-index:2;display:flex;align-items:center;gap:4px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;background:rgba(0,0,0,.45);color:#fff;border:1px solid rgba(255,255,255,.15)}
+  .back-btn:active{background:rgba(0,0,0,.65)}
+
+  /* ── 商户信息 ── */
+  .merchant-info{position:relative;padding:14px 16px 10px;background:var(--card);display:flex;align-items:center;gap:14px}
+  .merchant-logo{width:56px;height:56px;flex-shrink:0;background:url('贵州茅台.jpg')center/cover no-repeat;border:3px solid #fff;margin-top:-32px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+  .merchant-detail{flex:1;min-width:0}
+  .merchant-name{font-size:18px;font-weight:700;margin-bottom:3px}
+  .merchant-tags{display:flex;gap:4px;margin-bottom:4px}
+  .merchant-tags span{font-size:10px;padding:2px 8px;background:rgba(192,57,43,.08);color:var(--pri);font-weight:500}
+  .merchant-meta{font-size:11px;color:var(--txt2);display:flex;align-items:center;gap:8px}
+  .merchant-meta .star{color:#f5a623}
+
+  /* ── 介绍 ── */
+  .intro{background:var(--card);padding:0 16px 14px;font-size:13px;color:var(--txt2);line-height:1.7;border-bottom:1px solid rgba(0,0,0,.04)}
+
+  /* ── 功能板块 ── */
+  .features{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:16px}
+  .fc{background:var(--card);padding:18px 14px 14px;cursor:pointer;transition:all .25s;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;text-align:center}
+  .fc:active{transform:scale(.96);box-shadow:0 6px 16px rgba(0,0,0,.08)}
+  .fc-icon{width:52px;height:52px;margin-bottom:10px;background-position:center;background-size:contain;background-repeat:no-repeat}
+  .fc-name{font-size:14px;font-weight:600;margin-bottom:3px}
+  .fc-desc{font-size:11px;color:var(--txt3);line-height:1.3}
+
+  /* ── 通用标题 ── */
+  .section-hdr{display:flex;justify-content:space-between;align-items:center;padding:18px 16px 8px}
+  .section-hdr h2{font-size:16px;font-weight:700}
+  .section-hdr .more{font-size:12px;color:var(--pri);cursor:pointer;font-weight:500}
+
+  /* ── 推荐资产 ── */
+  .asset-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 16px}
+  .ac{background:var(--card);overflow:hidden;cursor:pointer;box-shadow:var(--shadow);transition:all .25s}
+  .ac:active{transform:scale(.96)}
+  .ac-img{height:110px;background-position:center;background-size:cover;background-repeat:no-repeat}
+  .ac-body{padding:12px}
+  .ac-name{font-size:13px;font-weight:600;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ac-price{font-size:15px;font-weight:700;color:var(--pri)}
+  .ac-price small{font-size:10px;font-weight:400;color:var(--txt3);margin-left:2px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- 顶部横幅 -->
+<div class="banner">
+  <div class="banner-overlay"></div>
+  <div class="back-btn" onclick="history.back()">← 返回</div>
+</div>
+
+<!-- 商户信息 -->
+<div class="merchant-info">
+  <div class="merchant-logo"></div>
+  <div class="merchant-detail">
+    <div class="merchant-name">贵州茅台</div>
+    <div class="merchant-tags"><span>白酒</span><span>中华老字号</span><span>酱香型</span></div>
+    <div class="merchant-meta">
+      <span class="star">★</span> 4.9 评分
+      <span>·</span>
+      <span>23.6万 关注</span>
+    </div>
+  </div>
+</div>
+
+<!-- 介绍 -->
+<div class="intro">
+  中国贵州茅台酒厂（集团）有限责任公司，中华老字号，大曲酱香型白酒的鼻祖。茅台酒产于贵州省仁怀市茅台镇，已有800多年历史，1915年巴拿马万国博览会荣获金奖，名扬天下。
+</div>
+
+<!-- 功能板块 -->
+<div class="features">
+  <div class="fc" onclick="window.location.href='vr_maotai.html'">
+    <div class="fc-icon" style="background-image:url('vr云参观.png')"></div>
+    <div class="fc-name">VR云参观</div>
+    <div class="fc-desc">360°全景漫游酒庄</div>
+  </div>
+  <div class="fc" onclick="window.location.href='assets_maotai.html'">
+    <div class="fc-icon" style="background-image:url('数字资产商城.png')"></div>
+    <div class="fc-name">数字资产商城</div>
+    <div class="fc-desc">限量数字藏品发售</div>
+  </div>
+  <div class="fc" onclick="window.location.href='brew_maotai.html'">
+    <div class="fc-icon" style="background-image:url('酿酒工艺.png')"></div>
+    <div class="fc-name">酿酒工艺演示</div>
+    <div class="fc-desc">12987古法工艺</div>
+  </div>
+  <div class="fc" onclick="window.location.href='chat_maotai.html'">
+    <div class="fc-icon" style="background-image:url('茅小美静态.png')"></div>
+    <div class="fc-name">茅小美·数字人</div>
+    <div class="fc-desc">AI品酒师在线</div>
+  </div>
+</div>
+
+<!-- 推荐数字资产 -->
+<div class="section-hdr">
+  <h2>💎 推荐数字资产</h2>
+  <span class="more">全部 ›</span>
+</div>
+<div class="asset-grid">
+  <div class="ac">
+    <div class="ac-img" style="background-image:url('飞天茅台·元宇宙酒票.png')"></div>
+    <div class="ac-body">
+      <div class="ac-name">飞天茅台·元宇宙酒票</div>
+      <div class="ac-price">¥299 <small>起</small></div>
+    </div>
+  </div>
+  <div class="ac" onclick="window.location.href='product_maotai1935.html'">
+    <div class="ac-img" style="background-image:url('茅台1935.png')"></div>
+    <div class="ac-body">
+      <div class="ac-name">茅台1935·数字珍藏</div>
+      <div class="ac-price">¥599 <small>起</small></div>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

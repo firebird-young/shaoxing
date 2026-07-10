@@ -1,0 +1,3445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数字资产管理 - 商家中心</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+    }
+    
+    /* 顶部导航 */
+    .header {
+      background: white;
+      padding: 16px 24px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .header-left h1 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .merchant-name {
+      font-weight: 500;
+      color: #667eea;
+    }
+    
+    .verify-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      color: white;
+    }
+    
+    .btn-logout {
+      padding: 8px 16px;
+      background: #f5f5f5;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #666;
+    }
+    
+    .btn-logout:hover {
+      background: #e8ecf0;
+    }
+    
+    /* 侧边栏 */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 60px;
+      bottom: 0;
+      width: 200px;
+      background: #2c3e50;
+      padding: 20px 0;
+    }
+    
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .menu-item {
+      margin-bottom: 4px;
+    }
+    
+    .menu-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      color: #b8c7ce;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    
+    a.menu-title:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    
+    .menu-title.active {
+      background: rgba(102, 126, 234, 0.3);
+      color: white;
+    }
+    
+    .submenu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: block;
+    }
+    
+    .submenu-item {
+      display: block;
+      padding: 10px 20px 10px 50px;
+      color: #8a9aa8;
+      font-size: 13px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    
+    .submenu-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    
+    .submenu-item.active {
+      background: rgba(102, 126, 234, 0.3);
+      color: white;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      margin-left: 200px;
+      padding: 24px;
+    }
+    
+    /* 搜索和操作栏 */
+    .search-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      background: white;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .search-input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .search-input input {
+      padding: 10px 14px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      width: 300px;
+    }
+    
+    .search-btn {
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .search-btn:hover {
+      background: #5a6fd6;
+    }
+    
+    .btn-primary {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #fa8c16 0%, #ffc53d 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(250, 140, 22, 0.3);
+    }
+    
+    /* 搜索栏 */
+    .search-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    /* 状态筛选Tab */
+    .status-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    
+    .status-tab {
+      padding: 8px 16px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      background: white;
+      color: #666;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    
+    .status-tab:hover {
+      background: #f5f5f5;
+    }
+    
+    .status-tab.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+    
+    /* 资产列表 */
+    .asset-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    
+    .asset-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .asset-card.hidden {
+      display: none;
+    }
+    
+    .asset-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    .asset-cover {
+      height: 180px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+    }
+    
+    .asset-info {
+      padding: 16px;
+    }
+    
+    .asset-header.search-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    /* 状态筛选Tab */
+    .status-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    
+    .status-tab {
+      padding: 8px 16px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      background: white;
+      color: #666;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    
+    .status-tab:hover {
+      background: #f5f5f5;
+    }
+    
+    .status-tab.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+    
+    .asset-card[data-status] {
+      display: block;
+    }
+    
+    .asset-card.hidden {
+      display: none;
+    }
+    
+    .asset-name {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .asset-meta {
+      display: flex;
+      gap: 12px;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 12px;
+    }
+    
+    .asset-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    
+    .asset-tags .tag {
+      padding: 4px 10px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+    
+    .asset-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .no-action {
+      font-size: 12px;
+      color: #999;
+      padding: 6px 12px;
+    }
+    
+    .action-btn {
+      flex: 0 0 auto;
+      padding: 6px 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      background: white;
+      color: #666;
+    }
+    
+    .action-btn:hover {
+      background: #f5f5f5;
+      color: #667eea;
+    }
+    
+    /* 弹窗 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      z-index: 1000;
+      padding-top: 50px;
+    }
+    
+    .modal-overlay.show {
+      display: flex;
+    }
+    
+    .modal-box {
+      background: white;
+      border-radius: 12px;
+      width: 95%;
+      max-width: 950px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid #f0f0f0;
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 1;
+    }
+    
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      color: #999;
+    }
+    
+    .modal-close:hover {
+      background: #f5f5f5;
+      color: #666;
+    }
+    
+    .modal-body {
+      padding: 24px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+    }
+    
+    .form-group label.required::after {
+      content: '*';
+      color: #ff4d4f;
+      margin-left: 4px;
+    }
+    
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    /* 文件上传区域 */
+    .file-upload-area {
+      border: 2px dashed #e0e0e0;
+      border-radius: 8px;
+      padding: 30px 20px;
+      text-align: center;
+      cursor: pointer;
+      background: #fafafa;
+      transition: all 0.3s;
+    }
+    
+    .file-upload-area:hover {
+      border-color: #667eea;
+      background: #f5f7ff;
+    }
+    
+    .file-upload-area input {
+      display: none;
+    }
+    
+    .file-upload-area .upload-icon {
+      font-size: 32px;
+      color: #667eea;
+      margin-bottom: 12px;
+    }
+    
+    .file-upload-area .upload-text {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    
+    .file-upload-area .upload-hint {
+      color: #999;
+      font-size: 12px;
+    }
+    
+    /* 多图上传预览 */
+    .images-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    
+    .image-item {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #e0e0e0;
+    }
+    
+    .image-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .image-item .remove-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 20px;
+      height: 20px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    
+    /* 标签输入容器 */
+    .tag-input-container {
+      margin-top: 8px;
+    }
+    
+    .tag-input-container input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    
+    .tags-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .tags-preview .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-size: 13px;
+      border-radius: 4px;
+    }
+    
+    .tags-preview .tag .remove-tag {
+      cursor: pointer;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    
+    .tags-preview .tag .remove-tag:hover {
+      opacity: 1;
+    }
+    
+    /* 数量选择器 */
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      width: fit-content;
+    }
+    
+    .quantity-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #e0e0e0;
+      background: white;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    .quantity-btn:hover {
+      background: #f5f5f5;
+    }
+    
+    .quantity-btn:first-child {
+      border-radius: 6px 0 0 6px;
+    }
+    
+    .quantity-btn:last-child {
+      border-radius: 0 6px 6px 0;
+    }
+    
+    .quantity-input {
+      width: 80px;
+      height: 36px;
+      text-align: center;
+      border: 1px solid #e0e0e0;
+      border-left: none;
+      border-right: none;
+      font-size: 14px;
+    }
+    
+    /* 款式列表 */
+    .styles-list {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .style-item {
+      background: white;
+      border: 2px solid #e8ecf0;
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+    
+    .style-item:hover {
+      border-color: #667eea;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+    }
+    
+    .style-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .style-title {
+      font-weight: 600;
+      font-size: 16px;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .style-title::before {
+      content: '';
+      width: 4px;
+      height: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 2px;
+    }
+    
+    .style-remove {
+      color: #ff4d4f;
+      font-size: 13px;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    
+    .style-remove:hover {
+      background: #fff2f0;
+      text-decoration: none;
+    }
+    
+    .style-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .style-fields .form-group {
+      margin-bottom: 0;
+    }
+    
+    .style-fields .form-group label {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 6px;
+    }
+    
+    /* 权益区域 */
+    .benefits-section {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 8px;
+    }
+    
+    .benefits-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed #e0e0e0;
+    }
+    
+    .benefits-title {
+      font-weight: 500;
+      font-size: 14px;
+      color: #333;
+    }
+    
+    /* 权益列表 */
+    .benefits-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .benefit-item {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px;
+      position: relative;
+      transition: all 0.2s;
+    }
+    
+    .benefit-item:hover {
+      border-color: #667eea;
+    }
+    
+    .benefit-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    
+    .benefit-fields .form-group {
+      margin-bottom: 0;
+    }
+    
+    .benefit-fields .form-group label {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 6px;
+    }
+    
+    .benefit-remove {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+    
+    .benefit-remove:hover {
+      color: #ff4d4f;
+      background: #fff2f0;
+    }
+    
+    .btn-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: #f5f5f5;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #666;
+    }
+    
+    .btn-add:hover {
+      background: #e8ecf0;
+    }
+    
+    .btn-group {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #f0f0f0;
+    }
+    
+    .btn-cancel {
+      padding: 10px 24px;
+      background: #f5f5f5;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .btn-cancel:hover {
+      background: #e8ecf0;
+    }
+    
+    /* 状态标签 */
+    .status-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .status-draft {
+      background: #f5f5f5;
+      color: #999;
+    }
+    
+    .status-pending {
+      background: #fff7e6;
+      color: #fa8c16;
+    }
+    
+    .status-rejected {
+      background: #fff2f0;
+      color: #ff4d4f;
+    }
+    
+    .status-approved {
+      background: #f6ffed;
+      color: #52c41a;
+    }
+    
+    .status-casting {
+      background: #e6f7ff;
+      color: #1890ff;
+    }
+    
+    .status-publish-pending {
+      background: #f9f0ff;
+      color: #722ed1;
+    }
+    
+    .status-published {
+      background: #f6ffed;
+      color: #52c41a;
+    }
+    
+    .status-ended {
+      background: #f5f5f5;
+      color: #999;
+    }
+    
+    /* 操作按钮 */
+    .action-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .action-btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .action-btn-primary:hover {
+      background: #5a6fd6;
+    }
+    
+    .action-btn-danger {
+      background: #fff2f0;
+      color: #ff4d4f;
+    }
+    
+    .action-btn-danger:hover {
+      background: #ffccc7;
+    }
+    
+    .action-btn-secondary {
+      background: #f5f5f5;
+      color: #666;
+    }
+    
+    .action-btn-secondary:hover {
+      background: #e8ecf0;
+    }
+    
+    .action-btn-warning {
+      background: #fff7e6;
+      color: #fa8c16;
+    }
+    
+    .action-btn-warning:hover {
+      background: #ffe0b3;
+    }
+    
+    /* 空状态 */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+    
+    .empty-state .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    
+    .empty-state .empty-title {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    /* 发行模式弹窗样式 */
+    .timeline-container {
+      background: #fafafa;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 12px;
+      min-height: 80px;
+    }
+    
+    .timeline-empty {
+      text-align: center;
+      color: #999;
+      padding: 20px;
+    }
+    
+    .timeline-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    
+    .timeline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+    
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 24px;
+      left: 20px;
+      right: 20px;
+      height: 2px;
+      background: #e0e0e0;
+    }
+    
+    .timeline-item {
+      position: relative;
+      flex: 1;
+      text-align: center;
+      padding: 0 10px;
+    }
+    
+    .timeline-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      font-size: 16px;
+      z-index: 1;
+    }
+    
+    .timeline-priority {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .timeline-lottery {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+    }
+    
+    .timeline-public {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: white;
+    }
+    
+    .timeline-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    
+    .timeline-time {
+      font-size: 11px;
+      color: #999;
+    }
+    
+    .btn-add-mode {
+      width: 100%;
+      padding: 10px;
+      background: #f0f5ff;
+      border: 1px dashed #1890ff;
+      border-radius: 6px;
+      color: #1890ff;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .btn-add-mode:hover {
+      background: #e6f7ff;
+    }
+    
+    .phases-container {
+      margin-top: 24px;
+    }
+    
+    .phase-card {
+      background: white;
+      border: 1px solid #e8e8e8;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    
+    .phase-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .phase-title {
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .phase-badge {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .phase-priority {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+    }
+    
+    .phase-lottery {
+      background: rgba(240, 147, 251, 0.1);
+      color: #f5576c;
+    }
+    
+    .phase-public {
+      background: rgba(79, 172, 254, 0.1);
+      color: #4facfe;
+    }
+    
+    .phase-remove-btn {
+      background: none;
+      border: none;
+      color: #999;
+      cursor: pointer;
+      padding: 4px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    
+    .phase-remove-btn:hover {
+      color: #ff4d4f;
+      background: #fff2f0;
+    }
+    
+    .phase-remove-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+    
+    .phase-fields {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    
+    .phase-fields .form-group {
+      margin-bottom: 0;
+    }
+    
+    .phase-fields .form-group label {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 6px;
+    }
+    
+    .phase-fields input,
+    .phase-fields select {
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+    
+    .phase-warning {
+      background: #fff7e6;
+      border-radius: 4px;
+      padding: 10px 12px;
+      margin-top: 12px;
+      font-size: 12px;
+      color: #fa8c16;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .phase-warning svg {
+      width: 14px;
+      height: 14px;
+    }
+    
+    /* 统计概览样式 */
+    .stats-overview {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      padding: 20px;
+      color: #fff;
+    }
+    
+    .stat-card .stat-label {
+      font-size: 13px;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    
+    .stat-card .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    
+    /* 图表样式 */
+    .chart-section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      border: 1px solid #e8e8e8;
+    }
+    
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .chart-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .chart-period {
+      padding: 6px 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    
+    .chart-container {
+      padding: 10px 0;
+    }
+    
+    .chart-placeholder {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      height: 150px;
+      padding: 0 10px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .chart-bar {
+      width: 12%;
+      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+      border-radius: 4px 4px 0 0;
+      position: relative;
+      transition: height 0.3s;
+      min-height: 10px;
+    }
+    
+    .chart-bar span {
+      position: absolute;
+      top: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: #666;
+      white-space: nowrap;
+    }
+    
+    .chart-labels {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+    }
+    
+    .chart-labels span {
+      width: 12%;
+      text-align: center;
+      font-size: 11px;
+      color: #999;
+    }
+    
+    /* 实际发放数量样式 */
+    .phase-issued {
+      background: #f6ffed;
+      border: 1px solid #b7eb8f;
+      border-radius: 4px;
+      padding: 10px 12px;
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    /* 阶段统计数据 */
+    .phase-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+      padding: 12px;
+      background: #fafafa;
+      border-radius: 6px;
+    }
+    
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .stat-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    /* 导入白名单按钮 */
+    .btn-whitelist {
+      padding: 6px 12px;
+      background: #fff7e6;
+      border: 1px solid #ffc53d;
+      border-radius: 4px;
+      color: #fa8c16;
+      font-size: 12px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.2s;
+    }
+    
+    .btn-whitelist:hover {
+      background: #fff1b8;
+    }
+    
+    /* 白名单弹窗样式 */
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .btn-add-whitelist,
+    .btn-add-manual {
+      padding: 6px 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-add-whitelist:hover,
+    .btn-add-manual:hover {
+      opacity: 0.9;
+    }
+    
+    .btn-add-manual {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .whitelist-summary {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 16px;
+      padding: 12px;
+      background: #fafafa;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #666;
+    }
+    
+    .whitelist-summary strong {
+      color: #333;
+      font-size: 16px;
+    }
+    
+    .whitelist-list {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 8px;
+    }
+    
+    .whitelist-list table {
+      width: 100%;
+    }
+    
+    .whitelist-list tbody tr {
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .whitelist-list tbody tr:last-child {
+      border-bottom: none;
+    }
+    
+    .btn-back {
+      padding: 6px 12px;
+      background: none;
+      border: none;
+      color: #1890ff;
+      font-size: 13px;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+    
+    .btn-back:hover {
+      color: #40a9ff;
+    }
+    
+    /* 默认按钮 */
+    .btn-default {
+      padding: 8px 16px;
+      background: #f5f5f5;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      color: #666;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-default:hover {
+      background: #e8e8e8;
+      border-color: #bfbfbf;
+    }
+    
+    /* 成功按钮 */
+    .btn-success {
+      padding: 8px 16px;
+      background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-success:hover {
+      opacity: 0.9;
+    }
+    
+    /* 白名单弹窗样式 */
+    .whitelist-preview {
+      margin-top: 12px;
+    }
+    
+    .whitelist-preview .address-item {
+      font-size: 12px;
+      color: #666;
+      font-family: monospace;
+      padding: 4px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .whitelist-preview .address-item:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <div class="header">
+    <div class="header-left">
+      <h1>数字资产管理</h1>
+    </div>
+    <div class="header-right">
+      <span class="merchant-name">贵州茅台集团</span>
+      <span class="verify-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" width="12" height="12">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </span>
+      <button class="btn-logout" onclick="goBack()">返回</button>
+    </div>
+  </div>
+  
+  <!-- 侧边栏 -->
+  <div class="sidebar">
+    <div class="sidebar-menu">
+      <div class="menu-item">
+        <a class="menu-title" href="dashboard.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>首页</span>
+        </a>
+      </div>
+      <div class="menu-item">
+        <div class="menu-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span>数字资产</span>
+        </div>
+        <ul class="submenu">
+          <li><a href="asset-management.html" class="submenu-item active">数字资产管理</a></li>
+          <li><a href="digital-asset-detail.html" class="submenu-item">数字资产详情</a></li>
+        </ul>
+      </div>
+      <div class="menu-item">
+        <div class="menu-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span>订单管理</span>
+        </div>
+        <ul class="submenu">
+          <li><a href="order-management.html" class="submenu-item">订单管理</a></li>
+          <li><a href="delivery-management.html" class="submenu-item">发货管理</a></li>
+        </ul>
+      </div>
+      <div class="menu-item">
+        <div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg><span>营销管理</span></div>
+      <ul class="submenu">
+          <li><a href="marketing.html" class="submenu-item">空间管理</a></li>
+          <li><a href="task-management.html" class="submenu-item">任务管理</a></li>
+        </ul>
+      </div>
+      <div class="menu-item">
+        <div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>内容管理</span></div>
+        <ul class="submenu">
+          <li><a href="story-admin.html" class="submenu-item">文化故事管理</a></li>
+        </ul>
+      </div>
+      <div class="menu-item">
+        <div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg><span>系统管理</span></div>
+        <ul class="submenu">
+          <li><a href="operator-management.html" class="submenu-item">操作员管理</a></li>
+          <li><a href="role-management.html" class="submenu-item">角色管理</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 主内容区 -->
+  <div class="main-content">
+    <!-- 搜索和操作栏 -->
+    <div class="search-bar">
+      <div class="search-input">
+        <input type="text" id="searchInput" placeholder="搜索数字资产名称">
+        <button class="search-btn" onclick="searchAssets()">搜索</button>
+      </div>
+      <button class="btn-primary" onclick="openAddModal()">+ 新增数字资产</button>
+    </div>
+    
+    <!-- 状态筛选Tab -->
+    <div class="status-tabs">
+      <button class="status-tab active" onclick="filterByStatus('all', this)">全部</button>
+      <button class="status-tab" onclick="filterByStatus('draft', this)">草稿</button>
+      <button class="status-tab" onclick="filterByStatus('pending', this)">待审核</button>
+      <button class="status-tab" onclick="filterByStatus('rejected', this)">已驳回</button>
+      <button class="status-tab" onclick="filterByStatus('approved', this)">已通过</button>
+      <button class="status-tab" onclick="filterByStatus('casting', this)">铸造中</button>
+      <button class="status-tab" onclick="filterByStatus('publish-pending', this)">待上线</button>
+      <button class="status-tab" onclick="filterByStatus('published', this)">已上线</button>
+      <button class="status-tab" onclick="filterByStatus('ended', this)">已结束</button>
+    </div>
+    
+    <!-- 资产列表 -->
+    <div class="asset-list" id="assetList">
+      <!-- 草稿状态 -->
+      <div class="asset-card" data-status="draft" onclick="viewAsset('1')">
+        <div class="asset-cover">🍷</div>
+        <div class="asset-info">
+          <div class="asset-header">
+            <div class="asset-name">飞天茅台数字藏品</div>
+            <span class="status-tag status-draft">草稿</span>
+          </div>
+          <div class="asset-meta">
+            <span>发行：1000</span>
+            <span>3款</span>
+          </div>
+          <div class="asset-tags">
+            <span class="tag">白酒</span>
+            <span class="tag">酱香型</span>
+            <span class="tag">高端</span>
+          </div>
+          <div class="asset-actions">
+            <button class="action-btn action-btn-secondary" onclick="event.stopPropagation(); editAsset('1')">编辑</button>
+            <button class="action-btn action-btn-danger" onclick="event.stopPropagation(); deleteAsset('1')">删除</button>
+            <button class="action-btn action-btn-primary" onclick="event.stopPropagation(); submitReview('1')">提交审核</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 待审核状态 -->
+      <div class="asset-card" data-status="pending" onclick="viewAsset('2')">
+        <div class="asset-cover">🏺</div>
+        <div class="asset-info">
+          <div class="asset-header">
+            <div class="asset-name">茅台年份酒数字凭证</div>
+            <span class="status-tag status-pending">待审核</span>
+          </div>
+          <div class="asset-meta">
+            <span>发行：500</span>
+            <span>2款</span>
+          </div>
+          <div class="asset-tags">
+            <span class="tag">年份酒</span>
+            <span class="tag">收藏</span>
+          </div>
+          <div class="asset-actions">
+            <button class="action-btn action-btn-warning" onclick="event.stopPropagation(); withdrawAsset('2')">撤回</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 已驳回状态 -->
+      <div class="asset-card" data-status="rejected" onclick="viewAsset('3')">
+        <div class="asset-cover">📦</div>
+        <div class="asset-info">
+          <div class="asset-header">
+            <div class="asset-name">茅台纪念版礼盒</div>
+            <span class="status-tag status-rejected">已驳回</span>
+          </div>
+          <div class="asset-meta">
+            <span>发行：200</span>
+            <span>1款</span>
+          </div>
+          <div class="asset-tags">
+            <span class="tag">礼盒</span>
+            <span class="tag">限量</span>
+            <span class="tag">纪念</span>
+          </div>
+          <div class="asset-actions">
+            <button class="action-btn action-btn-secondary" onclick="event.stopPropagation(); editAsset('3')">编辑</button>
+            <button class="action-btn action-btn-danger" onclick="event.stopPropagation(); deleteAsset('3')">删除</button>
+            <button class="action-btn action-btn-primary" onclick="event.stopPropagation(); submitReview('3')">提交审核</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 已通过状态 -->
+      <div class="asset-card" data-status="approved" onclick="viewAsset('4')">
+        <div class="asset-cover">�</div>
+        <div class="asset-info">
+          <div class="asset-header">
+            <div class="asset-name">茅台数字艺术藏品</div>
+            <span class="status-tag status-approved">已通过</span>
+          </div>
+          <div class="asset-meta">
+            <span>发行：800</span>
+            <span>2款</span>
+          </div>
+          <div class="asset-tags">
+            <span class="tag">艺术</span>
+            <span class="tag">创新</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 铸造中状态 -->
+      <div class="asset-card" data-status="casting" onclick="viewAsset('5')">
+        <div class="asset-cover">🔧</div>
+        <div class="asset-info">
+          <div class="asset-header">
+            <div class="asset-name">茅台VIP尊享卡</div>
+            <span class="status-tag status-casting">铸造中</span>
+          </div>
+          <div class="asset-meta">
+            <span>发行：500</span>
+            <span>1款</span>
+          </div>
+          <div class="asset-tags">
+            <span class="tag">VIP</span>
+            <span class="tag">权益</span>
+          </div>
+          <div class="asset-actions">
+            <span class="no-action">铸造中...</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 待上线状态 - 新品 -->
+      <div class="asset-card" data-status="publish-pending" onclick="viewAsset('8')">
+        <div class="asset-cover">🎨</div>
+        <div class="asset-info">
+          <div class="asset-header">
+            <div class="asset-name">艺术大师·臻品系列</div>
+            <span class="status-tag status-publish-pending">待上线</span>
+          </div>
+          <div class="asset-meta">
+            <span>发行：3000</span>
+            <span>8款</span>
+          </div>
+          <div class="asset-tags">
+            <span class="tag">艺术</span>
+            <span class="tag">限量</span>
+          </div>
+          <div class="asset-actions">
+            <button class="action-btn action-btn-primary" id="publishBtn8" onclick="event.stopPropagation(); setPublishMode('8')">设置发行模式</button>
+            <button class="action-btn action-btn-secondary" onclick="event.stopPropagation(); viewCastingInfo('cast8')">查看铸造信息</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 已上线状态 -->
+      <div class="asset-card" data-status="published" onclick="viewAsset('6')">
+        <div class="asset-cover">⛓️</div>
+        <div class="asset-info">
+          <div class="asset-header">
+            <div class="asset-name">1935·时光窖藏</div>
+            <span class="status-tag status-published">已上线</span>
+          </div>
+          <div class="asset-meta">
+            <span>发行：5000</span>
+            <span>5款</span>
+          </div>
+          <div class="asset-tags">
+            <span class="tag">白酒</span>
+            <span class="tag">收藏</span>
+          </div>
+          <div class="asset-actions">
+            <button class="action-btn action-btn-secondary" id="publishBtn6" onclick="event.stopPropagation(); setPublishMode('6')">查看发行情况</button>
+            <button class="action-btn action-btn-secondary" onclick="event.stopPropagation(); viewCastingInfo('cast6')">查看铸造信息</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 已上线状态 -->
+      <div class="asset-card" data-status="ended" onclick="viewAsset('7')">
+        <div class="asset-cover">🎯</div>
+        <div class="asset-info">
+          <div class="asset-header">
+            <div class="asset-name">茅台会员积分</div>
+            <span class="status-tag status-ended">已结束</span>
+          </div>
+          <div class="asset-meta">
+            <span>发行：10000</span>
+            <span>1款</span>
+          </div>
+          <div class="asset-tags">
+            <span class="tag">会员</span>
+            <span class="tag">积分</span>
+          </div>
+          <div class="asset-actions">
+            <button class="action-btn action-btn-secondary" id="publishBtn7" onclick="event.stopPropagation(); setPublishMode('7')">查看发行情况</button>
+            <button class="action-btn action-btn-secondary" onclick="event.stopPropagation(); viewCastingInfo('cast7')">查看铸造信息</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 新增/编辑弹窗 -->
+  <div class="modal-overlay" id="assetModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">新增数字资产</div>
+        <div class="modal-close" onclick="closeModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+      </div>
+      <div class="modal-body">
+        <form id="assetForm">
+          <!-- 名称 -->
+          <div class="form-group">
+            <label class="required">产品名称</label>
+            <input type="text" id="assetName" placeholder="请输入数字资产名称" required>
+          </div>
+          
+          <!-- 产品标签 -->
+          <div class="form-group">
+            <label class="required">产品标签</label>
+            <div class="tag-input-container">
+              <input type="text" id="assetTags" placeholder="输入标签后按回车添加，如：白酒、酱香型" required>
+              <div class="tags-preview" id="tagsPreview"></div>
+            </div>
+          </div>
+          
+          <!-- 产品价值评估报告 -->
+          <div class="form-group">
+            <label class="required">产品价值评估报告</label>
+            <div class="file-upload-area" id="reportUpload">
+              <input type="file" id="reportFile" accept=".doc,.docx,.pdf" required>
+              <div class="upload-icon">📄</div>
+              <div class="upload-text">将文件拖到此处，或点击上传</div>
+              <div class="upload-hint">只能上传.doc .docx .pdf文件</div>
+            </div>
+          </div>
+          
+          <!-- 3D模型文件 -->
+          <div class="form-group">
+            <label>上传3D模型文件</label>
+            <div class="file-upload-area" id="modelUpload">
+              <input type="file" id="modelFile" accept=".glb,.gltf,.obj,.fbx">
+              <div class="upload-icon">🗿</div>
+              <div class="upload-text">将文件拖到此处，或点击上传</div>
+              <div class="upload-hint">支持.glb .gltf .obj .fbx格式</div>
+            </div>
+          </div>
+          
+          <!-- 封面图片 -->
+          <div class="form-group">
+            <label class="required">封面图片</label>
+            <div class="file-upload-area" id="coverUpload">
+              <input type="file" id="coverFile" accept="image/*" required>
+              <div class="upload-icon">🖼️</div>
+              <div class="upload-text">将封面图片拖到此处，或点击上传</div>
+              <div class="upload-hint">支持 JPG、PNG 格式，建议尺寸 800x600</div>
+            </div>
+            <div class="images-preview" id="coverPreview"></div>
+          </div>
+          
+          <!-- 图片上传（多张） -->
+          <div class="form-group">
+            <label class="required">产品详情（可上传多张）</label>
+            <div class="file-upload-area" id="imagesUpload">
+              <input type="file" id="imagesFile" accept="image/*" multiple required>
+              <div class="upload-icon">📷</div>
+              <div class="upload-text">将图片拖到此处，或点击上传</div>
+              <div class="upload-hint">支持 JPG、PNG 格式，可多选</div>
+            </div>
+            <div class="images-preview" id="imagesPreview"></div>
+          </div>
+          
+          <!-- 发行总数量 -->
+          <div class="form-group">
+            <label class="required">发行总数量</label>
+            <div class="quantity-selector">
+              <button type="button" class="quantity-btn" onclick="decreaseQuantity()">-</button>
+              <input type="number" class="quantity-input" id="assetQuantity" value="1" min="1" required>
+              <button type="button" class="quantity-btn" onclick="increaseQuantity()">+</button>
+            </div>
+          </div>
+          
+          <!-- 款式列表 -->
+          <div class="form-group">
+            <label class="required">款式</label>
+            <div class="styles-list" id="stylesList">
+              <!-- 初始款式 -->
+              <div class="style-item">
+                <div class="style-header">
+                  <span class="style-title">款式 1</span>
+                  <span class="style-remove" onclick="removeStyle(this)">删除</span>
+                </div>
+                <div class="style-fields">
+                  <div>
+                    <label>款式名称</label>
+                    <input type="text" class="style-name" placeholder="请输入款式名称" required>
+                  </div>
+                  <div>
+                    <label>数量</label>
+                    <input type="number" class="style-quantity" value="1" min="1" required>
+                  </div>
+                </div>
+                <div>
+                  <label class="required">款式图片</label>
+                  <div class="file-upload-area style-image-upload">
+                    <input type="file" accept="image/*" class="style-image-file" required>
+                    <div class="upload-icon">🖼️</div>
+                    <div class="upload-text">点击上传款式图片</div>
+                    <div class="upload-hint">支持 JPG、PNG 格式</div>
+                  </div>
+                </div>
+                
+                <!-- 权益列表 -->
+                <div class="benefits-section">
+                  <div class="benefits-section-header">
+                    <span class="benefits-title">权益说明</span>
+                  </div>
+                  <div class="benefits-list" data-style-index="0">
+                    <div class="benefit-item">
+                      <div class="benefit-fields">
+                        <div>
+                          <label>权益名称</label>
+                          <input type="text" class="benefit-name" placeholder="请输入权益名称" required>
+                        </div>
+                        <div>
+                          <label>核销方式</label>
+                          <select class="benefit-method" required>
+                            <option value="">请选择核销方式</option>
+                            <option value="delivery">实物快递</option>
+                            <option value="verification">商家平台核销</option>
+                          </select>
+                        </div>
+                      </div>
+                      <span class="benefit-remove" onclick="removeBenefit(this)">×</span>
+                    </div>
+                  </div>
+                  <button type="button" class="btn-add" onclick="addBenefit(this)" style="margin-top: 12px;">+ 添加权益</button>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="btn-add" style="margin-top: 12px;" onclick="addStyle()">+ 添加款式</button>
+          </div>
+          
+          <div class="btn-group">
+            <button type="button" class="btn-cancel" onclick="closeModal()">取消</button>
+            <button type="submit" class="btn btn-primary">保存</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    let styleIndex = 1;
+    
+    // 返回商家中心
+    function goBack() {
+      window.location.href = 'dashboard.html';
+    }
+    // 搜索资产
+    function searchAssets() {
+      const keyword = document.getElementById('searchInput').value.toLowerCase();
+      const cards = document.querySelectorAll('.asset-card');
+      
+      cards.forEach(card => {
+        const name = card.querySelector('.asset-name').textContent.toLowerCase();
+        if (name.includes(keyword)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+    
+    // 打开新增弹窗
+    function openAddModal() {
+      document.getElementById('modalTitle').textContent = '新增数字资产';
+      document.getElementById('assetForm').reset();
+      document.getElementById('assetQuantity').value = 1;
+      document.getElementById('coverPreview').innerHTML = '';
+      document.getElementById('imagesPreview').innerHTML = '';
+      document.getElementById('tagsPreview').innerHTML = '';
+      // 重置款式列表
+      styleIndex = 1;
+      const stylesList = document.getElementById('stylesList');
+      stylesList.innerHTML = `
+        <div class="style-item">
+          <div class="style-header">
+            <span class="style-title">款式 1</span>
+            <span class="style-remove" onclick="removeStyle(this)">删除</span>
+          </div>
+          <div class="style-fields">
+            <div>
+              <label>款式名称</label>
+              <input type="text" class="style-name" placeholder="请输入款式名称" required>
+            </div>
+            <div>
+              <label>数量</label>
+              <input type="number" class="style-quantity" value="1" min="1" required>
+            </div>
+            <div>
+              <label>款式图片</label>
+              <div class="file-upload-area style-image-upload">
+                <input type="file" accept="image/*" class="style-image-file">
+                <div class="upload-icon">🖼️</div>
+                <div class="upload-text">点击上传款式图片</div>
+                <div class="upload-hint">支持 JPG、PNG 格式</div>
+              </div>
+            </div>
+          </div>
+          <div class="benefits-section">
+            <div class="benefits-section-header">
+              <span class="benefits-title">权益说明</span>
+            </div>
+            <div class="benefits-list" data-style-index="0">
+              <div class="benefit-item">
+                <div class="benefit-fields">
+                  <div>
+                    <label>权益名称</label>
+                    <input type="text" class="benefit-name" placeholder="请输入权益名称" required>
+                  </div>
+                  <div>
+                    <label>兑现方式</label>
+                    <select class="benefit-method" required>
+                      <option value="">请选择兑现方式</option>
+                      <option value="delivery">实物快递</option>
+                      <option value="verification">商家平台核销</option>
+                    </select>
+                  </div>
+                </div>
+                <span class="benefit-remove" onclick="removeBenefit(this)">×</span>
+              </div>
+            </div>
+            <button type="button" class="btn-add" onclick="addBenefit(this)" style="margin-top: 12px;">+ 添加权益</button>
+          </div>
+        </div>
+      `;
+      document.getElementById('assetModal').classList.add('show');
+    }
+    
+    // 编辑资产
+    function editAsset(id) {
+      document.getElementById('modalTitle').textContent = '编辑数字资产';
+      document.getElementById('assetForm').reset();
+      document.getElementById('assetQuantity').value = 1;
+      document.getElementById('assetName').value = '飞天茅台数字藏品';
+      document.getElementById('assetModal').classList.add('show');
+    }
+    
+    // 删除资产
+    function deleteAsset(id) {
+      if (confirm('确定要删除该数字资产吗？')) {
+        alert('删除成功！');
+      }
+    }
+    
+    // 关闭弹窗
+    function closeModal() {
+      document.getElementById('assetModal').classList.remove('show');
+    }
+    
+    // 数量增减
+    function increaseQuantity() {
+      const input = document.getElementById('assetQuantity');
+      input.value = parseInt(input.value) + 1;
+    }
+    
+    function decreaseQuantity() {
+      const input = document.getElementById('assetQuantity');
+      if (parseInt(input.value) > 1) {
+        input.value = parseInt(input.value) - 1;
+      }
+    }
+    
+    // 添加款式
+    function addStyle() {
+      styleIndex++;
+      const stylesList = document.getElementById('stylesList');
+      const newStyle = document.createElement('div');
+      newStyle.className = 'style-item';
+      newStyle.innerHTML = `
+        <div class="style-header">
+          <span class="style-title">款式 ${styleIndex}</span>
+          <span class="style-remove" onclick="removeStyle(this)">删除</span>
+        </div>
+        <div class="style-fields">
+          <div>
+            <label>款式名称</label>
+            <input type="text" class="style-name" placeholder="请输入款式名称" required>
+          </div>
+          <div>
+            <label>数量</label>
+            <input type="number" class="style-quantity" value="1" min="1" required>
+          </div>
+          <div>
+            <label>款式图片</label>
+            <div class="file-upload-area style-image-upload">
+              <input type="file" accept="image/*" class="style-image-file">
+              <div class="upload-icon">🖼️</div>
+              <div class="upload-text">点击上传款式图片</div>
+              <div class="upload-hint">支持 JPG、PNG 格式</div>
+            </div>
+          </div>
+        </div>
+        <div class="benefits-section">
+          <div class="benefits-section-header">
+            <span class="benefits-title">权益说明</span>
+          </div>
+          <div class="benefits-list" data-style-index="${styleIndex - 1}">
+            <div class="benefit-item">
+              <div class="benefit-fields">
+                <div>
+                  <label>权益名称</label>
+                  <input type="text" class="benefit-name" placeholder="请输入权益名称" required>
+                </div>
+                <div>
+                  <label>兑现方式</label>
+                  <select class="benefit-method" required>
+                    <option value="">请选择兑现方式</option>
+                    <option value="delivery">实物快递</option>
+                    <option value="verification">商家平台核销</option>
+                  </select>
+                </div>
+              </div>
+              <span class="benefit-remove" onclick="removeBenefit(this)">×</span>
+            </div>
+          </div>
+          <button type="button" class="btn-add" onclick="addBenefit(this)" style="margin-top: 12px;">+ 添加权益</button>
+        </div>
+      `;
+      stylesList.appendChild(newStyle);
+    }
+    
+    // 删除款式
+    function removeStyle(el) {
+      const stylesList = document.getElementById('stylesList');
+      if (stylesList.children.length > 1) {
+        el.parentElement.parentElement.remove();
+        // 更新款式序号
+        const items = stylesList.querySelectorAll('.style-item');
+        items.forEach((item, index) => {
+          item.querySelector('.style-title').textContent = `款式 ${index + 1}`;
+          item.querySelector('.benefits-list').setAttribute('data-style-index', index);
+        });
+        styleIndex = items.length;
+      } else {
+        alert('至少保留一个款式');
+      }
+    }
+    
+    // 添加权益
+    function addBenefit(el) {
+      const benefitsList = el.previousElementSibling;
+      const newBenefit = document.createElement('div');
+      newBenefit.className = 'benefit-item';
+      newBenefit.innerHTML = `
+        <div class="benefit-fields">
+          <div>
+            <label>权益名称</label>
+            <input type="text" class="benefit-name" placeholder="请输入权益名称" required>
+          </div>
+          <div>
+            <label>兑现方式</label>
+            <select class="benefit-method" required>
+              <option value="">请选择兑现方式</option>
+              <option value="delivery">实物快递</option>
+              <option value="verification">商家平台核销</option>
+            </select>
+          </div>
+        </div>
+        <span class="benefit-remove" onclick="removeBenefit(this)">×</span>
+      `;
+      benefitsList.appendChild(newBenefit);
+    }
+    
+    // 删除权益
+    function removeBenefit(el) {
+      const benefitsList = el.parentElement.parentElement;
+      if (benefitsList.children.length > 1) {
+        el.parentElement.remove();
+      } else {
+        alert('至少保留一个权益');
+      }
+    }
+    
+    // 封面图片预览
+    document.getElementById('coverFile').addEventListener('change', function(e) {
+      const preview = document.getElementById('coverPreview');
+      preview.innerHTML = ''; // 清空之前的预览
+      
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const imageItem = document.createElement('div');
+          imageItem.className = 'image-item';
+          imageItem.innerHTML = `
+            <img src="${event.target.result}" alt="封面">
+            <span class="remove-btn" onclick="removeImage(this)">×</span>
+          `;
+          preview.appendChild(imageItem);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+    
+    // 图片预览
+    document.getElementById('imagesFile').addEventListener('change', function(e) {
+      const preview = document.getElementById('imagesPreview');
+      const files = e.target.files;
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const imageItem = document.createElement('div');
+          imageItem.className = 'image-item';
+          imageItem.innerHTML = `
+            <img src="${event.target.result}" alt="">
+            <span class="remove-btn" onclick="removeImage(this)">×</span>
+          `;
+          preview.appendChild(imageItem);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+    
+    // 删除预览图片
+    function removeImage(el) {
+      el.parentElement.remove();
+    }
+    
+    // 标签输入逻辑
+    document.getElementById('assetTags').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const tagText = this.value.trim();
+        if (tagText && tagText.length > 0) {
+          addTag(tagText);
+          this.value = '';
+        }
+      }
+    });
+    
+    // 添加标签
+    function addTag(text) {
+      const preview = document.getElementById('tagsPreview');
+      const existingTags = preview.querySelectorAll('.tag');
+      for (let i = 0; i < existingTags.length; i++) {
+        if (existingTags[i].querySelector('.tag-text').textContent === text) {
+          return; // 标签已存在
+        }
+      }
+      
+      const tagElement = document.createElement('span');
+      tagElement.className = 'tag';
+      tagElement.innerHTML = `<span class="tag-text">${text}</span><span class="remove-tag" onclick="removeTag(this)">×</span>`;
+      preview.appendChild(tagElement);
+    }
+    
+    // 删除标签
+    function removeTag(el) {
+      el.parentElement.remove();
+    }
+    
+    // 文件上传点击事件
+    document.getElementById('reportUpload').addEventListener('click', function() {
+      document.getElementById('reportFile').click();
+    });
+    
+    document.getElementById('modelUpload').addEventListener('click', function() {
+      document.getElementById('modelFile').click();
+    });
+    
+    document.getElementById('coverUpload').addEventListener('click', function() {
+      document.getElementById('coverFile').click();
+    });
+    
+    document.getElementById('imagesUpload').addEventListener('click', function() {
+      document.getElementById('imagesFile').click();
+    });
+    
+    // 款式图片上传点击事件
+    document.addEventListener('click', function(e) {
+      const uploadArea = e.target.closest('.style-image-upload');
+      if (uploadArea) {
+        uploadArea.querySelector('input').click();
+      }
+    });
+    
+    // 查看资产详情
+    function viewAsset(id) {
+      alert(`查看资产详情: ID ${id}\n\n资产信息以只读模式展示，不可编辑`);
+    }
+    
+    // 状态筛选
+    function filterByStatus(status, tabElement) {
+      // 更新tab样式
+      document.querySelectorAll('.status-tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      tabElement.classList.add('active');
+      
+      // 筛选资产卡片
+      const cards = document.querySelectorAll('.asset-card');
+      cards.forEach(card => {
+        if (status === 'all') {
+          card.classList.remove('hidden');
+        } else {
+          const cardStatus = card.getAttribute('data-status');
+          if (cardStatus === status) {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.add('hidden');
+          }
+        }
+      });
+    }
+    
+    // 编辑资产
+    function editAsset(id) {
+      openAddModal();
+    }
+    
+    // 删除资产
+    function deleteAsset(id) {
+      if (confirm('确定要删除该资产吗？')) {
+        alert(`删除资产成功: ID ${id}`);
+      }
+    }
+    
+    // 提交审核
+    function submitReview(id) {
+      if (confirm('确定要提交审核吗？')) {
+        alert(`提交审核成功: ID ${id}`);
+      }
+    }
+    
+    // 撤回审核
+    function withdrawAsset(id) {
+      if (confirm('确定要撤回审核吗？')) {
+        alert(`撤回审核成功: ID ${id}`);
+      }
+    }
+    
+    // 开始铸造
+    function startCasting(id) {
+      if (confirm('确定要开始铸造吗？')) {
+        alert(`开始铸造: ID ${id}`);
+      }
+    }
+    
+    // 发行状态数据（模拟已发布的数据）
+    let publishStatusData = {
+      '6': {
+        status: 'published',
+        currentPhase: '优先购',
+        totalSales: 856,
+        totalRevenue: 512400,
+        buyerCount: 428,
+        phases: [
+          {
+            id: 1,
+            mode: 'priority',
+            modeLabel: '优先购',
+            modeIcon: '🎯',
+            startTime: '2026-06-15T10:00',
+            endTime: '2026-06-16T18:00',
+            totalAmount: 500,
+            issuedAmount: 423,
+            issuedCount: 385,
+            boughtAmount: 398,
+            boughtCount: 367,
+            whitelist: []
+          },
+          {
+            id: 2,
+            mode: 'lottery',
+            modeLabel: '抽签购',
+            modeIcon: '🎲',
+            startTime: '2026-06-17T10:00',
+            endTime: '2026-06-18T18:00',
+            totalAmount: 800,
+            issuedAmount: 312,
+            issuedCount: 298,
+            boughtAmount: 286,
+            boughtCount: 275,
+            whitelist: []
+          },
+          {
+            id: 3,
+            mode: 'public',
+            modeLabel: '全民购',
+            modeIcon: '👥',
+            startTime: '2026-06-19T10:00',
+            boughtAmount: 172,
+            boughtCount: 168
+          }
+        ]
+      }
+    };
+    
+    // 设置发行模式
+    function setPublishMode(id, isView = false) {
+      document.getElementById('publishAssetId').value = id;
+      document.getElementById('publishStatus').value = 'draft';
+      
+      // 检查是否有已发布的数据
+      const savedData = publishStatusData[id];
+      
+      if (savedData && savedData.status === 'published') {
+        // 已发布状态，显示查看模式
+        publishPhases = savedData.phases;
+        document.getElementById('publishModalTitle').textContent = '查看发行情况';
+        document.getElementById('btnSaveDraft').style.display = 'none';
+        document.getElementById('btnPublish').style.display = 'none';
+        document.getElementById('btnViewStats').style.display = 'none';
+        document.getElementById('btnAddPhase').style.display = 'none';
+        document.getElementById('statsOverview').style.display = 'grid';
+        document.getElementById('chartSection').style.display = 'block';
+        
+        // 更新统计数据
+        document.getElementById('currentPhase').textContent = savedData.currentPhase;
+        // 计算发行总量（优先购+抽签购+全民购的数量）
+        const totalPublish = savedData.phases.reduce((sum, phase) => {
+          return sum + (phase.totalAmount || 0);
+        }, 0);
+        document.getElementById('totalPublish').textContent = totalPublish.toLocaleString();
+        document.getElementById('totalSales').textContent = savedData.totalSales.toLocaleString();
+        document.getElementById('totalRevenue').textContent = '¥' + (savedData.totalRevenue || 0).toLocaleString();
+        document.getElementById('buyerCount').textContent = savedData.buyerCount.toLocaleString();
+      } else {
+        // 草稿状态，显示编辑模式
+        publishPhases = [];
+        document.getElementById('publishModalTitle').textContent = '设置发行模式';
+        document.getElementById('btnSaveDraft').style.display = 'inline-block';
+        document.getElementById('btnPublish').style.display = 'inline-block';
+        document.getElementById('btnViewStats').style.display = 'none';
+        document.getElementById('btnAddPhase').style.display = 'block';
+        document.getElementById('statsOverview').style.display = 'none';
+        document.getElementById('chartSection').style.display = 'none';
+      }
+      
+      document.getElementById('publishModeModal').classList.add('show');
+      renderTimeline();
+      renderPhases();
+    }
+    
+    // 关闭发行模式弹窗
+    function closePublishModeModal() {
+      document.getElementById('publishModeModal').classList.remove('show');
+      publishPhases = [];
+      // 恢复白名单管理按钮显示
+      document.querySelectorAll('.btn-whitelist').forEach(btn => btn.style.display = 'inline-block');
+    }
+    
+    // 发行阶段数据
+    let publishPhases = [];
+    
+    // 添加发行阶段
+    function addPublishPhase() {
+      // 检查是否已有全民购阶段，全民购只能在最后
+      const hasPublic = publishPhases.some(p => p.mode === 'public');
+      if (hasPublic) {
+        alert('全民购只能设置在最后一个阶段，不能再添加新阶段');
+        return;
+      }
+      
+      // 获取可用的模式（排除已使用的）
+      const usedModes = publishPhases.map(p => p.mode);
+      const modes = [
+        { value: 'priority', label: '优先购', icon: '🎯' },
+        { value: 'lottery', label: '抽签购', icon: '🎲' },
+        { value: 'public', label: '全民购', icon: '👥' }
+      ].filter(m => !usedModes.includes(m.value));
+      
+      if (modes.length === 0) {
+        alert('所有发行模式都已使用，无法添加新阶段');
+        return;
+      }
+      
+      const newPhase = {
+        id: Date.now(),
+        mode: modes[0].value,
+        modeLabel: modes[0].label,
+        modeIcon: modes[0].icon,
+        startTime: '',
+        endTime: '',
+        totalAmount: ''
+      };
+      
+      publishPhases.push(newPhase);
+      renderTimeline();
+      renderPhases();
+    }
+    
+    // 删除发行阶段
+    function removePublishPhase(id) {
+      // 检查是否还有其他阶段可以删除
+      if (publishPhases.length <= 1) {
+        alert('至少需要保留一个发行阶段');
+        return;
+      }
+      
+      // 如果删除的是全民购阶段后面的阶段（不可能，因为全民购只能在最后）
+      const phaseIndex = publishPhases.findIndex(p => p.id === id);
+      const hasPublicAfter = publishPhases.slice(phaseIndex + 1).some(p => p.mode === 'public');
+      if (hasPublicAfter) {
+        alert('不能删除全民购之前的阶段');
+        return;
+      }
+      
+      publishPhases = publishPhases.filter(p => p.id !== id);
+      renderTimeline();
+      renderPhases();
+    }
+    
+    // 更新发行阶段
+    function updatePublishPhase(id, field, value) {
+      const phase = publishPhases.find(p => p.id === id);
+      if (!phase) return;
+      
+      if (field === 'mode') {
+        // 检查模式是否已被其他阶段使用
+        const isModeUsed = publishPhases.some(p => p.id !== id && p.mode === value);
+        if (isModeUsed) {
+          alert(`${getModeLabel(value)}已被其他阶段使用，请选择其他模式`);
+          renderPhases(); // 重新渲染以恢复原选择
+          return;
+        }
+        
+        // 检查全民购是否在最后阶段
+        if (value === 'public') {
+          const phaseIndex = publishPhases.findIndex(p => p.id === id);
+          if (phaseIndex !== publishPhases.length - 1) {
+            alert('全民购只能设置在最后一个阶段');
+            renderPhases(); // 重新渲染以恢复原选择
+            return;
+          }
+        }
+        
+        // 更新模式信息
+        const modes = [
+          { value: 'priority', label: '优先购', icon: '🎯' },
+          { value: 'lottery', label: '抽签购', icon: '🎲' },
+          { value: 'public', label: '全民购', icon: '👥' }
+        ];
+        const modeInfo = modes.find(m => m.value === value);
+        if (modeInfo) {
+          phase.mode = value;
+          phase.modeLabel = modeInfo.label;
+          phase.modeIcon = modeInfo.icon;
+        }
+      } else {
+        phase[field] = value;
+      }
+      
+      renderTimeline();
+      renderPhases();
+    }
+    
+    // 获取模式标签
+    function getModeLabel(mode) {
+      const modes = {
+        'priority': '优先购',
+        'lottery': '抽签购',
+        'public': '全民购'
+      };
+      return modes[mode] || mode;
+    }
+    
+    // 渲染时间轴
+    function renderTimeline() {
+      const container = document.getElementById('timelineContainer');
+      
+      if (publishPhases.length === 0) {
+        container.innerHTML = `
+          <div class="timeline-empty">
+            <div class="timeline-icon">📅</div>
+            <div>请添加发行阶段</div>
+          </div>
+        `;
+        return;
+      }
+      
+      // 按开始时间排序
+      const sortedPhases = [...publishPhases].sort((a, b) => {
+        if (!a.startTime && !b.startTime) return 0;
+        if (!a.startTime) return 1;
+        if (!b.startTime) return -1;
+        return new Date(a.startTime) - new Date(b.startTime);
+      });
+      
+      let html = '<div class="timeline">';
+      sortedPhases.forEach((phase, index) => {
+        const timeText = phase.startTime ? formatDateTime(phase.startTime) : '未设置';
+        html += `
+          <div class="timeline-item">
+            <div class="timeline-dot timeline-${phase.mode}">${phase.modeIcon}</div>
+            <div class="timeline-title">${phase.modeLabel}</div>
+            <div class="timeline-time">${timeText}</div>
+          </div>
+        `;
+      });
+      html += '</div>';
+      
+      container.innerHTML = html;
+    }
+    
+    // 渲染发行阶段列表
+    function renderPhases() {
+      const container = document.getElementById('phasesContainer');
+      const isPublished = document.getElementById('publishStatus').value === 'published' || publishStatusData[document.getElementById('publishAssetId').value]?.status === 'published';
+      
+      if (publishPhases.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+      
+      let html = '';
+      publishPhases.forEach((phase, index) => {
+        const showEndTime = phase.mode !== 'public';
+        const isLastPhase = index === publishPhases.length - 1;
+        const showWhitelist = phase.mode === 'priority' || phase.mode === 'lottery';
+        const issuedAmount = phase.issuedAmount || 0;
+        
+        // 获取已使用的模式（排除当前阶段）
+        const usedModes = publishPhases.filter(p => p.id !== phase.id).map(p => p.mode);
+        
+        // 构建模式选项（禁用已使用的模式）
+        const modes = [
+          { value: 'priority', label: '优先购', icon: '🎯' },
+          { value: 'lottery', label: '抽签购', icon: '🎲' },
+          { value: 'public', label: '全民购', icon: '👥' }
+        ];
+        
+        let modeOptions = '';
+        modes.forEach(mode => {
+          const isUsed = usedModes.includes(mode.value);
+          const isSelected = phase.mode === mode.value;
+          const isDisabled = (isUsed && !isSelected) || isPublished;
+          const isPublicNotLast = mode.value === 'public' && !isLastPhase;
+          
+          modeOptions += `
+            <option value="${mode.value}" ${isSelected ? 'selected' : ''} ${isDisabled || isPublicNotLast ? 'disabled' : ''}>
+              ${mode.label}${isUsed && !isSelected ? ' (已使用)' : ''}${isPublicNotLast && !isSelected ? ' (仅最后阶段)' : ''}
+            </option>
+          `;
+        });
+        
+        html += `
+          <div class="phase-card">
+            <div class="phase-header">
+              <div class="phase-title">
+                <span class="phase-badge phase-${phase.mode}">${phase.modeLabel}</span>
+                <span>第${index + 1}阶段</span>
+              </div>
+              ${!isPublished ? `
+              <button class="phase-remove-btn" onclick="removePublishPhase(${phase.id})">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+              ` : ''}
+            </div>
+            
+            <div class="phase-fields">
+              <div class="form-group">
+                <label>发行模式</label>
+                <select ${isPublished ? 'disabled' : ''} onchange="updatePublishPhase(${phase.id}, 'mode', this.value)">
+                  ${modeOptions}
+                </select>
+              </div>
+              
+              ${phase.mode !== 'public' ? `
+              <div class="form-group">
+                <label>总数量</label>
+                <input type="number" min="1" ${isPublished ? 'disabled' : ''} value="${phase.totalAmount}" onchange="updatePublishPhase(${phase.id}, 'totalAmount', this.value)" placeholder="请输入发行数量">
+              </div>
+              ` : ''}
+              
+              <div class="form-group">
+                <label>开始时间</label>
+                <input type="datetime-local" ${isPublished ? 'disabled' : ''} value="${phase.startTime}" onchange="updatePublishPhase(${phase.id}, 'startTime', this.value)">
+              </div>
+              
+              ${showEndTime ? `
+              <div class="form-group">
+                <label>结束时间</label>
+                <input type="datetime-local" ${isPublished ? 'disabled' : ''} value="${phase.endTime}" onchange="updatePublishPhase(${phase.id}, 'endTime', this.value)">
+              </div>
+              ` : ''}
+            </div>
+            
+            <!-- 统计数据 -->
+            <div class="phase-stats">
+              ${phase.mode !== 'public' ? `
+              <div class="stat-item">
+                <span class="stat-label">实际领取数量</span>
+                <span class="stat-value">${(phase.issuedAmount || 0).toLocaleString()}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">实际领取人数</span>
+                <span class="stat-value">${(phase.issuedCount || 0).toLocaleString()}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">白名单数量</span>
+                <span class="stat-value">${(phase.whitelistTotal || 0).toLocaleString()}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">白名单人数</span>
+                <span class="stat-value">${(phase.whitelistCount || 0).toLocaleString()}</span>
+              </div>
+              ` : ''}
+              <div class="stat-item">
+                <span class="stat-label">已购买数量</span>
+                <span class="stat-value">${(phase.boughtAmount || 0).toLocaleString()}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">已购买人数</span>
+                <span class="stat-value">${(phase.boughtCount || 0).toLocaleString()}</span>
+              </div>
+            </div>
+            
+            <!-- 导入白名单按钮 -->
+            ${showWhitelist ? `
+            <button class="btn-whitelist" onclick="openWhitelistModal(${phase.id}, '${phase.mode}')">
+              ${phase.whitelist && phase.whitelist.length > 0 ? `管理白名单 (${phase.whitelist.length})` : '导入白名单'}
+            </button>
+            ` : ''}
+            
+            ${phase.mode === 'public' ? `
+            <div class="phase-warning">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              全民购模式只有开始时间，无结束时间限制
+            </div>
+            ` : ''}
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+    
+    // 格式化日期时间
+    function formatDateTime(datetimeStr) {
+      if (!datetimeStr) return '';
+      const date = new Date(datetimeStr);
+      return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+    }
+    
+    // 检查时间是否交叉
+    function checkTimeOverlap() {
+      const validPhases = publishPhases.filter(p => p.startTime && (p.mode === 'public' || p.endTime));
+      
+      for (let i = 0; i < validPhases.length; i++) {
+        for (let j = i + 1; j < validPhases.length; j++) {
+          const p1 = validPhases[i];
+          const p2 = validPhases[j];
+          
+          const p1Start = new Date(p1.startTime);
+          const p1End = p1.mode === 'public' ? new Date(p1Start.getTime() + 1000 * 60 * 60 * 24) : new Date(p1.endTime);
+          const p2Start = new Date(p2.startTime);
+          const p2End = p2.mode === 'public' ? new Date(p2Start.getTime() + 1000 * 60 * 60 * 24) : new Date(p2.endTime);
+          
+          // 检查时间重叠
+          if (p1Start < p2End && p2Start < p1End) {
+            return `第${i + 1}阶段(${p1.modeLabel})与第${j + 1}阶段(${p2.modeLabel})时间交叉`;
+          }
+        }
+      }
+      return null;
+    }
+    
+    // 确认上线（二次确认）
+    function confirmPublish() {
+      const assetId = document.getElementById('publishAssetId').value;
+      const assetCard = document.querySelector(`[onclick="viewAsset('${assetId}')"]`)?.closest('.asset-card');
+      const assetName = assetCard?.querySelector('.asset-name')?.textContent || '该资产';
+      
+      if (confirm(`确定要上线「${assetName}」吗？上线后将正式开始发行。`)) {
+        savePublishMode('publish');
+      }
+    }
+    
+    // 保存发行模式
+    function savePublishMode(action = 'draft') {
+      const assetId = document.getElementById('publishAssetId').value;
+      
+      // 验证
+      if (publishPhases.length === 0) {
+        alert('请至少添加一个发行阶段');
+        return;
+      }
+      
+      for (const phase of publishPhases) {
+        if (!phase.startTime) {
+          alert(`${phase.modeLabel}未设置开始时间`);
+          return;
+        }
+        if (!phase.totalAmount || phase.totalAmount <= 0) {
+          alert(`${phase.modeLabel}未设置有效数量`);
+          return;
+        }
+        if (phase.mode !== 'public' && !phase.endTime) {
+          alert(`${phase.modeLabel}未设置结束时间`);
+          return;
+        }
+        if (phase.mode !== 'public' && phase.startTime >= phase.endTime) {
+          alert(`${phase.modeLabel}开始时间不能大于等于结束时间`);
+          return;
+        }
+      }
+      
+      // 检查时间交叉
+      const overlapMsg = checkTimeOverlap();
+      if (overlapMsg) {
+        alert(`时间错误：${overlapMsg}`);
+        return;
+      }
+      
+      // 模拟保存/发布
+      const data = {
+        assetId,
+        status: action,
+        phases: publishPhases
+      };
+      
+      console.log('发行模式数据:', data);
+      
+      if (action === 'publish') {
+        // 上线时不保存数据，不改变产品状态
+        alert('发行模式已上线！');
+        closePublishModeModal();
+        return;
+      } else {
+        alert('发行模式保存成功！');
+      }
+      
+      closePublishModeModal();
+    }
+    
+    // 打开白名单导入弹窗
+    function openWhitelistModal(phaseId, mode) {
+      document.getElementById('whitelistPhaseId').value = phaseId;
+      document.getElementById('whitelistMode').value = mode;
+      document.getElementById('whitelistFile').value = '';
+      document.getElementById('whitelistText').value = '';
+      document.getElementById('whitelistPreview').style.display = 'none';
+      document.getElementById('whitelistModal').classList.add('show');
+    }
+    
+    // 关闭白名单导入弹窗
+    function closeWhitelistModal() {
+      document.getElementById('whitelistModal').classList.remove('show');
+    }
+    
+    // 导入白名单
+    function importWhitelist() {
+      const phaseId = parseInt(document.getElementById('whitelistPhaseId').value);
+      const textContent = document.getElementById('whitelistText').value.trim();
+      
+      if (!textContent) {
+        alert('请输入手机号或选择文件');
+        return;
+      }
+      
+      // 解析手机号和数量（每行格式：手机号,数量）
+      const whitelistData = [];
+      const lines = textContent.split('\n').map(line => line.trim()).filter(line => line);
+      
+      for (const line of lines) {
+        const parts = line.split(',');
+        const phone = parts[0]?.trim();
+        const quantity = parseInt(parts[1]?.trim() || '1');
+        
+        if (phone && /^1[3-9]\d{9}$/.test(phone)) {
+          whitelistData.push({ phone, quantity: isNaN(quantity) ? 1 : quantity });
+        }
+      }
+      
+      if (whitelistData.length === 0) {
+        alert('没有有效的手机号');
+        return;
+      }
+      
+      // 更新阶段的白名单
+      const phase = publishPhases.find(p => p.id === phaseId);
+      if (phase) {
+        phase.whitelist = whitelistData;
+        renderPhases();
+      }
+      
+      alert(`成功导入 ${whitelistData.length} 条记录到白名单`);
+      closeWhitelistModal();
+    }
+    
+    // 预览白名单
+    function previewWhitelist() {
+      const textContent = document.getElementById('whitelistText').value.trim();
+      const previewDiv = document.getElementById('whitelistPreview');
+      const tableBody = document.getElementById('whitelistTableBody');
+      const countSpan = document.getElementById('whitelistCount');
+      
+      if (!textContent) {
+        previewDiv.style.display = 'none';
+        return;
+      }
+      
+      // 解析数据
+      const whitelistData = [];
+      const lines = textContent.split('\n').map(line => line.trim()).filter(line => line);
+      
+      for (const line of lines) {
+        const parts = line.split(',');
+        const phone = parts[0]?.trim();
+        const quantity = parseInt(parts[1]?.trim() || '1');
+        
+        if (phone) {
+          whitelistData.push({ phone, quantity: isNaN(quantity) ? 1 : quantity });
+        }
+      }
+      
+      // 渲染预览表格
+      let html = '';
+      for (const item of whitelistData) {
+        html += `<tr>
+          <td style="padding: 4px 0; font-size: 13px; color: #333;">${item.phone}</td>
+          <td style="padding: 4px 0; font-size: 13px; color: #333; text-align: right;">${item.quantity}</td>
+        </tr>`;
+      }
+      
+      tableBody.innerHTML = html;
+      countSpan.textContent = whitelistData.length;
+      previewDiv.style.display = 'block';
+    }
+    
+    // 打开白名单弹窗
+    function openWhitelistModal(phaseId, mode) {
+      document.getElementById('whitelistPhaseId').value = phaseId;
+      document.getElementById('whitelistMode').value = mode;
+      document.getElementById('whitelistModal').classList.add('show');
+      renderWhitelistList();
+    }
+    
+    // 关闭白名单弹窗
+    function closeWhitelistModal() {
+      document.getElementById('whitelistModal').classList.remove('show');
+      document.getElementById('whitelistText').value = '';
+      document.getElementById('whitelistPreview').style.display = 'none';
+      document.getElementById('whitelistFile').value = '';
+    }
+    
+    // 显示列表面板
+    function showListPanel() {
+      document.getElementById('whitelistListSection').style.display = 'block';
+      document.getElementById('whitelistImportPanel').style.display = 'none';
+      document.getElementById('whitelistManualPanel').style.display = 'none';
+      renderWhitelistList();
+    }
+    
+    // 显示导入面板
+    function showImportPanel() {
+      document.getElementById('whitelistListSection').style.display = 'none';
+      document.getElementById('whitelistImportPanel').style.display = 'block';
+      document.getElementById('whitelistManualPanel').style.display = 'none';
+      document.getElementById('whitelistFile').value = '';
+    }
+    
+    // 显示手动输入面板
+    function showManualPanel() {
+      document.getElementById('whitelistListSection').style.display = 'none';
+      document.getElementById('whitelistImportPanel').style.display = 'none';
+      document.getElementById('whitelistManualPanel').style.display = 'block';
+      document.getElementById('whitelistText').value = '';
+      document.getElementById('whitelistPreview').style.display = 'none';
+    }
+    
+    // 渲染白名单列表
+    function renderWhitelistList() {
+      const phaseId = parseInt(document.getElementById('whitelistPhaseId').value);
+      const phase = publishPhases.find(p => p.id === phaseId);
+      const tbody = document.getElementById('whitelistListBody');
+      const emptyDiv = document.getElementById('whitelistEmpty');
+      const summaryDiv = document.querySelector('.whitelist-summary');
+      
+      if (!phase || !phase.whitelist || phase.whitelist.length === 0) {
+        tbody.innerHTML = '';
+        emptyDiv.style.display = 'block';
+        summaryDiv.innerHTML = '<span>当前白名单人数：<strong>0</strong> 人</span><span>总数量：<strong>0</strong></span>';
+        return;
+      }
+      
+      emptyDiv.style.display = 'none';
+      
+      // 计算统计
+      const count = phase.whitelist.length;
+      const total = phase.whitelist.reduce((sum, item) => sum + item.quantity, 0);
+      
+      summaryDiv.innerHTML = `<span>当前白名单人数：<strong>${count}</strong> 人</span><span>总数量：<strong>${total}</strong></span>`;
+      
+      // 更新阶段的统计数据
+      phase.whitelistCount = count;
+      phase.whitelistTotal = total;
+      renderPhases();
+      
+      // 渲染列表
+      let html = '';
+      phase.whitelist.forEach((item, index) => {
+        html += `<tr>
+          <td style="padding: 8px 0; font-size: 13px; color: #333;">${item.phone}</td>
+          <td style="padding: 8px 0; font-size: 13px; color: #333; text-align: center;">${item.quantity}</td>
+          <td style="padding: 8px 0; text-align: right;">
+            <button class="whitelist-remove-btn" onclick="removeWhitelistItem(${phaseId}, ${index})" style="color: #ff6b6b; font-size: 14px; padding: 4px 8px; border: none; background: transparent; cursor: pointer;">删除</button>
+          </td>
+        </tr>`;
+      });
+      
+      tbody.innerHTML = html;
+    }
+    
+    // 删除白名单项
+    function removeWhitelistItem(phaseId, index) {
+      const phase = publishPhases.find(p => p.id === phaseId);
+      if (phase && phase.whitelist && phase.whitelist.length > index) {
+        phase.whitelist.splice(index, 1);
+        renderWhitelistList();
+      }
+    }
+    
+    // 导入文件
+    function importWhitelistFile() {
+      const fileInput = document.getElementById('whitelistFile');
+      const phaseId = parseInt(document.getElementById('whitelistPhaseId').value);
+      
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert('请选择文件');
+        return;
+      }
+      
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        const textContent = e.target.result;
+        processWhitelistData(textContent, phaseId);
+      };
+      
+      reader.readAsText(file);
+    }
+    
+    // 导入文本
+    function importWhitelistText() {
+      const textContent = document.getElementById('whitelistText').value.trim();
+      const phaseId = parseInt(document.getElementById('whitelistPhaseId').value);
+      
+      if (!textContent) {
+        alert('请输入内容');
+        return;
+      }
+      
+      processWhitelistData(textContent, phaseId);
+    }
+    
+    // 处理白名单数据
+    function processWhitelistData(textContent, phaseId) {
+      // 解析手机号和数量（每行格式：手机号,数量）
+      const whitelistData = [];
+      const lines = textContent.split('\n').map(line => line.trim()).filter(line => line);
+      
+      for (const line of lines) {
+        const parts = line.split(',');
+        const phone = parts[0]?.trim();
+        const quantity = parseInt(parts[1]?.trim() || '1');
+        
+        if (phone && /^1[3-9]\d{9}$/.test(phone)) {
+          whitelistData.push({ phone, quantity: isNaN(quantity) ? 1 : quantity });
+        }
+      }
+      
+      if (whitelistData.length === 0) {
+        alert('没有有效的手机号');
+        return;
+      }
+      
+      // 更新阶段的白名单（追加模式）
+      const phase = publishPhases.find(p => p.id === phaseId);
+      if (phase) {
+        if (!phase.whitelist) {
+          phase.whitelist = [];
+        }
+        
+        // 去重：合并相同手机号的数量
+        const existingPhones = new Map();
+        phase.whitelist.forEach(item => {
+          existingPhones.set(item.phone, (existingPhones.get(item.phone) || 0) + item.quantity);
+        });
+        
+        whitelistData.forEach(item => {
+          existingPhones.set(item.phone, (existingPhones.get(item.phone) || 0) + item.quantity);
+        });
+        
+        phase.whitelist = Array.from(existingPhones.entries()).map(([phone, quantity]) => ({ phone, quantity }));
+        renderPhases();
+      }
+      
+      alert(`成功导入 ${whitelistData.length} 条记录到白名单`);
+      showListPanel();
+    }
+    
+    // 更新图表
+    function updateChart(period) {
+      console.log('更新图表:', period);
+      // 这里可以根据周期更新图表数据
+    }
+    
+    // 查看发行情况（仅已发布状态）
+    function viewPublishStats() {
+      const assetId = document.getElementById('publishAssetId').value;
+      const savedData = publishStatusData[assetId];
+      
+      if (savedData) {
+        setPublishMode(assetId, true);
+      }
+    }
+    
+    // 更新按钮状态
+    function updatePublishButtons() {
+      Object.keys(publishStatusData).forEach(assetId => {
+        const btn = document.getElementById(`publishBtn${assetId}`);
+        if (btn) {
+          const data = publishStatusData[assetId];
+          if (data.status === 'published') {
+            btn.textContent = '查看发行情况';
+            btn.classList.remove('action-btn-primary');
+            btn.classList.add('action-btn-secondary');
+          }
+        }
+      });
+    }
+    
+    // 页面加载完成后更新按钮状态
+    document.addEventListener('DOMContentLoaded', function() {
+      updatePublishButtons();
+    });
+    
+    // 查看数据（去掉白名单管理功能）
+    function viewData(id) {
+      document.getElementById('publishAssetId').value = id;
+      document.getElementById('publishStatus').value = 'draft';
+      
+      // 检查是否有已发布的数据
+      const savedData = publishStatusData[id];
+      
+      if (savedData && savedData.status === 'published') {
+        // 已发布状态，显示查看模式（去掉白名单管理）
+        publishPhases = savedData.phases;
+        document.getElementById('publishModalTitle').textContent = '查看数据';
+        document.getElementById('btnSaveDraft').style.display = 'none';
+        document.getElementById('btnPublish').style.display = 'none';
+        document.getElementById('btnViewStats').style.display = 'none';
+        document.getElementById('btnAddPhase').style.display = 'none';
+        document.getElementById('statsOverview').style.display = 'grid';
+        document.getElementById('chartSection').style.display = 'block';
+        // 隐藏白名单管理按钮
+        document.querySelectorAll('.btn-whitelist').forEach(btn => btn.style.display = 'none');
+        
+        // 更新统计数据
+        document.getElementById('currentPhase').textContent = savedData.currentPhase;
+        // 计算发行总量（优先购+抽签购+全民购的数量）
+        const totalPublish = savedData.phases.reduce((sum, phase) => {
+          return sum + (phase.totalAmount || 0);
+        }, 0);
+        document.getElementById('totalPublish').textContent = totalPublish.toLocaleString();
+        document.getElementById('totalSales').textContent = savedData.totalSales.toLocaleString();
+        document.getElementById('totalRevenue').textContent = '¥' + (savedData.totalRevenue || 0).toLocaleString();
+        document.getElementById('buyerCount').textContent = savedData.buyerCount.toLocaleString();
+      } else {
+        // 草稿状态，显示编辑模式
+        publishPhases = [];
+        document.getElementById('publishModalTitle').textContent = '查看数据';
+        document.getElementById('btnSaveDraft').style.display = 'none';
+        document.getElementById('btnPublish').style.display = 'none';
+        document.getElementById('btnViewStats').style.display = 'none';
+        document.getElementById('btnAddPhase').style.display = 'none';
+        document.getElementById('statsOverview').style.display = 'none';
+        document.getElementById('chartSection').style.display = 'none';
+      }
+      
+      document.getElementById('publishModeModal').classList.add('show');
+      renderTimeline();
+      renderPhases();
+    }
+    
+    // 表单提交
+    document.getElementById('assetForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('保存成功！');
+      closeModal();
+    });
+    // 查看铸造信息
+    function viewCastingInfo(id) {
+      const castingInfo = {
+        'cast6': {
+          name: '1935·时光窖藏',
+          totalAmount: 1935,
+          chainAddress: '0x7a3e...f2b1',
+          chainProtocol: 'ERC-721',
+          blockchain: '艺海链',
+          styles: [
+            { name: '凝时', quantity: 387 },
+            { name: '守岁', quantity: 387 },
+            { name: '溯年', quantity: 387 },
+            { name: '沉光', quantity: 387 },
+            { name: '驻痕', quantity: 387 }
+          ]
+        },
+        'cast7': {
+          name: '茅台会员积分',
+          totalAmount: 10000,
+          chainAddress: '0x8b4f...a9c2',
+          chainProtocol: 'ERC-721',
+          blockchain: '艺海链',
+          styles: [
+            { name: '基础积分', quantity: 10000 }
+          ]
+        },
+        'cast8': {
+          name: '艺术大师·臻品系列',
+          totalAmount: 3000,
+          chainAddress: '0x9c5a...d3e4',
+          chainProtocol: 'ERC-721',
+          blockchain: '艺海链',
+          styles: [
+            { name: '山水清音', quantity: 375 },
+            { name: '花鸟怡情', quantity: 375 },
+            { name: '人物神韵', quantity: 375 },
+            { name: '书法意境', quantity: 375 },
+            { name: '山水印象', quantity: 375 },
+            { name: '水墨丹青', quantity: 375 },
+            { name: '工笔重彩', quantity: 375 },
+            { name: '写意传神', quantity: 375 }
+          ]
+        }
+      };
+      
+      const info = castingInfo[id];
+      if (!info) return;
+      
+      let stylesHtml = `
+        <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">
+          <thead>
+            <tr style="background: #f5f5f7;">
+              <th style="padding: 8px 12px; text-align: left; font-size: 13px; color: #666; border: 1px solid #e8e8e8;">规格名称</th>
+              <th style="padding: 8px 12px; text-align: right; font-size: 13px; color: #666; border: 1px solid #e8e8e8;">铸造数量</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      info.styles.forEach((style) => {
+        stylesHtml += `
+          <tr>
+            <td style="padding: 8px 12px; font-size: 14px; color: #333; border: 1px solid #e8e8e8;">${style.name}</td>
+            <td style="padding: 8px 12px; font-size: 14px; color: #333; border: 1px solid #e8e8e8; text-align: right;">${style.quantity} 份</td>
+          </tr>
+        `;
+      });
+      stylesHtml += '</tbody></table>';
+      
+      const content = `
+        <div style="margin-bottom: 20px;">
+          <h3 style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 16px;">铸造形象</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div style="padding: 12px; background: #f8fafc; border-radius: 8px;">
+              <span style="font-size: 13px; color: #666;">发行数量</span>
+              <div style="font-size: 20px; font-weight: 600; color: #667eea; margin-top: 4px;">${info.totalAmount.toLocaleString()} 份</div>
+            </div>
+            <div style="padding: 12px; background: #f8fafc; border-radius: 8px;">
+              <span style="font-size: 13px; color: #666;">链上地址</span>
+              <div style="font-size: 12px; font-family: monospace; color: #333; margin-top: 4px;">${info.chainAddress}</div>
+            </div>
+            <div style="padding: 12px; background: #f8fafc; border-radius: 8px;">
+              <span style="font-size: 13px; color: #666;">链上协议</span>
+              <div style="font-size: 14px; color: #333; margin-top: 4px;">${info.chainProtocol}</div>
+            </div>
+            <div style="padding: 12px; background: #f8fafc; border-radius: 8px;">
+              <span style="font-size: 13px; color: #666;">区块链平台</span>
+              <div style="font-size: 14px; color: #333; margin-top: 4px;">${info.blockchain}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <h3 style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 16px;">各规格铸造数量</h3>
+          ${stylesHtml}
+        </div>
+      `;
+      
+      document.getElementById('castingContent').innerHTML = content;
+      document.getElementById('castingModal').classList.add('show');
+    }
+    
+    // 关闭铸造信息弹窗
+    function closeCastingModal() {
+      document.getElementById('castingModal').classList.remove('show');
+    }
+  </script>
+  
+  <!-- 铸造信息弹窗 -->
+  <div class="modal-overlay" id="castingModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">铸造信息</div>
+        <div class="modal-close" onclick="closeCastingModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+      </div>
+      <div class="modal-body" id="castingContent">
+        <!-- 铸造信息内容将通过JS渲染 -->
+      </div>
+      <div class="btn-group" style="padding: 20px 24px; border-top: 1px solid #f0f0f0;">
+        <button class="btn-cancel" onclick="closeCastingModal()">关闭</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 发行模式设置弹窗 -->
+  <div class="modal-overlay" id="publishModeModal">
+    <div class="modal-box" style="max-width: 900px;">
+      <div class="modal-header">
+        <div class="modal-title" id="publishModalTitle">设置发行模式</div>
+        <div class="modal-close" onclick="closePublishModeModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+      </div>
+      <div class="modal-body" style="max-height: 65vh; overflow-y: auto;">
+        <input type="hidden" id="publishAssetId">
+        <input type="hidden" id="publishStatus" value="draft">
+        
+        <!-- 统计概览 -->
+        <div class="stats-overview" id="statsOverview">
+          <div class="stat-card">
+            <div class="stat-label">当前阶段</div>
+            <div class="stat-value" id="currentPhase">-</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">发行总量</div>
+            <div class="stat-value" id="totalPublish">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">销售总量</div>
+            <div class="stat-value" id="totalSales">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">销售总额</div>
+            <div class="stat-value" id="totalRevenue" style="color:#FFD700">¥0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">购买人数</div>
+            <div class="stat-value" id="buyerCount">0</div>
+          </div>
+        </div>
+        
+        <!-- 销售趋势图表 -->
+        <div class="chart-section" id="chartSection">
+          <div class="chart-header">
+            <span class="chart-title">销售趋势</span>
+            <select class="chart-period" onchange="updateChart(this.value)">
+              <option value="7d">近7天</option>
+              <option value="30d">近30天</option>
+            </select>
+          </div>
+          <div class="chart-container" id="salesChart">
+            <div class="chart-placeholder">
+              <div class="chart-bar" style="height: 40%;"><span>120</span></div>
+              <div class="chart-bar" style="height: 65%;"><span>200</span></div>
+              <div class="chart-bar" style="height: 50%;"><span>160</span></div>
+              <div class="chart-bar" style="height: 80%;"><span>280</span></div>
+              <div class="chart-bar" style="height: 45%;"><span>140</span></div>
+              <div class="chart-bar" style="height: 70%;"><span>240</span></div>
+              <div class="chart-bar" style="height: 90%;"><span>320</span></div>
+            </div>
+            <div class="chart-labels">
+              <span>周一</span>
+              <span>周二</span>
+              <span>周三</span>
+              <span>周四</span>
+              <span>周五</span>
+              <span>周六</span>
+              <span>周日</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 发行时间轴 -->
+        <div class="form-group">
+          <label>发行时间轴</label>
+          <div class="timeline-container" id="timelineContainer">
+            <div class="timeline-empty">
+              <div class="timeline-icon">📅</div>
+              <div>请添加发行阶段</div>
+            </div>
+          </div>
+          <button type="button" class="btn-add-mode" id="btnAddPhase" onclick="addPublishPhase()">+ 添加发行阶段</button>
+        </div>
+        
+        <!-- 发行阶段列表 -->
+        <div class="phases-container" id="phasesContainer">
+          <!-- 发行阶段将通过JS渲染 -->
+        </div>
+        
+        <!-- 底部按钮组 -->
+        <div class="btn-group" style="padding: 20px 0 0 0; border-top: 1px solid #f0f0f0; margin-top: 20px;">
+          <button class="btn-cancel" onclick="closePublishModeModal()">取消</button>
+          <button class="btn-default" id="btnSaveDraft" onclick="savePublishMode('draft')">保存</button>
+          <button class="btn-primary" id="btnPublish" onclick="confirmPublish()">上线</button>
+          <button class="btn-success" id="btnViewStats" style="display: none;" onclick="viewPublishStats()">查看发行情况</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 管理白名单弹窗 -->
+  <div class="modal-overlay" id="whitelistModal">
+    <div class="modal-box" style="max-width: 600px;">
+      <div class="modal-header">
+        <div class="modal-title">管理白名单</div>
+        <div class="modal-actions">
+          <button class="btn-add-whitelist" onclick="showImportPanel()">导入白名单</button>
+          <button class="btn-add-manual" onclick="showManualPanel()">手动输入</button>
+        </div>
+        <div class="modal-close" onclick="closeWhitelistModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="whitelistPhaseId">
+        <input type="hidden" id="whitelistMode">
+        
+        <!-- 当前白名单列表 -->
+        <div class="whitelist-list-section" id="whitelistListSection">
+          <div class="whitelist-summary">
+            <span>当前白名单人数：<strong>${currentWhitelistCount}</strong> 人</span>
+            <span>总数量：<strong>${currentWhitelistTotal}</strong></span>
+          </div>
+          <div class="whitelist-list" id="whitelistList">
+            <table style="width: 100%;">
+              <thead>
+                <tr>
+                  <th style="text-align: left; font-size: 12px; color: #666; padding-bottom: 8px;">账号</th>
+                  <th style="text-align: center; font-size: 12px; color: #666; padding-bottom: 8px;">数量</th>
+                  <th style="text-align: right; font-size: 12px; color: #666; padding-bottom: 8px;">操作</th>
+                </tr>
+              </thead>
+              <tbody id="whitelistListBody">
+                <!-- 列表将通过JS渲染 -->
+              </tbody>
+            </table>
+            <div class="whitelist-empty" id="whitelistEmpty" style="display: none; text-align: center; padding: 40px 0; color: #999;">
+              <div style="font-size: 48px; margin-bottom: 12px;">📋</div>
+              <div>暂无白名单数据</div>
+              <div style="font-size: 12px; margin-top: 8px;">点击右上角按钮添加白名单</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 导入面板 -->
+        <div class="whitelist-import-panel" id="whitelistImportPanel" style="display: none;">
+          <button class="btn-back" onclick="showListPanel()">← 返回列表</button>
+          <div class="form-group">
+            <label>选择文件</label>
+            <div class="file-upload-area" id="whitelistUpload">
+              <input type="file" id="whitelistFile" accept=".txt,.csv">
+              <div class="upload-icon">📄</div>
+              <div class="upload-text">将文件拖到此处，或点击上传</div>
+              <div class="upload-hint">支持 .txt .csv 格式，每行格式：手机号,数量</div>
+            </div>
+          </div>
+          <div class="btn-group" style="padding-top: 12px;">
+            <button class="btn-primary" onclick="importWhitelistFile()">导入文件</button>
+          </div>
+        </div>
+        
+        <!-- 手动输入面板 -->
+        <div class="whitelist-manual-panel" id="whitelistManualPanel" style="display: none;">
+          <button class="btn-back" onclick="showListPanel()">← 返回列表</button>
+          <div class="form-group">
+            <label>手动输入（每行一个）</label>
+            <textarea id="whitelistText" rows="6" placeholder="每行格式：手机号,数量&#10;例如：&#10;13800138000,10&#10;13900139000,5" oninput="previewWhitelist()"></textarea>
+          </div>
+          <div class="whitelist-preview" id="whitelistPreview" style="display: none;">
+            <div style="margin-bottom: 8px; font-size: 13px; color: #666;">已导入记录数量：<span id="whitelistCount">0</span></div>
+            <div style="max-height: 150px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 4px; padding: 8px;">
+              <table id="whitelistAddresses" style="width: 100%;">
+                <thead>
+                  <tr>
+                    <th style="text-align: left; font-size: 12px; color: #666; padding-bottom: 8px;">手机号</th>
+                    <th style="text-align: right; font-size: 12px; color: #666; padding-bottom: 8px;">数量</th>
+                  </tr>
+                </thead>
+                <tbody id="whitelistTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="btn-group" style="padding-top: 12px;">
+            <button class="btn-primary" onclick="importWhitelistText()">确认添加</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

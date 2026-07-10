@@ -1,0 +1,329 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>资产转赠</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; justify-content: center; }
+.page { max-width: 430px; min-height: 100vh; background: #f6f7fb; padding: 0 16px 90px; position: relative; width: 100%; }
+
+.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; }
+.nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.nav-back svg { width: 20px; height: 20px; color: #333; display: block; }
+.nav-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+
+.step { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0 14px; }
+.step-dot { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; background: #ddd; }
+.step-dot.on { background: #D70C1F; }
+.step-line { width: 32px; height: 2px; background: #eee; }
+.step-line.on { background: #D70C1F; }
+.step-label { font-size: 10px; color: #ccc; text-align: center; }
+.step-label.on { color: #D70C1F; font-weight: 600; }
+
+.filter-bar { display: flex; gap: 8px; margin-bottom: 12px; }
+.filter-bar input { flex: 1; height: 36px; border: 1px solid #e8e8ec; border-radius: 10px; padding: 0 12px; font-size: 13px; outline: none; background: #fff; color: #333; }
+.filter-bar input:focus { border-color: #D70C1F; }
+.filter-bar select { height: 36px; border: 1px solid #e8e8ec; border-radius: 10px; padding: 0 8px; font-size: 12px; outline: none; background: #fff; color: #666; max-width: 120px; }
+
+.card { background: #fff; border-radius: 16px; margin-bottom: 10px; box-shadow: 0 1px 6px rgba(0,0,0,.04); overflow: hidden; }
+.card-hdr { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; border-bottom: 1px solid #f5f5f7; }
+.card-hdr:active { background: #fafafa; }
+.series-thumb { width: 44px; height: 54px; border-radius: 8px; background-position: center; background-size: cover; flex-shrink: 0; }
+.series-info { flex: 1; margin: 0 10px; min-width: 0; }
+.series-name { font-size: 14px; font-weight: 600; color: #1a1a2e; }
+.series-tag { font-size: 10px; color: #999; background: #f5f5f7; padding: 1px 6px; border-radius: 3px; display: inline-block; margin-top: 2px; }
+.series-hold { font-size: 13px; font-weight: 700; color: #D70C1F; }
+.series-expand { width: 14px; flex-shrink: 0; }
+.series-expand svg { width: 14px; height: 14px; color: #ccc; transition: transform .25s; display: block; }
+.series-expand.open svg { transform: rotate(180deg); }
+
+.instances { display: none; border-top: 1px solid #f5f5f7; }
+.instances.show { display: block; }
+.inst-item { display: flex; align-items: center; gap: 10px; padding: 12px 16px 12px 56px; cursor: pointer; transition: background .12s; border-bottom: 1px solid #fafafc; }
+.inst-item:last-child { border-bottom: none; }
+.inst-item:active { background: #fafafa; }
+.inst-thumb { width: 38px; height: 46px; border-radius: 6px; background-position: center; background-size: cover; flex-shrink: 0; background-color: #f5f5f7; }
+.inst-info { flex: 1; min-width: 0; }
+.inst-num { font-size: 13px; font-weight: 700; color: #1a1a2e; }
+.inst-spec { font-size: 11px; color: #999; }
+.inst-check { width: 20px; height: 20px; border: 2px solid #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.inst-item.selected .inst-check { border-color: #D70C1F; background: #D70C1F; }
+.inst-check svg { width: 12px; height: 12px; color: #fff; display: none; }
+.inst-item.selected .inst-check svg { display: block; }
+.inst-item.selected { background: #FFF9F9; }
+
+.selected-count { font-size: 12px; color: #D70C1F; font-weight: 600; text-align: center; padding: 8px 0; display: none; }
+.selected-count.show { display: block; }
+
+.bottom-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: #fff; border-top: 1px solid #eee; padding: 12px 16px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 50; display: none; }
+.bottom-bar.show { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.bottom-bar .bb-info { font-size: 12px; color: #666; }
+.bottom-bar .bb-count { color: #D70C1F; font-weight: 700; }
+.btn-next { height: 44px; padding: 0 32px; border: none; border-radius: 22px; background: #D70C1F; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+.btn-next:active { opacity: .9; }
+.btn-next:disabled { background: #ccc; cursor: not-allowed; }
+.btn-next svg { width: 14px; height: 14px; }
+
+/* step2 */
+.input-label { font-size: 12px; color: #666; margin-bottom: 6px; }
+.input-row { display: flex; gap: 8px; margin-bottom: 14px; }
+.input-row input { flex: 1; height: 46px; border: 1px solid #e8e8ec; border-radius: 12px; padding: 0 14px; font-size: 14px; outline: none; color: #333; }
+.input-row input:focus { border-color: #D70C1F; }
+
+.back-row { text-align: center; padding-top: 8px; }
+.back-row button { background: none; border: none; color: #999; font-size: 13px; cursor: pointer; }
+.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .3s; }
+.modal-mask.show { opacity: 1; pointer-events: auto; }
+.modal-box { width: 300px; background: #fff; border-radius: 18px; padding: 24px 20px; text-align: center; }
+.modal-box h3 { font-size: 17px; font-weight: 700; margin-bottom: 12px; }
+.modal-box p { font-size: 13px; color: #666; margin-bottom: 16px; line-height: 1.6; }
+.modal-box .addr { font-size: 12px; color: #999; padding: 8px 12px; background: #f5f5f7; border-radius: 8px; word-break: break-all; margin-bottom: 16px; }
+.modal-btns { display: flex; gap: 10px; }
+.modal-btns button { flex: 1; height: 42px; border: none; border-radius: 21px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.btn-cancel { background: #f5f5f7; color: #666; }
+.btn-confirm { background: #D70C1F; color: #fff; }
+
+.empty-tip { text-align: center; padding: 40px 0; color: #ccc; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="top-bar">
+  <div class="nav-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </div>
+  <div class="nav-title">资产转赠</div>
+  <a href="transfer_records.html" style="font-size:11px;color:#999;text-decoration:none">转赠记录</a>
+</div>
+
+<div class="step" id="stepBar">
+  <div><div class="step-dot on" id="d1">1</div><div class="step-label on" id="l1">选择资产</div></div>
+  <div class="step-line" id="line1"></div>
+  <div><div class="step-dot" id="d2">2</div><div class="step-label" id="l2">填写接收方</div></div>
+</div>
+
+<div class="filter-bar" id="filterBar">
+  <input type="text" id="searchInput" placeholder="搜索资产名称…" oninput="renderStep1()">
+  <select id="issuerSelect" onchange="renderStep1()"><option value="">全部发行方</option></select>
+</div>
+
+<div class="selected-count" id="selCount"></div>
+<div id="listArea"></div>
+
+<div class="bottom-bar" id="bottomBar">
+  <div class="bb-info">已选 <span class="bb-count" id="bbCount">0</span> 个资产</div>
+  <button class="btn-next" id="btnNext1" onclick="goStep2()" disabled>下一步 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+</div>
+
+</div>
+
+<div class="modal-mask" id="modal" onclick="closeModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <h3>确认转赠</h3>
+    <p id="modalDesc"></p>
+    <div class="addr" id="modalAddr"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">取消</button>
+      <button class="btn-confirm" onclick="confirmTransfer()">确认转赠</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var data = [
+  { series:'茅台1935·时光窖藏', issuer:'贵州茅台', hold:3, img:'茅台1935.png',
+    items:[
+      { id:'#54', spec:'凝时', img:'凝时.png', time:'2025-06-15 14:32', hash:'0x7a3e8f2b1c9d...1a2b' },
+      { id:'#77', spec:'守岁', img:'守岁.png', time:'2025-08-22 09:15', hash:'0x9c2d1e8f5a3b...3e4f' },
+      { id:'#102', spec:'溯年', img:'溯年.png', time:'2026-03-10 11:20', hash:'0xd5f8a3c2e7b1...9a6c' }
+    ]
+  },
+  { series:'飞天茅台·元宇宙酒票', issuer:'贵州茅台', hold:1, img:'飞天茅台·元宇宙酒票.png',
+    items:[
+      { id:'#28', spec:'典藏版', img:'飞天茅台·元宇宙酒票.png', time:'2025-08-22 09:15', hash:'0x3b5c9d1e8f2a...7d8e' }
+    ]
+  },
+  { series:'国酒·数字徽章', issuer:'贵州茅台', hold:1, img:'国酒·数字徽章.png',
+    items:[
+      { id:'#08', spec:'标准款', img:'国酒·数字徽章.png', time:'2025-04-10 15:00', hash:'0xae1c3f5b8d2e...9f0a' }
+    ]
+  },
+  { series:'巴拿马金奖·复刻', issuer:'贵州茅台', hold:1, img:'巴拿马金奖·复刻.png',
+    items:[
+      { id:'#03', spec:'典藏款', img:'巴拿马金奖·复刻.png', time:'2025-03-05 10:00', hash:'0x1f8c7d3a5b6e...2d4c' }
+    ]
+  },
+  { series:'茅台生肖兔·典藏', issuer:'贵州茅台', hold:1, img:'茅台生肖兔·典藏.png',
+    items:[
+      { id:'#12', spec:'兔年限定', img:'茅台生肖兔·典藏.png', time:'2026-01-15 12:00', hash:'0xb2e4d8c1a5f7...3e6d' }
+    ]
+  },
+  { series:'鬼吹灯·数字资产', issuer:'鬼吹灯', hold:1, img:'鬼吹灯.png',
+    items:[
+      { id:'#36', spec:'标准款', img:'鬼吹灯.png', time:'2026-05-10 10:00', hash:'0x7c8d9e0f1a...2b3c4d' }
+    ]
+  },
+  { series:'三体·数字资产', issuer:'三体', hold:1, img:'三体.png',
+    items:[
+      { id:'#42', spec:'标准款', img:'三体.png', time:'2026-06-01 14:00', hash:'0x8e0f1a2b3c...4d5e6f' }
+    ]
+  }
+];
+
+var step = 1;
+var selected = {};
+var expanded = {};
+
+function renderStep1(){
+  var keyword = (document.getElementById('searchInput').value||'').toLowerCase();
+  var issuerFilter = document.getElementById('issuerSelect').value;
+  var list = data.slice();
+  if(keyword) list = list.filter(function(s){ return s.series.toLowerCase().indexOf(keyword)>=0; });
+  if(issuerFilter) list = list.filter(function(s){ return s.issuer === issuerFilter; });
+
+  // 更新发行方下拉
+  var iss = []; data.forEach(function(s){ if(iss.indexOf(s.issuer)<0) iss.push(s.issuer); });
+  var selIss = document.getElementById('issuerSelect');
+  selIss.innerHTML = '<option value="">全部发行方</option>';
+  iss.forEach(function(v){ selIss.innerHTML += '<option value="'+v+'"'+(v===issuerFilter?' selected':'')+'>'+v+'</option>'; });
+
+  var h = '';
+  if(!list.length){ h = '<div class="empty-tip">没有匹配的资产</div>'; }
+  else {
+    list.forEach(function(s){
+      var si = data.indexOf(s);
+      h += '<div class="card">';
+      h += '<div class="card-hdr" onclick="toggleSeries('+si+')">';
+      h += '<div class="series-thumb" style="background-image:url(\''+s.img+'\')"></div>';
+      h += '<div class="series-info"><div class="series-name">'+s.series+'</div><span class="series-tag">'+s.issuer+'</span></div>';
+      h += '<div class="series-hold">×'+s.hold+'</div>';
+      h += '<div class="series-expand" id="exp_'+si+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>';
+      h += '</div>';
+      h += '<div class="instances" id="inst_'+si+'">';
+      s.items.forEach(function(it, ii){
+        var ks = si+'_'+ii;
+        var sel = selected[ks] ? ' selected' : '';
+        var chk = selected[ks] ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+        h += '<div class="inst-item'+sel+'" onclick="toggleItem('+si+','+ii+',event)">';
+        h += '<div class="inst-thumb" style="background-image:url(\''+it.img+'\')"></div>';
+        h += '<div class="inst-info"><div class="inst-num">'+it.id+'</div><div class="inst-spec">'+it.spec+' · '+it.time+'</div></div>';
+        h += '<div class="inst-check">'+chk+'</div>';
+        h += '</div>';
+      });
+      h += '</div></div>';
+    });
+  }
+  document.getElementById('listArea').innerHTML = h;
+
+  Object.keys(expanded).forEach(function(si){
+    var el=document.getElementById('inst_'+si),ex=document.getElementById('exp_'+si);
+    if(el)el.classList.add('show');if(ex)ex.classList.add('open');
+  });
+
+  var cnt = Object.keys(selected).length;
+  var bb = document.getElementById('bottomBar');
+  bb.className = 'bottom-bar show';
+  document.getElementById('bbCount').textContent = cnt;
+  document.getElementById('btnNext1').disabled = cnt === 0;
+  document.getElementById('filterBar').style.display = '';
+  document.getElementById('stepBar').style.display = '';
+}
+
+function toggleSeries(si){
+  if(expanded[si]) delete expanded[si]; else expanded[si] = true;
+  var el = document.getElementById('inst_'+si), ex = document.getElementById('exp_'+si);
+  el.classList.toggle('show'); ex.classList.toggle('open');
+}
+
+function toggleItem(si, ii, e){
+  e.stopPropagation();
+  var ks = si+'_'+ii;
+  if(selected[ks]) delete selected[ks]; else selected[ks] = true;
+  renderStep1();
+}
+
+function goStep2(){
+  step = 2;
+  var list = Object.keys(selected).map(function(ks){
+    var parts = ks.split('_');
+    return data[parseInt(parts[0])].items[parseInt(parts[1])];
+  });
+  var h = '<div style="padding:6px 0 10px"><div class="input-label">已选资产</div>';
+  h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">';
+  list.forEach(function(it){ h += '<div style="display:flex;align-items:center;gap:4px;background:#FFF2F3;border-radius:8px;padding:4px 10px;font-size:11px;color:#D70C1F">'+it.spec+' '+it.id+'</div>'; });
+  h += '</div></div>';
+  h += '<div class="card"><div style="padding:16px">';
+  h += '<div class="input-label">接收方手机号 / 区块链地址</div>';
+  h += '<div class="input-row"><input type="text" id="recipient" placeholder="手机号 或 0x...地址" oninput="checkRecipient()"></div>';
+  h += '<button class="btn-next" id="btnNext2" onclick="doTransfer()" disabled>确认转赠 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>';
+  h += '</div></div>';
+  h += '<div class="back-row"><button onclick="goBack()">← 返回重新选择</button></div>';
+  document.getElementById('listArea').innerHTML = h;
+  document.getElementById('bottomBar').className = 'bottom-bar';
+  document.getElementById('filterBar').style.display = 'none';
+  document.getElementById('stepBar').style.display = 'none';
+  updateStepBar();
+}
+
+function checkRecipient(){
+  var v = (document.getElementById('recipient')||{}).value || '';
+  var btn = document.getElementById('btnNext2');
+  if(btn) btn.disabled = v.trim().length < 8;
+}
+
+function goBack(){ step = 1; renderStep1(); updateStepBar(); }
+
+function updateStepBar(){
+  document.getElementById('d1').className = 'step-dot on';
+  document.getElementById('l1').className = 'step-label on';
+  document.getElementById('d2').className = 'step-dot' + (step===2?' on':'');
+  document.getElementById('l2').className = 'step-label' + (step===2?' on':'');
+  document.getElementById('line1').className = 'step-line' + (step===2?' on':'');
+  document.getElementById('bottomBar').className = step===1 ? 'bottom-bar show' : 'bottom-bar';
+}
+
+function doTransfer(){
+  var addr = document.getElementById('recipient').value.trim();
+  if(!addr) return;
+  var list = Object.keys(selected).map(function(ks){
+    var parts = ks.split('_');
+    var s = data[parseInt(parts[0])];
+    return { series:s.series, item:s.items[parseInt(parts[1])] };
+  });
+  var descHTML = '将向接收方转赠以下：<br>';
+  list.forEach(function(x){ descHTML += '<b>'+x.series+'</b> · '+x.item.spec+' '+x.item.id+'<br>'; });
+  document.getElementById('modalDesc').innerHTML = descHTML;
+  document.getElementById('modalAddr').textContent = '接收方：'+addr;
+  document.getElementById('modal').classList.add('show');
+}
+
+function confirmTransfer(){
+  document.getElementById('modal').classList.remove('show');
+  var list = Object.keys(selected).map(function(ks){
+    var parts = ks.split('_');
+    return { si:parseInt(parts[0]), ii:parseInt(parts[1]) };
+  });
+  list.sort(function(a,b){ return b.si*100+b.ii - (a.si*100+a.ii); });
+  list.forEach(function(x){
+    var s = data[x.si];
+    s.items.splice(x.ii, 1);
+    s.hold--;
+    if(s.hold <= 0) data.splice(x.si, 1);
+  });
+  selected = {}; expanded = {}; step = 1;
+  renderStep1(); updateStepBar();
+  alert('转赠成功！');
+}
+
+function closeModal(e){
+  if(e && e.target !== document.getElementById('modal')) return;
+  document.getElementById('modal').classList.remove('show');
+}
+
+renderStep1();
+</script>
+</body>
+</html>

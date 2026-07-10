@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>骰子大冒险</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:#1a1a2e;
+  display:flex;justify-content:center;align-items:center;
+  min-height:100vh;font-family:'PingFang SC','Microsoft YaHei',sans-serif;
+  overflow:hidden;user-select:none;
+}
+.phone{
+  position:relative;width:430px;height:860px;border-radius:36px;
+  background:#0a0a1a;padding:12px;
+  box-shadow:0 30px 80px rgba(0,0,0,.7),inset 0 0 0 2px #333;
+}
+.screen{
+  position:relative;width:100%;height:100%;border-radius:28px;
+  background:#111;overflow:hidden;
+}
+
+/* 顶部栏 */
+.topbar{
+  position:absolute;top:0;left:0;right:0;z-index:20;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 14px;
+  background:linear-gradient(180deg,rgba(0,0,0,.7),transparent);
+}
+.back-btn{
+  color:#fff;font-size:13px;cursor:pointer;
+  background:rgba(0,0,0,.5);padding:5px 12px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.15);
+}
+.score-display{
+  color:#ffcc66;font-size:14px;font-weight:700;
+  background:rgba(0,0,0,.5);padding:5px 14px;border-radius:14px;
+  border:1px solid rgba(255,204,102,.2);
+}
+.title-area{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:20;
+  color:#fff;font-size:14px;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.8);
+}
+
+/* 地图 */
+.map-container{
+  position:absolute;inset:0;z-index:1;
+}
+.map-container img{
+  width:100%;height:100%;object-fit:contain;
+}
+
+/* 格子 */
+.grid-cell{
+  position:absolute;z-index:10;
+  width:44px;height:44px;border-radius:50%;
+  transform:translate(-50%,-50%);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:12px;font-weight:800;
+  border:2px solid #fff;cursor:default;
+  transition:transform .2s,box-shadow .2s;
+  text-shadow:0 1px 2px rgba(0,0,0,.5);
+}
+.grid-cell.normal{background:linear-gradient(135deg,#667eea,#5a6fd6)}
+.grid-cell.start{background:linear-gradient(135deg,#20bf6b,#17a55a);width:50px;height:50px;font-size:14px}
+.grid-cell.end{background:linear-gradient(135deg,#D70C1F,#b80a1a);width:50px;height:50px;font-size:14px}
+.grid-cell.roll_again{background:linear-gradient(135deg,#f0ad4e,#e09a3a);animation:specialPulse 1.5s infinite}
+.grid-cell.lottery{background:linear-gradient(135deg,#ff6b6b,#e05050);animation:specialPulse 1.5s infinite}
+.grid-cell.reward{background:linear-gradient(135deg,#ffcc66,#e6b84f);color:#333;animation:specialPulse 1.5s infinite}
+.grid-cell.active{box-shadow:0 0 20px rgba(255,255,255,.8);z-index:11;transform:translate(-50%,-50%) scale(1.2)}
+.grid-cell .cell-img{width:100%;height:100%;border-radius:50%;object-fit:cover;position:absolute;top:0;left:0;z-index:2}
+.grid-cell .cell-num{position:relative;z-index:1;pointer-events:none}
+
+@keyframes specialPulse{
+  0%,100%{box-shadow:0 0 8px rgba(255,255,255,.3)}
+  50%{box-shadow:0 0 18px rgba(255,255,255,.6)}
+}
+
+/* 角色棋 */
+.player-piece{
+  position:absolute;z-index:99;width:72px;
+  transform:translate(-50%,-50%);
+  transition:left .5s ease,top .5s ease;
+  pointer-events:none;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.5));
+}
+.player-piece #playerSprite{
+  width:100%; background-repeat:no-repeat; background-size:auto 100%;
+}
+
+/* 底部面板 */
+.bottom-panel{
+  position:absolute;bottom:12px;left:12px;right:12px;z-index:20;
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-radius:18px;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.1);
+}
+.dice-btn{
+  width:64px;border-radius:14px;border:none;
+  background:transparent;cursor:pointer;flex-shrink:0;
+  box-shadow:0 4px 12px rgba(102,126,234,.4);
+  transition:transform .15s;overflow:hidden;
+}
+.dice-btn:active{transform:scale(.92)}
+.dice-btn #diceBtnSprite{width:100%;background-repeat:no-repeat;background-size:600% 100%;background-position:0 0}
+.dice-btn.rolling{animation:diceShake .5s ease}
+@keyframes diceShake{
+  0%,100%{transform:rotate(0)}
+  25%{transform:rotate(-15deg)}
+  75%{transform:rotate(15deg)}
+}
+.dice-result{
+  font-size:13px;color:#fff;flex:1;text-align:center;
+  line-height:1.5;
+}
+.dice-result .dr-num{font-size:28px;font-weight:800;color:#ffcc66}
+.step-info{color:rgba(255,255,255,.5);font-size:11px}
+
+/* 特效提示 */
+.effect-toast{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:30;
+  background:rgba(0,0,0,.85);color:#fff;padding:16px 24px;border-radius:16px;
+  font-size:18px;font-weight:700;pointer-events:none;text-align:center;
+  border:1px solid rgba(255,255,255,.2);
+  animation:toastIn .4s ease;
+  display:none;
+}
+.effect-toast.show{display:block}
+.effect-toast.hide{animation:toastOut .3s ease forwards;display:block}
+.effect-toast img{max-width:80px;max-height:60px;margin:6px auto 0;display:block}
+@keyframes toastIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.8)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@keyframes toastOut{0%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1.1)}}
+
+/* 抽奖动画 */
+.effect-toast.lottery-roll .lottery-spin{display:flex}
+.effect-toast .lottery-spin{display:none;flex-direction:column;align-items:center;gap:4px}
+.lottery-spin .ls-icon{font-size:40px;animation:lsBounce .15s infinite alternate}
+@keyframes lsBounce{0%{transform:scale(1)}100%{transform:scale(1.2)}}
+.effect-toast .lottery-final{display:none}
+.effect-toast.lottery-done .lottery-spin{display:none}
+.effect-toast.lottery-done .lottery-final{display:block}
+
+/* 胜利面板 */
+.win-panel{
+  position:absolute;inset:0;z-index:40;display:none;
+  align-items:center;justify-content:center;
+  background:rgba(0,0,0,.75);flex-direction:column;gap:16px;
+}
+.win-panel.show{display:flex}
+.win-text{font-size:28px;font-weight:800;color:#ffcc66;text-shadow:0 2px 12px rgba(255,204,102,.4)}
+.win-sub{color:rgba(255,255,255,.6);font-size:14px}
+.win-btn{
+  padding:12px 36px;border-radius:24px;border:none;font-size:16px;font-weight:600;
+  background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;cursor:pointer;
+  box-shadow:0 4px 16px rgba(102,126,234,.4);
+}
+
+/* 积分显示 */
+.points-bar{
+  position:absolute;top:46px;right:14px;z-index:20;
+  color:#ffcc66;font-size:13px;font-weight:700;
+  background:rgba(0,0,0,.5);padding:4px 10px;border-radius:10px;
+}
+
+/* 骰子弹窗 */
+.dice-popup{
+  position:absolute;inset:0;z-index:50;display:none;
+  align-items:center;justify-content:center;
+  background:rgba(0,0,0,.7);flex-direction:column;gap:12px;
+}
+.dice-popup.show{display:flex}
+.dice-popup .dp-dice{
+  width:100px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.1);border-radius:20px;
+  border:2px solid rgba(255,255,255,.2);
+}
+.dice-popup .dp-dice #dpDiceSprite{width:100%;background-repeat:no-repeat;background-size:600% 100%;background-position:0 0}
+.dice-popup .dp-dice.rolling{animation:diceShake .3s infinite}
+.dice-popup .dp-text{
+  color:#fff;font-size:16px;font-weight:600;
+}
+.dice-popup .dp-result{
+  color:#ffcc66;font-size:40px;font-weight:800;display:none;
+}
+.dice-popup .dp-result.show{display:block}
+.dice-popup .dp-sub{
+  color:rgba(255,255,255,.5);font-size:13px;display:none;
+}
+.dice-popup .dp-sub.show{display:block}
+
+/* ── 移动端适配 ── */
+@media (max-width: 768px) and (orientation: portrait) {
+  body{background:#000;align-items:flex-start}
+  .phone{width:100vw;height:calc(100vw * 2);border-radius:0;padding:0;box-shadow:none;margin-top:calc((100vh - 100vw * 2) / 2)}
+  .screen{border-radius:0}
+  .topbar{padding:8px 10px}
+  .back-btn{font-size:11px;padding:3px 8px}
+  .score-display{font-size:12px;padding:3px 8px}
+  .dice-btn{width:48px;height:48px;font-size:22px}
+  .dice-result .dr-num{font-size:22px}
+  .bottom-panel{padding:8px 10px}
+  .effect-toast{font-size:14px;padding:12px 18px}
+  .win-text{font-size:22px}
+}
+@media (max-width: 900px) and (orientation: landscape) {
+  body{background:#000}
+  .phone{height:100vh;width:calc(100vh / 2);border-radius:0;padding:0;box-shadow:none}
+  .screen{border-radius:0}
+  .topbar{padding:4px 8px}
+  .back-btn{font-size:10px;padding:2px 6px}
+  .score-display{font-size:10px;padding:2px 6px}
+  .dice-btn{width:38px;height:38px;font-size:18px}
+  .bottom-panel{padding:6px 8px;gap:6px}
+  .dice-result{font-size:11px}
+}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="screen" id="screen">
+    <!-- 地图 -->
+    <div class="map-container" id="mapContainer">
+      <img id="mapBg" src="" alt="">
+    </div>
+
+    <!-- 格子覆盖层 -->
+    <div id="gridOverlay" style="position:absolute;inset:0;z-index:10"></div>
+
+    <!-- 角色棋 -->
+    <div class="player-piece" id="player"><div id="playerSprite"></div></div>
+
+    <!-- 顶部 -->
+    <div class="topbar">
+      <span class="back-btn" onclick="window.location.href='mall_portrait.html'">← 返回</span>
+      <span class="score-display" id="scoreDisplay">🏆 <span id="pointsVal">0</span></span>
+    </div>
+
+    <!-- 积分条 -->
+    <div class="points-bar" id="pointsBar" style="display:none">💰 积分 +<span id="pointsEarned">0</span></div>
+
+    <!-- 底部 -->
+    <div class="bottom-panel" id="bottomPanel">
+      <div class="dice-btn" id="diceBtn" onclick="rollDice()"><div id="diceBtnSprite"></div></div>
+      <div class="dice-result">
+        <div style="display:none" id="diceNumWrap"><span class="dr-num" id="diceNum">1</span> 步</div>
+        <div class="step-info" id="stepInfo">点击骰子开始冒险</div>
+      </div>
+    </div>
+
+    <!-- 骰子弹窗 -->
+    <div class="dice-popup" id="dicePopup">
+      <div class="dp-text" id="dpText">掷骰子中...</div>
+      <div class="dp-dice" id="dpDice"><div id="dpDiceSprite"></div></div>
+      <div class="dp-result" id="dpResult"></div>
+      <div class="dp-sub" id="dpSub"></div>
+    </div>
+
+    <!-- 特效提示 -->
+    <div class="effect-toast" id="effectToast">
+      <div class="lottery-spin">
+        <div class="ls-icon" id="lsIcon">🎰</div>
+        <div id="lsText" style="color:#ffcc66;font-size:14px">抽奖中...</div>
+      </div>
+      <div class="lottery-final">
+        <div id="effectText"></div>
+        <img id="effectImg" src="" alt="" style="display:none">
+      </div>
+    </div>
+
+    <!-- 胜利 -->
+    <div class="win-panel" id="winPanel">
+      <div class="win-text">🎉 到达终点！</div>
+      <div class="win-sub" id="winSub">获得积分奖励</div>
+      <button class="win-btn" onclick="restartGame()">🔄 再来一局</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== 游戏状态 ==========
+var config = null;
+var currentStep = 0;
+var totalPoints = 0;
+var isRolling = false;
+var rollStack = 0;
+
+// 加载角色（6帧雪碧图，用像素位移参考李白动画.html）
+var _spriteTimer = null, _spriteFrameIdx = 0, _spriteFrames = 6, _spriteFrameW = 0;
+function loadCharacter() {
+  var sprite = '茅台妹妹雪碧图.png';
+  var spDiv = document.getElementById('playerSprite');
+  var probe = new Image();
+  probe.onload = function() {
+    var totalW = probe.naturalWidth, totalH = probe.naturalHeight;
+    var frameW = totalW / 6;
+    _spriteFrameW = frameW;
+    var scale = 72 / frameW;
+    spDiv.style.width = '72px';
+    spDiv.style.height = (totalH * scale) + 'px';
+    spDiv.style.backgroundImage = 'url(' + sprite + ')';
+    spDiv.style.backgroundSize = 'auto 100%';
+    spDiv.style.backgroundPosition = '0 0';
+  };
+  probe.onerror = function() {
+    spDiv.style.backgroundImage = 'url(' + sprite + ')';
+    spDiv.style.backgroundSize = 'auto 100%';
+  };
+  probe.src = sprite;
+}
+function startSpriteAnim() {
+  _spriteFrameIdx = 0;
+  var spDiv = document.getElementById('playerSprite');
+  spDiv.style.backgroundPosition = '0 0';
+  clearInterval(_spriteTimer);
+  var w = _spriteFrameW * _spriteFrames * (72 / _spriteFrameW); // rendered bg width = frames * container width
+  // Actually with bg-size:auto 100% and container w=72, bg renders at 72*frames = 432px
+  _spriteTimer = setInterval(function() {
+    _spriteFrameIdx = (_spriteFrameIdx + 1) % _spriteFrames;
+    spDiv.style.backgroundPosition = (-_spriteFrameIdx * 72) + 'px 0';
+  }, 120);
+}
+function stopSpriteAnim() {
+  clearInterval(_spriteTimer);
+  _spriteFrameIdx = 0;
+  document.getElementById('playerSprite').style.backgroundPosition = '0 0';
+}
+
+// ========== 初始化 ==========
+function init() {
+  var saved = localStorage.getItem('diceGameUser');
+  if (saved) {
+    try { config = JSON.parse(saved); } catch(e) { config = null; }
+  }
+  if (!config || !config.grids || config.grids.length < 2) config = getDefaultConfig();
+  if (!config.merchants) config.merchants = JSON.parse(localStorage.getItem('merchants') || '[]');
+  if (!config.grids || config.grids.length < 2) {
+    document.getElementById('mapBg').src = 'ChatGPT Image 2026年6月25日 09_21_39.png';
+    document.getElementById('stepInfo').textContent = '暂无配置，请商家设置';
+    return;
+  }
+
+  // 排序：按 num 升序
+  config.grids.sort(function(a, b) { return a.num - b.num; });
+
+  // 加载角色形象 + 骰子雪碧图
+  loadCharacter();
+  initDiceSprite();
+
+  // 加载地图：如果是 base64（旧数据）也能显示，文件名直接加载
+  var mapSrc = config.mapImage || 'ChatGPT Image 2026年6月25日 09_21_39.png';
+  document.getElementById('mapBg').src = mapSrc;
+  document.getElementById('mapBg').onerror = function() {
+    this.src = 'ChatGPT Image 2026年6月25日 09_21_39.png';
+  };
+
+  // 渲染格子
+  renderGrids();
+  // 放置角色到起点
+  placePlayer(0);
+  updateUI();
+}
+
+function renderGrids() {
+  var overlay = document.getElementById('gridOverlay');
+  overlay.innerHTML = '';
+  config.grids.forEach(function(g, idx) {
+    var cell = document.createElement('div');
+    cell.className = 'grid-cell ' + g.type;
+    cell.id = 'cell' + idx;
+    cell.style.left = g.x + '%';
+    cell.style.top = g.y + '%';
+
+    // 格子图片：优先用自身图，否则用类型图
+    var cellImg = g.gridImg || null;
+    if (!cellImg) {
+      var tInfo = config.gridTypes ? config.gridTypes[g.type] : null;
+      if (tInfo && tInfo.img) cellImg = tInfo.img;
+    }
+    if (cellImg) {
+      var img = document.createElement('img');
+      img.className = 'cell-img';
+      img.src = cellImg;
+      img.onerror = function() { this.remove(); };
+      cell.appendChild(img);
+    }
+    // 编号
+    var num = document.createElement('span');
+    num.className = 'cell-num';
+    num.textContent = g.type === 'end' ? '🏁' : (g.type === 'start' ? '▶' : g.num);
+    cell.appendChild(num);
+    cell.appendChild(num);
+
+    overlay.appendChild(cell);
+  });
+}
+
+function placePlayer(idx) {
+  currentStep = idx;
+  var g = config.grids[idx];
+  if (!g) return;
+  var el = document.getElementById('player');
+  el.style.left = g.x + '%';
+  el.style.top = g.y + '%';
+  // 高亮当前格
+  document.querySelectorAll('.grid-cell.active').forEach(function(c) { c.classList.remove('active'); });
+  var cell = document.getElementById('cell' + idx);
+  if (cell) cell.classList.add('active');
+}
+
+// ========== 掷骰子（雪碧图驱动，保持比例） ==========
+var _diceReady=false, _diceFrameH=0;
+function initDiceSprite() {
+  var probe = new Image();
+  probe.onload = function() {
+    var fw = probe.naturalWidth / 6, fh = probe.naturalHeight;
+    // 按钮：宽64，高按比例
+    var btnSp = document.getElementById('diceBtnSprite');
+    btnSp.style.height = (64 * fh / fw) + 'px';
+    btnSp.style.backgroundImage = 'url(骰子雪碧图.png)';
+    btnSp.style.backgroundSize = '600% 100%';
+    btnSp.style.backgroundPosition = '0 0';
+    // 弹窗骰子：宽100
+    var dpSp = document.getElementById('dpDiceSprite');
+    dpSp.style.height = (100 * fh / fw) + 'px';
+    dpSp.style.backgroundImage = 'url(骰子雪碧图.png)';
+    dpSp.style.backgroundSize = '600% 100%';
+    dpSp.style.backgroundPosition = '0 0';
+    _diceFrameH = fh / fw;
+    _diceReady = true;
+  };
+  probe.src = '骰子雪碧图.png';
+}
+function rollDice() {
+  if (isRolling || !_diceReady) return;
+  isRolling = true; rollStack = 0;
+
+  var popup   = document.getElementById('dicePopup');
+  var popDice = document.getElementById('dpDice');
+  var popText = document.getElementById('dpText');
+  var popResult = document.getElementById('dpResult');
+  var popSub  = document.getElementById('dpSub');
+  popResult.classList.remove('show'); popSub.classList.remove('show');
+  popDice.classList.add('rolling');
+  popText.textContent = '掷骰子中...';
+  popup.classList.add('show');
+
+  var btn = document.getElementById('diceBtn');
+  btn.classList.add('rolling');
+  document.getElementById('diceNumWrap').style.display = 'none';
+  document.getElementById('stepInfo').textContent = '掷骰子中...';
+
+  var btnSp = document.getElementById('diceBtnSprite');
+  var dpSp  = document.getElementById('dpDiceSprite');
+  var result = Math.floor(Math.random() * 6) + 1;
+  var btnW = btnSp.parentElement.clientWidth;
+  var dpW  = dpSp.parentElement.clientWidth;
+
+  var tick = 0, maxTick = 12;
+  var interval = setInterval(function() {
+    var idx = Math.floor(Math.random() * 6);
+    btnSp.style.backgroundPosition = (-idx * btnW) + 'px 0';
+    dpSp.style.backgroundPosition  = (-idx * dpW) + 'px 0';
+    tick++;
+    if (tick >= maxTick) {
+      clearInterval(interval);
+      var stopIdx = result - 1;
+      btnSp.style.backgroundPosition = (-stopIdx * btnW) + 'px 0';
+      dpSp.style.backgroundPosition  = (-stopIdx * dpW) + 'px 0';
+
+      popDice.classList.remove('rolling');
+      btn.classList.remove('rolling');
+      document.getElementById('diceNum').textContent = result;
+      document.getElementById('diceNumWrap').style.display = '';
+      popText.textContent = '';
+      popResult.textContent = result;
+      popResult.classList.add('show');
+      popSub.textContent = '前进 ' + result + ' 步';
+      popSub.classList.add('show');
+
+      setTimeout(function() {
+        popup.classList.remove('show');
+        popText.textContent = '掷骰子中...';
+        btnSp.style.backgroundPosition = '0 0';
+        dpSp.style.backgroundPosition  = '0 0';
+        document.getElementById('stepInfo').textContent = '前进中...';
+        movePlayer(result);
+      }, 1000);
+    }
+  }, 80);
+}
+
+function movePlayer(steps) {
+  var target = currentStep + steps;
+  var maxIdx = config.grids.length - 1;
+
+  // 开始移动动画
+  startSpriteAnim();
+
+  // 到达或超过终点
+  if (target >= maxIdx) {
+    target = maxIdx;
+    placePlayer(target);
+    stopSpriteAnim();
+    document.getElementById('stepInfo').textContent = '到达终点！';
+    isRolling = false;
+    setTimeout(showWin, 600);
+    return;
+  }
+
+  // 逐步动画移动（每步600ms）
+  function stepMove(from, to, done) {
+    if (from > to) { done(); return; }
+    placePlayer(from);
+    if (from === to) {
+      setTimeout(function() { done(); }, 600);
+      return;
+    }
+    setTimeout(function() { stepMove(from + 1, to, done); }, 600);
+  }
+
+  var start = currentStep;
+  stepMove(start + 1, target, function() {
+    placePlayer(target);
+    stopSpriteAnim();
+    checkCellEffect(target);
+  });
+}
+
+// ========== 格子特效 ==========
+function checkCellEffect(idx) {
+  var g = config.grids[idx];
+  if (!g) return;
+
+  var tInfo = config.gridTypes ? config.gridTypes[g.type] : {};
+  switch (g.type) {
+    case 'normal':
+      isRolling = false;
+      document.getElementById('stepInfo').textContent = '到达 格子 #' + g.num;
+      break;
+
+    case 'lottery':
+      // 抽奖动画：先展示滚动效果
+      var toast = document.getElementById('effectToast');
+      toast.classList.add('show', 'lottery-roll');
+      toast.classList.remove('lottery-done');
+      var icons = ['⭐','🎫','🔰'];
+      var tick = 0;
+      var spinInterval = setInterval(function() {
+        document.getElementById('lsIcon').textContent = icons[tick % 3];
+        tick++;
+      }, 200);
+
+      setTimeout(function() {
+        clearInterval(spinInterval);
+        // 判定结果
+        var hitType = null, hitQty = 0;
+        var lr = g.lotteryRewards;
+        if (lr) {
+          var types = Object.keys(lr);
+          types.forEach(function(k) {
+            if (Math.random() * 100 < (lr[k].prob || 40)) hitType = k;
+          });
+          if (hitType) hitQty = Math.floor(Math.random() * (lr[hitType].max || 1)) + 1;
+        }
+        var ltNames = { points:'积分', coupon:'优惠券', priority:'新品权' };
+        var ltIcons = { points:'⭐', coupon:'🎫', priority:'🔰' };
+        var merchantStr = '';
+        if (hitType && g.lotteryMerchants && g.lotteryMerchants.length && config.merchants) {
+          var mids = g.lotteryMerchants;
+          var m = config.merchants.find(function(x){ var acc = x.account||x.id||x.name; return mids.indexOf(acc) >= 0; });
+          if (m) merchantStr = ' | ' + (m.name||'');
+        }
+        var msg = hitType ? ('🎰 ' + (ltNames[hitType]||hitType) + ' ×' + hitQty + merchantStr) : '😢 未中奖';
+        document.getElementById('lsIcon').textContent = hitType ? (ltIcons[hitType]||'🎉') : '😢';
+        document.getElementById('lsText').textContent = msg;
+        toast.classList.remove('lottery-roll');
+        toast.classList.add('lottery-done');
+        document.getElementById('effectText').textContent = msg;
+        document.getElementById('effectImg').style.display = tInfo.img ? '' : 'none';
+        if (tInfo.img) document.getElementById('effectImg').src = tInfo.img;
+        if (hitType === 'points') { totalPoints += hitQty; updateUI(); }
+        setTimeout(function() {
+          toast.classList.remove('show', 'lottery-done');
+          toast.classList.add('hide');
+          var fd = toast.querySelector('.lottery-final');
+          if (fd) fd.style.display = '';
+          isRolling = false; rollStack = 0;
+          document.getElementById('stepInfo').textContent = msg;
+        }, 2000);
+        setTimeout(function() { toast.classList.remove('hide'); }, 2500);
+      }, 1800);
+      break;
+
+    case 'reward':
+      var rtype = g.rtype || 'points';
+      var rqty = g.quantity || 10;
+      var rtNames = { points:'积分', coupon:'优惠券', priority:'新品权' };
+      var merchantName = '';
+      if (g.merchantId && config.merchants) {
+        var m = config.merchants.find(function(x){ var acc = x.account||x.id||x.name; return acc === g.merchantId; });
+        if (m) merchantName = ' | ' + (m.name||'');
+      }
+      var rmsg = '💰 必得 ' + (rtNames[rtype]||rtype) + ' ×' + rqty + merchantName;
+      showEffect(rmsg, tInfo.img);
+      if (rtype === 'points') { totalPoints += rqty; updateUI(); }
+      setTimeout(function() { isRolling = false; rollStack = 0; document.getElementById('stepInfo').textContent = rmsg; }, 2000);
+      break;
+
+    case 'end':
+      showWin();
+      break;
+  }
+}
+
+function showEffect(text, imgSrc) {
+  var toast = document.getElementById('effectToast');
+  toast.classList.remove('lottery-roll','lottery-done');
+  var finalDiv = toast.querySelector('.lottery-final');
+  if (finalDiv) finalDiv.style.display = 'block';
+  document.getElementById('effectText').textContent = text;
+  var img = document.getElementById('effectImg');
+  if (imgSrc) { img.src = imgSrc; img.style.display = 'block'; }
+  else img.style.display = 'none';
+  toast.classList.remove('show','hide');
+  void toast.offsetWidth;
+  toast.classList.add('show');
+  setTimeout(function() { toast.classList.remove('show'); toast.classList.add('hide'); }, 2000);
+  setTimeout(function() { toast.classList.remove('hide'); if (finalDiv) finalDiv.style.display = ''; }, 2500);
+}
+
+// ========== 胜利 ==========
+function showWin() {
+  isRolling = false;
+  rollStack = 0;
+  totalPoints += 20; // 到达终点奖励
+  updateUI();
+  document.getElementById('winSub').textContent = '本次共获得 ' + totalPoints + ' 积分';
+  document.getElementById('winPanel').classList.add('show');
+}
+
+function restartGame() {
+  currentStep = 0;
+  totalPoints = 0;
+  isRolling = false;
+  rollStack = 0;
+  document.getElementById('winPanel').classList.remove('show');
+  document.getElementById('diceNumWrap').style.display = 'none';
+  document.getElementById('stepInfo').textContent = '点击骰子开始冒险';
+  document.getElementById('diceBtn').classList.remove('rolling');
+  var bsp = document.getElementById('diceBtnSprite'); if (bsp) bsp.style.backgroundPosition = '0 0';
+  var dsp = document.getElementById('dpDiceSprite'); if (dsp) dsp.style.backgroundPosition = '0 0';
+  placePlayer(0);
+  updateUI();
+  document.querySelectorAll('.grid-cell.active').forEach(function(c) { c.classList.remove('active'); });
+}
+
+function updateUI() {
+  document.getElementById('pointsVal').textContent = totalPoints;
+  document.getElementById('scoreDisplay').style.display = totalPoints > 0 ? '' : 'none';
+}
+
+function getDefaultConfig() {
+  return {mapImage:"ChatGPT Image 2026年6月25日 09_21_39.png",gridTypes:{start:{name:"起点",img:"起点.png"},end:{name:"终点",img:"轨迹终点.png"},normal:{name:"普通",img:"足迹.png"},lottery:{name:"抽奖",img:"抽奖彩.png"},reward:{name:"奖励",img:"奖励.png"}},merchants:[{account:"m1",name:"贵州茅台"},{account:"m2",name:"五粮液"},{account:"m3",name:"黄老五食品"},{account:"m4",name:"妙可蓝多"},{account:"m5",name:"王者荣耀"},{account:"m6",name:"三体"},{account:"m7",name:"故宫博物院"},{account:"m8",name:"杜甫草堂博物馆"}],grids:[{"id":"g0","num":0,"x":88,"y":77.2,"type":"start"},{"id":"g1","num":1,"x":69,"y":78.7,"type":"normal","gridImg":"鬼吹灯logo.png"},{"id":"g2","num":2,"x":51,"y":78.7,"type":"reward","rtype":"points","quantity":10,"merchantId":"m2"},{"id":"g10","num":3,"x":33.3,"y":80,"type":"normal"},{"id":"g3","num":4,"x":15.7,"y":79.2,"type":"reward","gridImg":"王者荣耀.jpeg","rtype":"coupon","quantity":5,"merchantId":"m5"},{"id":"g9","num":5,"x":38,"y":70.8,"type":"lottery","lotteryMerchants":["m6","m7"],"lotteryRewards":{"points":{"prob":40,"max":10},"coupon":{"prob":30,"max":3}}},{"id":"g11","num":6,"x":66,"y":67.8,"type":"normal"},{"id":"g4","num":7,"x":69.3,"y":60.2,"type":"lottery","lotteryRewards":{"points":{"prob":40,"max":10},"coupon":{"prob":30,"max":3}},"lotteryMerchants":["m1","m2"]},{"id":"g8","num":8,"x":68,"y":53,"type":"reward","gridImg":"妙可蓝多.jpeg","rtype":"points","quantity":10,"merchantId":"m4"},{"id":"g12","num":9,"x":46.4,"y":51.5,"type":"normal"},{"id":"g5","num":10,"x":25.3,"y":52.8,"type":"reward","gridImg":"贵州茅台.jpg","rtype":"coupon","quantity":10,"merchantId":"m1"},{"id":"g7","num":11,"x":27.7,"y":45.2,"type":"normal"},{"id":"g13","num":12,"x":40.9,"y":39,"type":"reward","gridImg":"五粮液·数字珍藏.png","rtype":"points","quantity":10,"merchantId":"m3"},{"id":"g19","num":13,"x":57,"y":42.8,"type":"normal"},{"id":"g6","num":14,"x":74.6,"y":47,"type":"reward","gridImg":"杜甫草堂logo.png","rtype":"points","quantity":10,"merchantId":"m5"},{"id":"g14","num":15,"x":73.7,"y":38.1,"type":"reward","rtype":"points","quantity":10,"merchantId":"m7"},{"id":"g18","num":16,"x":61,"y":33.3,"type":"normal"},{"id":"g15","num":17,"x":71.4,"y":27.5,"type":"lottery","lotteryRewards":{"points":{"prob":40,"max":10},"coupon":{"prob":30,"max":3}},"lotteryMerchants":["m1","m2","m8"]},{"id":"g17","num":18,"x":41.3,"y":29.3,"type":"normal"},{"id":"g16","num":19,"x":34.3,"y":23.7,"type":"normal"},{"id":"_end","num":999,"x":39.3,"y":17.5,"type":"end"}]};
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+元宇宙管理 ▾
+├── 场景管理          scene-admin.html
+├── 热区标注          hotspot-admin.html
+├── 跳转路径          path-admin.html
+└── 商家元宇宙空间管理   space-admin.html
+
+数字资产 ▾
+├── 数字资产管理      asset-admin.html
+└── 订单管理          order-admin.html
+
+会员管理 ▾
+└── 商家管理          merchant-admin.html
+└── 用户管理          user-admin.html
+
+审核管理 ▾
+└── 商家审核管理      cert-review.html
+
+系统管理▾
+└── 钱包管理 wallet-admin.html

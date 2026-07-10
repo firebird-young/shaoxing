@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数字资产管理 - 元宇宙商城后台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f0f2f5; color: #333; }
+
+    /* ── 顶部导航 ── */
+    .header { background: linear-gradient(135deg, #D70C1F, #F12B3D); color: #fff; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .header-title { font-size: 18px; font-weight: 600; }
+    .header-user { font-size: 14px; }
+
+    /* ── 主布局 ── */
+    .main-container { display: flex; min-height: calc(100vh - 60px); }
+
+    /* ── 左侧菜单 ── */
+    .sidebar { width: 200px; background: #fff; border-right: 1px solid #e8e8e8; padding: 16px 0; }
+    .sidebar-group-title { padding: 8px 24px; font-size: 12px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .sidebar-item { padding: 10px 24px 10px 48px; font-size: 14px; color: #666; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+    .sidebar-item:hover { background: #f5f5f5; color: #D70C1F; }
+    .sidebar-item.active { background: rgba(215, 12, 31, 0.1); color: #D70C1F; font-weight: 600; }
+    .sidebar-item svg { width: 14px; height: 14px; }
+    /* ── 右侧内容区 ── */
+    .content { flex: 1; padding: 24px; overflow-y: auto; }
+    .content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .content-title { font-size: 18px; font-weight: 600; color: #333; }
+
+    /* ── 状态筛选Tab ── */
+    .status-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+    .status-tab { padding: 8px 16px; border: 1px solid #ddd; border-radius: 6px; background: #fff; color: #666; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+    .status-tab:hover { background: #f5f5f5; }
+    .status-tab.active { background: #D70C1F; color: #fff; border-color: #D70C1F; }
+
+    /* ── 按钮样式 ── */
+    .btn { padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-primary { background: #D70C1F; color: #fff; }
+    .btn-primary:hover { background: #b8091a; }
+    .btn-default { background: #fff; color: #666; border: 1px solid #ddd; }
+    .btn-default:hover { background: #f5f5f5; }
+    .btn-success { background: #52c41a; color: #fff; }
+    .btn-success:hover { background: #389e0d; }
+    .btn-info { background: #1890ff; color: #fff; }
+    .btn-info:hover { background: #096dd9; }
+    .btn-disabled { background: #f5f5f5; color: #ccc; cursor: not-allowed; }
+
+    /* ── 资产列表 ── */
+    .asset-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+    .asset-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor: pointer; transition: all 0.2s; }
+    .asset-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .asset-cover { height: 180px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 48px; }
+    .asset-info { padding: 16px; }
+    .asset-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .asset-name { font-size: 16px; font-weight: 600; }
+    .status-tag { padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+    .status-pending { background: #fff7e6; color: #fa8c16; }
+    .status-rejected { background: #fff2f0; color: #ff4d4f; }
+    .status-approved { background: #f6ffed; color: #52c41a; }
+    .status-casting { background: #e6f7ff; color: #1890ff; }
+    .status-publish-pending { background: #f9f0ff; color: #722ed1; }
+    .status-published { background: #f6ffed; color: #52c41a; }
+    .status-ended { background: #f5f5f5; color: #999; }
+    .asset-merchant { font-size: 12px; color: #999; margin-bottom: 8px; }
+    .asset-meta { display: flex; gap: 12px; font-size: 12px; color: #666; margin-bottom: 12px; }
+    .asset-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .asset-tag { padding: 4px 10px; background: #f0f5ff; color: #1890ff; border-radius: 4px; font-size: 12px; }
+    .asset-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .no-action { font-size: 12px; color: #999; padding: 6px 12px; }
+
+    /* ── 弹窗样式 ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    .modal-overlay.show { opacity: 1; pointer-events: auto; }
+    .modal-box { background: #fff; border-radius: 12px; width: 90%; max-width: 800px; max-height: 85vh; overflow-y: auto; }
+    .modal-header { padding: 20px 24px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .modal-title { font-size: 18px; font-weight: 600; }
+    .modal-close { cursor: pointer; padding: 4px; }
+    .modal-close svg { width: 20px; height: 20px; color: #666; }
+    .modal-body { padding: 24px; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 12px; }
+
+    /* ── 详情弹窗样式 ── */
+    .detail-section { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #f0f0f0; }
+    .detail-section:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+    .detail-title { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .detail-title::before { content: ''; width: 4px; height: 16px; background: #D70C1F; border-radius: 2px; }
+    .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f8f8f8; }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { color: #999; font-size: 14px; }
+    .detail-value { color: #333; font-size: 14px; font-weight: 500; }
+    .detail-value.readonly { color: #666; font-weight: normal; }
+    .detail-image { max-width: 200px; max-height: 200px; border-radius: 8px; margin-top: 8px; }
+    .detail-images { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+    .style-item-detail { background: #fafafa; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+    .style-item-detail:last-child { margin-bottom: 0; }
+    .style-header-detail { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .style-name-detail { font-weight: 600; color: #333; }
+    .benefit-item-detail { padding: 8px 0; border-bottom: 1px dashed #e0e0e0; }
+    .benefit-item-detail:last-child { border-bottom: none; }
+
+    /* ── 图片放大预览 ── */
+    .image-preview-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 300; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    .image-preview-modal.show { opacity: 1; pointer-events: auto; }
+    .image-preview-content { max-width: 90%; max-height: 90vh; }
+    .image-preview-content img { max-width: 100%; max-height: 90vh; border-radius: 8px; }
+    .image-preview-close { position: absolute; top: 20px; right: 20px; color: #fff; cursor: pointer; font-size: 24px; }
+    
+    /* ── 款式图片 ── */
+    .style-image { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; }
+    
+    /* ── 下载链接 ── */
+    .download-link { color: #1890ff; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 4px; }
+    .download-link:hover { text-decoration: underline; }
+    
+    /* ── 审核弹窗样式 ── */
+    .audit-comment { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; resize: vertical; min-height: 80px; }
+
+    /* ── Toast 提示 ── */
+    .toast { position: fixed; top: 80px; left: 220px; right: 24px; padding: 12px 24px; border-radius: 8px; font-size: 14px; z-index: 400; animation: toastIn 0.3s ease-out; }
+    .toast.success { background: #e8f5e9; color: #2e7d32; }
+    .toast.error { background: #ffebee; color: #c62828; }
+    @keyframes toastIn { 0% { opacity: 0; transform: translateY(-20px); } 100% { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<div class="header">
+  <div class="header-title">元宇宙商城 - 后台管理</div>
+  <div class="header-user">管理员</div>
+</div>
+
+<!-- 主布局 -->
+<div class="main-container">
+  <!-- 左侧菜单 -->
+      <div class="sidebar">
+      <div class="sidebar-group-title">元宇宙管理</div>
+      <div class="sidebar-item" onclick="navigateTo('hotspot-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>场景和热区</div>
+      <div class="sidebar-item" onclick="navigateTo('path-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="12 19 19 12 12 5 5 12"/><circle cx="12" cy="12" r="3"/></svg>跳转路径</div>
+      <div class="sidebar-item" onclick="navigateTo('map-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3 9 12 15 21 9"/></svg>主地图管理</div>
+      <div class="sidebar-item" onclick="navigateTo('space-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>商家元宇宙空间管理</div>
+      <div class="sidebar-item" onclick="navigateTo('role-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>角色管理</div>
+      <div class="sidebar-item" onclick="navigateTo('dashboard-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>元宇宙看板</div>
+      <div class="sidebar-group-title">数字资产</div>
+      <div class="sidebar-item active" onclick="navigateTo('asset-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>数字资产管理</div>
+    <div class="sidebar-item" onclick="navigateTo('digital-asset-detail.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>数字资产详情</div>
+      <div class="sidebar-item" onclick="navigateTo('order-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>订单管理</div>
+      <div class="sidebar-group-title">会员管理</div>
+      <div class="sidebar-item" onclick="navigateTo('user-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>用户管理</div>
+      <div class="sidebar-item" onclick="navigateTo('merchant-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>商家管理</div>
+      <div class="sidebar-group-title">审核管理</div>
+      <div class="sidebar-item" onclick="navigateTo('cert-review.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>商家审核管理</div>
+    <div class="sidebar-item" onclick="navigateTo('story-review.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>文化故事审核</div>
+          <div class="sidebar-group-title">内容管理</div>
+    <div class="sidebar-item" onclick="navigateTo('message-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>消息管理</div>
+    <div class="sidebar-group-title">系统管理</div>
+      <div class="sidebar-item" onclick="navigateTo('wallet-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>钱包管理</div>
+    </div>
+
+  <!-- 右侧内容区 -->
+  <div class="content">
+    <div class="content-header">
+      <div class="content-title">数字资产管理</div>
+    </div>
+
+    <!-- 状态筛选Tab -->
+    <div class="status-tabs">
+      <button class="status-tab active" onclick="filterByStatus('all', this)">全部</button>
+      <button class="status-tab" onclick="filterByStatus('pending', this)">待审核</button>
+      <button class="status-tab" onclick="filterByStatus('rejected', this)">已驳回</button>
+      <button class="status-tab" onclick="filterByStatus('approved', this)">已通过</button>
+      <button class="status-tab" onclick="filterByStatus('casting', this)">铸造中</button>
+      <button class="status-tab" onclick="filterByStatus('publish-pending', this)">待上线</button>
+      <button class="status-tab" onclick="filterByStatus('published', this)">已上线</button>
+      <button class="status-tab" onclick="filterByStatus('ended', this)">已结束</button>
+    </div>
+
+    <!-- 资产列表 -->
+    <div class="asset-list" id="assetList">
+      <!-- 待审核状态 -->
+      <div class="asset-card" data-status="pending" onclick="viewAssetDetail('1')">
+        <div class="asset-cover" style="background-image: url('../茅台1935.png'); background-size: cover; background-position: center;"></div>
+        <div class="asset-info">
+          <div class="asset-header">
+            <div class="asset-name">1935·时光窖藏</div>
+            <span class="status-tag status-pending">待审核</span>
+          </div>
+          <div class="asset-merchant">商家：贵州茅台集团</div>
+          <div class="asset-meta">
+            <span>发行：5款</span>
+            <span>共5000</span>
+          </div>
+          <div class="asset-tags">
+            <span class="asset-tag">白酒</span>
+            <span class="asset-tag">收藏</span>
+            <span class="asset-tag">限量</span>
+          </div>
+          <div class="asset-actions">
+            <button class="btn btn-primary" onclick="event.stopPropagation(); openAuditModal('1')">审核</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 已驳回状态 -->
+      <div class="asset-card" data-status="rejected">
+        <div class="asset-cover">📦</div>
+        <div class="asset-info">
+          <div class="asset-header">
+            <div class="asset-name">茅台纪念版礼盒</div>
+            <span class="status-tag status-rejected">已驳回</span>
+          </div>
+          <div class="asset-merchant">商家：贵州茅台集团</div>
+          <div class="asset-meta">
+            <span>发行：200</span>
+            <span>1款</span>
+          </div>
+          <div class="asset-tags">
+            <span class="asset-tag">礼盒</span>
+            <span class="asset-tag">收藏</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 已通过状态 -->
+      <div class="asset-card" data-status="approved">
+        <div class="asset-cover">🌟</div>
+        <div class="asset-info">
+          <div class="asset-header">
+            <div class="asset-name">茅台数字艺术藏品</div>
+            <span class="status-tag status-approved">已通过</span>
+          </div>
+          <div class="asset-merchant">商家：贵州茅台集团</div>
+          <div class="asset-meta">
+            <span>发行：800</span>
+            <span>2款</span>
+          </div>
+          <div class="asset-tags">
+            <span class="asset-tag">艺术</span>
+            <span class="asset-tag">数字藏品</span>
+          </div>
+          <div class="asset-actions">
+            <button class="btn btn-success" onclick="startCasting('3')">开始铸造</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 铸造中状态 -->
+      <div class="asset-card" data-status="casting">
+        <div class="asset-cover">🔧</div>
+        <div class="asset-info">
+          <div class="asset-header">
+            <div class="asset-name">茅台VIP尊享卡</div>
+            <span class="status-tag status-casting">铸造中</span>
+          </div>
+          <div class="asset-merchant">商家：贵州茅台集团</div>
+          <div class="asset-meta">
+            <span>发行：500</span>
+            <span>1款</span>
+          </div>
+          <div class="asset-tags">
+            <span class="asset-tag">VIP</span>
+            <span class="asset-tag">权益</span>
+          </div>
+          <div class="asset-actions">
+            <span class="no-action">铸造中...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 待上线状态 -->
+      <div class="asset-card" data-status="publish-pending">
+        <div class="asset-cover">🚀</div>
+        <div class="asset-info">
+          <div class="asset-header">
+            <div class="asset-name">茅台品鉴会门票</div>
+            <span class="status-tag status-publish-pending">待上线</span>
+          </div>
+          <div class="asset-merchant">商家：贵州茅台集团</div>
+          <div class="asset-meta">
+            <span>发行：300</span>
+            <span>1款</span>
+          </div>
+          <div class="asset-tags">
+            <span class="asset-tag">门票</span>
+            <span class="asset-tag">品鉴会</span>
+          </div>
+          <div class="asset-actions">
+            <span class="no-action">等待商家操作</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 已结束状态 -->
+      <div class="asset-card" data-status="ended">
+        <div class="asset-cover">🎯</div>
+        <div class="asset-info">
+          <div class="asset-header">
+            <div class="asset-name">茅台会员积分</div>
+            <span class="status-tag status-ended">已结束</span>
+          </div>
+          <div class="asset-merchant">商家：贵州茅台集团</div>
+          <div class="asset-meta">
+            <span>发行：10000</span>
+            <span>1款</span>
+          </div>
+          <div class="asset-tags">
+            <span class="asset-tag">积分</span>
+            <span class="asset-tag">会员</span>
+          </div>
+          <div class="asset-actions">
+            <button class="btn btn-info" onclick="event.stopPropagation(); viewData('6')">查看数据</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 已上线状态 - 海底捞 -->
+      <div class="asset-card" data-status="published">
+        <div class="asset-cover">🍲</div>
+        <div class="asset-info">
+          <div class="asset-header">
+            <div class="asset-name">海底捞·黑海会员</div>
+            <span class="status-tag status-published">已上线</span>
+          </div>
+          <div class="asset-merchant">商家：海底捞</div>
+          <div class="asset-meta">
+            <span>发行：20000</span>
+            <span>1款</span>
+          </div>
+          <div class="asset-tags">
+            <span class="asset-tag">餐饮</span>
+            <span class="asset-tag">会员</span>
+            <span class="asset-tag">权益</span>
+          </div>
+          <div class="asset-actions">
+            <button class="btn btn-info" onclick="event.stopPropagation(); viewData('8')">查看数据</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 详情弹窗 -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">数字资产详情</div>
+      <div class="modal-close" onclick="closeDetailModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div class="modal-body" id="detailContent">
+      <!-- 详情内容将通过JS渲染 -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-default" onclick="closeDetailModal()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- 审核弹窗 -->
+<div class="modal-overlay" id="auditModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">审核数字资产</div>
+      <div class="modal-close" onclick="closeAuditModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="auditAssetId">
+      
+      <!-- 资产基本信息 -->
+      <div class="detail-section">
+        <div class="detail-title">资产信息</div>
+        <div class="detail-row">
+          <span class="detail-label">资产名称</span>
+          <span class="detail-value" id="auditAssetName">飞天茅台数字藏品</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">商家名称</span>
+          <span class="detail-value" id="auditMerchantName">贵州茅台集团</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">发行总数量</span>
+          <span class="detail-value" id="auditQuantity">1000</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">详细说明</span>
+          <span class="detail-value readonly" id="auditDescription">飞天茅台是贵州茅台集团的核心产品，具有独特的酱香风格...</span>
+        </div>
+      </div>
+
+      <!-- 产品价值评估报告 -->
+      <div class="detail-section">
+        <div class="detail-title">产品价值评估报告</div>
+        <div class="detail-row">
+          <span class="detail-label">报告内容</span>
+          <span class="detail-value readonly" id="auditReport">本数字藏品具有较高的收藏价值和市场潜力...</span>
+        </div>
+      </div>
+
+      <!-- 款式信息 -->
+      <div class="detail-section">
+        <div class="detail-title">款式信息</div>
+        <div id="auditStyles">
+          <div class="style-item-detail">
+            <div class="style-header-detail">
+              <span class="style-name-detail">款式 1：经典款</span>
+            </div>
+            <div class="detail-row" style="padding: 6px 0;">
+              <span class="detail-label">数量</span>
+              <span class="detail-value">500</span>
+            </div>
+            <div class="detail-row" style="padding: 6px 0;">
+              <span class="detail-label">权益说明</span>
+            </div>
+            <div class="benefit-item-detail">
+              <span class="detail-label">权益名称：</span>
+              <span class="detail-value">实物兑换</span>
+              <span style="margin-left: 20px;" class="detail-label">兑现方式：</span>
+              <span class="detail-value">实物快递</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 审核意见 -->
+      <div class="detail-section">
+        <div class="detail-title">审核意见</div>
+        <textarea class="audit-comment" id="auditComment" placeholder="请输入审核意见（驳回时必填）"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-default" onclick="closeAuditModal()">取消</button>
+      <button class="btn btn-default" onclick="rejectAsset()">驳回</button>
+      <button class="btn btn-primary" onclick="approveAsset()">通过</button>
+    </div>
+  </div>
+</div>
+
+<!-- 查看数据弹窗 -->
+<div class="modal-overlay" id="dataModal">
+  <div class="modal-box" style="max-width: 700px;">
+    <div class="modal-header">
+      <div class="modal-title">查看数据</div>
+      <div class="modal-close" onclick="closeDataModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div class="modal-body" id="dataContent"></div>
+    <div class="modal-footer">
+      <button class="btn btn-default" onclick="closeDataModal()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// 模拟数据
+const assets = {
+  '1': {
+    id: '1',
+    name: '1935·时光窖藏',
+    merchant: '贵州茅台集团',
+    quantity: 5000,
+    description: '茅台经典系列数字资产，1935时光窖藏系列，传承经典酿造工艺，具有独特的酱香风格。',
+    report: 'maotai_1935_report.pdf',
+    modelFile: 'maotai_1935_3d.glb',
+    cover: '茅台1935.png',
+    images: [
+      '1935详情.png'
+    ],
+    status: 'pending',
+    styles: [
+      { name: '凝时', quantity: 1000, image: '凝时.png', price: 599, benefits: [{ name: '实物酒兑换', method: '实物快递' }, { name: '超值优惠券', method: '商家平台核销' }] },
+      { name: '守岁', quantity: 1000, image: '守岁.png', price: 699, benefits: [{ name: '实物酒兑换', method: '实物快递' }, { name: '线下品鉴会资格', method: '商家平台核销' }] },
+      { name: '溯年', quantity: 1000, image: '溯年.png', price: 899, benefits: [{ name: '实物酒兑换', method: '实物快递' }, { name: '超值优惠券', method: '商家平台核销' }, { name: '线下品鉴会资格', method: '商家平台核销' }] },
+      { name: '沉光', quantity: 1000, image: '沉光.png', price: 599, benefits: [{ name: '实物酒兑换', method: '实物快递' }] },
+      { name: '驻痕', quantity: 1000, image: '驻痕.png', price: 799, benefits: [{ name: '实物酒兑换', method: '实物快递' }, { name: '超值优惠券', method: '商家平台核销' }], soldOut: true }
+    ]
+  },
+  '2': {
+    id: '2',
+    name: '茅台纪念版礼盒',
+    merchant: '贵州茅台集团',
+    quantity: 200,
+    description: '限量版纪念礼盒，包含经典茅台产品及专属收藏证书。',
+    report: 'moutai_gift_report.pdf',
+    modelFile: 'moutai_gift_3d.glb',
+    images: ['https://neeko-copilot.bytedance.net/api/text_to_image?prompt=moutai%20gift%20box%20luxury%20red%20packaging&image_size=landscape_4_3'],
+    status: 'rejected',
+    styles: [{ name: '标准版', quantity: 200, image: 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=moutai%20gift%20box%20elegant&image_size=square', benefits: [{ name: '实物兑换', method: '实物快递' }] }]
+  },
+  '3': {
+    id: '3',
+    name: '茅台数字艺术藏品',
+    merchant: '贵州茅台集团',
+    quantity: 800,
+    description: '融合传统工艺与数字艺术的创新藏品。',
+    report: 'moutai_art_report.pdf',
+    modelFile: 'moutai_art_3d.glb',
+    images: ['https://neeko-copilot.bytedance.net/api/text_to_image?prompt=digital%20art%20chinese%20wine%20bottle%20abstract&image_size=landscape_4_3'],
+    status: 'approved',
+    styles: [
+      { name: '艺术款A', quantity: 400, image: 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=digital%20art%20purple%20wine%20bottle&image_size=square', benefits: [{ name: '数字证书', method: '商家平台核销' }] },
+      { name: '艺术款B', quantity: 400, image: 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=digital%20art%20gold%20wine%20bottle&image_size=square', benefits: [{ name: '数字证书', method: '商家平台核销' }] }
+    ]
+  },
+  '4': {
+    id: '4',
+    name: '茅台VIP尊享卡',
+    merchant: '贵州茅台集团',
+    quantity: 500,
+    description: '为VIP客户专属打造的数字权益凭证。',
+    report: 'moutai_vip_report.pdf',
+    modelFile: 'moutai_vip_3d.glb',
+    images: ['https://neeko-copilot.bytedance.net/api/text_to_image?prompt=VIP%20card%20gold%20luxury%20elegant&image_size=landscape_4_3'],
+    status: 'casting',
+    styles: [{ name: 'VIP卡', quantity: 500, image: 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=VIP%20membership%20card%20gold&image_size=square', benefits: [{ name: '专属服务', method: '商家平台核销' }, { name: '优先购买', method: '商家平台核销' }, { name: '专属客服', method: '商家平台核销' }] }]
+  },
+  '5': {
+    id: '5',
+    name: '茅台品鉴会门票',
+    merchant: '贵州茅台集团',
+    quantity: 300,
+    description: '茅台品鉴会专属数字门票。',
+    report: 'moutai_ticket_report.pdf',
+    modelFile: 'moutai_ticket_3d.glb',
+    images: ['https://neeko-copilot.bytedance.net/api/text_to_image?prompt=luxury%20event%20ticket%20gold%20red&image_size=landscape_4_3'],
+    status: 'publish-pending',
+    styles: [{ name: '品鉴门票', quantity: 300, image: 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=event%20ticket%20elegant%20design&image_size=square', benefits: [{ name: '品鉴资格', method: '商家平台核销' }] }]
+  },
+  '6': {
+    id: '6',
+    name: '茅台会员积分',
+    merchant: '贵州茅台集团',
+    quantity: 10000,
+    description: '茅台会员专属积分数字资产。',
+    report: 'moutai_points_report.pdf',
+    modelFile: 'moutai_points_3d.glb',
+    images: ['https://neeko-copilot.bytedance.net/api/text_to_image?prompt=loyalty%20points%20gold%20coins%20digital&image_size=landscape_4_3'],
+    status: 'ended',
+    styles: [{ name: '积分资产', quantity: 10000, image: 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=digital%20coins%20gold%20shiny&image_size=square', benefits: [{ name: '积分兑换', method: '商家平台核销' }] }]
+  },
+  '7': {
+    id: '7',
+    name: '王者荣耀·传说皮肤',
+    merchant: '腾讯游戏',
+    quantity: 5000,
+    description: '王者荣耀限定传说皮肤数字藏品。',
+    report: 'honor_skin_report.pdf',
+    modelFile: 'honor_skin_3d.glb',
+    images: ['https://neeko-copilot.bytedance.net/api/text_to_image?prompt=anime%20game%20character%20legendary%20skin%20epic&image_size=landscape_4_3'],
+    status: 'pending',
+    styles: [
+      { name: '皮肤A-李白', quantity: 1000, image: 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=anime%20warrior%20white%20hair%20sword&image_size=square', benefits: [{ name: '游戏道具', method: '商家平台核销' }, { name: '专属头像框', method: '商家平台核销' }] },
+      { name: '皮肤B-貂蝉', quantity: 1000, image: 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=anime%20princess%20pink%20dress%20elegant&image_size=square', benefits: [{ name: '游戏道具', method: '商家平台核销' }, { name: '专属表情', method: '商家平台核销' }] },
+      { name: '皮肤C-赵云', quantity: 1000, image: 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=anime%20general%20silver%20armor%20spear&image_size=square', benefits: [{ name: '游戏道具', method: '商家平台核销' }] },
+      { name: '皮肤D-妲己', quantity: 1000, image: 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=anime%20fox%20girl%20pink%20cute&image_size=square', benefits: [{ name: '游戏道具', method: '商家平台核销' }, { name: '专属回城特效', method: '商家平台核销' }] },
+      { name: '皮肤E-韩信', quantity: 1000, image: 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=anime%20thief%20purple%20mask%20speedy&image_size=square', benefits: [{ name: '游戏道具', method: '商家平台核销' }] }
+    ]
+  },
+  '8': {
+    id: '8',
+    name: '海底捞·黑海会员',
+    merchant: '海底捞',
+    quantity: 20000,
+    description: '海底捞黑海会员专属权益数字卡。',
+    report: 'haidilao_vip_report.pdf',
+    modelFile: 'haidilao_vip_3d.glb',
+    images: ['https://neeko-copilot.bytedance.net/api/text_to_image?prompt=hotpot%20restaurant%20elegant%20interior%20chinese&image_size=landscape_4_3'],
+    status: 'published',
+    styles: [{ name: '黑海会员卡', quantity: 20000, image: 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=black%20gold%20membership%20card%20premium&image_size=square', benefits: [{ name: '优先排队', method: '商家平台核销' }, { name: '免费菜品', method: '商家平台核销' }, { name: '生日礼遇', method: '商家平台核销' }, { name: '专属包厢', method: '商家平台核销' }] }]
+  }
+};
+
+// 切换子菜单
+function toggleSidebarSubmenu(menuId) {
+  const parent = document.querySelector(`.sidebar-parent[onclick*="${menuId}"]`);
+  const submenu = document.getElementById(`submenu-${menuId}`);
+  if (parent && submenu) {
+    parent.classList.toggle('open');
+    submenu.classList.toggle('show');
+  }
+}
+
+// 页面跳转
+function navigateTo(url) {
+  window.location.href = url;
+}
+
+// 状态筛选
+function filterByStatus(status, tabElement) {
+  document.querySelectorAll('.status-tab').forEach(tab => tab.classList.remove('active'));
+  tabElement.classList.add('active');
+  
+  const cards = document.querySelectorAll('.asset-card');
+  cards.forEach(card => {
+    if (status === 'all') {
+      card.style.display = 'block';
+    } else {
+      const cardStatus = card.getAttribute('data-status');
+      card.style.display = cardStatus === status ? 'block' : 'none';
+    }
+  });
+}
+
+// 查看资产详情
+function viewAssetDetail(id) {
+  const asset = assets[id];
+  if (!asset) return;
+  
+  let stylesHtml = '';
+  asset.styles.forEach((style, index) => {
+    let benefitsHtml = `
+      <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">
+        <thead>
+          <tr style="background: #f5f5f7;">
+            <th style="padding: 6px 10px; text-align: left; font-size: 12px; color: #666; border: 1px solid #e8e8e8;">权益名称</th>
+            <th style="padding: 6px 10px; text-align: left; font-size: 12px; color: #666; border: 1px solid #e8e8e8;">核销方式</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+    style.benefits.forEach((benefit) => {
+      benefitsHtml += `
+        <tr>
+          <td style="padding: 6px 10px; font-size: 13px; color: #333; border: 1px solid #e8e8e8;">${benefit.name}</td>
+          <td style="padding: 6px 10px; font-size: 13px; color: #333; border: 1px solid #e8e8e8;">${benefit.method === 'delivery' ? '实物快递' : '商家平台核销'}</td>
+        </tr>
+      `;
+    });
+    benefitsHtml += '</tbody></table>';
+    
+    stylesHtml += `
+      <div class="style-item-detail">
+        <div class="style-header-detail">
+          <span class="style-name-detail">款式 ${index + 1}：${style.name}</span>
+        </div>
+        <div style="display: flex; gap: 16px; margin-bottom: 12px;">
+          <img src="${style.image}" alt="${style.name}" class="style-image" onclick="previewImage('${style.image}')" style="cursor: pointer;">
+          <div style="flex: 1;">
+            <div class="detail-row" style="padding: 6px 0;">
+              <span class="detail-label">数量</span>
+              <span class="detail-value">${style.quantity}</span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 8px;">
+          <span class="detail-label" style="display: block; margin-bottom: 8px;">权益说明：</span>
+          ${benefitsHtml}
+        </div>
+      </div>
+    `;
+  });
+  
+  let imagesHtml = '';
+  if (asset.images && asset.images.length > 0) {
+    imagesHtml = `
+      <div class="detail-section">
+        <div class="detail-title">产品详情</div>
+        <div class="detail-images">
+          ${asset.images.map((img, index) => `
+            <img src="${img}" alt="产品图片${index + 1}" style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px; cursor: pointer;" onclick="previewImage('${img}')">
+          `).join('')}
+        </div>
+        <div style="font-size: 12px; color: #999; margin-top: 8px;">点击图片可放大查看</div>
+      </div>
+    `;
+  }
+  
+  const content = `
+    <div class="detail-section">
+      <div class="detail-title">资产信息</div>
+      <div class="detail-row">
+        <span class="detail-label">产品名称</span>
+        <span class="detail-value">${asset.name}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">封面</span>
+        <div>
+          <img src="${asset.cover || asset.images[0]}" alt="封面" style="width: 150px; height: 180px; object-fit: cover; border-radius: 8px; cursor: pointer;" onclick="previewImage('${asset.cover || asset.images[0]}')">
+          <div style="font-size: 12px; color: #999; margin-top: 4px;">1935详情.png</div>
+        </div>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">商家名称</span>
+        <span class="detail-value">${asset.merchant}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">发行总数量</span>
+        <span class="detail-value">${asset.quantity}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">详细说明</span>
+        <span class="detail-value readonly">${asset.description}</span>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-title">产品价值评估报告</div>
+      <div class="detail-row">
+        <span class="detail-label">报告文件</span>
+        <a href="#" class="download-link" onclick="event.preventDefault(); showToast('正在下载报告', 'success')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          查看 ${asset.report}
+        </a>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-title">3D模型文件</div>
+      <div class="detail-row">
+        <span class="detail-label">模型文件</span>
+        <a href="#" class="download-link" onclick="event.preventDefault(); showToast('正在下载3D模型', 'success')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          下载 ${asset.modelFile}
+        </a>
+      </div>
+    </div>
+
+    ${imagesHtml}
+
+    <div class="detail-section">
+      <div class="detail-title">款式信息</div>
+      ${stylesHtml}
+    </div>
+  `;
+  
+  document.getElementById('detailContent').innerHTML = content;
+  document.getElementById('detailModal').classList.add('show');
+}
+
+// 图片放大预览
+function previewImage(src) {
+  const modal = document.createElement('div');
+  modal.className = 'image-preview-modal show';
+  modal.innerHTML = `
+    <span class="image-preview-close" onclick="this.parentElement.remove()">&times;</span>
+    <div class="image-preview-content">
+      <img src="${src}" alt="预览">
+    </div>
+  `;
+  document.body.appendChild(modal);
+  
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  });
+}
+
+// 关闭详情弹窗
+function closeDetailModal() {
+  document.getElementById('detailModal').classList.remove('show');
+}
+
+// 打开审核弹窗
+function openAuditModal(id) {
+  const asset = assets[id];
+  if (!asset) return;
+  
+  document.getElementById('auditAssetId').value = id;
+  document.getElementById('auditAssetName').textContent = asset.name;
+  document.getElementById('auditMerchantName').textContent = asset.merchant;
+  document.getElementById('auditQuantity').textContent = asset.quantity;
+  document.getElementById('auditDescription').textContent = asset.description;
+  document.getElementById('auditReport').textContent = asset.report;
+  
+  let stylesHtml = '';
+  asset.styles.forEach((style, index) => {
+    let benefitsHtml = '';
+    style.benefits.forEach(benefit => {
+      benefitsHtml += `
+        <div class="benefit-item-detail">
+          <span class="detail-label">权益名称：</span>
+          <span class="detail-value">${benefit.name}</span>
+          <span style="margin-left: 20px;" class="detail-label">兑现方式：</span>
+          <span class="detail-value">${benefit.method === 'delivery' ? '实物快递' : '商家平台核销'}</span>
+        </div>
+      `;
+    });
+    stylesHtml += `
+      <div class="style-item-detail">
+        <div class="style-header-detail">
+          <span class="style-name-detail">款式 ${index + 1}：${style.name}</span>
+        </div>
+        <div class="detail-row" style="padding: 6px 0;">
+          <span class="detail-label">数量</span>
+          <span class="detail-value">${style.quantity}</span>
+        </div>
+        <div class="detail-row" style="padding: 6px 0;">
+          <span class="detail-label">权益说明</span>
+        </div>
+        ${benefitsHtml}
+      </div>
+    `;
+  });
+  
+  document.getElementById('auditStyles').innerHTML = stylesHtml;
+  document.getElementById('auditComment').value = '';
+  document.getElementById('auditModal').classList.add('show');
+}
+
+// 关闭审核弹窗
+function closeAuditModal() {
+  document.getElementById('auditModal').classList.remove('show');
+}
+
+// 审核通过
+function approveAsset() {
+  const id = document.getElementById('auditAssetId').value;
+  assets[id].status = 'approved';
+  
+  // 更新卡片状态
+  const card = document.querySelector(`.asset-card[data-status="pending"][onclick="viewAssetDetail('${id}')"]`);
+  if (card) {
+    card.setAttribute('data-status', 'approved');
+    card.querySelector('.status-tag').className = 'status-tag status-approved';
+    card.querySelector('.status-tag').textContent = '已通过';
+    card.querySelector('.asset-actions').innerHTML = '<button class="btn btn-success" onclick="event.stopPropagation(); startCasting(\'' + id + '\')">开始铸造</button>';
+  }
+  
+  closeAuditModal();
+  showToast('审核通过', 'success');
+}
+
+// 驳回
+function rejectAsset() {
+  const comment = document.getElementById('auditComment').value.trim();
+  if (!comment) {
+    showToast('请输入驳回理由', 'error');
+    return;
+  }
+  
+  const id = document.getElementById('auditAssetId').value;
+  assets[id].status = 'rejected';
+  
+  // 更新卡片状态
+  const card = document.querySelector(`.asset-card[data-status="pending"][onclick="viewAssetDetail('${id}')"]`);
+  if (card) {
+    card.setAttribute('data-status', 'rejected');
+    card.querySelector('.status-tag').className = 'status-tag status-rejected';
+    card.querySelector('.status-tag').textContent = '已驳回';
+    card.querySelector('.asset-actions').innerHTML = '<span class="no-action">无操作</span>';
+  }
+  
+  closeAuditModal();
+  showToast('已驳回', 'success');
+}
+
+// 开始铸造
+function startCasting(id) {
+  assets[id].status = 'casting';
+  
+  const card = document.querySelector(`.asset-card[data-status="approved"][onclick="viewAssetDetail('${id}')"]`);
+  if (card) {
+    card.setAttribute('data-status', 'casting');
+    card.querySelector('.status-tag').className = 'status-tag status-casting';
+    card.querySelector('.status-tag').textContent = '铸造中';
+    card.querySelector('.asset-actions').innerHTML = '<span class="no-action">铸造中...</span>';
+  }
+  
+  showToast('开始铸造', 'success');
+}
+
+// 查看数据弹窗（数据对齐 merchant/asset-management.html）
+function viewData(id) {
+  var mockData = {
+    currentPhase: '优先购',
+    totalSales: 856,
+    totalRevenue: 512400,
+    buyerCount: 428,
+    phases: [
+      { id:1, mode:'priority', modeLabel:'优先购', modeIcon:'🎯', startTime:'2026-06-15T10:00', endTime:'2026-06-16T18:00', totalAmount:500, issuedAmount:423, issuedCount:385, whitelistCount:500, boughtAmount:398, boughtCount:367 },
+      { id:2, mode:'lottery', modeLabel:'抽签购', modeIcon:'🎲', startTime:'2026-06-17T10:00', endTime:'2026-06-18T18:00', totalAmount:800, issuedAmount:312, issuedCount:298, whitelistCount:800, boughtAmount:286, boughtCount:275 },
+      { id:3, mode:'public', modeLabel:'全民购', modeIcon:'👥', startTime:'2026-06-19T10:00', boughtAmount:172, boughtCount:168 }
+    ]
+  };
+  if (id === '8') {
+    mockData.currentPhase = '全民购';
+    mockData.totalSales = 12578;
+    mockData.totalRevenue = 7534200;
+    mockData.buyerCount = 8920;
+    mockData.phases = [
+      { id:1, mode:'priority', modeLabel:'优先购', modeIcon:'🎯', startTime:'2026-04-01T10:00', endTime:'2026-04-03T18:00', totalAmount:5000, issuedAmount:4823, issuedCount:4456, whitelistCount:5000, boughtAmount:4756, boughtCount:4389 },
+      { id:2, mode:'lottery', modeLabel:'抽签购', modeIcon:'🎲', startTime:'2026-04-05T10:00', endTime:'2026-04-07T18:00', totalAmount:8000, issuedAmount:7623, issuedCount:7120, whitelistCount:8000, boughtAmount:5289, boughtCount:4876 },
+      { id:3, mode:'public', modeLabel:'全民购', modeIcon:'👥', startTime:'2026-04-10T10:00', boughtAmount:2533, boughtCount:2156 }
+    ];
+  }
+
+  var totalPublish = mockData.phases.reduce(function(sum, p){ return sum + (p.totalAmount || 0); }, 0);
+
+  var h = '';
+  h += '<div class="stats-overview" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px">';
+  h += '<div class="stat-card" style="background:#f8fafc;border-radius:10px;padding:16px"><div class="stat-label" style="font-size:12px;color:#999">当前阶段</div><div class="stat-value" style="font-size:20px;font-weight:700;color:#333;margin-top:4px">'+mockData.currentPhase+'</div></div>';
+  h += '<div class="stat-card" style="background:#f8fafc;border-radius:10px;padding:16px"><div class="stat-label" style="font-size:12px;color:#999">发行总量</div><div class="stat-value" style="font-size:20px;font-weight:700;color:#667eea;margin-top:4px">'+totalPublish.toLocaleString()+'</div></div>';
+  h += '<div class="stat-card" style="background:#f8fafc;border-radius:10px;padding:16px"><div class="stat-label" style="font-size:12px;color:#999">销售总量</div><div class="stat-value" style="font-size:20px;font-weight:700;color:#52c41a;margin-top:4px">'+mockData.totalSales.toLocaleString()+'</div></div>';
+  h += '<div class="stat-card" style="background:#f8fafc;border-radius:10px;padding:16px"><div class="stat-label" style="font-size:12px;color:#999">销售总金额</div><div class="stat-value" style="font-size:20px;font-weight:700;color:#D70C1F;margin-top:4px">¥'+mockData.totalRevenue.toLocaleString()+'</div></div>';
+  h += '<div class="stat-card" style="background:#f8fafc;border-radius:10px;padding:16px"><div class="stat-label" style="font-size:12px;color:#999">购买人数</div><div class="stat-value" style="font-size:20px;font-weight:700;color:#fa8c16;margin-top:4px">'+mockData.buyerCount.toLocaleString()+'</div></div>';
+  h += '</div>';
+
+  // 销售趋势图表
+  h += '<div class="chart-section" style="margin-bottom:20px"><div class="chart-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span class="chart-title" style="font-size:14px;font-weight:600;color:#333">销售趋势</span><select style="padding:4px 10px;border:1px solid #ddd;border-radius:4px;font-size:12px"><option>近7天</option><option>近30天</option></select></div>';
+  h += '<div style="background:#f8fafc;border-radius:10px;padding:16px">';
+  h += '<div style="display:flex;align-items:flex-end;gap:12px;height:120px;padding:0 8px">';
+  var days = [120,200,160,280,140,240,320];
+  var maxVal = Math.max.apply(null, days);
+  days.forEach(function(v) {
+    var pct = Math.round(v / maxVal * 100);
+    h += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="font-size:10px;color:#999">'+v+'</div><div style="width:100%;height:'+pct+'%;background:linear-gradient(180deg,#667eea,#a78bfa);border-radius:4px 4px 0 0;min-height:8px"></div></div>';
+  });
+  h += '</div><div style="display:flex;gap:12px;margin-top:8px;padding:0 8px">';
+  ['周一','周二','周三','周四','周五','周六','周日'].forEach(function(d){ h += '<div style="flex:1;font-size:10px;color:#999;text-align:center">'+d+'</div>'; });
+  h += '</div></div></div>';
+
+  // 发行阶段列表
+  h += '<div style="font-size:14px;font-weight:600;color:#333;margin-bottom:10px">发行阶段</div>';
+  mockData.phases.forEach(function(phase, i) {
+    h += '<div style="background:#f8fafc;border-radius:10px;padding:14px 16px;margin-bottom:8px">';
+    h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span style="font-size:20px">'+phase.modeIcon+'</span><span class="phase-badge" style="padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600;background:#e6f7ff;color:#1890ff">'+phase.modeLabel+'</span><span style="font-size:12px;color:#999">第'+(i+1)+'阶段</span></div>';
+    if (phase.mode === 'public') {
+      h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+      h += '<div><div style="font-size:10px;color:#999">已购买数量</div><div style="font-size:14px;font-weight:600;color:#333">'+(phase.boughtAmount||0).toLocaleString()+'</div></div>';
+      h += '<div><div style="font-size:10px;color:#999">已购买人数</div><div style="font-size:14px;font-weight:600;color:#333">'+(phase.boughtCount||0).toLocaleString()+'</div></div>';
+      h += '</div>';
+    } else {
+      h += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">';
+      h += '<div><div style="font-size:10px;color:#999">实际领取数量</div><div style="font-size:14px;font-weight:600;color:#333">'+(phase.issuedAmount||0).toLocaleString()+'</div></div>';
+      h += '<div><div style="font-size:10px;color:#999">实际领取人数</div><div style="font-size:14px;font-weight:600;color:#333">'+(phase.issuedCount||0).toLocaleString()+'</div></div>';
+      h += '<div><div style="font-size:10px;color:#999">白名单数量</div><div style="font-size:14px;font-weight:600;color:#333">'+phase.totalAmount.toLocaleString()+'</div></div>';
+      h += '<div><div style="font-size:10px;color:#999">白名单人数</div><div style="font-size:14px;font-weight:600;color:#333">'+(phase.whitelistCount||0).toLocaleString()+'</div></div>';
+      h += '<div><div style="font-size:10px;color:#999">已购买数量</div><div style="font-size:14px;font-weight:600;color:#333">'+(phase.boughtAmount||0).toLocaleString()+'</div></div>';
+      h += '<div><div style="font-size:10px;color:#999">已购买人数</div><div style="font-size:14px;font-weight:600;color:#333">'+(phase.boughtCount||0).toLocaleString()+'</div></div>';
+      h += '</div>';
+    }
+    var fmt = function(s){ return s ? s.substring(0,10)+' '+s.substring(11,16) : ''; };
+    h += '<div style="font-size:11px;color:#999;margin-top:8px">'+fmt(phase.startTime)+' '+(phase.endTime?'～ '+fmt(phase.endTime):'起')+'</div>';
+    h += '</div>';
+  });
+
+  document.getElementById('dataContent').innerHTML = h;
+  document.getElementById('dataModal').classList.add('show');
+}
+function closeDataModal() { document.getElementById('dataModal').classList.remove('show'); }
+
+// Toast 提示
+function showToast(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+</script>
+</body>
+</html>

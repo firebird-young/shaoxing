@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>李白行走动画</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Microsoft YaHei', sans-serif;
+            overflow: hidden;
+        }
+
+        .title {
+            color: #e94560;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 8px;
+        }
+
+        .scene {
+            width: 90%;
+            max-width: 1100px;
+            height: 450px;
+            background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 55%, #90EE90 55%, #228B22 100%);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        /* 云朵 */
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+            opacity: 0.75;
+        }
+
+        .cloud1 {
+            width: 100px; height: 45px; top: 25px; left: 80px;
+            animation: float 18s infinite linear;
+        }
+
+        .cloud2 {
+            width: 70px; height: 32px; top: 55px; left: 350px;
+            animation: float 23s infinite linear;
+        }
+
+        .cloud3 {
+            width: 120px; height: 50px; top: 35px; right: 120px;
+            animation: float 20s infinite linear reverse;
+        }
+
+        @keyframes float {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(100px); }
+        }
+
+        /* 地面装饰 */
+        .flower {
+            position: absolute;
+            bottom: 25px;
+            font-size: 1.6rem;
+            animation: sway 3s infinite ease-in-out;
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(-6deg); }
+            50% { transform: rotate(6deg); }
+        }
+
+        /* 李白角色容器 */
+        .character-container {
+            position: absolute;
+            bottom: 10px;
+            width: 362px;   /* 2172 / 6 */
+            height: 724px;  /* 原始高度 */
+            transform-origin: bottom center;
+            animation: moveAcross 10s infinite linear;
+        }
+
+        @keyframes moveAcross {
+            0%   { left: -110px; transform: scale(0.3) scaleX(1); }
+            45%  { left: calc(100% + 50px); transform: scale(0.3) scaleX(1); }
+            50%  { left: calc(100% + 50px); transform: scale(0.3) scaleX(-1); }
+            95%  { left: -110px; transform: scale(0.3) scaleX(-1); }
+            100% { left: -110px; transform: scale(0.3) scaleX(1); }
+        }
+
+        /* 雪碧图 - 6帧，总宽2172，高724 */
+        .sprite {
+            width: 100%;
+            height: 100%;
+            background-image: url('茅台妹妹雪碧图.png');
+            background-repeat: no-repeat;
+            background-size: auto 100%;
+            image-rendering: pixelated;
+            animation: animateSprite 0.8s steps(6) infinite;
+        }
+
+        @keyframes animateSprite {
+            from { background-position: 0 0; }
+            to   { background-position: -2172px 0; }
+        }
+
+        /* 控制面板 */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Microsoft YaHei', sans-serif;
+            color: white;
+        }
+
+        .btn-speed {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn-pause {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .speed-label {
+            color: #aaa;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .info {
+            margin-top: 15px;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">李白行吟图</h1>
+
+    <div class="scene">
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+        <div class="cloud cloud3"></div>
+
+        <span class="flower" style="left:8%;">🌸</span>
+        <span class="flower" style="left:22%; animation-delay:0.5s;">🌺</span>
+        <span class="flower" style="left:40%; animation-delay:1s;">🌼</span>
+        <span class="flower" style="left:58%; animation-delay:0.3s;">🌻</span>
+        <span class="flower" style="left:75%; animation-delay:0.8s;">🌷</span>
+        <span class="flower" style="left:90%; animation-delay:0.2s;">🌹</span>
+
+        <div class="character-container" id="character">
+            <div class="sprite"></div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-speed" onclick="toggleSpeed()">切换速度</button>
+        <button class="btn btn-pause" onclick="togglePause()">暂停 / 继续</button>
+    </div>
+    <div class="speed-label" id="speedLabel">当前：正常速度</div>
+    <div class="info">✧ 雪碧图 2172×724 · 6帧 · 李白持酒漫步 ✧</div>
+
+    <script>
+        let isPaused = false;
+        let speedLevel = 0;
+        const speeds = [1, 0.5, 0.25]; // 正常, 慢速, 快速
+        const speedNames = ['正常速度', '慢速', '快速'];
+
+        const character = document.getElementById('character');
+        const sprite = document.querySelector('.sprite');
+        const speedLabel = document.getElementById('speedLabel');
+
+        function togglePause() {
+            isPaused = !isPaused;
+            const state = isPaused ? 'paused' : 'running';
+            character.style.animationPlayState = state;
+            sprite.style.animationPlayState = state;
+        }
+
+        function toggleSpeed() {
+            speedLevel = (speedLevel + 1) % speeds.length;
+            const s = speeds[speedLevel];
+            character.style.animationDuration = (10 / s) + 's';
+            sprite.style.animationDuration = (0.8 / s) + 's';
+            speedLabel.textContent = '当前：' + speedNames[speedLevel];
+        }
+    </script>
+</body>
+</html>

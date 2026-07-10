@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>骰子游戏配置 - 商家中心</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f7fa;color:#333}
+
+/* 顶部 */
+.header{background:#fff;padding:12px 24px;box-shadow:0 2px 4px rgba(0,0,0,.05);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.header h1{font-size:18px;font-weight:600}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-size:13px;transition:.2s}
+.btn-primary{background:#667eea;color:#fff}
+.btn-primary:hover{background:#5a6fd6}
+.btn-default{background:#f0f0f0;color:#666}
+.btn-default:hover{background:#e0e0e0}
+.btn-danger{background:#D70C1F;color:#fff}
+.btn-danger:hover{background:#b80a1a}
+.btn-sm{padding:4px 10px;font-size:11px}
+
+/* 主布局 */
+.main{padding:20px 24px;max-width:1200px;margin:0 auto}
+.row{display:flex;gap:20px;margin-bottom:20px;flex-wrap:wrap}
+.row .col{flex:1;min-width:360px}
+
+/* 卡片 */
+.card{background:#fff;border-radius:10px;padding:16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card-title{font-size:14px;font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #f0f0f0}
+
+/* 地图上传 */
+.upload-area{border:2px dashed #ddd;border-radius:10px;padding:30px;text-align:center;cursor:pointer;transition:.2s}
+.upload-area:hover{border-color:#667eea;background:rgba(102,126,234,.02)}
+.upload-area.has-img{padding:8px}
+.upload-area img{max-width:100%;max-height:300px;border-radius:6px;display:block;margin:0 auto}
+.upload-text{color:#999;font-size:14px}
+
+/* 格子编辑器 */
+.gcell-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5}
+.gcell-item:last-child{border-bottom:none}
+.gcell-num{width:26px;height:26px;border-radius:50%;background:#667eea;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.gcell-info{flex:1;min-width:0}
+.gcell-pos{font-size:11px;color:#999}
+.gcell-pos span{color:#667eea;font-weight:600}
+.gcell-type{font-size:11px;color:#e6a23c;margin-top:2px}
+.gcell-actions{display:flex;gap:4px;flex-shrink:0}
+
+/* 编辑器地图容器 */
+.editor-wrap{position:relative;background:#f0f0f0;border-radius:8px;overflow:hidden;aspect-ratio:1/2;max-height:600px}
+.editor-wrap img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none}
+.editor-overlay{position:absolute;inset:0}
+.editor-grid{position:absolute;width:36px;height:36px;background:#667eea;border:2px solid #fff;border-radius:50%;transform:translate(-50%,-50%);cursor:grab;z-index:5;box-shadow:0 2px 6px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.editor-grid.start{background:#20bf6b;border-color:#fff}
+.editor-grid.end{background:#D70C1F;border-color:#fff}
+.editor-grid.selected{background:#ff6b6b;box-shadow:0 0 10px rgba(255,107,107,.6)}
+.editor-grid.dragging{cursor:grabbing;z-index:10}
+
+/* 模态框 */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-box{background:#fff;border-radius:12px;padding:20px;width:90%;max-width:440px;max-height:80vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:16px}
+.form-group{margin-bottom:12px}
+.form-label{display:block;font-size:12px;color:#666;margin-bottom:4px}
+.form-select,.form-input{width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;outline:none}
+.form-select:focus,.form-input:focus{border-color:#667eea}
+.form-row{display:flex;gap:10px}
+.form-row .form-group{flex:1}
+
+/* 类型配置 */
+.type-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5}
+.type-row:last-child{border-bottom:none}
+.type-row .tr-name{width:60px;font-size:13px;font-weight:600;flex-shrink:0}
+.type-row .tr-upload{display:flex;align-items:center;gap:6px;flex:1}
+.type-row .tr-preview{width:32px;height:32px;border-radius:50%;border:1px solid #ddd;object-fit:cover;flex-shrink:0}
+.type-row .tr-value{width:60px;text-align:center}
+.type-row .tr-value input{width:50px;padding:4px;border:1px solid #ddd;border-radius:4px;font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+
+<a href="dashboard-admin.html" style="position:fixed;top:10px;left:10px;z-index:99;background:rgba(0,0,0,.5);color:#fff;padding:5px 10px;border-radius:14px;font-size:11px;text-decoration:none">← 返回</a>
+<a href="../index.html" style="position:fixed;top:10px;right:10px;z-index:99;background:rgba(0,0,0,.5);color:#fff;padding:5px 10px;border-radius:14px;font-size:11px;text-decoration:none">📁 目录</a>
+
+<div class="header">
+  <h1>🎲 骰子小游戏配置</h1>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-default" onclick="loadConfig()">📂 加载已有</button>
+    <button class="btn btn-primary" onclick="saveAll()">💾 保存配置</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-title">🗺️ 游戏地图</div>
+        <div class="upload-area" id="mapUpload" onclick="document.getElementById('mapFile').click()">
+          <div class="upload-text" id="uploadText">点击上传地图图片</div>
+          <img id="mapPreview" src="" alt="" style="display:none">
+        </div>
+        <input type="file" id="mapFile" accept="image/*" onchange="uploadMap()" style="display:none">
+        <div style="margin-top:10px;font-size:12px;color:#999">
+          💡 输入格子总数一键生成 — 拖动格子调整位置 — 点击格子编辑属性
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card" id="typeCard">
+        <div class="card-title">🏷️ 格子类型配置</div>
+        <div id="typeConfig"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="card" style="" id="editorCard">
+        <div class="card-title">📐 拖拽定位</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+          <span style="font-size:13px;color:#666;white-space:nowrap">格子总数：</span>
+          <input id="gridTotalCount" type="number" min="1" max="200" value="10" style="width:70px;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px;text-align:center">
+          <button class="btn btn-primary btn-sm" onclick="generateGrids()">一键生成</button>
+          <button class="btn btn-default btn-sm" onclick="addOneGrid()">+1 添加</button>
+          <button class="btn btn-default btn-sm" onclick="removeOneGrid()">-1 删除</button>
+          <button class="btn btn-danger btn-sm" onclick="clearAllGrids()">全部清除</button>
+        </div>
+        <div class="editor-wrap" id="editorWrap">
+          <img id="editorImg" src="" alt="">
+          <div class="editor-overlay" id="editorOverlay"></div>
+        </div>
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <button class="btn btn-default btn-sm" onclick="sortGridsByPath()">🔄 按路径排序</button>
+          <button class="btn btn-danger btn-sm" onclick="delSelected()">🗑 删除选中</button>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        <div class="card-title">📋 格子配置列表 (<span id="gridCount">0</span>)</div>
+        <div id="gridList" style="max-height:500px;overflow-y:auto">
+          <div style="color:#999;font-size:13px;padding:20px;text-align:center">暂无格子，在地图上点击添加</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 编辑弹窗 -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-box">
+    <div class="modal-title">✏️ 编辑格子 <span id="editGridNum">#1</span></div>
+    <input type="hidden" id="editGridId">
+    <input type="hidden" id="editGridMerchant" value="">
+    <input type="hidden" id="editGridLotteryMerchants" value="">
+    <div class="form-group">
+      <label class="form-label">格子类型</label>
+      <select class="form-select" id="editGridType" onchange="onTypeChange()">
+        <option value="normal">🟦 普通</option>
+        <option value="lottery">🎰 抽奖</option>
+        <option value="reward">💰 奖励</option>
+      </select>
+    </div>
+    <div id="gtypePreview" style="text-align:center;margin:8px 0">
+      <img id="gtypeImg" src="" style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid #ddd;display:none">
+      <div id="gtypeName" style="font-size:12px;color:#666;margin-top:4px"></div>
+    </div>
+    <div id="lotteryConfig" style="display:none">
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px">🎰 抽奖奖励配置</div>
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 0">
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="checkbox" id="lc_points" onchange="toggleLotterySub()"> 积分</label>
+        <span style="font-size:11px;color:#666">命中率%</span><input type="number" id="lc_pointsProb" min="1" max="100" value="40" style="width:50px;padding:3px;font-size:12px;border:1px solid #ddd;border-radius:4px;text-align:center">
+        <span style="font-size:11px;color:#666">最大数</span><input type="number" id="lc_pointsMax" min="1" max="99" value="10" style="width:45px;padding:3px;font-size:12px;border:1px solid #ddd;border-radius:4px;text-align:center">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 0">
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="checkbox" id="lc_coupon" onchange="toggleLotterySub()"> 优惠券</label>
+        <span style="font-size:11px;color:#666">命中率%</span><input type="number" id="lc_couponProb" min="1" max="100" value="30" style="width:50px;padding:3px;font-size:12px;border:1px solid #ddd;border-radius:4px;text-align:center">
+        <span style="font-size:11px;color:#666">最大数</span><input type="number" id="lc_couponMax" min="1" max="99" value="3" style="width:45px;padding:3px;font-size:12px;border:1px solid #ddd;border-radius:4px;text-align:center">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 0">
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="checkbox" id="lc_priority" onchange="toggleLotterySub()"> 新品权</label>
+        <span style="font-size:11px;color:#666">命中率%</span><input type="number" id="lc_priorityProb" min="1" max="100" value="30" style="width:50px;padding:3px;font-size:12px;border:1px solid #ddd;border-radius:4px;text-align:center">
+        <span style="font-size:11px;color:#666">最大数</span><input type="number" id="lc_priorityMax" min="1" max="99" value="2" style="width:45px;padding:3px;font-size:12px;border:1px solid #ddd;border-radius:4px;text-align:center">
+      </div>
+      <div style="font-size:13px;font-weight:600;margin-top:10px;margin-bottom:4px">🏪 合作商家（多选）</div>
+      <div id="lc_merchantList" style="display:flex;flex-wrap:wrap;gap:6px;max-height:80px;overflow-y:auto"></div>
+    </div>
+    <div id="rewardConfig" style="display:none">
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px">💰 奖励配置</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">奖励类型</label>
+          <select class="form-select" id="rc_type">
+            <option value="points">积分</option>
+            <option value="coupon">优惠券</option>
+            <option value="priority">新品权</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">数量</label>
+          <input class="form-input" type="number" id="rc_qty" min="1" max="99" value="10">
+        </div>
+        <div class="form-group" id="merchantGroup" style="display:none">
+          <label class="form-label">合作商家</label>
+          <select class="form-select" id="rc_merchant"></select>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">格子图片（可选，覆盖类型图）</label>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="btn btn-sm btn-default" onclick="document.getElementById('editGridImgInput').click()" id="editGridImgBtn">📷 上传</button>
+        <img id="editGridImgPreview" src="" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid #eee;display:none">
+        <span id="editGridImgClear" style="display:none;font-size:12px;color:#D70C1F;cursor:pointer" onclick="clearGridImg()">✕ 移除</span>
+        <input type="file" id="editGridImgInput" accept="image/*" style="display:none" onchange="uploadGridImg()">
+        <input type="hidden" id="editGridImgVal" value="">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-default" onclick="closeEditModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveGridEdit()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var STORAGE = 'diceGameConfig';
+var DEFAULT_MERCHANTS = [
+  {account:"m1",name:"贵州茅台"},
+  {account:"m2",name:"五粮液"},
+  {account:"m3",name:"黄老五食品"},
+  {account:"m4",name:"妙可蓝多"},
+  {account:"m5",name:"王者荣耀"},
+  {account:"m6",name:"三体"},
+  {account:"m7",name:"故宫博物院"},
+  {account:"m8",name:"杜甫草堂博物馆"}
+];
+var merchants = JSON.parse(localStorage.getItem('merchants') || JSON.stringify(DEFAULT_MERCHANTS));
+
+// 默认配置
+var config = {
+  mapImage: 'ChatGPT Image 2026年6月25日 09_21_39.png',
+  gridTypes: {
+    start:   { name: '起点', img: '起点.png' },
+    end:     { name: '终点', img: '轨迹终点.png' },
+    normal:  { name: '普通', img: '足迹.png' },
+    lottery: { name: '抽奖', img: '抽奖彩.png' },
+    reward:  { name: '奖励', img: '奖励.png' }
+  },
+  grids: [{"id":"g0","num":0,"x":88,"y":77.2,"type":"start"},
+{"id":"g1","num":1,"x":69,"y":78.7,"type":"normal","gridImg":"鬼吹灯logo.png"},
+{"id":"g2","num":2,"x":51,"y":78.7,"type":"reward","gridImg":"","rtype":"points","quantity":10,"merchantId":"m2"},
+{"id":"g10","num":3,"x":33.3,"y":80,"type":"normal"},
+{"id":"g3","num":4,"x":15.7,"y":79.2,"type":"reward","gridImg":"王者荣耀.jpeg","rtype":"coupon","quantity":5,"merchantId":"m5"},
+{"id":"g9","num":5,"x":38,"y":70.8,"type":"lottery","lotteryMerchants":["m6","m7"],"lotteryRewards":{"points":{"prob":40,"max":10},"coupon":{"prob":30,"max":3}}},
+{"id":"g11","num":6,"x":66,"y":67.8,"type":"normal"},
+{"id":"g4","num":7,"x":69.3,"y":60.2,"type":"lottery","lotteryRewards":{"points":{"prob":40,"max":10},"coupon":{"prob":30,"max":3}},"lotteryMerchants":["m1","m2"]},
+{"id":"g8","num":8,"x":68,"y":53,"type":"reward","gridImg":"妙可蓝多.jpeg","rtype":"points","quantity":10,"merchantId":"m4"},
+{"id":"g12","num":9,"x":46.4,"y":51.5,"type":"normal"},
+{"id":"g5","num":10,"x":25.3,"y":52.8,"type":"reward","gridImg":"贵州茅台.jpg","rtype":"coupon","quantity":10,"merchantId":"m1"},
+{"id":"g7","num":11,"x":27.7,"y":45.2,"type":"normal"},
+{"id":"g13","num":12,"x":40.9,"y":39,"type":"reward","gridImg":"五粮液·数字珍藏.png","rtype":"points","quantity":10,"merchantId":"m3"},
+{"id":"g19","num":13,"x":57,"y":42.8,"type":"normal"},
+{"id":"g6","num":14,"x":74.6,"y":47,"type":"reward","gridImg":"杜甫草堂logo.png","rtype":"points","quantity":10,"merchantId":"m5"},
+{"id":"g14","num":15,"x":73.7,"y":38.1,"type":"reward","gridImg":"","rtype":"points","quantity":10,"merchantId":"m7"},
+{"id":"g18","num":16,"x":61,"y":33.3,"type":"normal"},
+{"id":"g15","num":17,"x":71.4,"y":27.5,"type":"lottery","lotteryRewards":{"points":{"prob":40,"max":10},"coupon":{"prob":30,"max":3}},"lotteryMerchants":["m1","m2","m8"]},
+{"id":"g17","num":18,"x":41.3,"y":29.3,"type":"normal"},
+{"id":"g16","num":19,"x":34.3,"y":23.7,"type":"normal"},
+{"id":"_end","num":999,"x":39.3,"y":17.5,"type":"end"}],
+  gridNumCounter: 20
+};
+
+var selectedGridId = null;
+var dragInfo = null;
+
+// ========== 初始化 ==========
+function init() {
+  var saved = localStorage.getItem(STORAGE);
+  if (saved) {
+    try {
+      var data = JSON.parse(saved);
+      config.mapImage = data.mapImage || config.mapImage;
+      config.grids = data.grids || config.grids;
+      config.gridTypes = data.gridTypes || config.gridTypes;
+      config.gridNumCounter = data.gridNumCounter || 1;
+    } catch(e) {}
+  }
+  // 补全类型默认值
+  if (!config.gridTypes) config.gridTypes = { start:{name:'起点',img:''}, end:{name:'终点',img:''}, normal:{name:'普通',img:''}, lottery:{name:'抽奖',img:''}, reward:{name:'奖励',img:''} };
+  var def = ['start','end','normal','lottery','reward'];
+  def.forEach(function(k){ if (!config.gridTypes[k]) config.gridTypes[k] = { name: k, img: '' }; });
+  if (!config.grids) config.grids = [];
+  // 确保起点终点存在
+  var hasStart = config.grids.some(function(g){ return g.type === 'start'; });
+  var hasEnd = config.grids.some(function(g){ return g.type === 'end'; });
+  if (!hasStart) config.grids.push({ id: 'g0', num: 0, x: 5, y: 50, type: 'start' });
+  if (!hasEnd) config.grids.push({ id: '_end', num: 999, x: 85, y: 50, type: 'end' });
+  // 显示地图
+  if (config.mapImage) {
+    var prev = document.getElementById('mapPreview');
+    var path = config.mapImage;
+    if (path.indexOf('data:') !== 0 && path.indexOf('blob:') !== 0) { if (path.indexOf('../') !== 0) path = '../' + path; path = encodeURI(path); }
+    if (prev) { prev.src = path; prev.style.display = 'block'; }
+    var txt = document.getElementById('uploadText'); if (txt) txt.style.display = 'none';
+    var area = document.getElementById('mapUpload'); if (area) area.classList.add('has-img');
+  }
+  renderTypeConfig();
+  showEditor();
+  renderGridList();
+}
+
+// ========== 地图上传（存文件名，不存 base64 避免超限） ==========
+function uploadMap() {
+  var f = document.getElementById('mapFile').files[0];
+  if (!f) return;
+  // 用 objectURL 临时预览，不消耗 localStorage
+  var url = URL.createObjectURL(f);
+  document.getElementById('mapPreview').src = url;
+  document.getElementById('mapPreview').style.display = 'block';
+  document.getElementById('uploadText').style.display = 'none';
+  document.getElementById('mapUpload').classList.add('has-img');
+  // 只存文件名，游戏端从根目录加载
+  config.mapImage = f.name;
+  showEditor();
+  saveAll();
+}
+
+// ========== 类型配置 ==========
+function renderTypeConfig() {
+  var el = document.getElementById('typeConfig');
+  var keys = ['start','end','normal','lottery','reward'];
+  var names = { start:'起点', end:'终点', normal:'普通', lottery:'抽奖', reward:'奖励' };
+  var html = '';
+  keys.forEach(function(k) {
+    var t = config.gridTypes[k] || { name: names[k], img: '' };
+    var imgSrc = t.img || '';
+    if (imgSrc && imgSrc.indexOf('data:') !== 0 && imgSrc.indexOf('blob:') !== 0) { if (imgSrc.indexOf('../') !== 0) imgSrc = '../' + imgSrc; imgSrc = encodeURI(imgSrc); }
+    html += '<div class="type-row">';
+    html += '<div class="tr-name">' + (names[k] || k) + '</div>';
+    html += '<div class="tr-upload">';
+    html += '<img class="tr-preview" id="tp_' + k + '" src="' + imgSrc + '" style="' + (t.img ? '' : 'display:none') + '" onerror="this.style.display=\'none\'">';
+    html += '<button class="btn btn-sm btn-default" onclick="uploadTypeImg(\'' + k + '\')">上传图片</button>';
+    html += '<input type="file" id="tf_' + k + '" accept="image/*" onchange="handleTypeImg(\'' + k + '\')" style="display:none">';
+    html += '</div>';
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+function uploadTypeImg(k) { document.getElementById('tf_' + k).click(); }
+function handleTypeImg(k) {
+  var f = document.getElementById('tf_' + k).files[0];
+  if (!f) return;
+  config.gridTypes[k].img = f.name;
+  document.getElementById('tp_' + k).src = URL.createObjectURL(f);
+  document.getElementById('tp_' + k).style.display = '';
+  saveAll();
+  refreshEditor();
+  renderGridList();
+}
+
+// ========== 编辑器 ==========
+function showEditor() {
+  document.getElementById('editorCard').style.display = '';
+  // admin 页面在 merchant/ 目录下，图片在根目录，需要加 ../
+  var path = config.mapImage || '';
+  if (path.indexOf('data:') !== 0 && path.indexOf('blob:') !== 0) { if (path.indexOf('../') !== 0) path = '../' + path; path = encodeURI(path); }
+  document.getElementById('editorImg').src = path;
+  refreshEditor();
+}
+
+function refreshEditor() {
+  var overlay = document.getElementById('editorOverlay');
+  overlay.innerHTML = '';
+  config.grids.forEach(function(g) {
+    var dot = document.createElement('div');
+    dot.className = 'editor-grid';
+    if (g.type === 'start') dot.classList.add('start');
+    if (g.type === 'end') dot.classList.add('end');
+    if (g.id === selectedGridId) dot.classList.add('selected');
+    dot.style.left = g.x + '%';
+    dot.style.top = g.y + '%';
+    dot.title = (config.gridTypes[g.type] ? config.gridTypes[g.type].name : g.type) + ' #' + g.num;
+    dot.dataset.gridId = g.id;
+
+    // 用格子自身图或类型图
+    var tInfo = config.gridTypes[g.type];
+    var dotImgSrc = (g.gridImg) ? g.gridImg : (tInfo && tInfo.img) ? tInfo.img : null;
+    if (dotImgSrc) {
+      dot.style.background = 'none';
+      dot.style.overflow = 'hidden';
+      var dotImg = document.createElement('img');
+      dotImg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%';
+      var src = dotImgSrc;
+      if (src.indexOf('data:') !== 0 && src.indexOf('blob:') !== 0) { if (src.indexOf('../') !== 0) src = '../' + src; src = encodeURI(src); }
+      dotImg.src = src;
+      dotImg.onerror = function() { this.style.display = 'none'; };
+      dot.appendChild(dotImg);
+    }
+    var lbl = document.createElement('span');
+    lbl.style.cssText = 'position:relative;z-index:1;font-size:13px;font-weight:800;background:rgba(0,0,0,.55);padding:1px 5px;border-radius:8px;';
+    lbl.textContent = g.type === 'end' ? '终' : g.num;
+    dot.appendChild(lbl);
+
+    dot.addEventListener('mousedown', function(e) { startDrag(e, g.id); e.stopPropagation(); });
+    dot.addEventListener('touchstart', function(e) { startDrag(e, g.id); e.stopPropagation(); }, {passive:false});
+    dot.addEventListener('click', function(e) { e.stopPropagation(); selectGrid(g.id); });
+    overlay.appendChild(dot);
+  });
+}
+
+// ========== 批量生成格子 ==========
+function generateGrids() {
+  var count = parseInt(document.getElementById('gridTotalCount').value) || 10;
+  if (count < 1 || count > 200) { toast('请输入 1~200 之间'); return; }
+  // 保留起点和终点，重置计数器
+  config.grids = config.grids.filter(function(g) { return g.type === 'start' || g.type === 'end'; });
+  config.gridNumCounter = 1;
+  // 按蛇形排列生成中间格子
+  var startRow = 15, startCol = 25, rowH = 12, colW = 10;
+  for (var i = 0; i < count; i++) {
+    var row = Math.floor(i / 5);
+    var col = i % 5;
+    var x, y;
+    if (row % 2 === 0) {
+      x = startCol + col * colW;
+    } else {
+      x = startCol + (4 - col) * colW;
+    }
+    y = startRow + row * rowH;
+    if (y > 92) y = 92;
+    var gid = 'g' + (config.gridNumCounter++);
+    config.grids.push({ id: gid, num: i + 1, x: x, y: y, type: 'normal' });
+  }
+  // 终点放在最后
+  var endG = config.grids.find(function(g) { return g.type === 'end'; });
+  if (endG) { endG.x = 85; endG.y = startRow + Math.ceil(count / 5) * rowH + 5; }
+  selectedGridId = null;
+  renumberGrids();
+  showEditor(); refreshEditor(); renderGridList();
+  saveAll();
+  toast('已生成 ' + count + ' 个格子');
+}
+
+// ========== 增减单个格子（不重置已有位置） ==========
+function addOneGrid() {
+  // 找当前最大编号的非起终点格子
+  var mids = config.grids.filter(function(g) { return g.type !== 'start' && g.type !== 'end'; });
+  var maxNum = 0, lastGrid = null;
+  mids.forEach(function(g) {
+    if (g.num > maxNum) { maxNum = g.num; lastGrid = g; }
+  });
+  var newNum = maxNum + 1;
+  // 放在最后一个格子旁边，略微偏移
+  var nx = lastGrid ? Math.min(95, lastGrid.x + 3) : 50;
+  var ny = lastGrid ? lastGrid.y : 50;
+  var gid = 'g' + (config.gridNumCounter++);
+  config.grids.push({ id: gid, num: newNum, x: nx, y: ny, type: 'normal' });
+  saveAll(); refreshEditor(); renderGridList();
+  toast('已添加 格子 #' + newNum);
+}
+
+function removeOneGrid() {
+  var mids = config.grids.filter(function(g) { return g.type !== 'start' && g.type !== 'end'; });
+  if (mids.length === 0) { toast('没有可删除的格子'); return; }
+  // 删除编号最大的
+  mids.sort(function(a, b) { return b.num - a.num; });
+  var toRemove = mids[0];
+  config.grids = config.grids.filter(function(g) { return g.id !== toRemove.id; });
+  saveAll(); refreshEditor(); renderGridList();
+  toast('已删除 格子 #' + toRemove.num);
+}
+
+function clearAllGrids() {
+  if (!confirm('确定清除所有格子（保留起点终点）？')) return;
+  config.grids = config.grids.filter(function(g) { return g.type === 'start' || g.type === 'end'; });
+  selectedGridId = null;
+  renumberGrids();
+  showEditor(); refreshEditor(); renderGridList();
+  saveAll();
+  toast('已清除');
+}
+
+function selectGrid(id) {
+  selectedGridId = id;
+  refreshEditor();
+  renderGridList();
+}
+
+function delGridById(gid) {
+  var g = config.grids.find(function(g) { return g.id === gid; });
+  if (!g) return;
+  if (g.type === 'start' || g.type === 'end') { toast('起点和终点不能删除'); return; }
+  config.grids = config.grids.filter(function(g) { return g.id !== gid; });
+  if (selectedGridId === gid) selectedGridId = null;
+  saveAll(); refreshEditor(); renderGridList();
+  toast('已删除 格子 #' + g.num);
+}
+
+function delSelected() {
+  if (!selectedGridId) return;
+  var g = config.grids.find(function(g) { return g.id === selectedGridId; });
+  if (g && (g.type === 'start' || g.type === 'end')) { alert('起点和终点不能删除'); return; }
+  config.grids = config.grids.filter(function(g) { return g.id !== selectedGridId; });
+  selectedGridId = null;
+  saveAll(); refreshEditor(); renderGridList();
+}
+
+// ========== 拖拽 ==========
+function startDrag(e, gid) {
+  e.preventDefault();
+  dragInfo = { gid: gid, startX: e.clientX || e.touches[0].clientX, startY: e.clientY || e.touches[0].clientY };
+  var g = config.grids.find(function(g) { return g.id === gid; });
+  if (g) { dragInfo.origX = g.x; dragInfo.origY = g.y; }
+  selectedGridId = gid;
+  refreshEditor();
+}
+
+window.addEventListener('mousemove', function(e) {
+  if (!dragInfo) return;
+  doDrag(e.clientX, e.clientY);
+});
+window.addEventListener('touchmove', function(e) {
+  if (!dragInfo) return;
+  doDrag(e.touches[0].clientX, e.touches[0].clientY);
+}, {passive:false});
+window.addEventListener('mouseup', endDrag);
+window.addEventListener('touchend', endDrag);
+
+function doDrag(cx, cy) {
+  var wrap = document.getElementById('editorWrap');
+  var rect = wrap.getBoundingClientRect();
+  var dx = (cx - dragInfo.startX) / rect.width * 100;
+  var dy = (cy - dragInfo.startY) / rect.height * 100;
+  var g = config.grids.find(function(g) { return g.id === dragInfo.gid; });
+  if (g) {
+    g.x = Math.max(0, Math.min(100, Math.round((dragInfo.origX + dx) * 10) / 10));
+    g.y = Math.max(0, Math.min(100, Math.round((dragInfo.origY + dy) * 10) / 10));
+  }
+  refreshEditorQuick();
+}
+
+function endDrag() {
+  if (!dragInfo) return;
+  dragInfo = null;
+  saveAll();
+  refreshEditor();
+}
+
+function refreshEditorQuick() {
+  var overlay = document.getElementById('editorOverlay');
+  var dots = overlay.querySelectorAll('.editor-grid');
+  dots.forEach(function(dot) {
+    var g = config.grids.find(function(g) { return g.id === dot.dataset.gridId; });
+    if (g) { dot.style.left = g.x + '%'; dot.style.top = g.y + '%'; }
+  });
+}
+
+// ========== 编号排序 ==========
+function renumberGrids() {
+  var starts = config.grids.filter(function(g) { return g.type === 'start'; });
+  var ends = config.grids.filter(function(g) { return g.type === 'end'; });
+  var mids = config.grids.filter(function(g) { return g.type !== 'start' && g.type !== 'end'; });
+  // 按 x+y 路径排序中间格子
+  mids.sort(function(a, b) { return (a.x + a.y) - (b.x + b.y); });
+  config.grids = [];
+  starts.forEach(function(g, i) { g.num = 0; config.grids.push(g); });
+  mids.forEach(function(g, i) { g.num = i + 1; config.grids.push(g); });
+  ends.forEach(function(g, i) { g.num = 999; config.grids.push(g); });
+}
+
+function sortGridsByPath() {
+  renumberGrids();
+  saveAll(); refreshEditor(); renderGridList();
+}
+
+// ========== 格子列表 ==========
+function renderGridList() {
+  var el = document.getElementById('gridList');
+  document.getElementById('gridCount').textContent = config.grids.length;
+  var typeNames = { start:'起点', end:'终点', normal:'普通', lottery:'抽奖', reward:'奖励' };
+  var items = config.grids.map(function(g) {
+    var tInfo = config.gridTypes[g.type] || {};
+    var typeName = tInfo.name || typeNames[g.type] || g.type;
+    var numStr = g.type === 'end' ? '终' : g.num;
+    var selected = g.id === selectedGridId ? ' style="background:#fff3cd"' : '';
+    var cellImg = g.gridImg || tInfo.img;
+    var imgPath = cellImg;
+    if (imgPath && imgPath.indexOf('data:') !== 0 && imgPath.indexOf('blob:') !== 0) { if (imgPath.indexOf('../') !== 0) imgPath = '../' + imgPath; imgPath = encodeURI(imgPath); }
+    var imgTag = cellImg ? '<img src="' + imgPath + '" style="width:24px;height:24px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px">' : '';
+    var sub = '';
+    if (g.type === 'lottery' && g.lotteryRewards) {
+      var keys = Object.keys(g.lotteryRewards);
+      sub = ' <span style="font-size:10px;color:#667eea">' + keys.map(function(k){ return tickName(k); }).join('/') + '</span>';
+    }
+    if (g.type === 'reward') sub = ' <span style="font-size:10px;color:#20bf6b">'+tickName(g.rtype||'points')+' ×'+g.quantity+'</span>';
+    var editBtn = (g.type !== 'start' && g.type !== 'end') ? '<button class="btn btn-default btn-sm" onclick="editGrid(\'' + g.id + '\')">编辑</button>' : '';
+    return '<div class="gcell-item"' + selected + '>' +
+      '<div class="gcell-num">' + numStr + '</div>' +
+      '<div class="gcell-info">' +
+        '<div class="gcell-pos">' + imgTag + typeName + sub + ' <span style="font-size:11px;color:#999;margin-left:4px">X:' + g.x + '% Y:' + g.y + '%</span></div>' +
+      '</div>' +
+      '<div class="gcell-actions">' + editBtn + '</div>' +
+    '</div>';
+  }).join('');
+  function tickName(k) { return k==='points'?'积分':k==='coupon'?'优惠券':k==='priority'?'新品权':k; }
+  el.innerHTML = items || '<div style="color:#999;font-size:13px;padding:20px;text-align:center">暂无格子</div>';
+}
+
+// ========== 弹窗编辑 ==========
+function editGrid(gid) {
+  var g = config.grids.find(function(g) { return g.id === gid; });
+  if (!g) return;
+  document.getElementById('editGridId').value = g.id;
+  document.getElementById('editGridNum').textContent = '#' + (g.type === 'end' ? '终点' : g.num);
+  // 预存商家选择数据
+  window._editLotteryMerchants = g.lotteryMerchants || [];
+  window._editRewardMerchant = g.merchantId || '';
+  document.getElementById('editGridMerchant').value = g.merchantId || '';
+  document.getElementById('editGridLotteryMerchants').value = (g.lotteryMerchants || []).join(',');
+  document.getElementById('editGridType').value = g.type;
+  // 回填抽奖配置
+  var lr = g.lotteryRewards || {};
+  document.getElementById('lc_points').checked = !!lr.points;
+  document.getElementById('lc_coupon').checked = !!lr.coupon;
+  document.getElementById('lc_priority').checked = !!lr.priority;
+  if (lr.points) { document.getElementById('lc_pointsProb').value = lr.points.prob||40; document.getElementById('lc_pointsMax').value = lr.points.max||10; }
+  if (lr.coupon) { document.getElementById('lc_couponProb').value = lr.coupon.prob||30; document.getElementById('lc_couponMax').value = lr.coupon.max||3; }
+  if (lr.priority) { document.getElementById('lc_priorityProb').value = lr.priority.prob||30; document.getElementById('lc_priorityMax').value = lr.priority.max||2; }
+  // 回填奖励配置
+  document.getElementById('rc_type').value = g.rtype || 'points';
+  document.getElementById('rc_qty').value = g.quantity || 10;
+  // 回填格子图片
+  clearGridImg();
+  document.getElementById('editGridImgVal').value = g.gridImg || '';
+  if (g.gridImg) {
+    var imgPath = g.gridImg;
+    if (imgPath.indexOf('data:') !== 0 && imgPath.indexOf('blob:') !== 0) { if (imgPath.indexOf('../') !== 0) imgPath = '../' + imgPath; imgPath = encodeURI(imgPath); }
+    document.getElementById('editGridImgPreview').src = imgPath;
+    document.getElementById('editGridImgPreview').style.display = 'block';
+    document.getElementById('editGridImgBtn').textContent = '✓ 已上传';
+    document.getElementById('editGridImgClear').style.display = 'inline';
+  }
+  onTypeChange();
+  document.getElementById('editModal').classList.add('show');
+}
+
+function toggleLotterySub() {
+  var f = function(id){ var el=document.getElementById(id); el.disabled=!el.parentElement.querySelector('input[type=checkbox]').checked; };
+  f('lc_pointsProb'); f('lc_pointsMax'); f('lc_couponProb'); f('lc_couponMax'); f('lc_priorityProb'); f('lc_priorityMax');
+}
+
+function onTypeChange() {
+  var t = document.getElementById('editGridType').value;
+  document.getElementById('lotteryConfig').style.display = (t === 'lottery') ? '' : 'none';
+  document.getElementById('rewardConfig').style.display = (t === 'reward') ? '' : 'none';
+  document.getElementById('merchantGroup').style.display = (t === 'reward') ? '' : 'none';
+  // 填充商家
+ 	// 保障商家数据用隐藏字段写入，这里只渲染UI
+ 	if (t !== 'reward' && t !== 'lottery') {
+    document.getElementById('editGridMerchant').value = '';
+    document.getElementById('editGridLotteryMerchants').value = '';
+  }
+ 	if (t === 'reward') {
+    var sel = document.getElementById('rc_merchant');
+    var savedMid = (window._editRewardMerchant && window._editRewardMerchant !== 'undefined') ? window._editRewardMerchant : '';
+    var opts = '<option value="">不指定</option>';
+    var found = false;
+    merchants.forEach(function(m){
+      var acc = m.account || m.id || m.name || '';
+      if (!acc) return;
+      if (savedMid && acc === savedMid) found = true;
+      opts += '<option value="'+acc+'">'+(m.name||acc)+'</option>';
+    });
+    if (savedMid && !found) {
+      opts = '<option value="">不指定</option><option value="'+savedMid+'" selected>'+savedMid+' (已保存)</option>' + opts.substring(opts.indexOf('>')+1);
+    }
+    sel.innerHTML = opts;
+    sel.value = found ? savedMid : '';
+    sel.onchange = function() { document.getElementById('editGridMerchant').value = this.value; };
+  }
+   if (t === 'lottery') {
+    var selectedMids = window._editLotteryMerchants || [];
+    var list = document.getElementById('lc_merchantList');
+    // 收集当前列表中所有可能的 key
+    var allKeys = merchants.map(function(m){ return m.account || m.id || m.name || ''; });
+    // 过滤掉 selectedMids 中的无效值
+    var validMids = selectedMids.filter(function(mid){ return mid && mid !== 'undefined'; });
+    var html = merchants.map(function(m){
+      var acc = m.account || m.id || m.name || '';
+      if (!acc) return '';
+      return '<label style="font-size:11px;cursor:pointer;display:flex;align-items:center;gap:3px">' +
+        '<input type="checkbox" value="'+acc+'" '+(validMids.indexOf(acc)>=0?'checked':'')+'>'+(m.name||acc)+'</label>';
+    }).join('');
+    // 追加已保存但不在当前列表中的
+    validMids.forEach(function(mid){
+      if (allKeys.indexOf(mid) < 0) {
+        html += '<label style="font-size:11px;cursor:pointer;display:flex;align-items:center;gap:3px">' +
+          '<input type="checkbox" value="'+mid+'" checked>'+mid+' (已保存)</label>';
+      }
+    });
+    list.innerHTML = html;
+    // 复选框变化时同步
+    var cbs = list.querySelectorAll('input[type=checkbox]');
+    for (var ci=0; ci<cbs.length; ci++) {
+      cbs[ci].onchange = function(){
+        var all = list.querySelectorAll('input[type=checkbox]:checked');
+        var vals = [];
+        for (var j=0; j<all.length; j++) vals.push(all[j].value);
+        document.getElementById('editGridLotteryMerchants').value = vals.join(',');
+      };
+    }
+ 	}
+  toggleLotterySub();
+  var tInfo = config.gridTypes[t] || {};
+  var img = document.getElementById('gtypeImg');
+  var name = document.getElementById('gtypeName');
+  if (tInfo.img) {
+    var typeImgSrc = tInfo.img;
+    if (typeImgSrc.indexOf('data:') !== 0 && typeImgSrc.indexOf('blob:') !== 0) { if (typeImgSrc.indexOf('../') !== 0) typeImgSrc = '../' + typeImgSrc; typeImgSrc = encodeURI(typeImgSrc); }
+    img.src = typeImgSrc; img.style.display = '';
+  }
+  else img.style.display = 'none';
+  name.textContent = tInfo.name || t;
+}
+
+function uploadGridImg() {
+  var f = document.getElementById('editGridImgInput').files[0];
+  if (!f) return;
+  document.getElementById('editGridImgVal').value = f.name;
+  document.getElementById('editGridImgPreview').src = URL.createObjectURL(f);
+  document.getElementById('editGridImgPreview').style.display = 'block';
+  document.getElementById('editGridImgBtn').textContent = '✓ 已上传';
+  document.getElementById('editGridImgClear').style.display = 'inline';
+}
+function clearGridImg() {
+  document.getElementById('editGridImgVal').value = '';
+  document.getElementById('editGridImgPreview').src = '';
+  document.getElementById('editGridImgPreview').style.display = 'none';
+  document.getElementById('editGridImgBtn').textContent = '📷 上传';
+  document.getElementById('editGridImgClear').style.display = 'none';
+}
+
+function saveGridEdit() {
+  try {
+    var gid = document.getElementById('editGridId').value;
+    var g = config.grids.find(function(g) { return g.id === gid; });
+    if (!g) { toast('格子不存在'); return; }
+    g.type = document.getElementById('editGridType').value;
+    g.gridImg = document.getElementById('editGridImgVal').value || '';
+    if (g.type === 'lottery') {
+      var lr = {};
+      if (document.getElementById('lc_points').checked) lr.points = { prob: parseInt(document.getElementById('lc_pointsProb').value)||40, max: parseInt(document.getElementById('lc_pointsMax').value)||10 };
+      if (document.getElementById('lc_coupon').checked) lr.coupon = { prob: parseInt(document.getElementById('lc_couponProb').value)||30, max: parseInt(document.getElementById('lc_couponMax').value)||3 };
+      if (document.getElementById('lc_priority').checked) lr.priority = { prob: parseInt(document.getElementById('lc_priorityProb').value)||30, max: parseInt(document.getElementById('lc_priorityMax').value)||2 };
+      g.lotteryRewards = lr;
+      // 从隐藏字段读取，同时兼容复选框直接读取
+      var hiddenVal = document.getElementById('editGridLotteryMerchants').value;
+      if (hiddenVal) {
+        g.lotteryMerchants = hiddenVal.split(',');
+      } else {
+        var mids = [];
+        document.querySelectorAll('#lc_merchantList input[type=checkbox]:checked').forEach(function(cb){ mids.push(cb.value); });
+        g.lotteryMerchants = mids;
+      }
+      delete g.rtype; delete g.quantity; delete g.merchantId;
+    } else if (g.type === 'reward') {
+      g.rtype = document.getElementById('rc_type').value;
+      g.quantity = parseInt(document.getElementById('rc_qty').value) || 10;
+      var mSel = document.getElementById('rc_merchant');
+      g.merchantId = mSel ? mSel.value : '';
+      delete g.lotteryRewards;
+    } else {
+      delete g.lotteryRewards; delete g.rtype; delete g.quantity; delete g.merchantId;
+    }
+    saveAll();
+    closeEditModal();
+    refreshEditor();
+    renderGridList();
+    toast('格子已更新');
+  } catch(e) { toast('编辑失败：' + e.message); }
+}
+
+function closeEditModal() {
+  var m = document.getElementById('editModal');
+  if (m) m.classList.remove('show');
+}
+try {
+  var modalEl = document.getElementById('editModal');
+  if (modalEl) {
+    modalEl.addEventListener('click', function(e) {
+      if (e.target === this) closeEditModal();
+    });
+  }
+} catch(e) {}
+
+// ========== 保存 ==========
+function saveAll() {
+  try {
+    var cfg = {
+      mapImage: config.mapImage || '',
+      gridTypes: config.gridTypes,
+      grids: config.grids || [],
+      gridNumCounter: config.gridNumCounter || 1
+    };
+    localStorage.setItem(STORAGE, JSON.stringify(cfg));
+    // 同步到用户端
+    var userData = {
+      mapImage: cfg.mapImage || '',
+      gridTypes: cfg.gridTypes,
+      grids: (cfg.grids || []).map(function(g) {
+        var item = { num: g.num, x: g.x, y: g.y, type: g.type, gridImg: g.gridImg || '' };
+        if (g.type === 'lottery') { item.lotteryRewards = g.lotteryRewards; item.lotteryMerchants = g.lotteryMerchants || []; }
+        if (g.type === 'reward') { item.rtype = g.rtype; item.quantity = g.quantity; item.merchantId = g.merchantId || ''; }
+        return item;
+      }),
+      merchants: merchants
+    };
+    localStorage.setItem('diceGameUser', JSON.stringify(userData));
+    renderGridList();
+    toast('配置已保存！');
+  } catch(e) { toast('保存失败：' + e.message); }
+}
+
+function loadConfig() {
+  var saved = localStorage.getItem(STORAGE);
+  if (saved) {
+    try {
+      var data = JSON.parse(saved);
+      config.mapImage = data.mapImage || '';
+      config.grids = data.grids || config.grids;
+      config.gridTypes = data.gridTypes || config.gridTypes;
+      config.gridNumCounter = data.gridNumCounter || 1;
+      if (config.mapImage) {
+        var path = config.mapImage;
+        if (path.indexOf('data:') !== 0 && path.indexOf('blob:') !== 0) { if (path.indexOf('../') !== 0) path = '../' + path; path = encodeURI(path); }
+        document.getElementById('mapPreview').src = path;
+        document.getElementById('mapPreview').style.display = 'block';
+        document.getElementById('uploadText').style.display = 'none';
+        document.getElementById('mapUpload').classList.add('has-img');
+      }
+      if (config.grids && config.grids.length > 2) showEditor();
+      else if (config.mapImage) showEditor();
+      renderGridList();
+      toast('配置已加载');
+    } catch(e) { toast('加载失败'); }
+  } else { toast('无已保存配置'); }
+}
+
+function toast(msg) {
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:999;pointer-events:none';
+  document.body.appendChild(t);
+  setTimeout(function(){ t.remove(); }, 2000);
+}
+
+// 键盘删除
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT' || document.activeElement.tagName === 'TEXTAREA') return;
+    if (selectedGridId) delSelected();
+  }
+});
+
+init();
+</script>
+</body>
+</html>
+

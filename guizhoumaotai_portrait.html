@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>贵州茅台 · 空间 · 竖屏</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:#fff;font-family:'PingFang SC','Microsoft YaHei',sans-serif;
+    display:flex;justify-content:center;align-items:center;
+    min-height:100vh;overflow:hidden;user-select:none;
+  }
+  .phone-wrap{
+    display:flex;flex-direction:column;align-items:center;
+  }
+  .phone{
+    position:relative;width:430px;height:860px;
+    border-radius:36px;background:#1a1a2e;padding:12px;
+    box-shadow:0 30px 80px rgba(0,0,0,.7),inset 0 0 0 2px #333;
+    animation:in .7s ease-out;
+  }
+  @keyframes in{0%{opacity:0;transform:translateY(60px) scale(.92)}100%{opacity:1;transform:translateY(0) scale(1)}}
+  .screen{
+    position:relative;width:100%;height:100%;border-radius:24px;
+    overflow:hidden;background:#000;
+  }
+
+  /* 场景图层 */
+  .scene-layer{
+    position:absolute;inset:0;z-index:0;
+    background-size:cover;background-position:center;background-repeat:no-repeat;
+    transition:opacity .7s ease,transform .7s ease;
+  }
+  .scene-layer.hidden{opacity:0;transform:scale(1.05);pointer-events:none}
+
+  /* 场景切换箭头 */
+  .scene-arrow{
+    position:absolute;right:8px;top:50%;transform:translateY(-50%);
+    z-index:55;cursor:pointer;pointer-events:auto;
+    width:40px;height:40px;border-radius:50%;
+    background:rgba(0,0,0,.45);backdrop-filter:blur(4px);
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid rgba(255,255,255,.15);
+    filter:drop-shadow(0 4px 10px rgba(0,0,0,.4));
+    transition:transform .25s,right .25s;
+  }
+  .scene-arrow:hover{transform:translateY(-50%) scale(1.1);background:rgba(0,0,0,.6)}
+  .scene-arrow:active{transform:translateY(-50%) scale(.9)}
+  .scene-arrow img{width:20px;height:auto;display:block;transform:rotate(90deg)}
+  .scene-arrow.rev{right:auto;left:8px}
+  .scene-arrow.rev img{transform:rotate(90deg)}
+
+  /* 顶部返回箭头 */
+  .back-arrow{
+    position:absolute;left:8px;top:12px;
+    z-index:55;cursor:pointer;
+    width:34px;height:34px;border-radius:50%;
+    background:rgba(0,0,0,.45);backdrop-filter:blur(4px);
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid rgba(255,255,255,.15);
+    filter:drop-shadow(0 2px 8px rgba(0,0,0,.4));
+    transition:transform .2s;
+  }
+  .back-arrow:hover{transform:scale(1.1);background:rgba(0,0,0,.6)}
+  .back-arrow img{width:16px;height:auto;transform:rotate(-90deg);display:block}
+
+  /* 覆盖层 */
+  .overlay{position:absolute;inset:0;z-index:1;pointer-events:none}
+  .overlay>*{pointer-events:auto}
+
+  /* 标题栏 */
+  .title-bar{
+    position:absolute;top:12px;left:60px;z-index:50;
+    pointer-events:none;display:flex;align-items:center;gap:6px;
+  }
+  .title-logo{width:24px;height:24px;border-radius:4px;object-fit:cover}
+  .title-text{color:#fff;font-size:14px;font-weight:600;text-shadow:0 2px 8px rgba(0,0,0,.7)}
+
+  /* 右上角用户信息 */
+  .user-info-btn{
+    position:absolute;top:10px;right:60px;z-index:50;
+    display:flex;align-items:center;gap:6px;
+    padding:4px 10px 4px 4px;
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:18px;background:rgba(0,0,0,.4);
+    cursor:pointer;backdrop-filter:blur(6px);
+  }
+  .user-info-btn .u-avatar{width:26px;height:26px;border-radius:50%;object-fit:cover}
+  .user-info-btn .u-name{color:#fff;font-size:12px;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  /* 背包下拉面板 */
+  .backpack-panel{
+    position:absolute;top:46px;right:0;z-index:60;pointer-events:auto;
+    width:240px;max-height:320px;overflow-y:auto;
+    background:rgba(20,20,50,.95);backdrop-filter:blur(12px);
+    border-radius:12px;padding:10px;
+    border:1px solid rgba(255,255,255,.1);
+    box-shadow:0 8px 30px rgba(0,0,0,.5);
+    display:none;flex-direction:column;gap:8px;
+  }
+  .backpack-panel.show{display:flex}
+  .bp-section-title{color:rgba(255,255,255,.5);font-size:10px;font-weight:600;margin-bottom:4px;letter-spacing:1px}
+  .bp-row{display:flex;align-items:center;gap:6px;padding:5px 8px;background:rgba(255,255,255,.04);border-radius:8px;margin-bottom:3px}
+  .bp-row:last-child{margin-bottom:0}
+  .bp-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  .bp-info{flex:1;min-width:0}
+  .bp-name{color:#fff;font-size:11px;font-weight:500}
+  .bp-num{color:rgba(255,255,255,.4);font-size:10px}
+  .bp-skin-list{display:flex;gap:6px;flex-wrap:wrap}
+  .bp-skin-item{width:50px;border-radius:8px;border:1px solid rgba(255,255,255,.1);cursor:pointer;transition:border .2s}
+  .bp-skin-item:hover{border-color:#667eea}
+  .bp-skin-item img{width:100%;height:50px;object-fit:cover;border-radius:7px;display:block}
+
+  /* 角色昵称 */
+  .origin-name{
+    position:absolute;bottom:100%;left:50%;transform:translateX(-50%);white-space:nowrap;
+    color:#fff;font-size:12px;font-weight:600;text-shadow:0 1px 8px rgba(0,0,0,.8);
+    padding:2px 8px;border-radius:10px;background:rgba(0,0,0,.5);margin-bottom:4px;
+  }
+
+  /* 角色 */
+  .character{
+    position:absolute;left:50%;top:80%;z-index:10;
+    transform:translate(-50%,-50%);transition:left 1.6s cubic-bezier(.34,1.56,.64,1),top 1.6s cubic-bezier(.34,1.56,.64,1);
+  }
+  .character img{width:64px;height:64px;display:block;border-radius:50%;box-shadow:0 0 24px rgba(100,200,255,.6);animation:float 2.4s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+  /* 点位 - 区域热区 */
+  .spot{
+    position:absolute;cursor:pointer;z-index:8;
+    border:2px solid rgba(255,255,255,.2);
+    border-radius:8px;background:rgba(255,255,255,.04);
+    display:flex;align-items:center;justify-content:center;
+    transition:border .25s,background .25s,transform .25s;
+  }
+  .spot:hover{
+    border-color:rgba(70,180,255,.7);
+    background:rgba(70,180,255,.1);
+    box-shadow:0 0 16px rgba(0,180,255,.3);
+  }
+  .spot .spot-label{
+    white-space:nowrap;color:#fff;font-size:11px;font-weight:600;
+    text-shadow:0 1px 6px rgba(0,0,0,.8);pointer-events:none;
+  }
+
+  /* 抽签热点 */
+  .lottery-spot{animation:lotteryPulse 2s ease-in-out infinite}
+  .lottery-spot:hover{transform:none!important}
+  .lottery-img{width:36px;height:36px;display:block;border-radius:8px;box-shadow:0 0 16px rgba(255,200,50,.5)}
+  @keyframes lotteryPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.3)}}
+
+  /* 抽签弹窗 */
+  .lottery-mask{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
+  .lottery-mask.show{display:flex}
+  .lottery-box{background:linear-gradient(135deg,#2a1a3e,#1a1a38);border-radius:20px;padding:24px 20px 18px;text-align:center;max-width:320px;width:88vw;border:1px solid rgba(255,255,255,.1);box-shadow:0 0 40px rgba(200,150,50,.3)}
+  .lottery-box .lt-title{color:#ffcc66;font-size:18px;font-weight:700;margin-bottom:4px}
+  .lottery-box .lt-sub{color:rgba(255,255,255,.45);font-size:12px;margin-bottom:16px}
+  .lottery-anim{width:80px;height:80px;margin:0 auto 14px;border-radius:50%;background:rgba(255,204,102,.15);display:flex;align-items:center;justify-content:center;position:relative}
+  .lottery-anim.rolling .anim-ring{animation:spin .6s linear infinite}
+  .anim-ring{width:64px;height:64px;border-radius:50%;border:3px solid transparent;border-top-color:#ffcc66;border-right-color:#ffcc66}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .lottery-result{display:none}
+  .lottery-box.result .lottery-anim{display:none}
+  .lottery-box.result .lottery-result{display:block}
+  .lottery-result .lr-img{width:100px;height:100px;object-fit:contain;margin:0 auto 10px;display:block;animation:bounceIn .5s ease}
+  .lottery-result .lr-text{color:#ffcc66;font-size:16px;font-weight:700}
+  .lottery-result .lr-sub{color:rgba(255,255,255,.5);font-size:12px;margin-top:4px}
+  .lottery-miss{color:#aaa!important}
+  .lt-btn{display:inline-block;margin-top:14px;padding:6px 28px;border-radius:20px;background:linear-gradient(135deg,#ffcc66,#ff9966);color:#1a1a2e;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:transform .2s}
+  .lt-btn:hover{transform:scale(1.05)}
+  .lt-btn:active{transform:scale(.95)}
+  .lottery-box .lt-btn{display:none}
+  .lottery-box.result .lt-btn{display:inline-block}
+  @keyframes bounceIn{0%{transform:scale(0);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+
+  /* 停留奖励弹窗 */
+  .lr-title{color:#ffcc66;font-size:16px;font-weight:700;margin-bottom:4px}
+  .lr-sub{color:rgba(255,255,255,.5);font-size:12px;margin-bottom:12px}
+
+  /* 任务中心 */
+  .task-center-btn{
+    position:absolute;bottom:80px;right:12px;z-index:50;
+    width:36px;height:36px;border-radius:50%;
+    background:rgba(0,0,0,.5);backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,.15);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-size:18px;
+  }
+  .task-badge{position:absolute;top:-4px;right:-4px;background:#D70C1F;color:#fff;font-size:9px;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+  .task-modal-overlay{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
+  .task-modal-overlay.show{display:flex}
+  .task-modal-box{background:#1e1e3a;border-radius:14px;padding:16px;width:88%;max-width:360px;max-height:80vh;overflow-y:auto;border:1px solid rgba(255,255,255,.1)}
+  .task-modal-title{color:#fff;font-size:16px;font-weight:700;margin-bottom:12px;text-align:center}
+  .task-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.04);border-radius:10px;margin-bottom:8px}
+  .task-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  .task-info{flex:1;min-width:0}
+  .task-name{color:#fff;font-size:13px;font-weight:600;margin-bottom:2px}
+  .task-progress{color:rgba(255,255,255,.4);font-size:11px}
+  .task-reward{color:#ffcc66;font-size:11px}
+
+  /* 重置按钮 */
+  .reset-dwell-btn{
+    color:rgba(255,255,255,.4);font-size:10px;cursor:pointer;
+    margin-top:8px;text-align:center;
+  }
+  .dwell-count{color:rgba(255,255,255,.4);font-size:10px;text-align:center}
+
+  @media (max-width:480px){
+    body{background:#000}
+    .phone{width:100vw;height:200vw;border-radius:0;padding:0;box-shadow:none;animation:none}
+    .screen{border-radius:0}
+    .spot .spot-label{font-size:10px;padding:2px 8px}
+    .lottery-img{width:28px;height:28px}
+    .character img{width:48px;height:48px}
+  }
+</style>
+</head>
+<body>
+
+<div class="phone-wrap">
+  <div class="phone" id="phone">
+    <div class="screen">
+
+      <!-- 场景1 -->
+      <div class="scene-layer" id="scene1" style="background-image:url('茅台空间_new.png')">
+        <div class="overlay">
+          <!-- 场景标题 -->
+          <div class="title-bar">
+            <img class="title-logo" src="贵州茅台.jpg" alt="茅台">
+            <span class="title-text scene-title" id="sceneTitle">贵州茅台 · 元宇宙空间</span>
+          </div>
+
+          <!-- 返回箭头 -->
+          <div class="back-arrow" id="backArrow" onclick="goBackFromScene()">
+            <img src="arrow.png" alt="返回">
+          </div>
+
+          <!-- 场景切换 -->
+          <div class="scene-arrow" id="sceneArrow" onclick="switchScene(currentScene===1?2:1)">
+            <img src="arrow.png" alt="切换场景">
+          </div>
+
+          <!-- 角色 -->
+          <div class="character" id="char" style="left:50%;top:85%">
+            <img class="char-img" id="charImg" src="李白待机.gif" alt="角色">
+            <span class="origin-name" id="originName" style="display:none"></span>
+          </div>
+
+          <!-- 场景1 点位 -->
+          <div class="spot" data-scene="1" style="left:15%;top:30%;width:12%;height:12%" onclick="goSpot('vr')">
+            <div class="spot-label">VR云参观</div>
+          </div>
+          <div class="spot" data-scene="1" style="left:15%;top:52%;width:12%;height:12%" onclick="goSpot('assets')">
+            <div class="spot-label">数字资产商城</div>
+          </div>
+          <div class="spot" data-scene="1" style="left:72%;top:30%;width:13%;height:12%" onclick="goSpot('brew')">
+            <div class="spot-label">酿酒工艺演示</div>
+          </div>
+          <div class="spot" data-scene="1" style="left:72%;top:52%;width:13%;height:12%" onclick="goSpot('digital')">
+            <div class="spot-label">茅小美·数字人</div>
+          </div>
+          <div class="spot" data-scene="1" style="left:44%;top:70%;width:13%;height:12%" onclick="goSpot('miniapp')">
+            <div class="spot-label">📱 茅台小程序</div>
+          </div>
+
+          <!-- 抽签热点 -->
+          <div class="spot lottery-spot" data-scene="1" style="left:13%;top:14%;width:8%;height:8%" onclick="startLottery(1)">
+            <img class="lottery-img" src="热点1.png" alt="抽签">
+          </div>
+          <div class="spot lottery-spot" data-scene="1" style="left:38%;top:10%;width:8%;height:8%" onclick="startLottery(2)">
+            <img class="lottery-img" src="热点2.png" alt="抽签">
+          </div>
+          <div class="spot lottery-spot" data-scene="1" style="left:63%;top:17%;width:8%;height:8%" onclick="startLottery(3)">
+            <img class="lottery-img" src="热点1.png" alt="抽签">
+          </div>
+          <div class="spot lottery-spot" data-scene="1" style="left:83%;top:7%;width:8%;height:8%" onclick="startLottery(4)">
+            <img class="lottery-img" src="热点2.png" alt="抽签">
+          </div>
+
+          <!-- 任务中心 -->
+          <div class="task-center-btn" id="taskCenterBtn" onclick="openTaskCenter()">
+            📋<span class="task-badge" id="taskBadge" style="display:none">1</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 场景2 -->
+      <div class="scene-layer hidden" id="scene2" style="background-image:url('茅台空间2_new.png')">
+        <div class="overlay">
+          <div class="title-bar">
+            <img class="title-logo" src="贵州茅台.jpg" alt="茅台">
+            <span class="text-white scene-title">贵州茅台 · 空间2号</span>
+          </div>
+
+          <div class="back-arrow" id="backArrow2" onclick="goBackFromScene()">
+            <img src="arrow.png" alt="返回">
+          </div>
+
+          <div class="scene-arrow" id="sceneArrow2" onclick="switchScene(currentScene===1?2:1)">
+            <img src="arrow.png" alt="切换场景">
+          </div>
+
+          <div class="character" id="char2" style="left:50%;top:85%">
+            <img class="char-img" id="charImg2" src="李白待机.gif" alt="角色">
+            <span class="origin-name" id="originName2" style="display:none"></span>
+          </div>
+
+          <!-- 场景2 点位 -->
+          <div class="spot" data-scene="2" style="left:15%;top:32%;width:12%;height:12%;display:none" onclick="goSpot('master')">
+            <div class="spot-label">茅台大师课堂</div>
+          </div>
+          <div class="spot" data-scene="2" style="left:75%;top:32%;width:13%;height:12%;display:none" onclick="goSpot('river')">
+            <div class="spot-label">赤水河生态馆</div>
+          </div>
+          <div class="spot" data-scene="2" style="left:15%;top:50%;width:12%;height:12%;display:none" onclick="goSpot('cellar')">
+            <div class="spot-label">数字酒窖</div>
+          </div>
+          <div class="spot" data-scene="2" style="left:75%;top:50%;width:13%;height:12%;display:none" onclick="goSpot('brewer')">
+            <div class="spot-label">数字酿酒师</div>
+          </div>
+
+          <div class="task-center-btn" id="taskCenterBtn2" onclick="openTaskCenter()">
+            📋<span class="task-badge" id="taskBadge2" style="display:none">1</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右上角用户信息 + 背包（屏幕层，所有场景可见） -->
+      <div class="user-info-btn" id="userInfoBtn" onclick="toggleBackpack()">
+        <img class="u-avatar" id="uAvatar" src="李白待机.gif" alt="">
+        <span class="u-name" id="uName">游客</span>
+        <span style="color:rgba(255,255,255,.4);font-size:10px">▾</span>
+      </div>
+      <div class="backpack-panel" id="backpackPanel" onclick="event.stopPropagation()">
+        <div style="color:#fff;font-size:13px;font-weight:700;margin-bottom:4px;text-align:center">🎒 我的背包（贵州茅台）</div>
+        <div class="bp-section">
+          <div class="bp-section-title">💎 数字资产</div>
+          <div class="bp-row">
+            <div class="bp-icon" style="background:rgba(102,126,234,.15)">🖼️</div>
+            <div class="bp-info"><div class="bp-name">数字藏品</div></div>
+            <div class="bp-num">5件</div>
+          </div>
+        </div>
+        <div class="bp-section">
+          <div class="bp-section-title">💰 积分资产</div>
+          <div class="bp-row">
+            <div class="bp-icon" style="background:rgba(212,165,71,.15)">⭐</div>
+            <div class="bp-info"><div class="bp-name">茅台积分</div></div>
+            <div class="bp-num">1,280</div>
+          </div>
+        </div>
+        <div class="bp-section">
+          <div class="bp-section-title">🎫 营销券码</div>
+          <div class="bp-row">
+            <div class="bp-icon" style="background:rgba(72,199,142,.15)">🎟️</div>
+            <div class="bp-info"><div class="bp-name">茅台优惠券</div></div>
+            <div class="bp-num">3张</div>
+          </div>
+          <div class="bp-row">
+            <div class="bp-icon" style="background:rgba(240,173,78,.15)">🔰</div>
+            <div class="bp-info"><div class="bp-name">新品优先权</div></div>
+            <div class="bp-num">2次</div>
+          </div>
+        </div>
+        <div class="bp-section">
+          <div class="bp-section-title">🎭 数字权益</div>
+          <div class="bp-skin-list">
+            <div class="bp-skin-item" onclick="applySkin('茅台酿酒师.png')"><img src="茅台酿酒师.png" alt="茅台酿酒师"><div style="color:#fff;font-size:8px;text-align:center;margin-top:2px">茅台酿酒师</div></div>
+            <div class="bp-skin-item" onclick="applySkin('茅台巴拿马限定款.png')"><img src="茅台巴拿马限定款.png" alt="茅台巴拿马限定款"><div style="color:#fff;font-size:8px;text-align:center;margin-top:2px">巴拿马限定</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="particle-layer" id="particleLayer"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 抽签弹窗 -->
+<div class="lottery-mask" id="lotteryMask" onclick="closeLottery()">
+  <div class="lottery-box" id="lotteryBox" onclick="event.stopPropagation()">
+    <div class="lt-title">🎯 幸运奖励</div>
+    <div class="lt-sub" id="ltSub"></div>
+    <div class="lottery-anim" id="lotteryAnim"><div class="anim-ring"></div></div>
+    <div class="lottery-result" id="lotteryResult">
+      <img class="lr-img" id="lrImg" src="" alt="">
+      <div class="lr-text" id="lrText"></div>
+      <div class="lr-sub" id="lrSub"></div>
+    </div>
+    <button class="lt-btn" id="ltStartBtn" onclick="doDraw()">开始抽签</button>
+    <button class="lt-btn" id="ltCloseBtn" onclick="closeLottery()">关闭</button>
+  </div>
+</div>
+
+<!-- 停留奖励弹窗 -->
+<div class="lottery-mask" id="dwellRewardMask" onclick="closeDwellReward()">
+  <div class="lottery-box" onclick="event.stopPropagation()">
+    <div class="lr-title">🎁 停留奖励</div>
+    <div style="font-size:40px;margin-bottom:8px">🎁</div>
+    <div class="lr-sub">停留时间超过10s，获得新品优先权奖励</div>
+    <button class="lt-btn" style="display:inline-block" onclick="closeDwellReward()">收下奖励</button>
+  </div>
+</div>
+
+<!-- 任务中心弹窗 -->
+<div class="task-modal-overlay" id="taskModalOverlay" onclick="closeTaskCenter()">
+  <div class="task-modal-box" onclick="event.stopPropagation()">
+    <div class="task-modal-title">📋 任务中心</div>
+    <div id="taskList"></div>
+  </div>
+</div>
+
+<div class="dwell-count" id="dwellCountLabel" style="display:none">每日可领 1 次</div>
+
+<script>
+  var currentScene = 1;
+  var sceneTitles = {1:'贵州茅台 · 元宇宙空间', 2:'贵州茅台 · 空间2号'};
+
+  function switchScene(targetId) {
+    if (targetId === currentScene) return;
+    currentScene = targetId;
+    [1,2].forEach(function(id){
+      var el = document.getElementById('scene'+id);
+      if (id === targetId) { el.classList.remove('hidden'); }
+      else { el.classList.add('hidden'); }
+    });
+    var titleEls = document.querySelectorAll('.scene-title');
+    titleEls.forEach(function(el){ el.textContent = '🏬 '+sceneTitles[targetId]; });
+    document.querySelectorAll('.spot[data-scene]').forEach(function(spot){
+      spot.style.display = spot.dataset.scene == targetId ? '' : 'none';
+    });
+    var arrow = document.getElementById('sceneArrow');
+    var arrow2 = document.getElementById('sceneArrow2');
+    arrow.style.display = targetId === 2 ? 'none' : '';
+    if (arrow2) arrow2.style.display = targetId === 2 ? 'none' : '';
+    arrow.title = targetId === 2 ? '返回场景1' : '切换到场景2';
+    // 更新角色位置
+    var chars = document.querySelectorAll('.char-img');
+    var savedRole = localStorage.getItem('metaMallRole');
+    if (savedRole) {
+      try { var r = JSON.parse(savedRole);
+        chars.forEach(function(c){ c.src = r.avatar; });
+      } catch(e){}
+    }
+  }
+
+  function goBackFromScene(){
+    if (currentScene === 2) { switchScene(1); }
+    else { window.location.href = 'mall_portrait.html#2'; }
+  }
+
+  function goSpot(type){
+    if (currentScene === 2) return;
+    // 人物移动到热区中心
+    var char = document.getElementById('char');
+    var left = 50, top = 85;
+    if (type === 'vr') { left = 12; top = 48; }
+    else if (type === 'assets') { left = 32; top = 58; }
+    else if (type === 'brew') { left = 68.5; top = 48; }
+    else if (type === 'digital') { left = 88.5; top = 64; }
+    else if (type === 'miniapp') { left = 50.5; top = 81; }
+    char.style.left = left + '%'; char.style.top = top + '%';
+    setTimeout(function(){
+      var links = {
+        vr: 'vr_maotai.html', assets: 'assets_maotai_portrait.html',
+        brew: 'brew_maotai.html', digital: 'chat_maotai.html',
+        miniapp: 'miniapp_maotai.html'
+      };
+      window.location.href = links[type] || '#';
+    }, 1700);
+  }
+
+  // 抽签
+  var lotteryActive = false;
+  function startLottery(id) {
+    if (lotteryActive) return;
+    lotteryActive = true;
+    var box = document.getElementById('lotteryBox');
+    box.classList.remove('result');
+    document.getElementById('ltStartBtn').style.display = 'inline-block';
+    document.getElementById('ltCloseBtn').style.display = 'none';
+    document.getElementById('lotteryAnim').classList.remove('rolling');
+    document.getElementById('ltSub').textContent = '点击下方按钮开始抽签';
+    document.getElementById('lotteryMask').classList.add('show');
+  }
+  function doDraw() {
+    document.getElementById('ltStartBtn').style.display = 'none';
+    document.getElementById('lotteryAnim').classList.add('rolling');
+    document.getElementById('ltSub').textContent = '';
+    setTimeout(function(){
+      var box = document.getElementById('lotteryBox');
+      box.classList.add('result');
+      document.getElementById('lotteryAnim').classList.remove('rolling');
+      document.getElementById('ltCloseBtn').style.display = 'inline-block';
+      incrTask('t2');
+      var hit = Math.random() < 0.4;
+      if (hit) {
+        var prizeImg = Math.random() < 0.5 ? '新品权.png' : '茅台积分.png';
+        var prizeName = prizeImg === '新品权.png' ? '新品购买权' : '茅台积分';
+        document.getElementById('lrImg').src = prizeImg;
+        document.getElementById('lrText').textContent = '🎉 恭喜获得';
+        document.getElementById('lrText').className = 'lr-text';
+        document.getElementById('lrSub').textContent = prizeName;
+      } else {
+        document.getElementById('lrImg').src = '';
+        document.getElementById('lrImg').style.display = 'none';
+        document.getElementById('lrText').textContent = '谢谢参与';
+        document.getElementById('lrText').className = 'lr-text lottery-miss';
+        document.getElementById('lrSub').textContent = '好运下次相见';
+      }
+    }, 2000);
+  }
+  function closeLottery() {
+    document.getElementById('lotteryMask').classList.remove('show');
+    lotteryActive = false;
+    document.getElementById('lrImg').style.display = 'block';
+    document.getElementById('lrImg').src = '';
+  }
+
+  // 停留奖励
+  var dwellCount = 0, dwellMax = 1;
+  var dwellTimer = null, dwellRetryTimer = null;
+  function startDwellTimer() {
+    if (dwellCount >= dwellMax) return;
+    dwellTimer = setTimeout(checkDwellReward, 10000);
+  }
+  function checkDwellReward() {
+    if (dwellCount >= dwellMax) return;
+    if (document.getElementById('lotteryMask').classList.contains('show')) {
+      dwellRetryTimer = setTimeout(checkDwellReward, 5000); return;
+    }
+    dwellCount++;
+    incrTask('t1');
+    document.getElementById('dwellRewardMask').classList.add('show');
+    if (lotteryActive) closeLottery();
+    if (dwellCount < dwellMax) startDwellTimer();
+  }
+  function closeDwellReward() {
+    document.getElementById('dwellRewardMask').classList.remove('show');
+    if (dwellRetryTimer) { clearTimeout(dwellRetryTimer); dwellRetryTimer = null; }
+  }
+  startDwellTimer();
+
+  // 任务中心
+  var taskProgress = { t1: 0, t2: 0, t5: 0 };
+  var taskMax = { t1: 5, t2: 5, t5: 5 };
+  function incrTask(key) { if (taskProgress[key] < taskMax[key]) taskProgress[key]++; updateTaskBadge(); }
+  function updateTaskBadge() {
+    var total = 0;
+    Object.keys(taskProgress).forEach(function(k){ total += taskProgress[k]; });
+    var badge = document.getElementById('taskBadge');
+    if (total > 0) { badge.style.display = 'flex'; badge.textContent = total; }
+    else { badge.style.display = 'none'; }
+  }
+  function openTaskCenter() {
+    var tasks = [
+      { icon: '⏱️', name: '茅台空间停留10s获取茅台积分10', key: 't1', reward: '茅台积分', bg: 'rgba(255,200,50,.2)' },
+      { icon: '🏺', name: '茅台空间参与5次抽奖获得优惠券', key: 't2', reward: '优惠券', bg: 'rgba(100,180,255,.2)' },
+      { icon: '📄', name: '茅台空间点击5次项目获得优惠券', key: 't5', reward: '优惠券', bg: 'rgba(255,130,130,.2)' }
+    ];
+    document.getElementById('taskList').innerHTML = tasks.map(function(t){
+      return '<div class="task-item"><div class="task-icon" style="background:'+t.bg+'">'+t.icon+'</div><div class="task-info"><div class="task-name">'+t.name+'</div><div class="task-progress">'+taskProgress[t.key]+' / '+taskMax[t.key]+'</div></div><div class="task-reward">🎁 '+t.reward+'</div></div>';
+    }).join('');
+    document.getElementById('taskModalOverlay').classList.add('show');
+  }
+  function closeTaskCenter() { document.getElementById('taskModalOverlay').classList.remove('show'); }
+
+  // 角色
+  (function initRole(){
+    var saved = localStorage.getItem('metaMallRole');
+    var avatar = '李白待机.gif', nick = '';
+    if (saved) {
+      try { var r = JSON.parse(saved); avatar = r.avatar; nick = r.name; } catch(e){}
+    }
+    document.querySelectorAll('.char-img').forEach(function(c){ c.src = avatar; });
+    if (nick) {
+      document.getElementById('originName').textContent = nick;
+      document.getElementById('originName').style.display = '';
+    }
+    document.getElementById('uAvatar').src = avatar;
+    document.getElementById('uName').textContent = nick || '游客';
+  })();
+
+  // 返回时触发停留奖励重新计算
+  var productRewardRead = sessionStorage.getItem('metaProductRewardFlag');
+  if (productRewardRead) { sessionStorage.removeItem('metaProductRewardFlag'); incrTask('t5'); }
+
+  // 背包面板
+  function toggleBackpack(){
+    document.getElementById('backpackPanel').classList.toggle('show');
+  }
+  document.addEventListener('click', function(e){
+    var panel = document.getElementById('backpackPanel');
+    var btn = document.getElementById('userInfoBtn');
+    if (panel && btn && panel.classList.contains('show') && !btn.contains(e.target) && !panel.contains(e.target)) {
+      panel.classList.remove('show');
+    }
+  });
+  function applySkin(skinSrc){
+    document.querySelectorAll('.char-img').forEach(function(el){ el.src = skinSrc; });
+    document.getElementById('uAvatar').src = skinSrc;
+    document.getElementById('backpackPanel').classList.remove('show');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title>文化故事管理 - 商家后台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f0f2f5; color: #333; }
+
+    .header { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .header-title { font-size: 18px; font-weight: 600; }
+    .header-back { font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+    .header-back:hover { opacity: .8; }
+
+    .main-container { display: flex; min-height: calc(100vh - 60px); }
+    .sidebar { width: 200px; background: #2c3e50; padding: 20px 0; flex-shrink: 0; overflow-y: auto; }
+    .sidebar-menu { list-style: none; padding: 0; margin: 0; }
+    .menu-title { display: flex; align-items: center; gap: 10px; padding: 12px 20px; color: #b8c7ce; font-size: 14px; text-decoration: none; transition: all .2s; }
+    .menu-title svg { width: 18px; height: 18px; flex-shrink: 0; }
+    a.menu-title:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .menu-title.active { background: rgba(102,126,234,.3); color: #fff; }
+    .submenu { list-style: none; padding: 0; margin: 0; }
+    .submenu-item { display: block; padding: 10px 20px 10px 50px; color: #8a9aa8; font-size: 13px; text-decoration: none; transition: all .2s; }
+    .submenu-item:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .submenu-item.active { background: rgba(102,126,234,.3); color: #fff; }
+
+    .content { flex: 1; padding: 24px; overflow-y: auto; max-width: none; }
+    .content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .content-title { font-size: 20px; font-weight: 700; color: #1a1a2e; }
+    .btn { padding: 8px 18px; border-radius: 8px; font-size: 14px; cursor: pointer; border: none; transition: all .2s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
+    .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+    .btn-sm { padding: 4px 10px; font-size: 12px; border-radius: 6px; }
+    .btn-outline { background: #fff; color: #667eea; border: 1px solid #667eea; }
+    .btn-outline:hover { background: #f5f3ff; }
+    .btn-danger { background: #fff5f5; color: #e74c3c; border: 1px solid #ffcccc; }
+    .btn-danger:hover { background: #ffeaea; }
+    .btn-success { background: rgba(7,193,96,.1); color: #07c160; border: 1px solid rgba(7,193,96,.3); }
+    .btn-success:hover { background: rgba(7,193,96,.15); }
+
+    .card { background: #fff; border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+
+    .form-group { margin-bottom: 18px; }
+    .form-label { display: block; font-size: 14px; font-weight: 600; color: #555; margin-bottom: 8px; }
+    .form-input { width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; transition: border .2s; }
+    .form-input:focus { border-color: #667eea; }
+    .form-select { width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; }
+    .form-textarea { width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; min-height: 120px; resize: vertical; }
+    .form-textarea:focus { border-color: #667eea; }
+
+    /* 状态标签 */
+    .status-tag { display: inline-block; font-size: 12px; padding: 3px 10px; border-radius: 12px; font-weight: 600; }
+    .status-tag.draft { background: #f5f5f5; color: #999; }
+    .status-tag.pending { background: #fff7e6; color: #fa8c16; }
+    .status-tag.approved { background: #e6f7ff; color: #1890ff; }
+    .status-tag.rejected { background: #fff1f0; color: #e74c3c; }
+    .status-tag.online { background: #f6ffed; color: #52c41a; }
+    .status-tag.offline { background: #f5f5f5; color: #999; }
+
+    .story-list { display: flex; flex-direction: column; gap: 12px; }
+    .story-item { display: flex; gap: 16px; padding: 16px; background: #fafafa; border-radius: 12px; align-items: center; }
+    .story-item:hover { background: #f5f5f5; }
+    .story-cover { width: 80px; height: 80px; border-radius: 8px; object-fit: cover; background: #eee; flex-shrink: 0; }
+    .story-info { flex: 1; min-width: 0; }
+    .story-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 4px; }
+    .story-meta { font-size: 12px; color: #999; display: flex; gap: 12px; align-items: center; }
+    .story-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    .upload-area { border: 2px dashed #ddd; border-radius: 12px; padding: 30px; text-align: center; cursor: pointer; transition: all .2s; }
+    .upload-area:hover { border-color: #667eea; background: rgba(102,126,234,.02); }
+    .upload-area img { max-width: 100%; max-height: 160px; border-radius: 8px; }
+    .upload-text { font-size: 14px; color: #999; }
+
+    .editor-toolbar { display: flex; gap: 2px; padding: 6px 8px; background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 8px 8px 0 0; border-bottom: none; }
+    .et-btn { width: 28px; height: 28px; border: 1px solid transparent; background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+    .et-btn:hover { background: #e8e8e8; }
+    .et-sep { width: 1px; background: #ddd; margin: 4px 4px; }
+    .editor-area { min-height: 150px; max-height: 400px; overflow-y: auto; padding: 12px; border: 1px solid #e0e0e0; border-radius: 0 0 8px 8px; font-size: 14px; line-height: 1.8; outline: none; }
+    .editor-area:focus { border-color: #667eea; }
+    .editor-area h3 { font-size: 16px; margin: 8px 0 4px; }
+    .editor-area ul, .editor-area ol { padding-left: 20px; margin: 4px 0; }
+    .editor-area img { max-width: 100%; border-radius: 6px; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal-overlay.show { display: flex; }
+    .modal-box { background: #fff; border-radius: 16px; width: 100%; max-width: 600px; max-height: 85vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #f0f0f0; }
+    .modal-title { font-size: 16px; font-weight: 600; }
+    .modal-close { width: 30px; height: 30px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; }
+    .modal-body { padding: 20px; }
+    .modal-footer { padding: 16px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px; }
+
+    .empty-state { padding: 60px 0; text-align: center; color: #ccc; }
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .filter-btn { padding: 6px 14px; font-size: 13px; border-radius: 20px; border: 1px solid #e0e0e0; background: #fff; cursor: pointer; }
+    .filter-btn.active { background: #667eea; color: #fff; border-color: #667eea; }
+
+    .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); padding: 12px 20px; border-radius: 8px; font-size: 14px; z-index: 2000; animation: slideIn .3s ease; color: #fff; }
+    .toast.success { background: rgba(7,193,96,.9); }
+    .toast.error { background: rgba(231,76,60,.9); }
+    @keyframes slideIn { from { transform: translateX(-50%) translateY(-20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-back" onclick="history.back()">← 返回</div>
+    <div class="header-title">文化故事管理</div>
+    <div style="width:60px"></div>
+  </div>
+
+  <div class="main-container">
+    <div class="sidebar" id="sidebar">
+      <ul class="sidebar-menu">
+        <li><a class="menu-title" href="dashboard.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          首页
+        </a></li>
+        <li>
+          <div class="menu-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><polyline points="21 15 16 10 5 21"/></svg>
+            数字资产
+          </div>
+          <ul class="submenu"><li><a class="submenu-item" href="asset-management.html">数字资产管理</a></li>
+        <li><a class="submenu-item" href="digital-asset-detail.html">数字资产详情</a></li></ul>
+        </li>
+        <li>
+          <div class="menu-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            订单管理
+          </div>
+          <ul class="submenu">
+            <li><a class="submenu-item" href="order-management.html">订单管理</a></li>
+            <li><a class="submenu-item" href="delivery-management.html">发货管理</a></li>
+          </ul>
+        </li>
+        <li>
+          <div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>营销管理</div>
+          <ul class="submenu"><li><a class="submenu-item" href="marketing.html">空间管理</a></li><li><a class="submenu-item" href="task-management.html">任务管理</a></li></ul>
+        </li>
+        <li>
+          <div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>内容管理</div>
+          <ul class="submenu">
+            <li><a class="submenu-item active" style="font-weight:600">文化故事管理</a></li>
+          </ul>
+        </li>
+        <li>
+          <div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>系统管理</div>
+          <ul class="submenu">
+            <li><a class="submenu-item" href="operator-management.html">操作员管理</a></li>
+            <li><a class="submenu-item" href="role-management.html">角色管理</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="content">
+      <div class="content-header">
+        <div class="content-title">📖 我的文化故事</div>
+        <button class="btn btn-primary" onclick="openStoryModal()">+ 新建故事</button>
+      </div>
+
+    <div class="card">
+      <div class="filter-bar" id="filterBar">
+        <button class="filter-btn active" onclick="filterStories('all')">全部</button>
+        <button class="filter-btn" onclick="filterStories('draft')">草稿</button>
+        <button class="filter-btn" onclick="filterStories('pending')">待审核</button>
+        <button class="filter-btn" onclick="filterStories('rejected')">审核不通过</button>
+        <button class="filter-btn" onclick="filterStories('approved')">审核通过</button>
+        <button class="filter-btn" onclick="filterStories('online')">已上线</button>
+        <button class="filter-btn" onclick="filterStories('offline')">已下线</button>
+      </div>
+      <div class="story-list" id="storyList"></div>
+      <div class="empty-state" id="emptyState" style="display:none">暂无文化故事，点击上方按钮创建</div>
+    </div>
+  </div>
+  </div>
+
+  <!-- 编辑弹窗 -->
+  <div class="modal-overlay" id="storyModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">新建文化故事</div>
+        <div class="modal-close" onclick="closeStoryModal()">✕</div>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="storyEditId">
+        <div class="form-group">
+          <label class="form-label">故事标题</label>
+          <input class="form-input" id="storyTitle" placeholder="输入文化故事标题">
+        </div>
+        <div class="form-group">
+          <label class="form-label">封面图片</label>
+          <input type="hidden" id="storyCover" value="">
+          <div class="upload-area" id="coverUpload" onclick="document.getElementById('coverInput').click()">
+            <div class="upload-text" id="coverText">点击上传封面图片</div>
+            <img id="coverPreview" src="" alt="" style="display:none">
+          </div>
+          <input type="file" id="coverInput" accept="image/*" onchange="uploadCover()" style="display:none">
+        </div>
+        <div class="form-group">
+          <label class="form-label">故事内容</label>
+          <div class="editor-toolbar">
+            <button type="button" class="et-btn" onclick="execCmd('bold')" title="加粗"><b>B</b></button>
+            <button type="button" class="et-btn" onclick="execCmd('italic')" title="斜体"><i>I</i></button>
+            <button type="button" class="et-btn" onclick="execCmd('underline')" title="下划线"><u>U</u></button>
+            <span class="et-sep"></span>
+            <button type="button" class="et-btn" onclick="execCmd('formatBlock','h3')" title="小标题">H</button>
+            <button type="button" class="et-btn" onclick="execCmd('insertUnorderedList')" title="无序列表">≡</button>
+            <button type="button" class="et-btn" onclick="execCmd('insertOrderedList')" title="有序列表">≣</button>
+            <span class="et-sep"></span>
+            <button type="button" class="et-btn" onclick="document.getElementById('editorImgInput').click()" title="插入图片">🖼</button>
+            <input type="file" id="editorImgInput" accept="image/*" onchange="insertEditorImage()" style="display:none">
+          </div>
+          <div class="editor-area" id="storyEditor" contenteditable="true"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="btnSaveDraft" onclick="saveStory('draft')">保存草稿</button>
+        <button class="btn btn-primary" id="btnSubmit" onclick="saveStory('pending')">提交审核</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var STORAGE = 'merchantStories';
+    var stories = [];
+    var currentFilter = 'all';
+    var MERCHANT_ID = 'm01';
+    var MERCHANT_NAME = '贵州茅台';
+
+    function navigateTo(url) { window.location.href = url; }
+
+    function execCmd(cmd, arg) { document.execCommand(cmd, false, arg || null); document.getElementById('storyEditor').focus(); }
+
+    function insertEditorImage() {
+      var f = document.getElementById('editorImgInput').files[0]; if (!f) return;
+      var r = new FileReader();
+      r.onload = function(e) {
+        document.execCommand('insertImage', false, e.target.result);
+        document.getElementById('storyEditor').focus();
+      };
+      r.readAsDataURL(f);
+      document.getElementById('editorImgInput').value = '';
+    }
+
+
+
+
+
+    var imgStore = {};
+
+    function saveData() {
+      var light = stories.map(function(s) {
+        var l = { id:s.id, title:s.title, content:s.content, status:s.status, createdAt:s.createdAt, updatedAt:s.updatedAt, merchantId:s.merchantId, merchantName:s.merchantName, rejectReason:s.rejectReason };
+        if (s.cover && s.cover.indexOf('data:') === 0) { imgStore[s.id] = s.cover; l.cover = '[IMG:' + s.id + ']'; }
+        else l.cover = s.cover || '';
+        return l;
+      });
+      localStorage.setItem(STORAGE, JSON.stringify(light));
+      // 图片单独存 IndexedDB
+      saveImgStore();
+    }
+
+    function loadStories() {
+      var saved = localStorage.getItem(STORAGE);
+      if (saved) { try { stories = JSON.parse(saved); } catch(e) { stories = []; } }
+      loadImgStore(function() {
+        stories.forEach(function(s) {
+          if (s.cover && s.cover.indexOf('[IMG:') === 0 && imgStore[s.id]) s.cover = imgStore[s.id];
+        });
+        renderStories();
+      });
+    }
+
+    function openDB(cb) {
+      var req = indexedDB.open('MetaMallImgs', 1);
+      req.onupgradeneeded = function(e) { e.target.result.createObjectStore('covers', {keyPath:'id'}); };
+      req.onsuccess = function(e) { cb(e.target.result); };
+    }
+    function saveImgStore() {
+      openDB(function(db) {
+        var tx = db.transaction('covers', 'readwrite'), store = tx.objectStore('covers');
+        Object.keys(imgStore).forEach(function(k) { store.put({id:k, data:imgStore[k]}); });
+      });
+    }
+    function loadImgStore(cb) {
+      openDB(function(db) {
+        var tx = db.transaction('covers', 'readonly'), store = tx.objectStore('covers');
+        var req = store.getAll();
+        req.onsuccess = function() { (req.result || []).forEach(function(r) { imgStore[r.id] = r.data; }); cb(); };
+        req.onerror = function() { cb(); };
+      });
+    }
+
+    function renderStories() {
+      var filtered = currentFilter === 'all' ? stories : stories.filter(function(s) { return s.status === currentFilter; });
+      var container = document.getElementById('storyList');
+      var empty = document.getElementById('emptyState');
+      if (filtered.length === 0) { container.innerHTML = ''; empty.style.display = 'block'; return; }
+      empty.style.display = 'none';
+      var statusMap = { draft:'草稿', pending:'待审核', approved:'审核通过', rejected:'审核不通过', online:'已上线', offline:'已下线' };  // 与审核端保持一致
+      container.innerHTML = filtered.map(function(s) {
+        var coverHtml = s.cover ? '<img class="story-cover" src="' + s.cover + '">' : '<div class="story-cover" style="display:flex;align-items:center;justify-content:center;font-size:28px;color:#ccc">📖</div>';
+        var actions = '';
+        if (s.status === 'draft') actions += '<button class="btn btn-sm btn-outline" onclick="openStoryModal(\'' + s.id + '\')">编辑</button><button class="btn btn-sm btn-success" onclick="changeStatus(\'' + s.id + '\',\'pending\')">提交审核</button><button class="btn btn-sm btn-danger" onclick="deleteStory(\'' + s.id + '\')">删除</button>';
+        else if (s.status === 'rejected') actions += '<button class="btn btn-sm btn-outline" onclick="openStoryModal(\'' + s.id + '\')">编辑重审</button>';
+        else if (s.status === 'pending') actions += '<button class="btn btn-sm btn-outline" onclick="openStoryModal(\'' + s.id + '\')">查看</button><button class="btn btn-sm btn-danger" onclick="changeStatus(\'' + s.id + '\',\'draft\')">撤销</button>';
+        else if (s.status === 'approved') actions += '<button class="btn btn-sm btn-outline" onclick="openStoryModal(\'' + s.id + '\')">查看</button><button class="btn btn-sm btn-success" onclick="changeStatus(\'' + s.id + '\',\'online\')">上线</button>';
+        else if (s.status === 'online') actions += '<button class="btn btn-sm btn-outline" onclick="openStoryModal(\'' + s.id + '\')">查看</button><button class="btn btn-sm btn-danger" onclick="changeStatus(\'' + s.id + '\',\'offline\')">下线</button>';
+        else if (s.status === 'offline') actions += '<button class="btn btn-sm btn-outline" onclick="openStoryModal(\'' + s.id + '\')">编辑</button><button class="btn btn-sm btn-success" onclick="changeStatus(\'' + s.id + '\',\'online\')">重新上线</button>';
+        var rejectInfo = s.rejectReason ? '<div style="font-size:11px;color:#e74c3c;margin-top:2px">拒绝原因：' + s.rejectReason + '</div>' : '';
+        return '<div class="story-item">' + coverHtml +
+          '<div class="story-info"><div class="story-title">' + s.title + '</div>' + rejectInfo +
+          '<div class="story-meta"><span class="status-tag ' + s.status + '">' + (statusMap[s.status] || s.status) + '</span><span>' + s.updatedAt + '</span></div></div>' +
+          '<div class="story-actions">' + actions + '</div></div>';
+      }).join('');
+    }
+
+    function filterStories(f) {
+      currentFilter = f;
+      document.querySelectorAll('#filterBar .filter-btn').forEach(function(b) { b.classList.toggle('active', b.textContent.trim().indexOf({all:'全部',draft:'草稿',pending:'待审核',rejected:'审核不通过',approved:'审核通过',online:'已上线',offline:'已下线'}[f]) === 0); });
+      renderStories();
+    }
+
+    function openStoryModal(id) {
+      document.getElementById('storyEditId').value = '';
+      document.getElementById('storyTitle').value = '';
+      document.getElementById('storyEditor').innerHTML = '';
+      document.getElementById('storyCover').value = '';
+      document.getElementById('coverPreview').style.display = 'none';
+      document.getElementById('coverText').style.display = '';
+      document.getElementById('modalTitle').textContent = '新建文化故事';
+
+      if (id) {
+        var s = stories.find(function(x) { return x.id === id; });
+        if (!s) return;
+        document.getElementById('storyEditId').value = id;
+        document.getElementById('storyTitle').value = s.title || '';
+        document.getElementById('storyEditor').innerHTML = s.content || '';
+        document.getElementById('storyCover').value = s.cover || '';
+        if (s.cover) { document.getElementById('coverPreview').src = s.cover; document.getElementById('coverPreview').style.display = 'block'; document.getElementById('coverText').style.display = 'none'; }
+        var canEdit = s.status === 'draft' || s.status === 'rejected' || s.status === 'offline';
+        var isView = s.status === 'pending' || s.status === 'approved' || s.status === 'online';
+        document.getElementById('storyTitle').readOnly = isView;
+        document.getElementById('storyEditor').contentEditable = isView ? 'false' : 'true';
+        document.getElementById('storyEditor').style.background = isView ? '#f9f9f9' : '#fff';
+        document.querySelector('.editor-toolbar').style.display = isView ? 'none' : 'flex';
+        document.getElementById('coverUpload').style.pointerEvents = isView ? 'none' : '';
+        document.getElementById('coverUpload').style.opacity = isView ? '0.6' : '1';
+        document.getElementById('modalTitle').textContent = canEdit ? '编辑文化故事' : '查看文化故事';
+        document.getElementById('btnSaveDraft').style.display = canEdit ? '' : 'none';
+        document.getElementById('btnSubmit').style.display = canEdit ? '' : 'none';
+      } else {
+        document.getElementById('storyTitle').readOnly = false;
+        document.getElementById('storyEditor').contentEditable = 'true';
+        document.getElementById('storyEditor').style.background = '#fff';
+        document.querySelector('.editor-toolbar').style.display = 'flex';
+        document.getElementById('coverUpload').style.pointerEvents = '';
+        document.getElementById('coverUpload').style.opacity = '1';
+        document.getElementById('btnSaveDraft').style.display = '';
+        document.getElementById('btnSubmit').style.display = '';
+      }
+      document.getElementById('storyModal').classList.add('show');
+    }
+
+    function closeStoryModal() { document.getElementById('storyModal').classList.remove('show'); }
+
+    function uploadCover() {
+      var f = document.getElementById('coverInput').files[0]; if (!f) return;
+      var r = new FileReader();
+      r.onload = function(e) {
+        document.getElementById('storyCover').value = e.target.result;
+        document.getElementById('coverPreview').src = e.target.result;
+        document.getElementById('coverPreview').style.display = 'block';
+        document.getElementById('coverText').style.display = 'none';
+      };
+      r.readAsDataURL(f);
+    }
+
+    function saveStory(status) {
+      try {
+        var title = document.getElementById('storyTitle').value.trim();
+        var editor = document.getElementById('storyEditor');
+        var content = editor ? editor.innerHTML.trim() : '';
+        var cover = document.getElementById('storyCover').value;
+        if (!title) { showToast('请输入故事标题', 'error'); return; }
+        if (!content || content === '<br>') { showToast('请输入故事内容', 'error'); return; }
+
+        var editId = document.getElementById('storyEditId').value;
+        var now = new Date().toLocaleDateString('zh-CN');
+        if (editId) {
+          var s = stories.find(function(x) { return x.id === editId; });
+          if (s) {
+            s.title = title; s.content = content; s.cover = cover;
+            if (s.status === 'rejected' || s.status === 'offline' || s.status === 'draft') s.status = status;
+            else s.status = status;
+            s.updatedAt = now;
+            if (status === 'pending') delete s.rejectReason;
+          }
+          showToast(status === 'pending' ? '已提交审核' : '草稿已保存', 'success');
+        } else {
+          stories.push({ id: 'st' + Date.now(), title: title, content: content, cover: cover, status: status, createdAt: now, updatedAt: now, merchantId: MERCHANT_ID, merchantName: MERCHANT_NAME });
+          showToast(status === 'draft' ? '草稿已保存' : '已提交审核', 'success');
+        }
+        saveData();
+        closeStoryModal();
+        currentFilter = 'all';
+        renderStories();
+      } catch(e) { showToast('保存失败：' + e.message, 'error'); }
+    }
+
+    function changeStatus(id, newStatus) {
+      var s = stories.find(function(x) { return x.id === id; });
+      if (!s) return;
+      if (newStatus === 'draft' && s.status !== 'pending') { showToast('只有待审核的故事才能撤销', 'error'); return; }
+      if (newStatus === 'online' && s.status !== 'approved' && s.status !== 'offline') { showToast('只有审核通过或已下线的故事才能上线', 'error'); return; }
+
+      s.status = newStatus;
+      s.updatedAt = new Date().toLocaleDateString('zh-CN');
+      saveData();
+      renderStories();
+      showToast('状态已更新', 'success');
+    }
+
+    function deleteStory(id) {
+      if (!confirm('确定删除该故事？')) return;
+      stories = stories.filter(function(s) { return s.id !== id; });
+      saveData();
+      renderStories();
+      showToast('已删除', 'success');
+    }
+
+    function showToast(msg, type) {
+      var t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg;
+      document.body.appendChild(t); setTimeout(function() { t.remove(); }, 2000);
+    }
+
+    // 清理旧的大数据
+    try { var old = localStorage.getItem('merchantStories'); if (old && old.length > 500000) localStorage.removeItem('merchantStories'); } catch(e) {}
+    loadStories();
+  </script>
+</body>
+</html>

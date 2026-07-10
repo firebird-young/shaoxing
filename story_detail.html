@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>文化故事 · 茅台的百年酱香密码</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; flex-direction: column; align-items: center; }
+.page { max-width: 430px; min-height: 100vh; background: #f6f7fb; padding: 0 16px 40px; position: relative; width: 100%; }
+
+/* ── 顶部导航 ── */
+.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; position: relative; z-index: 10; }
+.nav-back { width: 32px; height: 32px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.nav-back svg { width: 18px; height: 18px; color: #555; display: block; }
+.nav-placeholder { width: 32px; }
+
+/* ── 封面图 ── */
+.cover { height: 220px; border-radius: 16px; margin: 0 0 16px; background-position: center; background-size: cover; position: relative; overflow: hidden; }
+.cover::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 60%; background: linear-gradient(transparent, rgba(0,0,0,0.5)); }
+.cover-title { position: absolute; bottom: 20px; left: 20px; right: 20px; z-index: 1; color: #fff; font-size: 22px; font-weight: 700; letter-spacing: 1px; text-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+
+/* ── 发布者信息 ── */
+.publisher { display: flex; align-items: center; gap: 12px; padding: 0 0 16px; }
+.pub-ava { width: 40px; height: 40px; border-radius: 8px; background: #D70C1F; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; font-weight: 700; flex-shrink: 0; }
+.pub-info { flex: 1; }
+.pub-name { font-size: 14px; font-weight: 600; color: #1a1a2e; margin-bottom: 2px; }
+.pub-date { font-size: 11px; color: #999; }
+.pub-btn { height: 32px; padding: 0 16px; border-radius: 16px; border: 1px solid #e0e0e0; background: #fff; font-size: 12px; color: #666; cursor: pointer; font-weight: 500; }
+.pub-btn:active { background: #f5f5f7; }
+
+/* ── 正文内容 ── */
+.content { font-size: 14px; color: #444; line-height: 2; letter-spacing: 0.5px; }
+.content p { margin-bottom: 16px; text-indent: 2em; }
+.content p.no-indent { text-indent: 0; }
+.content h3 { font-size: 16px; font-weight: 700; color: #1a1a2e; margin: 24px 0 12px; padding-left: 10px; border-left: 3px solid #D70C1F; }
+.content .highlight { background: linear-gradient(transparent 60%, rgba(215,12,31,0.1) 60%); padding: 0 2px; }
+.content .quote { margin: 20px 0; padding: 16px 20px; background: #fff; border-radius: 12px; border-left: 4px solid #D70C1F; font-size: 13px; color: #666; line-height: 1.8; text-indent: 0; font-style: italic; }
+
+/* ── 插图 ── */
+.inline-img { width: 100%; border-radius: 12px; margin: 16px 0; display: block; }
+
+/* ── 底部分享 ── */
+.share-bar { display: flex; gap: 10px; padding: 24px 0 12px; }
+.share-btn { flex: 1; height: 44px; border: 1px solid #e0e0e5; border-radius: 12px; background: #fff; color: #666; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.share-btn:active { background: #f5f5f7; }
+.share-btn svg { width: 16px; height: 16px; }
+.share-btn.like.liked { color: #D70C1F; border-color: #D70C1F; background: #FFF2F3; }
+
+/* ── 推荐故事 ── */
+.sec-title { display: flex; align-items: center; gap: 8px; padding: 20px 0 10px; }
+.sec-title::before { content: ''; width: 3px; height: 14px; background: #D70C1F; border-radius: 2px; }
+.sec-title span { font-size: 14px; font-weight: 700; color: #1a1a2e; }
+.relate-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 0 0 8px; scrollbar-width: none; }
+.relate-scroll::-webkit-scrollbar { display: none; }
+.relate-card { flex-shrink: 0; width: 140px; background: #fff; border-radius: 14px; overflow: hidden; cursor: pointer; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
+.relate-card:active { transform: scale(0.96); }
+.relate-img { height: 90px; background-position: center; background-size: cover; }
+.relate-info { padding: 10px; }
+.relate-info .r-title { font-size: 12px; font-weight: 600; color: #1a1a2e; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.relate-info .r-date { font-size: 10px; color: #bbb; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="top-bar">
+  <div class="nav-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </div>
+  <div class="nav-placeholder"></div>
+</div>
+
+<div class="cover" style="background-image:url('贵州茅台封面海报.png')">
+  <div class="cover-title">茅台的百年酱香密码</div>
+</div>
+
+<div class="publisher">
+  <div class="pub-ava">茅</div>
+  <div class="pub-info">
+    <div class="pub-name">贵州茅台</div>
+    <div class="pub-date">3天前 · 阅读 12,860</div>
+  </div>
+  <button class="pub-btn" onclick="alert('已关注')">+ 关注</button>
+</div>
+
+<div class="content">
+  <h3>赤水河畔的千年传承</h3>
+  <p>在中国西南腹地的贵州省仁怀市茅台镇，一条赤水河蜿蜒而过。这条被誉为"美酒河"的水系，孕育了中国白酒史上最为璀璨的明珠——<span class="highlight">贵州茅台酒</span>。从汉代"枸酱酒"的雏形，到如今享誉世界的民族品牌，茅台走过了一条跨越千年的酿造之路。</p>
+
+  <p>茅台酒的酿造历史可以追溯至公元前135年的西汉时期。当时，赤水河流域的濮僚人已经掌握了原始的酿酒技术，酿造出一种名为"枸酱"的果酒。汉武帝时期，唐蒙出使南越，在夜郎国品尝到枸酱酒后，将其带回长安，汉武帝饮后称赞"甘美之"。这便是茅台酒最早的历史记载。</p>
+
+  <div class="quote">"风来隔壁三家醉，雨后开瓶十里香"——这流传百年的诗句，生动描绘了茅台酒独特的酱香魅力。茅台酒的香气来自世代传承的古法酿造技艺，凝聚了无数匠人的心血与智慧。</div>
+
+  <h3>12987 古法酿造工艺</h3>
+  <p>茅台酒的酿造工艺极其复杂，有"<span class="highlight">12987</span>"之说：一年一个生产周期、两次投料、九次蒸煮、八次发酵、七次取酒。这看似简单的数字背后，蕴藏着茅台人数百年来的智慧结晶。</p>
+
+  <p>每年端午后，茅台镇气温升高，酒师们便开始了繁忙的制曲工作。曲为酒之骨，茅台采用独特的高温大曲，在60摄氏度左右的环境中培育而成，富含大量微生物和酶类，为后期发酵提供了关键的物质基础。</p>
+
+  <p>重阳下沙是茅台酒酿造的重要节点。所谓"沙"，指的是茅台镇本地产的红缨子糯高粱，颗粒小、皮厚、耐蒸煮，是酿造优质酱香酒的关键原料。经过润粮、蒸煮、摊晾、拌曲、堆积发酵后进入窖池，在泥窖中进行长达一个月的无氧发酵。</p>
+
+  <p>七次取酒是茅台工艺的精髓。每一轮次的酒质都有差异，酒精度从高到低，香气从清雅到浓郁，酒体从清爽到醇厚。这七个轮次的基酒需要经过大师级的勾兑调配，才能成就一瓶完美的茅台佳酿。</p>
+
+  <h3>从酒坊到数字资产</h3>
+  <p>2025年，贵州茅台开启了数字化战略转型。借助区块链技术，茅台将每一瓶收藏级酒品与<span class="highlight">数字资产</span>绑定，推出了"飞天茅台·元宇宙酒票"、"茅台1935·时光窖藏"等一系列数字藏品，让传统酿造文化与前沿科技深度交融。</p>
+
+  <p>这些数字资产不仅代表着茅台酒的真实产权，更承载着茅台百年文化的精神内核。持有者不仅拥有实物酒的兑换权益，还可以参与线下品鉴会、优先购买限量新品，甚至可以通过数字资产交易平台进行流转。</p>
+
+  <p>在元宇宙时代，茅台正以全新的姿态，将千年酱香文化传递给新一代的数字原住民。每一滴酱香都凝聚着时光的沉淀，每一枚数字资产都链接着文化的传承。</p>
+
+  <p>从赤水河畔的古老酒坊，到区块链上的数字凭证，茅台的故事仍在继续书写。这瓶跨越千年的美酒，正以最现代的方式，讲述着最传统的中国故事。</p>
+</div>
+
+<div class="share-bar">
+  <button class="share-btn like" id="likeBtn" onclick="toggleLike()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span id="likeCount">1,286</span>
+  </button>
+  <button class="share-btn" onclick="navigator.clipboard.writeText(location.href);alert('链接已复制')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    分享
+  </button>
+</div>
+
+<div class="sec-title"><span>为你推荐</span></div>
+<div class="relate-scroll">
+  <div class="relate-card" onclick="alert('即将开放')">
+    <div class="relate-img" style="background-image:url('王者荣耀.jpeg')"></div>
+    <div class="relate-info">
+      <div class="r-title">王者荣耀的元宇宙进化</div>
+      <div class="r-date">5天前</div>
+    </div>
+  </div>
+  <div class="relate-card" onclick="alert('即将开放')">
+    <div class="relate-img" style="background-image:url('杜甫草堂·文旅数字藏品.png')"></div>
+    <div class="relate-info">
+      <div class="r-title">杜甫草堂的文化数字化</div>
+      <div class="r-date">1周前</div>
+    </div>
+  </div>
+  <div class="relate-card" onclick="alert('即将开放')">
+    <div class="relate-img" style="background-image:url('五粮液·数字珍藏.png')"></div>
+    <div class="relate-info">
+      <div class="r-title">五粮液的数字窖池</div>
+      <div class="r-date">2周前</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+var liked = false;
+function toggleLike(){
+  var btn = document.getElementById('likeBtn');
+  var cnt = document.getElementById('likeCount');
+  liked = !liked;
+  if(liked){
+    btn.classList.add('liked');
+    cnt.textContent = '1,287';
+  } else {
+    btn.classList.remove('liked');
+    cnt.textContent = '1,286';
+  }
+}
+</script>
+
+</body>
+</html>

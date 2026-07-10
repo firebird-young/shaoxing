@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title>元宇宙看板 - 元宇宙商城后台</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;color:#333}
+    .header{background:linear-gradient(135deg,#D70C1F,#F12B3D);color:#fff;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+    .header-title{font-size:18px;font-weight:600}
+    .header-user{font-size:14px}
+    .main-container{display:flex;min-height:calc(100vh - 60px)}
+    .sidebar{width:200px;background:#fff;border-right:1px solid #e8e8e8;padding:16px 0}
+    .sidebar-group-title{padding:8px 24px;font-size:12px;color:#999;font-weight:600;text-transform:uppercase;letter-spacing:1px}
+    .sidebar-item{padding:10px 24px 10px 48px;font-size:14px;color:#666;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px}
+    .sidebar-item:hover{background:#f5f5f5;color:#D70C1F}
+    .sidebar-item.active{background:rgba(215,12,31,.1);color:#D70C1F;font-weight:600}
+    .sidebar-item svg{width:14px;height:14px;flex-shrink:0}
+    .content{flex:1;padding:24px;overflow-y:auto}
+    .page-title{font-size:20px;font-weight:600;color:#1a1a2e;margin-bottom:24px}
+
+    .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+    .stat-card{background:#fff;border-radius:14px;padding:24px 20px;box-shadow:0 2px 12px rgba(0,0,0,.04);display:flex;align-items:center;gap:16px;border:1px solid #f0f0f0;transition:transform .2s,box-shadow .2s}
+    .stat-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.08)}
+    .stat-card .s-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+    .stat-card .s-val{font-size:30px;font-weight:800;color:#1a1a2e;line-height:1.1}
+    .stat-card .s-label{font-size:12px;color:#999;margin-top:4px}
+
+    .card{background:#fff;border-radius:14px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.04);margin-bottom:20px;border:1px solid #f0f0f0}
+    .card-title{font-size:16px;font-weight:600;color:#1a1a2e;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+    .card-title .title-bar{width:4px;height:18px;background:linear-gradient(135deg,#D70C1F,#F12B3D);border-radius:2px;flex-shrink:0}
+    .card-title-spacer{flex:1}
+
+    .btn{padding:8px 16px;border-radius:6px;font-size:13px;cursor:pointer;border:none;transition:all .2s;font-weight:500}
+    .btn-primary{background:#D70C1F;color:#fff}
+    .btn-primary:hover{background:#c60a1b}
+    .btn-default{background:#f5f5f5;color:#666;border:1px solid #ddd}
+    .btn-default:hover{background:#e8ecf0}
+    .btn-sm{padding:4px 10px;font-size:11px}
+
+    .form-group{margin-bottom:0}
+    .form-label{display:block;font-size:12px;color:#999;margin-bottom:3px;font-weight:500}
+    .form-input{width:100%;height:34px;padding:0 8px;border:1px solid #e0e0e0;border-radius:6px;font-size:13px;outline:none;background:#fff}
+    .form-input:focus{border-color:#D70C1F;box-shadow:0 0 0 3px rgba(215,12,31,.1)}
+
+    .online-change{display:inline-block;font-size:13px;margin-left:6px;padding:1px 8px;border-radius:10px;font-weight:600}
+    .online-change.up{color:#52c41a;background:#f6ffed}
+    .online-change.down{color:#ff4d4f;background:#fff2f0}
+
+    .online-block{flex:1;min-width:200px;padding:24px 20px;background:#f8f9fb;border-radius:14px;border:1px solid #eee;position:relative}
+    .online-block .ob-val{font-size:56px;font-weight:900;line-height:1.1}
+    .online-block .ob-label{font-size:13px;color:#999;margin-top:4px}
+    .online-block.real .ob-val{color:#1a1a2e}
+    .online-block.sim .ob-val{background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+    .table-wrap{border-radius:10px;overflow:hidden;border:1px solid #f0f0f0}
+    .table-wrap table{width:100%;border-collapse:collapse}
+    .table-wrap th{text-align:left;padding:12px 16px;font-size:12px;color:#999;background:#fafafa;font-weight:600;border-bottom:2px solid #f0f0f0}
+    .table-wrap td{padding:12px 16px;font-size:13px;border-bottom:1px solid #f8f8f8}
+    .table-wrap tbody tr:hover td{background:#fafbff}
+    .rank-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0}
+    .rank-num.top1{background:#ffd700;color:#8b6914}
+    .rank-num.top2{background:#c0c0c0;color:#555}
+    .rank-num.top3{background:#cd853f;color:#fff}
+    .rank-num.normal{background:#f0f0f0;color:#999}
+    .vis-bar{display:inline-block;height:6px;border-radius:3px;background:linear-gradient(90deg,#667eea,#764ba2);vertical-align:middle;margin-right:8px}
+
+    @media(max-width:768px){
+      .main-container{flex-direction:column}
+      .sidebar{width:100%;display:flex;flex-wrap:wrap;padding:8px;gap:4px}
+      .stats-grid{grid-template-columns:repeat(2,1fr)}
+    }
+  </style>
+</head>
+<body>
+<a href="../index.html" style="position:fixed;top:10px;left:10px;z-index:9999;background:rgba(0,0,0,.5);color:rgba(255,255,255,.7);padding:5px 10px;border-radius:14px;font-size:11px;text-decoration:none;backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.12)">📁 目录</a>
+
+<div class="header">
+  <div class="header-title">元宇宙商城 - 后台管理</div>
+  <div class="header-user">管理员</div>
+</div>
+
+<div class="main-container">
+  <div class="sidebar">
+    <div class="sidebar-group-title">元宇宙管理</div>
+    <div class="sidebar-item" onclick="navigateTo('hotspot-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>场景和热区</div>
+    <div class="sidebar-item" onclick="navigateTo('path-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="12 19 19 12 12 5 5 12"/><circle cx="12" cy="12" r="3"/></svg>跳转路径</div>
+    <div class="sidebar-item" onclick="navigateTo('map-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3 9 12 15 21 9"/></svg>主地图管理</div>
+    <div class="sidebar-item" onclick="navigateTo('space-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>商家元宇宙空间管理</div>
+    <div class="sidebar-item" onclick="navigateTo('role-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>角色管理</div>
+    <div class="sidebar-item active" onclick="navigateTo('dashboard-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>元宇宙看板</div>
+    <div class="sidebar-item" onclick="navigateTo('dice-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><text x="12" y="17" text-anchor="middle" font-size="10">?</text></svg>🎲 骰子游戏</div>
+    <div class="sidebar-group-title">数字资产</div>
+    <div class="sidebar-item" onclick="navigateTo('asset-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>数字资产管理</div>
+    <div class="sidebar-item" onclick="navigateTo('digital-asset-detail.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>数字资产详情</div>
+    <div class="sidebar-item" onclick="navigateTo('order-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>订单管理</div>
+    <div class="sidebar-group-title">会员管理</div>
+    <div class="sidebar-item" onclick="navigateTo('user-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>用户管理</div>
+    <div class="sidebar-item" onclick="navigateTo('merchant-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>商家管理</div>
+    <div class="sidebar-group-title">审核管理</div>
+    <div class="sidebar-item" onclick="navigateTo('cert-review.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>商家审核管理</div>
+    <div class="sidebar-item" onclick="navigateTo('story-review.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>文化故事审核</div>
+    <div class="sidebar-group-title">内容管理</div>
+    <div class="sidebar-item" onclick="navigateTo('message-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>消息管理</div>
+    <div class="sidebar-group-title">系统管理</div>
+    <div class="sidebar-item" onclick="navigateTo('wallet-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>钱包管理</div>
+  </div>
+
+  <div class="content">
+    <div class="page-title">元宇宙看板</div>
+
+    <!-- 统计卡片 -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="s-icon" style="background:rgba(82,196,26,.1);color:#52c41a">🏪</div>
+        <div>
+          <div class="s-val" id="statMerchants">48</div>
+          <div class="s-label">入驻商家</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon" style="background:rgba(114,46,209,.1);color:#722ed1">🖼️</div>
+        <div>
+          <div class="s-val" id="statScenes">3</div>
+          <div class="s-label">元宇宙场景</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 在线人数 -->
+    <div class="card">
+      <div class="card-title"><span class="title-bar"></span>在线人数</div>
+      <div style="display:flex;gap:24px;flex-wrap:wrap;text-align:center">
+        <div class="online-block real">
+          <div class="ob-val" id="onlineNum">286</div>
+          <div class="ob-label">真实在线用户 <span class="online-change" id="realChangeInd"></span></div>
+        </div>
+        <div class="online-block sim">
+          <div class="ob-val" id="simNum">286</div>
+          <div class="ob-label">模拟在线用户 <span class="online-change" id="simChangeInd"></span></div>
+          <div style="display:flex;gap:6px;align-items:flex-end;justify-content:center;margin-top:12px">
+            <input class="form-input" id="simInput" type="number" min="0" value="286" style="width:80px;text-align:center">
+            <button class="btn btn-primary btn-sm" onclick="setSimValue()">修改</button>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-end;justify-content:center;margin-top:8px;flex-wrap:wrap">
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <label class="form-label">幅度</label>
+              <input class="form-input" id="amplitude" type="number" min="1" max="50" value="7" style="width:60px;text-align:center">
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <label class="form-label">频率(秒)</label>
+              <input class="form-input" id="frequency" type="number" min="1" max="60" value="3" style="width:60px;text-align:center">
+            </div>
+            <button class="btn btn-default btn-sm" id="btnToggle" onclick="toggleOnline()" style="height:34px">恢复真实数据</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 场景热度 -->
+    <div class="card">
+      <div class="card-title">
+        <span class="title-bar"></span>场景热度排名
+        <span class="card-title-spacer"></span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <label class="form-label" style="margin-bottom:0;white-space:nowrap">选择日期</label>
+          <input class="form-input" id="sceneDate" type="date" style="width:150px" onchange="renderSceneRank()">
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>场景</th><th>商家空间</th><th style="text-align:right;cursor:pointer" onclick="toggleSort()">访问量 <span id="sortInd">▼</span></th><th style="text-align:right">停留时长</th></tr></thead>
+          <tbody id="sceneRankTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var realCount = 286;
+  var simCount = 286;
+  var realTimer = null;
+  var simTimer = null;
+
+  function navigateTo(url) { window.location.href = url; }
+
+  function setSimValue() {
+    var val = parseInt(document.getElementById('simInput').value) || 0;
+    simCount = Math.max(0, val);
+    document.getElementById('simNum').textContent = simCount;
+    document.getElementById('simInput').value = simCount;
+    document.getElementById('simChangeInd').innerHTML = '';
+    restartSim();
+  }
+
+  function toggleOnline() {
+    simCount = realCount;
+    document.getElementById('simNum').textContent = simCount;
+    document.getElementById('simInput').value = simCount;
+    document.getElementById('simChangeInd').innerHTML = '';
+    restartSim();
+  }
+
+  function startReal() {
+    if (realTimer) { clearInterval(realTimer); realTimer = null; }
+    realTimer = setInterval(function(){
+      var delta = Math.floor(Math.random() * 5) - 2;
+      realCount = Math.max(0, Math.min(9999, realCount + delta));
+      document.getElementById('onlineNum').textContent = realCount;
+      var ci = document.getElementById('realChangeInd');
+      if (delta > 0) { ci.innerHTML = '▲ ' + delta; ci.className = 'online-change up'; }
+      else if (delta < 0) { ci.innerHTML = '▼ ' + Math.abs(delta); ci.className = 'online-change down'; }
+      else { ci.innerHTML = ''; }
+      localStorage.setItem('adminOnlineCount', realCount);
+    }, 3000);
+  }
+
+  function restartSim() {
+    if (simTimer) { clearInterval(simTimer); simTimer = null; }
+    var freq = Math.max(1, parseInt(document.getElementById('frequency').value) || 3);
+    simTimer = setInterval(function(){
+      var amp = parseInt(document.getElementById('amplitude').value) || 7;
+      var delta = Math.floor(Math.random() * (amp * 2 + 1)) - amp;
+      simCount = Math.max(0, Math.min(9999, simCount + delta));
+      document.getElementById('simNum').textContent = simCount;
+      var ci = document.getElementById('simChangeInd');
+      if (delta > 0) { ci.innerHTML = '▲ ' + delta; ci.className = 'online-change up'; }
+      else if (delta < 0) { ci.innerHTML = '▼ ' + Math.abs(delta); ci.className = 'online-change down'; }
+      else { ci.innerHTML = ''; }
+    }, freq * 1000);
+  }
+
+  // 按天统计的场景热度数据
+  var dailySceneData = {
+    '2026-06-17': [
+      { name: '食品区', merchant: '贵州茅台集团', visits: 4520, duration: '8分32秒' },
+      { name: '食品区', merchant: '五粮液', visits: 3820, duration: '6分18秒' },
+      { name: '文旅区', merchant: '杜甫草堂博物馆', visits: 3100, duration: '4分45秒' },
+      { name: '影视区', merchant: '鬼吹灯', visits: 2680, duration: '3分22秒' },
+      { name: '食品区', merchant: '妙可蓝多', visits: 2150, duration: '2分50秒' }
+    ],
+    '2026-06-16': [
+      { name: '食品区', merchant: '贵州茅台集团', visits: 3980, duration: '7分15秒' },
+      { name: '文旅区', merchant: '杜甫草堂博物馆', visits: 3560, duration: '5分40秒' },
+      { name: '食品区', merchant: '五粮液', visits: 3400, duration: '5分12秒' },
+      { name: '影视区', merchant: '鬼吹灯', visits: 2200, duration: '3分08秒' },
+      { name: '食品区', merchant: '妙可蓝多', visits: 1800, duration: '2分20秒' }
+    ],
+    '2026-06-15': [
+      { name: '食品区', merchant: '贵州茅台集团', visits: 5100, duration: '9分02秒' },
+      { name: '食品区', merchant: '五粮液', visits: 4200, duration: '6分55秒' },
+      { name: '影视区', merchant: '鬼吹灯', visits: 2900, duration: '4分10秒' },
+      { name: '文旅区', merchant: '杜甫草堂博物馆', visits: 2800, duration: '4分05秒' },
+      { name: '食品区', merchant: '妙可蓝多', visits: 1950, duration: '2分35秒' }
+    ],
+    '2026-06-14': [
+      { name: '食品区', merchant: '贵州茅台集团', visits: 3680, duration: '6分50秒' },
+      { name: '文旅区', merchant: '杜甫草堂博物馆', visits: 3200, duration: '5分30秒' },
+      { name: '食品区', merchant: '五粮液', visits: 3100, duration: '5分00秒' },
+      { name: '影视区', merchant: '鬼吹灯', visits: 2500, duration: '3分45秒' },
+      { name: '食品区', merchant: '妙可蓝多', visits: 1600, duration: '2分10秒' }
+    ],
+    '2026-06-13': [
+      { name: '食品区', merchant: '贵州茅台集团', visits: 4800, duration: '8分10秒' },
+      { name: '食品区', merchant: '五粮液', visits: 3600, duration: '6分20秒' },
+      { name: '文旅区', merchant: '杜甫草堂博物馆', visits: 2900, duration: '4分50秒' },
+      { name: '影视区', merchant: '鬼吹灯', visits: 2400, duration: '3分30秒' },
+      { name: '食品区', merchant: '妙可蓝多', visits: 2100, duration: '3分00秒' }
+    ]
+  };
+
+  // 设置日期选择器默认值
+  var today = new Date().toISOString().split('T')[0];
+  document.getElementById('sceneDate').value = today;
+  // 为今天生成随机数据（如果不存在）
+  if (!dailySceneData[today]) {
+    dailySceneData[today] = [
+      { name: '食品区', merchant: '贵州茅台集团', visits: 3000 + Math.floor(Math.random() * 3000), duration: '5分' + Math.floor(Math.random() * 60) + '秒' },
+      { name: '食品区', merchant: '五粮液', visits: 2500 + Math.floor(Math.random() * 2500), duration: '4分' + Math.floor(Math.random() * 50) + '秒' },
+      { name: '文旅区', merchant: '杜甫草堂博物馆', visits: 2000 + Math.floor(Math.random() * 2000), duration: '3分' + Math.floor(Math.random() * 40) + '秒' },
+      { name: '影视区', merchant: '鬼吹灯', visits: 1800 + Math.floor(Math.random() * 1800), duration: '2分' + Math.floor(Math.random() * 30) + '秒' },
+      { name: '食品区', merchant: '妙可蓝多', visits: 1200 + Math.floor(Math.random() * 1200), duration: '1分' + Math.floor(Math.random() * 30) + '秒' }
+    ];
+  }
+
+  var sortDesc = true; // 默认降序
+  function toggleSort() {
+    sortDesc = !sortDesc;
+    document.getElementById('sortInd').textContent = sortDesc ? '▼' : '▲';
+    renderSceneRank();
+  }
+
+  function renderSceneRank() {
+    var date = document.getElementById('sceneDate').value;
+    var data = (dailySceneData[date] || dailySceneData['2026-06-17']).slice();
+    data.sort(function(a, b){ return sortDesc ? b.visits - a.visits : a.visits - b.visits; });
+    var maxVisits = Math.max.apply(null, data.map(function(s){ return s.visits; }));
+    var tbody = document.getElementById('sceneRankTbody');
+    tbody.innerHTML = data.map(function(s, i){
+      var rankCls = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : 'normal';
+      var barW = Math.round(s.visits / maxVisits * 120);
+      return '<tr>' +
+        '<td><span class="rank-num ' + rankCls + '">' + (i + 1) + '</span></td>' +
+        '<td><strong>' + s.name + '</strong></td>' +
+        '<td>' + s.merchant + '</td>' +
+        '<td style="text-align:right"><span class="vis-bar" style="width:' + barW + 'px"></span>' + s.visits.toLocaleString() + '</td>' +
+        '<td style="text-align:right">' + s.duration + '</td></tr>';
+    }).join('');
+  }
+
+  startReal();
+  restartSim();
+  renderSceneRank();
+</script>
+</body>
+</html>

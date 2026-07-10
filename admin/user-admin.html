@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户管理 - 元宇宙商城后台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f0f2f5; color: #333; }
+
+    .header { background: linear-gradient(135deg, #D70C1F, #F12B3D); color: #fff; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .header-title { font-size: 18px; font-weight: 600; }
+    .header-user { font-size: 14px; }
+
+    .main-container { display: flex; min-height: calc(100vh - 60px); }
+    .sidebar { width: 200px; background: #fff; border-right: 1px solid #e8e8e8; padding: 16px 0; }
+    .sidebar-group-title { padding: 8px 24px; font-size: 12px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .sidebar-item { padding: 10px 24px 10px 48px; font-size: 14px; color: #666; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .sidebar-item:hover { background: #f5f5f5; color: #D70C1F; }
+    .sidebar-item.active { background: rgba(215, 12, 31, 0.1); color: #D70C1F; font-weight: 600; }
+    .sidebar-item svg { width: 14px; height: 14px; }
+
+    .content { flex: 1; padding: 24px; overflow-y: auto; }
+    .content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .content-title { font-size: 18px; font-weight: 600; color: #333; }
+
+    .card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .card-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #1a1a2e; }
+
+    .btn { padding: 6px 14px; border-radius: 4px; font-size: 12px; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-primary { background: #D70C1F; color: #fff; }
+    .btn-primary:hover { background: #c60a1b; }
+    .btn-default { background: #fff; color: #666; border: 1px solid #ddd; }
+    .btn-default:hover { background: #f5f5f5; }
+    .btn-info { background: #1890ff; color: #fff; }
+    .btn-danger { background: #ff4d4f; color: #fff; }
+    .btn-warn { background: #fa8c16; color: #fff; }
+    .btn-success { background: #52c41a; color: #fff; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 12px 16px; font-size: 13px; color: #999; border-bottom: 2px solid #f0f0f0; font-weight: 600; }
+    td { padding: 14px 16px; border-bottom: 1px solid #f5f5f5; font-size: 14px; vertical-align: middle; }
+    tr:hover td { background: #fafafa; }
+
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+    .status-dot.active { background: #52c41a; }
+    .status-dot.frozen { background: #ff4d4f; }
+    .badge { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+    .badge-active { background: #f6ffed; color: #52c41a; }
+    .badge-frozen { background: #fff2f0; color: #ff4d4f; }
+    .badge-open { background: #e6f7ff; color: #1890ff; }
+    .badge-closed { background: #f5f5f5; color: #999; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal-overlay.show { display: flex; }
+    .modal-box { background: #fff; border-radius: 16px; width: 100%; max-width: 860px; max-height: 85vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #f0f0f0; }
+    .modal-title { font-size: 16px; font-weight: 600; }
+    .modal-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .modal-close svg { width: 14px; height: 14px; color: #666; }
+    .modal-body { padding: 20px; }
+    .modal-footer { padding: 16px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px; }
+
+    .info-section { margin-bottom: 20px; }
+    .info-section-title { font-size: 14px; font-weight: 600; color: #1a1a2e; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; }
+    .info-row { display: flex; padding: 8px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
+    .info-label { color: #999; width: 100px; flex-shrink: 0; }
+    .info-value { color: #333; font-weight: 500; }
+    .wallet-status { display: flex; gap: 12px; padding: 16px; background: #f8fafc; border-radius: 10px; margin-bottom: 12px; }
+    .wallet-item { flex: 1; text-align: center; }
+    .wallet-item .w-num { font-size: 20px; font-weight: 700; }
+    .wallet-item .w-label { font-size: 11px; color: #999; margin-top: 4px; }
+
+    .history-list { max-height: 200px; overflow-y: auto; }
+    .history-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
+    .history-item:last-child { border-bottom: none; }
+    .history-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .history-dot.register { background: #1890ff; }
+    .history-dot.verify { background: #52c41a; }
+    .history-dot.freeze { background: #ff4d4f; }
+    .history-dot.unfreeze { background: #fa8c16; }
+    .history-content { flex: 1; }
+    .history-action { font-weight: 500; }
+    .history-time { font-size: 11px; color: #999; margin-top: 2px; }
+
+    .search-bar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .search-input { height: 36px; padding: 0 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; outline: none; width: 200px; }
+    .search-input:focus { border-color: #D70C1F; }
+    .filter-select { height: 36px; padding: 0 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; outline: none; }
+
+    .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); padding: 12px 20px; border-radius: 8px; font-size: 14px; z-index: 2000; animation: slideIn 0.3s ease; }
+    .toast.success { background: rgba(7, 193, 96, 0.9); color: #fff; }
+    .toast.error { background: rgba(215, 12, 31, 0.9); color: #fff; }
+    @keyframes slideIn { from { transform: translateX(-50%) translateY(-20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="header-title">元宇宙商城 - 后台管理</div>
+  <div class="header-user">管理员</div>
+</div>
+
+<div class="main-container">
+      <div class="sidebar">
+      <div class="sidebar-group-title">元宇宙管理</div>
+      <div class="sidebar-item" onclick="navigateTo('hotspot-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>场景和热区</div>
+      <div class="sidebar-item" onclick="navigateTo('path-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="12 19 19 12 12 5 5 12"/><circle cx="12" cy="12" r="3"/></svg>跳转路径</div>
+      <div class="sidebar-item" onclick="navigateTo('map-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3 9 12 15 21 9"/></svg>主地图管理</div>
+      <div class="sidebar-item" onclick="navigateTo('space-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>商家元宇宙空间管理</div>
+      <div class="sidebar-item" onclick="navigateTo('role-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>角色管理</div>
+      <div class="sidebar-item" onclick="navigateTo('dashboard-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>元宇宙看板</div>
+      <div class="sidebar-group-title">数字资产</div>
+      <div class="sidebar-item" onclick="navigateTo('asset-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>数字资产管理</div>
+    <div class="sidebar-item" onclick="navigateTo('digital-asset-detail.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>数字资产详情</div>
+      <div class="sidebar-item" onclick="navigateTo('order-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>订单管理</div>
+      <div class="sidebar-group-title">会员管理</div>
+      <div class="sidebar-item active" onclick="navigateTo('user-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>用户管理</div>
+      <div class="sidebar-item" onclick="navigateTo('merchant-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>商家管理</div>
+      <div class="sidebar-group-title">审核管理</div>
+      <div class="sidebar-item" onclick="navigateTo('cert-review.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>商家审核管理</div>
+    <div class="sidebar-item" onclick="navigateTo('story-review.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>文化故事审核</div>
+          <div class="sidebar-group-title">内容管理</div>
+    <div class="sidebar-item" onclick="navigateTo('message-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>消息管理</div>
+    <div class="sidebar-group-title">系统管理</div>
+      <div class="sidebar-item" onclick="navigateTo('wallet-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>钱包管理</div>
+    </div>
+
+  <div class="content">
+    <div class="content-header"><div class="content-title">用户管理</div></div>
+
+    <div class="card">
+      <div class="card-title">用户列表</div>
+      <div class="search-bar">
+        <input class="search-input" id="searchInput" placeholder="搜索昵称/姓名/手机号" oninput="renderList()">
+        <select class="filter-select" id="statusFilter" onchange="renderList()">
+          <option value="all">全部状态</option>
+          <option value="active">正常</option>
+          <option value="frozen">已冻结</option>
+        </select>
+      </div>
+      <table>
+        <thead><tr><th>用户ID</th><th>昵称</th><th>用户姓名</th><th>用户账号</th><th>钱包</th><th>状态</th><th>认证状态</th><th>注册时间</th><th style="width:180px">操作</th></tr></thead>
+        <tbody id="userTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- 用户详情弹窗 -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">用户详情</div>
+      <div class="modal-close" onclick="closeDetailModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div class="modal-body" id="detailContent"></div>
+    <div class="modal-footer">
+      <button class="btn btn-default" onclick="closeDetailModal()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var users = [
+  { id: 'U001', name: '茅台收藏家', realName: '张三', phone: '13800156789', account: '13800156789', gender:'男', birthday:'1990-03-15', userType:'个人', idNumber:'320523199003151234', certStatus:'verified', verifyDate:'2025-03-12', wallet:[
+    { platform:'中金支付', status:'open', balance:12580.50, frozenBalance:0, walletDate:'2025-03-15' },
+    { platform:'汇付天下', status:'closed', balance:0, frozenBalance:0, walletDate:'-' }
+  ], status:'active', regDate:'2025-03-10', collectionCount:3, assetCount:12, history:[
+    { action:'注册', type:'register', time:'2025-03-10 14:30:25', operator:'用户' },
+    { action:'实名认证', type:'verify', time:'2025-03-12 10:15:33', operator:'用户' },
+    { action:'开通中金支付钱包', type:'register', time:'2025-03-15 09:00:00', operator:'用户' }
+  ]},
+  { id: 'U002', name: '数字玩家', realName: '李四', phone: '13900151234', account: '13900151234', gender:'女', birthday:'1995-07-22', userType:'个人', idNumber:'510106199507225678', certStatus:'verified', verifyDate:'2025-04-19', wallet:[
+    { platform:'中金支付', status:'closed', balance:0, frozenBalance:0, walletDate:'-' },
+    { platform:'汇付天下', status:'open', balance:34200.00, frozenBalance:500.00, walletDate:'2025-04-20' }
+  ], status:'active', regDate:'2025-04-18', collectionCount:5, assetCount:28, history:[
+    { action:'注册', type:'register', time:'2025-04-18 16:00:00', operator:'用户' },
+    { action:'实名认证', type:'verify', time:'2025-04-19 09:00:00', operator:'用户' },
+    { action:'开通汇付支付钱包', type:'register', time:'2025-04-20 11:00:00', operator:'用户' }
+  ]},
+  { id: 'U003', name: '元宇宙探索者', realName: '王五', phone: '13700506789', account: '13700506789', gender:'男', birthday:'1988-11-08', userType:'个人', idNumber:'110102198811089012', certStatus:'unverified', verifyDate:'-', wallet:[
+    { platform:'中金支付', status:'closed', balance:0, frozenBalance:0, walletDate:'-' },
+    { platform:'汇付天下', status:'closed', balance:0, frozenBalance:0, walletDate:'-' }
+  ], status:'active', regDate:'2025-05-22', collectionCount:0, assetCount:0, history:[
+    { action:'注册', type:'register', time:'2025-05-22 09:30:12', operator:'用户' }
+  ]},
+  { id: 'U004', name: '白酒爱好者', realName: '赵六', phone: '13600159012', account: '13600159012', gender:'男', birthday:'1992-05-18', userType:'企业', idNumber:'9152000021441686XK', certStatus:'verified', verifyDate:'2025-05-30', wallet:[
+    { platform:'中金支付', status:'open', balance:89500.00, frozenBalance:10000.00, walletDate:'2025-06-01' },
+    { platform:'汇付天下', status:'open', balance:20000.00, frozenBalance:0, walletDate:'2025-06-05' }
+  ], status:'active', regDate:'2025-05-28', collectionCount:8, assetCount:45, history:[
+    { action:'注册', type:'register', time:'2025-05-28 10:00:08', operator:'用户' },
+    { action:'实名认证', type:'verify', time:'2025-05-30 14:00:45', operator:'用户' },
+    { action:'开通中金支付钱包', type:'register', time:'2025-06-01 08:00:20', operator:'用户' },
+    { action:'冻结账户', type:'freeze', time:'2025-06-15 14:00:30', operator:'管理员A', remark:'涉嫌虚假交易，临时冻结调查' },
+    { action:'解冻账户', type:'unfreeze', time:'2025-06-20 09:00:15', operator:'管理员A', remark:'调查完毕，已解冻' }
+  ]},
+  { id: 'U005', name: '收藏达人', realName: '孙七', phone: '13500153456', account: '13500153456', gender:'女', birthday:'1998-12-02', userType:'个人', idNumber:'440305199812023456', certStatus:'verified', verifyDate:'2025-07-09', wallet:[
+    { platform:'中金支付', status:'closed', balance:0, frozenBalance:0, walletDate:'-' },
+    { platform:'汇付天下', status:'open', balance:2300.00, frozenBalance:0, walletDate:'2025-07-10' }
+  ], status:'frozen', regDate:'2025-07-08', collectionCount:2, assetCount:5, history:[
+    { action:'注册', type:'register', time:'2025-07-08 11:00:55', operator:'用户' },
+    { action:'实名认证', type:'verify', time:'2025-07-09 16:00:12', operator:'用户' },
+    { action:'开通汇付支付钱包', type:'register', time:'2025-07-10 08:00:38', operator:'用户' },
+    { action:'冻结账户', type:'freeze', time:'2025-08-01 10:00:00', operator:'管理员A', remark:'多次违规交易，冻结处理' }
+  ]},
+  { id: 'U006', name: '海贼迷', realName: '周八', phone: '13400157890', account: '13400157890', gender:'男', birthday:'2000-01-25', userType:'个人', idNumber:'350203200001257890', certStatus:'unverified', verifyDate:'-', wallet:[
+    { platform:'中金支付', status:'open', balance:580.00, frozenBalance:0, walletDate:'2025-08-15' },
+    { platform:'汇付天下', status:'closed', balance:0, frozenBalance:0, walletDate:'-' }
+  ], status:'active', regDate:'2025-08-12', collectionCount:1, assetCount:2, history:[
+    { action:'注册', type:'register', time:'2025-08-12 08:00:42', operator:'用户' },
+    { action:'开通中金支付钱包', type:'register', time:'2025-08-15 14:00:18', operator:'用户' }
+  ]},
+  { id: 'U007', name: '电竞选手', realName: '吴九', phone: '13300152345', account: '13300152345', gender:'男', birthday:'2002-06-30', userType:'个人', idNumber:'210102200206302345', certStatus:'verified', verifyDate:'2025-09-03', wallet:[
+    { platform:'中金支付', status:'closed', balance:0, frozenBalance:0, walletDate:'-' },
+    { platform:'汇付天下', status:'closed', balance:0, frozenBalance:0, walletDate:'-' }
+  ], status:'active', regDate:'2025-09-01', collectionCount:1, assetCount:3, history:[
+    { action:'注册', type:'register', time:'2025-09-01 13:00:10', operator:'用户' },
+    { action:'实名认证', type:'verify', time:'2025-09-03 10:00:28', operator:'用户' },
+    { action:'冻结账户', type:'freeze', time:'2025-10-15 09:00:55', operator:'管理员A', remark:'涉嫌异常登录' },
+    { action:'解冻账户', type:'unfreeze', time:'2025-10-20 15:00:33', operator:'管理员A', remark:'核实无误，已解冻' }
+  ]},
+  { id: 'U008', name: '潮流先锋', realName: '郑十', phone: '13200158901', account: '13200158901', gender:'女', birthday:'1996-09-14', userType:'企业', idNumber:'914403001922038216', certStatus:'verified', verifyDate:'2025-10-03', wallet:[
+    { platform:'中金支付', status:'closed', balance:0, frozenBalance:0, walletDate:'-' },
+    { platform:'汇付天下', status:'open', balance:56000.00, frozenBalance:0, walletDate:'2025-10-05' }
+  ], status:'active', regDate:'2025-10-01', collectionCount:4, assetCount:18, history:[
+    { action:'注册', type:'register', time:'2025-10-01 10:00:05', operator:'用户' },
+    { action:'实名认证', type:'verify', time:'2025-10-03 11:00:40', operator:'用户' },
+    { action:'开通汇付支付钱包', type:'register', time:'2025-10-05 09:00:22', operator:'用户' }
+  ]}
+];
+
+function renderList() {
+  var keyword = (document.getElementById('searchInput').value || '').toLowerCase();
+  var filter = document.getElementById('statusFilter').value;
+  var list = users.filter(function(u) {
+    var match = !keyword || u.name.toLowerCase().includes(keyword) || u.phone.includes(keyword) || u.id.toLowerCase().includes(keyword) || u.realName.includes(keyword);
+    if (filter !== 'all') match = match && u.status === filter;
+    return match;
+  });
+  var tbody = document.getElementById('userTbody');
+  tbody.innerHTML = list.map(function(u) {
+    return '<tr>' +
+      '<td style="color:#667eea;font-weight:500">' + u.id + '</td>' +
+      '<td style="font-weight:600">' + u.name + '</td>' +
+      '<td>' + u.realName + '</td>' +
+      '<td>' + u.account + '</td>' +
+      '<td><span class="badge ' + (u.wallet.some(function(w){return w.status==='open'})?'badge-open':'badge-closed') + '">' + (u.wallet.some(function(w){return w.status==='open'})?'已开通':'未开通') + '</span></td>' +
+      '<td><span class="status-dot ' + u.status + '"></span><span class="badge badge-' + u.status + '">' + (u.status==='active'?'正常':'已冻结') + '</span></td>' +
+      '<td><span class="badge ' + (u.certStatus==='verified'?'badge-active':'badge-frozen') + '">' + (u.certStatus==='verified'?'已认证':'未认证') + '</span></td>' +
+      '<td style="font-size:12px;color:#999">' + u.regDate + '</td>' +
+      '<td><button class="btn btn-info" onclick="openDetail(\'' + u.id + '\')">详情</button> ' + (u.status==='active' ? '<button class="btn btn-warn" onclick="toggleFreeze(\'' + u.id + '\',true)">冻结</button>' : '<button class="btn btn-success" onclick="toggleFreeze(\'' + u.id + '\',false)">解冻</button>') + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+function openDetail(id) {
+  var u = users.find(function(u) { return u.id === id; });
+  if (!u) return;
+  var h = '';
+
+  // 用户信息
+  h += '<div class="info-section"><div class="info-section-title">用户信息</div>';
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 32px">';
+  h += '<div class="info-row"><span class="info-label">用户编号</span><span class="info-value">' + u.id + '</span></div>';
+  h += '<div class="info-row"><span class="info-label">用户姓名</span><span class="info-value">' + u.realName + '</span></div>';
+  h += '<div class="info-row"><span class="info-label">用户账号</span><span class="info-value">' + u.account + '</span></div>';
+  h += '<div class="info-row"><span class="info-label">用户昵称</span><span class="info-value">' + u.name + '</span></div>';
+  h += '<div class="info-row"><span class="info-label">性别</span><span class="info-value">' + u.gender + '</span></div>';
+  h += '<div class="info-row"><span class="info-label">出生日期</span><span class="info-value">' + u.birthday + '</span></div>';
+  h += '<div class="info-row"><span class="info-label">类型</span><span class="info-value">' + u.userType + '</span></div>';
+  h += '<div class="info-row"><span class="info-label">证件号码</span><span class="info-value">' + u.idNumber + '</span></div>';
+  h += '<div class="info-row"><span class="info-label">注册时间</span><span class="info-value">' + u.regDate + '</span></div>';
+  h += '<div class="info-row"><span class="info-label">认证时间</span><span class="info-value">' + u.verifyDate + '</span></div>';
+  h += '<div class="info-row"><span class="info-label">认证状态</span><span class="info-value"><span class="badge ' + (u.certStatus==='verified'?'badge-active':'badge-frozen') + '">' + (u.certStatus==='verified'?'已认证':'未认证') + '</span></span></div>';
+  h += '<div class="info-row"><span class="info-label">账户状态</span><span class="info-value"><span class="badge badge-' + u.status + '">' + (u.status==='active'?'正常':'已冻结') + '</span></span></div>';
+  h += '</div></div>';
+
+  // 支付钱包 - 两行
+  h += '<div class="info-section"><div class="info-section-title">支付钱包</div>';
+  u.wallet.forEach(function(w) {
+    var isOpen = w.status === 'open';
+    h += '<div style="background:#f8fafc;border-radius:10px;padding:14px 16px;margin-bottom:8px">';
+    h += '<div style="font-size:14px;font-weight:600;color:#1a1a2e;margin-bottom:10px">' + w.platform + '</div>';
+    h += '<div style="display:flex;gap:24px;flex-wrap:wrap">';
+    h += '<div><span style="font-size:11px;color:#999">状态</span><span class="badge ' + (isOpen?'badge-open':'badge-closed') + '" style="margin-left:8px">' + (isOpen?'已开通':'未开通') + '</span></div>';
+    h += '<div><span style="font-size:11px;color:#999">开通时间</span><span style="margin-left:8px;font-size:13px;color:#333">' + w.walletDate + '</span></div>';
+    h += '<div><span style="font-size:11px;color:#999">可用余额</span><span style="margin-left:8px;font-size:14px;font-weight:700;color:#52c41a">¥' + w.balance.toLocaleString('zh-CN',{minimumFractionDigits:2}) + '</span></div>';
+    h += '<div><span style="font-size:11px;color:#999">冻结余额</span><span style="margin-left:8px;font-size:14px;font-weight:700;color:#fa8c16">¥' + w.frozenBalance.toLocaleString('zh-CN',{minimumFractionDigits:2}) + '</span></div>';
+    h += '</div></div>';
+  });
+  h += '</div>';
+
+  // 资产概况
+  h += '<div class="info-section"><div class="info-section-title">资产概况</div>';
+  h += '<div style="display:flex;gap:16px">';
+  h += '<div style="flex:1;text-align:center;padding:16px;background:#f8fafc;border-radius:10px"><div style="font-size:11px;color:#999;margin-bottom:4px">数字资产合集数量</div><div style="font-size:18px;font-weight:700;color:#667eea">' + (u.collectionCount||0) + '</div></div>';
+  h += '<div style="flex:1;text-align:center;padding:16px;background:#f8fafc;border-radius:10px"><div style="font-size:11px;color:#999;margin-bottom:4px">数字资产数量</div><div style="font-size:18px;font-weight:700;color:#1890ff">' + (u.assetCount||0) + '</div></div>';
+  h += '</div></div>';
+
+  // 操作记录
+  h += '<div class="info-section"><div class="info-section-title">操作记录</div><div class="history-list">';
+  u.history.slice().reverse().forEach(function(his) {
+    h += '<div class="history-item"><div class="history-dot ' + his.type + '"></div>';
+    h += '<div class="history-content"><div style="display:flex;align-items:center;gap:10px">';
+    h += '<div class="history-action">' + his.action + '</div>';
+    h += '<span style="font-size:11px;color:#999;white-space:nowrap">' + (his.operator||'') + '</span>';
+    if (his.remark) h += '<span style="font-size:11px;color:#888;white-space:nowrap">' + his.remark + '</span>';
+    h += '<div style="flex:1"></div><span style="font-size:11px;color:#bbb;white-space:nowrap">' + his.time + '</span>';
+    h += '</div></div></div>';
+  });
+  h += '</div></div>';
+
+  document.getElementById('detailContent').innerHTML = h;
+  document.getElementById('detailModal').classList.add('show');
+}
+
+function closeDetailModal() { document.getElementById('detailModal').classList.remove('show'); }
+
+function toggleFreeze(id, freeze) {
+  var u = users.find(function(u) { return u.id === id; });
+  if (!u) return;
+  u.status = freeze ? 'frozen' : 'active';
+  u.history.push({
+    action: freeze ? '冻结账户' : '解冻账户',
+    type: freeze ? 'freeze' : 'unfreeze',
+    time: new Date().toISOString().substring(0,19).replace('T',' '),
+    operator: '管理员A',
+    remark: freeze ? '临时冻结调查' : '已核实解冻'
+  });
+  renderList();
+  showToast(freeze ? '已冻结' : '已解冻', 'success');
+}
+
+function navigateTo(url) { window.location.href = url; }
+function showToast(msg, type) {
+  var t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function() { t.remove(); }, 2000);
+}
+
+renderList();
+</script>
+</body>
+</html>

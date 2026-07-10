@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>绍兴数资</title>
+<style>
+:root{
+  --accent:#3F8B6D;--accent-contrast:#fff;--link:#3F8B6D;--muted:#a0a0a0;
+  --bg:#fff;--ink:#222;--ink-muted:#555;--ink-subtle:#888;
+  --border:#e0e0e0;--page-bg:#F0F0F0;
+  --radius-sm:7px;--radius-card:7px;--radius-pill:9999px;
+  --font-display:"Helvetica Neue",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+  --font-body:"Inter",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+}
+html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-muted);display:flex;justify-content:center;min-height:100%}
+.page{max-width:430px;width:100%;min-height:100vh;background:var(--page-bg);padding:16px;padding-bottom:80px;position:relative;box-sizing:border-box}
+@media(max-width:430px){.page{max-width:100%}}
+
+/* ── 顶部 ── */
+.header{display:flex;justify-content:space-between;align-items:center}
+.logo{height:32px;width:auto}
+.logo-text{font-size:15px;font-weight:700;color:var(--ink);margin-left:6px;white-space:nowrap;font-family:var(--font-display)}
+.header-icons{display:flex;gap:16px}
+.header-icons .hi{width:22px;height:22px;color:var(--ink-subtle);cursor:pointer;transition:transform .15s}
+.header-icons .hi:active{transform:scale(.8)}
+.header-icons .hi svg{display:block;width:100%;height:100%}
+
+/* ── 用户卡 ── */
+.user-card{margin-top:16px;background:linear-gradient(135deg,#3F8B6D,#2d6b53);border-radius:var(--radius-card);padding:20px;color:var(--accent-contrast);display:flex;justify-content:space-between;align-items:center;animation:fadeUp .4s ease-out}
+.user-left{display:flex;align-items:center;gap:14px;flex:1;min-width:0}
+.avatar{width:60px;height:60px;border-radius:50%;border:2px solid rgba(255,255,255,.25);object-fit:cover;display:block;flex-shrink:0}
+.user-left h2{font-size:17px;font-weight:700;margin:0 0 2px}
+.user-left p{font-size:10px;margin:0;opacity:.55;display:flex;align-items:center;gap:3px;cursor:pointer}
+.user-left p svg{width:11px;height:11px;opacity:.7}
+.verify-btn{height:40px;padding:0 18px;border:none;border-radius:var(--radius-pill);background:rgba(255,255,255,.25);color:#fff;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;letter-spacing:.5px;transition:background .2s}
+.verify-btn:active{background:rgba(255,255,255,.35)}
+
+/* ── Banner 轮播 ── */
+.banner-wrap{margin-top:16px;border-radius:var(--radius-card);overflow:hidden;position:relative;animation:fadeUp .4s ease-out .08s both}
+.banner-slider{display:flex;transition:transform .35s cubic-bezier(.4,0,.2,1)}
+.banner-slider img{width:100%;flex-shrink:0;display:block;border-radius:var(--radius-card)}
+.banner-dots{display:flex;justify-content:center;gap:4px;padding:8px 0 0}
+.banner-dots span{width:5px;height:5px;border-radius:50%;background:#ddd;transition:all .3s;cursor:pointer}
+.banner-dots span.on{width:18px;border-radius:3px;background:var(--accent)}
+
+/* ── 区块标题 ── */
+.section{margin-top:24px;animation:fadeUp .4s ease-out .16s both}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.section-title span{font-size:17px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px}
+.section-title span::before{content:'';display:inline-block;width:3px;height:16px;background:var(--accent);border-radius:2px}
+.section-title a{font-size:12px;color:var(--ink-subtle);cursor:pointer;padding:4px 0;transition:color .2s}
+.section-title a:active{color:var(--accent)}
+
+/* ── 数字资产市场（2列网格） ── */
+.goods-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.goods-card{background:var(--bg);border-radius:var(--radius-card);overflow:hidden;cursor:pointer;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:transform .2s,box-shadow .2s}
+.goods-card:active{transform:scale(.96);box-shadow:0 4px 14px rgba(0,0,0,.1)}
+.goods-img{width:100%;height:130px;background-position:center;background-size:cover;position:relative}
+.goods-card h4{font-size:13px;font-weight:600;padding:10px 12px 0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+.goods-card .tags{padding:0 12px;margin-top:4px;display:flex;gap:4px;flex-wrap:wrap}
+.goods-card .tags span{display:inline-block;font-size:9px;padding:2px 8px;border-radius:4px;font-weight:500}
+.t-sale-all{color:#2980b9;background:#E8F4FD}
+.t-sale-prior{color:#f0ad4e;background:#FFF8EC}
+.t-sale-lottery{color:#6c5ce7;background:#F3F0FF}
+.goods-card .price{color:var(--accent);font-size:22px;font-weight:700;padding:4px 12px 0}
+.goods-card .price small{font-size:11px;font-weight:400;color:var(--ink-subtle)}
+.goods-card .sold{color:var(--ink-subtle);font-size:10px;padding:0 12px 12px}
+.goods-card .issuer{color:var(--ink-subtle);font-size:10px;padding:2px 12px 0}
+
+/* ── 底部TabBar ── */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:64px;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:space-between;padding:0 16px;padding-bottom:env(safe-area-inset-bottom,4px);z-index:100;box-sizing:border-box}
+.bnav .ni{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border:none;background:none;padding:4px 10px;font-size:10px;color:var(--ink-subtle);transition:color .2s}
+.bnav .ni .ico{width:22px;height:22px;transition:transform .15s}
+.bnav .ni .ico svg{display:block;width:100%;height:100%}
+.bnav .ni:active .ico{transform:scale(.8)}
+.bnav .ni.on{color:var(--accent)}
+.bnav .ni.on .ico{transform:scale(1.05)}
+.bnav .ni span:last-child{font-size:10px;display:block}
+
+/* ── 发售日历 ── */
+.calendar-wrap{background:var(--bg);border-radius:var(--radius-card);padding:10px 14px 6px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.cal-day-block{margin-bottom:6px}
+.cal-day-block:last-child{margin-bottom:0}
+.cal-day-hdr{font-size:12px;font-weight:700;color:var(--ink);padding:4px 0 6px;display:flex;align-items:center;gap:6px}
+.cal-day-hdr::before{content:'';width:14px;height:14px;border-radius:50%;border:3px solid var(--accent);background:var(--bg);flex-shrink:0}
+.cal-day-hdr::after{content:'';flex:1;height:1px;background:#e8e8e8;margin-left:0}
+.cal-prod{padding:6px 0 6px 8px;border-left:2px solid #eee;margin-left:6px;cursor:pointer;transition:background .12s}
+.cal-day-block:last-child .cal-prod:last-child{border-left-color:transparent}
+.cal-prod:active{background:#fafafa}
+.cal-prod-time-top{font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px;padding:2px 8px;background:rgba(63,139,109,.15);border-radius:4px;display:inline-block}
+.cal-prod-row{display:flex;align-items:center;gap:10px}
+.cal-prod-img{width:44px;height:54px;border-radius:var(--radius-sm);background-position:center;background-size:cover;flex-shrink:0}
+.cal-prod-info{flex:1;min-width:0}
+.cal-prod-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cal-prod-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:2px}
+.cal-prod-tags span{font-size:9px;padding:1px 6px;border-radius:3px;font-weight:500}
+.cal-prod-price{font-size:15px;font-weight:700;color:var(--accent);flex-shrink:0}
+.cal-prod-price small{font-size:10px;font-weight:400;color:var(--ink-subtle)}
+
+/* ── 发售日历弹窗 ── */
+.cal-modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.cal-modal-mask.show{opacity:1;pointer-events:auto}
+.cal-modal{width:100%;max-width:430px;max-height:75vh;background:var(--page-bg);border-radius:var(--radius-card) var(--radius-card) 0 0;overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1)}
+.cal-modal-mask.show .cal-modal{transform:translateY(0)}
+.cal-modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;background:var(--bg);border-radius:var(--radius-card) var(--radius-card) 0 0;position:sticky;top:0;z-index:2}
+.cal-modal-hdr h3{font-size:17px;font-weight:700;color:var(--ink)}
+.cal-modal-close{width:32px;height:32px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.cal-modal-close svg{width:18px;height:18px;color:var(--ink-subtle)}
+.cal-modal-body{padding:12px 16px 20px}
+.cal-day-group{margin-bottom:16px}
+.cal-day-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px;padding-left:6px;display:flex;align-items:center;gap:8px}
+.cal-day-title::before{content:'';width:4px;height:16px;background:var(--accent);border-radius:2px;flex-shrink:0}
+.cal-modal-item{display:flex;gap:12px;background:var(--bg);border-radius:var(--radius-card);padding:12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.04);cursor:pointer;transition:transform .15s}
+.cal-modal-item:active{transform:scale(.98)}
+.cal-modal-item .cmi-img{width:60px;height:74px;border-radius:var(--radius-sm);background-position:center;background-size:cover;flex-shrink:0}
+.cal-modal-item .cmi-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.cal-modal-item .cmi-info .cmi-name{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.cal-modal-item .cmi-info .cmi-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px}
+.cal-modal-item .cmi-info .cmi-meta .cmi-badge{font-size:9px;padding:2px 6px;border-radius:3px;color:#fff;font-weight:500;background:var(--accent)}
+.cal-modal-item .cmi-info .cmi-meta .cmi-limit{font-size:10px;color:var(--ink-subtle)}
+.cal-modal-item .cmi-info .cmi-time-top{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:3px;padding:1px 8px;background:rgba(63,139,109,.15);border-radius:4px;display:inline-block}
+.cal-modal-item .cmi-price{font-size:16px;font-weight:700;color:var(--accent);flex-shrink:0;align-self:center}
+.cal-modal-item .cmi-price small{font-size:10px;font-weight:400;color:var(--ink-subtle)}
+.cal-status-open{font-size:10px;color:var(--accent);font-weight:600;margin-top:3px}
+
+/* ── 动画 ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- 顶部 -->
+  <header class="header">
+    <img class="logo" src="asset/logo.png" alt="文交所"><span class="logo-text">绍兴数资</span>
+    <div class="header-icons">
+      <span class="hi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><line x1="15" y1="15" x2="21" y2="21"/></svg></span>
+      <span class="hi" onclick="window.location.href='messages.html'" style="position:relative"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span style="position:absolute;top:-4px;right:-4px;width:8px;height:8px;border-radius:50%;background:#3F8B6D;border:1.5px solid #F0F0F0"></span></span>
+    </div>
+  </header>
+
+  <!-- 回到目录按钮 -->
+  <a href="index.html" style="position:fixed;top:12px;right:12px;z-index:9999;background:rgba(0,0,0,.5);color:rgba(255,255,255,.7);padding:6px 12px;border-radius:16px;font-size:12px;text-decoration:none;backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.12)">📁 目录</a>
+
+  <!-- 用户卡 -->
+  <section class="user-card">
+    <div class="user-left">
+      <img src="头像.jpg" class="avatar">
+      <div>
+        <h2>兰亭泼墨人</h2>
+        <p onclick="copyWallet(event)">0x7a3e...b9c1d <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></p>
+      </div>
+    </div>
+    <button class="verify-btn">白银用户</button>
+  </section>
+
+  <!-- Banner 轮播 -->
+  <div class="banner-wrap" id="bannerWrap">
+    <div class="banner-slider" id="bannerSlider">
+      <img src="asset/banner.png" alt="banner1">
+      <img src="asset/banner1.png" alt="banner2">
+    </div>
+    <div class="banner-dots" id="bannerDots">
+      <span class="on"></span>
+      <span></span>
+    </div>
+  </div>
+
+  <!-- 发售日历 -->
+  <section class="section" style="animation:fadeUp .4s ease-out .18s both">
+    <div class="section-title">
+      <span>发售日历</span>
+      <a onclick="showCalendarModal()">查看全部</a>
+    </div>
+    <div class="calendar-wrap" id="calendarPreview"></div>
+  </section>
+
+  <!-- 数字资产市场 -->
+  <section class="section">
+    <div class="section-title">
+      <span>数字资产市场</span>
+      <a onclick="window.location.href='asset_market.html'">查看全部</a>
+    </div>
+    <div class="goods-grid">
+      <div class="goods-card">
+        <div class="goods-img" style="background-image:url('asset/兰亭碑刻封面图.png')"></div>
+        <h4>兰亭碑刻·数字藏品</h4>
+        <div class="tags"><span class="t-sale-prior">优先购</span></div>
+        <div class="issuer">发行方：绍兴兰亭产业数资</div>
+        <div class="price">¥299</div>
+        <div class="sold">已售 128</div>
+      </div>
+      <div class="goods-card">
+        <div class="goods-img" style="background-image:url('asset/兰亭春禊封面图.png')"></div>
+        <h4>兰亭春禊·数字藏品</h4>
+        <div class="tags"><span class="t-sale-all">全民购</span></div>
+        <div class="issuer">发行方：绍兴兰亭产业数资</div>
+        <div class="price">¥199</div>
+        <div class="sold">已售 256</div>
+      </div>
+      <div class="goods-card">
+        <div class="goods-img" style="background-image:url('asset/兰亭雅集产品图.png')"></div>
+        <h4>兰亭雅集·数字藏品</h4>
+        <div class="tags"><span class="t-sale-lottery">抽签购</span></div>
+        <div class="issuer">发行方：绍兴兰亭产业数资</div>
+        <div class="price">¥399</div>
+        <div class="sold">已售 67</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- 底部TabBar -->
+<div class="bnav">
+  <button class="ni on">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+    <span>首页</span>
+  </button>
+  <button class="ni">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="currentColor"/></svg></span>
+    <span>发现</span>
+  </button>
+  <button class="ni" onclick="window.location.href='my_assets.html'">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 16 7 12 15 8 7 12 2"/><line x1="12" y1="15" x2="12" y2="22"/><line x1="8" y1="19" x2="16" y2="19"/></svg></span>
+    <span>资产</span>
+  </button>
+  <button class="ni" onclick="window.location.href='asset_market.html'">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><line x1="6" y1="16" x2="6" y2="20"/><line x1="10" y1="12" x2="10" y2="20"/><line x1="14" y1="8" x2="14" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/></svg></span>
+    <span>市场</span>
+  </button>
+  <button class="ni" onclick="window.location.href='my.html'">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+    <span>我的</span>
+  </button>
+</div>
+
+<!-- 发售日历弹窗 -->
+<div class="cal-modal-mask" id="calendarModal" onclick="closeCalendar(event)">
+  <div class="cal-modal" onclick="event.stopPropagation()">
+    <div class="cal-modal-hdr">
+      <h3>发售日历</h3>
+      <div class="cal-modal-close" onclick="closeCalendar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div class="cal-modal-body" id="calendarFull"></div>
+  </div>
+</div>
+
+<script>
+// ═══ 发售日历数据 ═══
+var calendarData = [
+  { date:'05月11日', time:'10:00', name:'兰亭碑刻·数字藏品', img:'asset/兰亭碑刻封面图.png', cat:'tour', catLabel:'文旅', sale:'优先购', saleCls:'t-sale-prior', limit:'限量888份', price:'¥299', status:'优先购' },
+  { date:'05月11日', time:'14:00', name:'兰亭春禊·数字藏品', img:'asset/兰亭春禊封面图.png', cat:'tour', catLabel:'文旅', sale:'全民购', saleCls:'t-sale-all', limit:'限量2000份', price:'¥199', status:'全民购' },
+  { date:'05月12日', time:'10:00', name:'兰亭雅集·数字藏品', img:'asset/兰亭雅集封面图.png', cat:'tour', catLabel:'文旅', sale:'抽签购', saleCls:'t-sale-lottery', limit:'限量666份', price:'¥399', status:'抽签购' }
+];
+
+var catBadgeCls = { food:'ba-food', ent:'ba-ent', tour:'ba-tour' };
+
+// ═══ 首页预览（时间线样式，最多2条） ═══
+function renderCalendarPreview(){
+  var list = calendarData.slice(0, 2);
+  var grouped = {};
+  list.forEach(function(item){
+    if(!grouped[item.date]) grouped[item.date] = [];
+    grouped[item.date].push(item);
+  });
+  var html = '';
+  Object.keys(grouped).forEach(function(date){
+    html += '<div class="cal-day-block">';
+    html +=   '<div class="cal-day-hdr">'+date+'</div>';
+    grouped[date].forEach(function(item){
+      html +=
+        '<div class="cal-prod" onclick="showCalendarModal()">'+
+          '<div class="cal-prod-time-top">'+item.time+'</div>'+
+          '<div class="cal-prod-row">'+
+          '<div class="cal-prod-img" style="background-image:url(\''+item.img+'\')"></div>'+
+          '<div class="cal-prod-info">'+
+            '<div class="cal-prod-name">'+item.name+'</div>'+
+            '<div class="cal-prod-tags">'+
+              '<span class="'+item.saleCls+'">'+item.sale+'</span>'+
+              '<span style="color:var(--ink-subtle);background:#f0f0f0">'+item.limit+'</span>'+
+            '</div>'+
+          '</div>'+
+          '<div class="cal-prod-price">'+item.price+'</div>'+
+          '</div>'+
+        '</div>';
+    });
+    html += '</div>';
+  });
+  document.getElementById('calendarPreview').innerHTML = html;
+}
+
+// ═══ 弹窗完整列表 ═══
+function renderCalendarFull(){
+  var grouped = {};
+  calendarData.forEach(function(item){
+    if(!grouped[item.date]) grouped[item.date] = [];
+    grouped[item.date].push(item);
+  });
+  var html = '';
+  Object.keys(grouped).forEach(function(date){
+    html += '<div class="cal-day-group"><div class="cal-day-title">'+date+'</div>';
+    grouped[date].forEach(function(item){
+      html +=
+        '<div class="cal-modal-item">'+
+          '<div class="cmi-img" style="background-image:url(\''+item.img+'\')"></div>'+
+          '<div class="cmi-info">'+
+            '<div class="cmi-time-top">'+item.time+'</div>'+
+            '<div class="cmi-name">'+item.name+'</div>'+
+            '<div class="cmi-meta">'+
+              '<span class="cmi-badge ba-tour">文旅</span>'+
+              '<span class="cmi-limit">'+item.limit+'</span>'+
+            '</div>'+
+            '<div class="cal-status-open">'+item.status+'</div>'+
+          '</div>'+
+          '<div class="cmi-price">'+item.price+'</div>'+
+        '</div>';
+    });
+    html += '</div>';
+  });
+  document.getElementById('calendarFull').innerHTML = html;
+}
+
+function showCalendarModal(){
+  renderCalendarFull();
+  document.getElementById('calendarModal').classList.add('show');
+}
+function closeCalendar(e){
+  if(e && e.target !== document.getElementById('calendarModal')) return;
+  document.getElementById('calendarModal').classList.remove('show');
+}
+
+// ═══ Banner 自动轮播 ═══
+(function(){
+  var slider = document.getElementById('bannerSlider');
+  var dots = document.querySelectorAll('#bannerDots span');
+  var idx = 0, total = 2;
+  setInterval(function(){
+    idx = (idx + 1) % total;
+    slider.style.transform = 'translateX(-' + (idx * 100) + '%)';
+    dots.forEach(function(d,i){ d.className = i === idx ? 'on' : ''; });
+  }, 4000);
+  dots.forEach(function(d,i){
+    d.addEventListener('click',function(){
+      idx = i;
+      slider.style.transform = 'translateX(-' + (idx * 100) + '%)';
+      dots.forEach(function(dd,j){ dd.className = j === idx ? 'on' : ''; });
+    });
+  });
+})();
+
+renderCalendarPreview();
+</script>
+
+<script>
+function copyWallet(e){e.stopPropagation();
+  navigator.clipboard.writeText('0x7a3e8f2b1c9d5e6a4f3d2c1b0a9e8f7d').then(function(){alert('钱包地址已复制')}).catch(function(){prompt('复制：','0x7a3e8f2b1c9d5e6a4f3d2c1b0a9e8f7d')});
+}
+</script>
+
+</body>
+</html>

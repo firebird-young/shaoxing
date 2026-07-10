@@ -1,0 +1,212 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>选择规格</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; justify-content: center; }
+.page { max-width: 430px; min-height: 100vh; background: #f6f7fb; padding-bottom: 100px; position: relative; }
+@media(max-width:430px) { .page { max-width: 100%; } }
+
+.nav-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #fff; }
+.nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.nav-back svg { width: 20px; height: 20px; color: #333; display: block; }
+.nav-title { flex: 1; text-align: center; font-size: 16px; font-weight: 600; color: #1a1a2e; }
+.nav-placeholder { width: 32px; }
+
+.series-card { margin: 12px 16px; background: linear-gradient(135deg, #1a1a2e, #2d1f1f); border-radius: 16px; padding: 16px; display: flex; gap: 12px; }
+.series-img { width: 72px; height: 88px; border-radius: 10px; background-position: center; background-size: cover; flex-shrink: 0; background-color: rgba(255,255,255,0.05); }
+.series-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+.series-name { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.series-desc { font-size: 11px; color: rgba(255,255,255,0.5); }
+.series-tag { display: inline-block; font-size: 10px; padding: 2px 10px; border-radius: 20px; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); margin-top: 6px; }
+
+.section-card { margin: 12px 16px; background: #fff; border-radius: 16px; padding: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
+.sec-title { font-size: 14px; font-weight: 700; color: #1a1a2e; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.sec-title::before { content: ''; width: 3px; height: 14px; background: #D70C1F; border-radius: 2px; }
+.sec-sub { font-size: 11px; color: #999; font-weight: 400; margin-left: 4px; }
+
+.spec-list { display: flex; flex-direction: column; gap: 8px; }
+.spec-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1.5px solid #f0f0f0; border-radius: 12px; cursor: pointer; transition: all 0.2s; position: relative; }
+.spec-item:active { background: #fafafa; }
+.spec-item.selected { border-color: #D70C1F; background: #FFF9F9; }
+.spec-item.sold-out { opacity: .5; cursor: not-allowed; background: #f9f9f9; }
+.spec-item.sold-out:active { background: #f9f9f9; }
+.spec-item.sold-out .spec-price { color: #bbb; }
+.spec-sold-tag { position: absolute; top: 8px; right: 8px; font-size: 9px; padding: 2px 8px; border-radius: 4px; background: #eee; color: #999; font-weight: 600; }
+.spec-img { width: 48px; height: 58px; border-radius: 8px; background-position: center; background-size: cover; flex-shrink: 0; background-color: #f5f5f7; }
+.spec-info { flex: 1; min-width: 0; }
+.spec-name { font-size: 13px; font-weight: 600; color: #1a1a2e; margin-bottom: 3px; }
+.spec-benefits { display: flex; gap: 4px; flex-wrap: wrap; }
+.spec-bf { font-size: 9px; padding: 1px 6px; border-radius: 3px; background: #f5f5f7; color: #888; }
+.spec-price { font-size: 16px; font-weight: 700; color: #D70C1F; flex-shrink: 0; }
+.spec-check { width: 20px; height: 20px; border: 2px solid #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.spec-item.selected .spec-check { border-color: #D70C1F; background: #D70C1F; }
+.spec-check svg { width: 12px; height: 12px; color: #fff; display: none; }
+.spec-item.selected .spec-check svg { display: block; }
+
+.quantity-row { display: flex; align-items: center; justify-content: space-between; }
+.quantity-label { font-size: 14px; color: #666; }
+.quantity-ctrl { display: flex; align-items: center; border: 1px solid #e8e8ec; border-radius: 8px; overflow: hidden; }
+.quantity-ctrl button { width: 36px; height: 36px; border: none; background: #f5f5f7; font-size: 18px; color: #666; cursor: pointer; }
+.quantity-ctrl button:active { background: #e8e8ec; }
+.quantity-ctrl button:disabled { color: #ccc; cursor: not-allowed; }
+.quantity-ctrl input { width: 50px; height: 36px; border: none; border-left: 1px solid #e8e8ec; border-right: 1px solid #e8e8ec; text-align: center; font-size: 15px; font-weight: 600; color: #1a1a2e; outline: none; }
+
+.bottom-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); padding: 12px 16px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 4px)); z-index: 100; display: flex; align-items: center; justify-content: space-between; }
+.bottom-left { display: flex; flex-direction: column; gap: 2px; }
+.total-price { display: flex; align-items: baseline; gap: 4px; }
+.total-label { font-size: 13px; color: #666; }
+.total-value { font-size: 22px; font-weight: 700; color: #D70C1F; }
+.total-value small { font-size: 13px; }
+.stock-warn { font-size: 11px; color: #D70C1F; }
+.btn-submit { height: 44px; padding: 0 32px; border: none; border-radius: 22px; background: #D70C1F; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
+.btn-submit:active { opacity: 0.9; }
+.btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+
+.toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(0,0,0,.78); color: #fff; font-size: 14px; padding: 12px 24px; border-radius: 8px; z-index: 200; opacity: 0; pointer-events: none; transition: opacity .25s; white-space: nowrap; }
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="nav-bar">
+  <div class="nav-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </div>
+  <div class="nav-title">选择规格</div>
+  <div class="nav-placeholder"></div>
+</div>
+
+<div class="series-card">
+  <div class="series-img" id="seriesImg" style="background-image:url('茅台1935.png')"></div>
+  <div class="series-info">
+    <div class="series-name">1935·时光窖藏</div>
+    <div class="series-desc">茅台经典系列数字资产</div>
+
+  </div>
+</div>
+
+<div class="section-card">
+  <div class="sec-title">选择规格<span class="sec-sub">不同规格对应不同权益</span></div>
+  <div class="spec-list" id="specList"></div>
+</div>
+
+<div class="section-card">
+  <div class="sec-title">购买数量</div>
+  <div class="quantity-row">
+    <span class="quantity-label">数量</span>
+    <div class="quantity-ctrl">
+      <button onclick="changeQty(-1)" id="btnMinus">−</button>
+      <input type="number" value="1" min="1" max="10" id="qtyInput" readonly>
+      <button onclick="changeQty(1)" id="btnPlus">+</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="bottom-bar">
+  <div class="bottom-left">
+    <div class="total-price">
+      <span class="total-label">合计：</span>
+      <span class="total-value"><small>¥</small><span id="totalPrice">599</span></span>
+    </div>
+    <div class="stock-warn" id="stockWarn" style="display:none"></div>
+  </div>
+  <button class="btn-submit" id="btnSubmit" onclick="goConfirm()">下一步</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var specs = [
+  { name:'凝时', img:'凝时.png', price:599, benefits:['实物酒兑换','超值优惠券'], stock:1 },
+  { name:'守岁', img:'守岁.png', price:699, benefits:['实物酒兑换','线下品鉴会资格'] },
+  { name:'溯年', img:'溯年.png', price:899, benefits:['实物酒兑换','超值优惠券','线下品鉴会资格'] },
+  { name:'沉光', img:'沉光.png', price:599, benefits:['实物酒兑换'] },
+  { name:'驻痕', img:'驻痕.png', price:799, benefits:['实物酒兑换','超值优惠券'], soldOut: true }
+];
+
+var selIdx = 0;
+var quantity = 1;
+
+function renderSpecs(){
+  var html = '';
+  specs.forEach(function(sp, i){
+    var sel = i === selIdx ? ' selected' : '';
+    var so  = sp.soldOut ? ' sold-out' : '';
+    var checked = i === selIdx && !sp.soldOut ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+    var tag = sp.soldOut ? '<span class="spec-sold-tag">售罄</span>' : '';
+    html +=
+      '<div class="spec-item'+sel+so+'" onclick="'+(sp.soldOut?'':'selectSpec('+i+')')+'">'+
+        '<div class="spec-img" style="background-image:url(\''+sp.img+'\')"></div>'+
+        '<div class="spec-info"><div class="spec-name">'+sp.name+'</div><div class="spec-benefits">'+sp.benefits.map(function(b){ return '<span class="spec-bf">'+b+'</span>'; }).join('')+'</div></div>'+
+        '<div class="spec-price">¥'+sp.price+'</div>'+
+        '<div class="spec-check">'+checked+'</div>'+
+        tag+
+      '</div>';
+  });
+  document.getElementById('specList').innerHTML = html;
+}
+
+function selectSpec(i){
+  var sp = specs[i];
+  if(sp.soldOut) return;
+  selIdx = i;
+  if(sp.stock && quantity > sp.stock) quantity = sp.stock;
+  document.getElementById('qtyInput').value = quantity;
+  document.getElementById('seriesImg').style.backgroundImage = 'url('+sp.img+')';
+  renderSpecs();
+  updateControls();
+}
+
+function updateTotal(){
+  document.getElementById('totalPrice').textContent = specs[selIdx].price * quantity;
+}
+
+function updateControls(){
+  var sp = specs[selIdx];
+  updateTotal();
+  // 有限购：允许加到stock+1触发toast；无限购：无上限
+  var btnMax = sp.stock ? sp.stock + 1 : 999;
+  document.getElementById('btnMinus').disabled = quantity <= 1;
+  document.getElementById('btnPlus').disabled = quantity >= btnMax || sp.soldOut;
+  document.getElementById('btnSubmit').disabled = sp.soldOut || (sp.stock && quantity > sp.stock);
+  document.getElementById('stockWarn').style.display = 'none';
+}
+
+function changeQty(delta){
+  var n = quantity + delta;
+  var sp = specs[selIdx];
+  if(n < 1) return;
+  if(sp.stock && n > sp.stock + 1) return;
+  if(sp.stock && n > sp.stock){ showToast('超出限购数或商品库存上限'); return; }
+  quantity = n;
+  document.getElementById('qtyInput').value = quantity;
+  updateControls();
+}
+
+function showToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('show'); void t.offsetWidth;
+  t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(function(){ t.classList.remove('show'); }, 2000);
+}
+
+function goConfirm(){
+  var sp = specs[selIdx];
+  if(sp.soldOut || (sp.stock && quantity > sp.stock)) return;
+  location.href = 'order_confirm.html?spec='+encodeURIComponent(sp.name)+'&img='+encodeURIComponent(sp.img)+'&price='+sp.price+'&qty='+quantity+'&bfs='+encodeURIComponent(sp.benefits.join(','))+'&series=1935·时光窖藏';
+}
+
+renderSpecs();
+selectSpec(0);
+</script>
+
+</body>
+</html>

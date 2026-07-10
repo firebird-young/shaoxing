@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title>主地图管理 - 元宇宙商城后台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f0f2f5; color: #333; }
+
+    .header { background: linear-gradient(135deg, #D70C1F, #F12B3D); color: #fff; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .header-title { font-size: 18px; font-weight: 600; }
+    .header-user { font-size: 14px; }
+
+    .main-container { display: flex; min-height: calc(100vh - 60px); }
+
+    .sidebar { width: 200px; background: #fff; border-right: 1px solid #e8e8e8; padding: 16px 0; }
+    .sidebar-group-title { padding: 8px 24px; font-size: 12px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .sidebar-item { padding: 10px 24px 10px 48px; font-size: 14px; color: #666; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+    .sidebar-item:hover { background: #f5f5f5; color: #D70C1F; }
+    .sidebar-item.active { background: rgba(215, 12, 31, 0.1); color: #D70C1F; font-weight: 600; }
+    .sidebar-item svg { width: 14px; height: 14px; }
+
+    .content { flex: 1; padding: 24px; overflow-y: auto; }
+    .content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .content-title { font-size: 18px; font-weight: 600; color: #1a1a2e; }
+
+    .btn { padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-primary { background: #D70C1F; color: #fff; }
+    .btn-primary:hover { background: #c60a1b; }
+    .btn-default { background: #fff; color: #666; border: 1px solid #ddd; }
+    .btn-default:hover { background: #f5f5f5; }
+    .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+    .card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .card-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #1a1a2e; display: flex; justify-content: space-between; align-items: center; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 14px; color: #666; margin-bottom: 8px; }
+    .form-input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .form-input:focus { border-color: #D70C1F; }
+    .form-select { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; outline: none; }
+
+    /* 图片上传 */
+    .upload-area { border: 2px dashed #ddd; border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .upload-area:hover { border-color: #D70C1F; background: rgba(215,12,31,.02); }
+    .upload-icon { width: 48px; height: 48px; margin: 0 auto 12px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .upload-icon svg { width: 24px; height: 24px; color: #999; }
+    .upload-text { font-size: 14px; color: #666; }
+    .upload-hint { font-size: 12px; color: #999; margin-top: 4px; }
+
+    /* 地图编辑器 */
+    .map-editor { position: relative; background: #f9f9f9; border-radius: 12px; overflow: hidden; }
+    .map-editor img { display: block; max-width: 100%; height: auto; }
+
+    .hotspot-box { position: absolute; border: 2px dashed #20bf6b; background: rgba(32,191,107,.1); cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; }
+    .hotspot-box:hover { border-style: solid; background: rgba(32,191,107,.18); }
+    .hotspot-box.drawing { border-style: solid; border-color: #26de81; background: rgba(38,222,129,.2); }
+    .hotspot-box.deco { border: none; background: none; overflow: visible; }
+    .hotspot-box.deco:hover { border: 1px dashed #f0ad4e; background: rgba(240,173,78,.05); }
+    .hotspot-box.deco img { display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+    .hotspot-box.start { border: 2px dashed #667eea; background: rgba(102,126,234,.08); border-radius: 50%; }
+    .hotspot-box.start:hover { border-style: solid; background: rgba(102,126,234,.15); }
+    .hotspot-box.start .hotspot-box-label { border-radius: 50%; padding: 4px 8px; }
+    .hotspot-box-label { background: rgba(0,0,0,.8); color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; pointer-events: none; text-align: center; }
+
+    /* 热区类型切换 */
+    .type-toggle { display: flex; gap: 0; margin-bottom: 16px; }
+    .type-btn { flex: 1; padding: 10px 16px; font-size: 14px; border: 1px solid #ddd; background: #fff; cursor: pointer; text-align: center; transition: all 0.2s; }
+    .type-btn:first-child { border-radius: 6px 0 0 6px; }
+    .type-btn:last-child { border-radius: 0 6px 6px 0; }
+    .type-btn.active { background: #D70C1F; color: #fff; border-color: #D70C1F; }
+    .type-btn:hover:not(.active) { background: #f5f5f5; }
+
+    /* 装饰热区上传 */
+    .deco-upload { border: 2px dashed #ddd; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; }
+    .deco-upload:hover { border-color: #f0ad4e; background: rgba(240,173,78,.03); }
+    .deco-upload.has-img { padding: 8px; }
+    .deco-upload img { max-width: 100%; max-height: 120px; border-radius: 4px; }
+    .deco-upload-text { font-size: 14px; color: #999; }
+    .deco-field { display: none; }
+    .deco-field.show { display: block; }
+    .deco-param { display: none; }
+    .deco-param.show { display: block; }
+    .jump-field { display: none; }
+    .jump-field.show { display: block; }
+
+    /* 列表中类型标记 */
+    .hi-type-badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
+    .hi-type-badge.jump { background: rgba(32,191,107,.12); color: #20bf6b; }
+    .hi-type-badge.deco { background: rgba(240,173,78,.12); color: #e6a23c; }
+    .hi-type-badge.start { background: rgba(102,126,234,.12); color: #667eea; }
+    .hi-deco-thumb { width: 40px; height: 40px; border-radius: 4px; object-fit: contain; background: #f5f5f5; }
+
+    .hotspot-list { margin-top: 8px; }
+    .hotspot-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #f9f9f9; border-radius: 8px; margin-bottom: 8px; }
+    .hi-info { flex: 1; }
+    .hi-name { font-size: 14px; font-weight: 600; color: #333; }
+    .hi-target { font-size: 12px; color: #D70C1F; margin-top: 2px; }
+    .hi-pos { font-size: 11px; color: #999; margin-top: 4px; }
+    .hi-actions { display: flex; gap: 8px; }
+    .hi-btn { padding: 6px 12px; font-size: 12px; border-radius: 4px; border: none; cursor: pointer; }
+    .hi-btn.edit { background: #f5f5f5; color: #666; }
+    .hi-btn.delete { background: #fff5f5; color: #D70C1F; }
+
+    /* 两列分类布局 */
+    .hi-columns { display: flex; gap: 20px; }
+    .hi-column { flex: 1; min-width: 0; }
+    .hi-col-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #eee; display: flex; align-items: center; gap: 6px; }
+    .hi-col-title.jump { border-color: rgba(32,191,107,.3); color: #20bf6b; }
+    .hi-col-title.deco { border-color: rgba(240,173,78,.3); color: #e6a23c; }
+    .hi-col-title.start { border-color: rgba(102,126,234,.3); color: #667eea; }
+    .hi-col-count { font-size: 12px; font-weight: 400; color: #999; margin-left: auto; }
+    .hi-col-empty { padding: 30px 0; text-align: center; color: #ccc; font-size: 13px; }
+
+    /* 模态框 */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal-overlay.show { display: flex; }
+    .modal-box { background: #fff; border-radius: 16px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #f0f0f0; }
+    .modal-title { font-size: 16px; font-weight: 600; }
+    .modal-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; }
+    .modal-close:hover { background: #e8e8e8; }
+    .modal-body { padding: 20px; }
+    .modal-footer { padding: 16px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px; }
+
+    .empty-state { padding: 60px 0; text-align: center; }
+    .empty-icon svg { width: 32px; height: 32px; color: #ccc; }
+    .empty-text { font-size: 14px; color: #999; margin-top: 8px; }
+
+    .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); padding: 12px 20px; border-radius: 8px; font-size: 14px; z-index: 2000; animation: slideIn 0.3s ease; }
+    .toast.success { background: rgba(7, 193, 96, 0.9); color: #fff; }
+    .toast.error { background: rgba(215, 12, 31, 0.9); color: #fff; }
+    @keyframes slideIn { from { transform: translateX(-50%) translateY(-20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+
+    /* ── 功能说明浮窗 ── */
+    .f-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 500px; max-height: 80vh; overflow-y: auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 9999; padding: 24px; display: none; }
+    .f-modal.show { display: block; }
+    .f-modal .fm-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+    .f-modal .fm-title:active { cursor: grabbing; }
+    .f-modal .fm-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; color: #666; border: none; flex-shrink: 0; }
+    .f-modal .fm-close:hover { background: #e8e8e8; }
+    .f-modal .fm-body { font-size: 13px; color: #555; line-height: 1.8; }
+    .f-modal .fm-body h4 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 16px 0 8px; }
+    .f-modal .fm-body h4:first-child { margin-top: 0; }
+    .f-modal .fm-body ul { padding-left: 18px; margin: 0 0 12px; }
+    .f-modal .fm-body li { margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-title">元宇宙商城 - 后台管理</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="btn btn-default" onclick="toggleFuncModal()" style="font-size:12px;padding:4px 12px;border-radius:6px;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4)">📖 功能说明</button>
+      <div class="header-user">管理员</div>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <div class="sidebar">
+      <div class="sidebar-group-title">元宇宙管理</div>
+      <div class="sidebar-item" onclick="navigateTo('hotspot-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>场景和热区</div>
+      <div class="sidebar-item" onclick="navigateTo('path-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="12 19 19 12 12 5 5 12"/><circle cx="12" cy="12" r="3"/></svg>跳转路径</div>
+      <div class="sidebar-item active" onclick="navigateTo('map-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3 9 12 15 21 9"/></svg>主地图管理</div>
+      <div class="sidebar-item" onclick="navigateTo('space-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>商家元宇宙空间管理</div>
+      <div class="sidebar-item" onclick="navigateTo('role-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>角色管理</div>
+      <div class="sidebar-item" onclick="navigateTo('dashboard-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>元宇宙看板</div>
+      <div class="sidebar-group-title">数字资产</div>
+      <div class="sidebar-item" onclick="navigateTo('asset-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>数字资产管理</div>
+    <div class="sidebar-item" onclick="navigateTo('digital-asset-detail.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>数字资产详情</div>
+      <div class="sidebar-item" onclick="navigateTo('order-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>订单管理</div>
+      <div class="sidebar-group-title">会员管理</div>
+      <div class="sidebar-item" onclick="navigateTo('user-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>用户管理</div>
+      <div class="sidebar-item" onclick="navigateTo('merchant-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>商家管理</div>
+      <div class="sidebar-group-title">审核管理</div>
+      <div class="sidebar-item" onclick="navigateTo('cert-review.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>商家审核管理</div>
+    <div class="sidebar-item" onclick="navigateTo('story-review.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>文化故事审核</div>
+          <div class="sidebar-group-title">内容管理</div>
+    <div class="sidebar-item" onclick="navigateTo('message-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>消息管理</div>
+    <div class="sidebar-group-title">系统管理</div>
+      <div class="sidebar-item" onclick="navigateTo('wallet-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>钱包管理</div>
+    </div>
+
+    <div class="content">
+      <div class="content-header">
+        <div class="content-title">主地图管理</div>
+        <button class="btn btn-primary" onclick="document.getElementById('mapImgUpload').click()">更换地图图片</button>
+        <input type="file" id="mapImgUpload" accept="image/*" onchange="uploadMapImage()" style="display:none">
+      </div>
+
+      <!-- 地图编辑区 -->
+      <div class="card">
+        <div class="card-title"><span>地图热区标注</span></div>
+        <div class="map-editor" id="mapEditor">
+          <img id="mapImage" src="../元宇宙地图_new.png" alt="主地图">
+        </div>
+        <div class="empty-state" id="emptyMap" style="display:none">
+          <div class="empty-text">请先上传主地图图片</div>
+        </div>
+      </div>
+
+      <!-- 地图参数 -->
+      <div class="card">
+        <div class="card-title">地图参数设置</div>
+        <div class="form-row" style="display:flex;gap:16px;align-items:flex-end">
+          <div class="form-group" style="flex:1;margin-bottom:0">
+            <label class="form-label">地图缩放比例（%）</label>
+            <input class="form-input" id="mapScale" type="number" min="100" max="300" value="130" placeholder="默认130">
+            <div style="font-size:11px;color:#999;margin-top:4px">用户端地图默认放大比例，越大拖拽范围越大</div>
+          </div>
+          <button class="btn btn-primary" onclick="saveMapScale()">保存</button>
+        </div>
+      </div>
+
+      <!-- 热区列表 -->
+      <div class="card">
+        <div class="card-title">热区列表</div>
+        <div class="hi-columns">
+          <div class="hi-column">
+            <div class="hi-col-title jump">📍 跳转热区 <span class="hi-col-count" id="jumpCount"></span></div>
+            <div class="hotspot-list" id="jumpList"></div>
+            <div class="hi-col-empty" id="jumpEmpty" style="display:none">暂无跳转热区</div>
+          </div>
+          <div class="hi-column">
+            <div class="hi-col-title deco">🎨 装饰热区 <span class="hi-col-count" id="decoCount"></span></div>
+            <div class="hotspot-list" id="decoList"></div>
+            <div class="hi-col-empty" id="decoEmpty" style="display:none">暂无装饰热区</div>
+          </div>
+          <div class="hi-column">
+            <div class="hi-col-title start">🚶 起始位置 <span class="hi-col-count" id="startCount"></span></div>
+            <div class="hotspot-list" id="startList"></div>
+            <div class="hi-col-empty" id="startEmpty" style="display:none">暂无起始位置</div>
+          </div>
+        </div>
+        <div class="empty-state" id="emptyHotspotList" style="display:none">
+          <div class="empty-text">暂无热区，在地图上拖拽绘制</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 热区编辑弹窗 -->
+  <div class="modal-overlay" id="hotspotEditModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="hotspotModalTitle">创建热区</div>
+        <div class="modal-close" onclick="closeHotspotModal()">✕</div>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="hotspotEditId">
+        <input type="hidden" id="hotspotDecoImg" value="">
+        <div class="form-group">
+          <label class="form-label">热区名称</label>
+          <input class="form-input" id="hotspotEditName" placeholder="例如：食品区">
+        </div>
+        <div class="form-group">
+          <label class="form-label">热区类型</label>
+          <div class="type-toggle">
+            <div class="type-btn active" onclick="switchHotspotType('jump')" id="typeBtnJump">📍 跳转热区</div>
+            <div class="type-btn" onclick="switchHotspotType('deco')" id="typeBtnDeco">🎨 装饰热区</div>
+            <div class="type-btn" onclick="switchHotspotType('start')" id="typeBtnStart">🚶 起始位置</div>
+          </div>
+        </div>
+        <div class="jump-field show" id="jumpField">
+          <div class="form-group">
+            <label class="form-label">跳转目标（选择场景下的图片）</label>
+            <select class="form-select" id="hotspotTarget">
+              <option value="">不跳转</option>
+            </select>
+          </div>
+        </div>
+        <div class="deco-field" id="decoField">
+          <div class="form-group">
+            <label class="form-label">装饰类型</label>
+            <select class="form-select" id="decoSubtype" onchange="switchDecoSubtype()">
+              <option value="sprite">🖼️ 雪碧图动画</option>
+              <option value="lottie">🎬 Lottie 动画</option>
+              <option value="css">✨ CSS 动画</option>
+              <option value="particle">🌟 原生粒子</option>
+            </select>
+          </div>
+          <!-- 雪碧图参数 -->
+          <div class="deco-param" id="decoParamSprite">
+            <div class="form-group">
+              <label class="form-label">雪碧图文件</label>
+              <input type="hidden" id="decoSpriteImg" value="">
+              <div class="deco-upload" id="spriteUpload" onclick="document.getElementById('spriteImgInput').click()">
+                <div class="deco-upload-text" id="spriteEmptyText">点击上传雪碧图</div>
+                <img id="spritePreview" src="" alt="" style="display:none">
+              </div>
+              <input type="file" id="spriteImgInput" accept="image/*" onchange="uploadSpriteImage()" style="display:none">
+            </div>
+            <div class="form-group">
+              <label class="form-label">坐标文件（JSON，非必填）</label>
+              <input type="file" id="spriteCoordInput" accept=".json" onchange="uploadSpriteCoord()">
+              <div style="font-size:11px;color:#999;margin-top:4px">定义每帧 x,y,w,h，均匀分割无需上传</div>
+            </div>
+            <div class="form-row" style="display:flex;gap:12px">
+              <div class="form-group" style="flex:1;margin-bottom:0">
+                <label class="form-label">帧数</label>
+                <input class="form-input" id="decoSpriteFrames" type="number" min="1" max="64" value="6" placeholder="帧数">
+              </div>
+              <div class="form-group" style="flex:1;margin-bottom:0">
+                <label class="form-label">帧速(ms)</label>
+                <input class="form-input" id="decoSpriteSpeed" type="number" min="50" max="2000" value="300" placeholder="ms">
+              </div>
+            </div>
+          </div>
+          <!-- Lottie参数 -->
+          <div class="deco-param" id="decoParamLottie" style="display:none">
+            <div class="form-group">
+              <label class="form-label">.lottie 文件</label>
+              <input type="hidden" id="decoLottieData" value="">
+              <div class="deco-upload" id="lottieUpload" onclick="document.getElementById('lottieFileInput').click()">
+                <div class="deco-upload-text" id="lottieEmptyText">点击上传 .lottie 文件</div>
+                <div id="lottieFileName" style="font-size:13px;color:#20bf6b;display:none"></div>
+              </div>
+              <input type="file" id="lottieFileInput" accept=".lottie,.json" onchange="uploadLottieFile()" style="display:none">
+            </div>
+          </div>
+          <!-- CSS动画参数 -->
+          <div class="deco-param" id="decoParamCss" style="display:none">
+            <div class="form-group">
+              <label class="form-label">静态图片</label>
+              <input type="hidden" id="decoCssImg" value="">
+              <div class="deco-upload" id="cssUpload" onclick="document.getElementById('cssImgInput').click()">
+                <div class="deco-upload-text" id="cssEmptyText">点击上传图片</div>
+                <img id="cssPreview" src="" alt="" style="display:none">
+              </div>
+              <input type="file" id="cssImgInput" accept="image/*" onchange="uploadCssImage()" style="display:none">
+            </div>
+            <div class="form-group">
+              <label class="form-label">CSS 动画效果</label>
+              <select class="form-select" id="decoCssAnim">
+                <option value="pulse">脉冲缩放</option>
+                <option value="float">上下浮动</option>
+                <option value="sway">左右摇摆</option>
+                <option value="glow">光晕呼吸</option>
+                <option value="rotate">旋转闪烁</option>
+                <option value="bounce">弹跳弹入</option>
+              </select>
+            </div>
+          </div>
+          <!-- 粒子参数 -->
+          <div class="deco-param" id="decoParamParticle" style="display:none">
+            <div class="form-group">
+              <label class="form-label">粒子类型</label>
+              <select class="form-select" id="decoParticleType">
+                <option value="light-gold">金色光点</option>
+                <option value="light-blue">蓝色星光</option>
+                <option value="petal-pink">粉色花瓣</option>
+                <option value="petal-red">红色花瓣</option>
+                <option value="snow">飘雪粒子</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">生成率 (0~1)</label>
+              <input class="form-input" id="decoParticleRate" type="number" min="0" max="1" step="0.01" value="0.3" placeholder="每帧生成概率">
+            </div>
+          </div>
+          <div class="form-row" style="display:flex;gap:12px">
+            <div class="form-group" style="flex:1;margin-bottom:0">
+              <label class="form-label">宽度(px)</label>
+              <input class="form-input" id="decoWidth" type="number" min="20" max="500" value="240" placeholder="px">
+            </div>
+            <div class="form-group" style="flex:1;margin-bottom:0">
+              <label class="form-label">Z轴序号 <span style="font-weight:400;font-size:11px;color:#999">（数值越大越靠上）</span></label>
+              <input class="form-input" id="decoZIndex" type="number" min="1" max="99" value="5" placeholder="层级">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" onclick="deleteHotspotFromModal()" style="background:#fff5f5;color:#D70C1F;border-color:#ffcccc">删除热区</button>
+        <button class="btn btn-primary" onclick="saveHotspot()">确认保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== 功能说明浮窗 ====== -->
+  <div class="f-modal" id="funcModal">
+    <div class="fm-title">
+      <span>📖 功能说明</span>
+      <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+    </div>
+    <div class="fm-body">
+      <p style="margin:0 0 12px;color:#666">该功能是管理元宇宙主地图上的热区标注，用户端在主地图上点击热区可跳转到对应场景或查看装饰元素</p>
+      <h4>一、地图管理</h4>
+      <ul>
+        <li><strong>上传地图</strong>：点击"更换地图图片"上传主地图底图，支持 PNG/JPG 格式</li>
+        <li><strong>缩放配置</strong>：设置地图缩放比例（100%~300%），控制用户端地图的拖拽范围</li>
+      </ul>
+      <h4>二、热区标注</h4>
+      <ul>
+        <li><strong>拖拽绘制</strong>：在地图上拖拽生成矩形热区区域，实时预览位置和大小</li>
+        <li><strong>三种热区类型</strong>：
+          <ul>
+            <li><strong>📍跳转热区</strong>：点击跳转到指定场景图片，需关联跳转目标</li>
+            <li><strong>🎨装饰热区</strong>：纯视觉装饰元素，配置子类型和参数</li>
+            <li><strong>🚶起始位置</strong>：角色初始站位，自动填入名称"人物起始位置"</li>
+          </ul>
+        </li>
+        <li><strong>装饰子类型</strong>（4种）：
+          <ul>
+            <li><strong>🖼️雪碧图动画</strong>：上传雪碧图 + 坐标JSON（可选）+ 帧数 + 帧速</li>
+            <li><strong>🎬Lottie动画</strong>：上传 .lottie 文件</li>
+            <li><strong>✨CSS动效</strong>：上传图片 + 选择效果（脉冲/浮动/摇摆/光晕/旋转/弹跳）</li>
+            <li><strong>🌟原生粒子</strong>：选择粒子类型 + 生成率</li>
+            <li style="list-style:none;margin-top:4px">均支持宽度(px) 和 Z轴序号配置</li>
+          </ul>
+        </li>
+      </ul>
+      <h4>三、热区列表</h4>
+      <ul>
+        <li>按类型分三列展示：跳转热区 / 装饰热区 / 起始位置</li>
+        <li>每列显示热区名称、类型标识、Z轴序号、宽度、坐标位置</li>
+        <li>支持编辑和删除热区</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    function toggleFuncModal() {
+      var el = document.getElementById('funcModal');
+      el.classList.toggle('show');
+      if (el.classList.contains('show') && !el.dataset.dragged) {
+        el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%,-50%)';
+      }
+    }
+    (function() {
+      var modal, titleBar, offX, offY, dragging = false;
+      document.addEventListener('DOMContentLoaded', function() {
+        modal = document.getElementById('funcModal');
+        titleBar = modal.querySelector('.fm-title');
+        titleBar.addEventListener('mousedown', startDrag);
+        titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+        document.addEventListener('mousemove', onDrag);
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchmove', onDragTouch, {passive:true});
+        document.addEventListener('touchend', endDrag);
+      });
+      function startDrag(e) { modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+      function startDragTouch(e) { var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+      function onDrag(e) { if (!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+      function onDragTouch(e) { if (!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+      function endDrag() { dragging = false; if (titleBar) titleBar.style.cursor = 'grab'; }
+    })();
+
+    // 场景数据（供跳转选择用）
+    var scenes = [
+      { id: 'scene1', name: '食品区',
+        images: [{ imgId: 'img_1', name: '食品区主图', src: '../scene1.png' }] },
+      { id: 'scene2', name: '文旅区',
+        images: [
+          { imgId: 'img_1', name: '文旅区主图', src: '../scene2.png' },
+          { imgId: 'img_2', name: '文旅区副图', src: '../scene1.png' }
+        ] },
+      { id: 'scene3', name: '影视区',
+        images: [{ imgId: 'img_1', name: '影视区主图', src: '../scene3.png' }] }
+    ];
+
+    var STORAGE = 'adminMapData';
+    var mapData = { image: '../元宇宙地图_new.png', hotspots: [], scale: 130 };
+    var isDrawing = false, drawStartX = 0, drawStartY = 0, drawingBox = null;
+
+    function navigateTo(url) { window.location.href = url; }
+
+    // 加载地图数据
+    function loadMapData() {
+      var saved = localStorage.getItem(STORAGE);
+      if (saved) { try { mapData = JSON.parse(saved); } catch(e) {} }
+      if (!mapData.hotspots) mapData.hotspots = [];
+      if (!mapData.scale) mapData.scale = 130;
+      if (!mapData.image || mapData.image.indexOf('data:') === 0) mapData.image = '../元宇宙地图_new.png';
+      document.getElementById('mapScale').value = mapData.scale;
+      var img = document.getElementById('mapImage');
+      img.src = '../元宇宙地图_new.png';
+      img.style.display = 'block';
+      document.getElementById('emptyMap').style.display = mapData.image ? 'none' : 'block';
+      renderHotspots();
+      renderHotspotList();
+    }
+
+    // 上传地图
+    function uploadMapImage() {
+      var f = document.getElementById('mapImgUpload').files[0];
+      if (!f) return;
+      var r = new FileReader();
+      r.onload = function(e) {
+        mapData.image = e.target.result;
+        saveMapData();
+        loadMapData();
+        showToast('地图已更新', 'success');
+      };
+      r.readAsDataURL(f);
+      document.getElementById('mapImgUpload').value = '';
+    }
+
+    function saveMapData() {
+      localStorage.setItem(STORAGE, JSON.stringify(mapData));
+      // 同步到用户端（包含缩放比例）
+      var userData = { image: mapData.image, hotspots: mapData.hotspots, scale: mapData.scale || 130 };
+      localStorage.setItem('metaMapData', JSON.stringify(userData));
+    }
+
+    function saveMapScale() {
+      var scale = parseInt(document.getElementById('mapScale').value) || 130;
+      scale = Math.max(100, Math.min(300, scale));
+      mapData.scale = scale;
+      saveMapData();
+      showToast('缩放比例已保存为 ' + scale + '%', 'success');
+    }
+
+    // 绘制热区
+    function renderHotspots() {
+      var editor = document.getElementById('mapEditor');
+      editor.querySelectorAll('.hotspot-box').forEach(function(b) { b.remove(); });
+      if (!mapData.image) return;
+
+      (mapData.hotspots || []).forEach(function(h) {
+        var box = document.createElement('div');
+        var isDeco = h.type === 'deco';
+        var isStart = h.type === 'start';
+        box.className = 'hotspot-box' + (isDeco ? ' deco' : '') + (isStart ? ' start' : '');
+        box.style.left = h.x + '%'; box.style.top = h.y + '%';
+        box.style.width = (h.w || 8) + '%'; box.style.height = (h.h || 10) + '%';
+        if (isDeco && h.decoImg) {
+          box.innerHTML = '<img src="' + h.decoImg + '" alt="' + (h.name || '装饰') + '" title="' + (h.name || '装饰') + '">';
+        } else if (isStart) {
+          box.innerHTML = '<div class="hotspot-box-label">🚶 ' + (h.name || '起始位置') + '</div>';
+        } else {
+          box.innerHTML = '<div class="hotspot-box-label">' + (h.name || '热区') + '</div>';
+        }
+        box.onclick = function(e) { e.stopPropagation(); editHotspot(h.id); };
+        editor.appendChild(box);
+      });
+
+      editor.onmousedown = startDrawing;
+      editor.onmousemove = drawHotspot;
+      editor.onmouseup = finishDrawing;
+      editor.onmouseleave = cancelDrawing;
+    }
+
+    function startDrawing(e) {
+      var t = e.target;
+      if (t.classList.contains('hotspot-box') || t.classList.contains('hotspot-box-label')) return;
+      if (drawingBox) { drawingBox.remove(); drawingBox = null; }
+      isDrawing = true;
+      var rect = document.getElementById('mapEditor').getBoundingClientRect();
+      drawStartX = ((e.clientX - rect.left) / rect.width) * 100;
+      drawStartY = ((e.clientY - rect.top) / rect.height) * 100;
+      drawingBox = document.createElement('div'); drawingBox.className = 'hotspot-box drawing';
+      drawingBox.style.left = drawStartX + '%'; drawingBox.style.top = drawStartY + '%';
+      drawingBox.style.width = '0%'; drawingBox.style.height = '0%';
+      document.getElementById('mapEditor').appendChild(drawingBox);
+    }
+
+    function drawHotspot(e) {
+      if (!isDrawing || !drawingBox) return;
+      var rect = document.getElementById('mapEditor').getBoundingClientRect();
+      var cx = ((e.clientX - rect.left) / rect.width) * 100;
+      var cy = ((e.clientY - rect.top) / rect.height) * 100;
+      var x = Math.min(Math.max(0, Math.min(drawStartX, cx)), 95);
+      var y = Math.min(Math.max(0, Math.min(drawStartY, cy)), 90);
+      drawingBox.style.left = x + '%'; drawingBox.style.top = y + '%';
+      drawingBox.style.width = Math.max(2, Math.abs(cx - drawStartX)) + '%';
+      drawingBox.style.height = Math.max(3, Math.abs(cy - drawStartY)) + '%';
+    }
+
+    function finishDrawing() {
+      if (!isDrawing || !drawingBox) return; isDrawing = false;
+      var w = parseFloat(drawingBox.style.width), h = parseFloat(drawingBox.style.height);
+      if (w < 2 || h < 3) { cancelDrawing(); return; }
+      document.getElementById('hotspotEditId').value = '';
+      document.getElementById('hotspotEditName').value = '';
+      document.getElementById('hotspotTarget').value = '';
+      document.getElementById('hotspotDecoImg').value = '';
+      // 重置装饰子类型
+      document.getElementById('decoSubtype').value = 'sprite';
+      switchDecoSubtype();
+      resetDecoPreviews();
+      document.getElementById('hotspotModalTitle').textContent = '创建热区';
+      document.getElementById('hotspotEditModal').querySelector('[onclick="deleteHotspotFromModal()"]').style.display = 'none';
+      var modal = document.getElementById('hotspotEditModal');
+      modal.dataset.tempX = drawingBox.style.left; modal.dataset.tempY = drawingBox.style.top;
+      modal.dataset.tempW = drawingBox.style.width; modal.dataset.tempH = drawingBox.style.height;
+      switchHotspotType('jump');
+      buildTargetSelect();
+      modal.classList.add('show');
+    }
+
+    function cancelDrawing() { isDrawing = false; if (drawingBox) { drawingBox.remove(); drawingBox = null; } }
+
+    // 切换热区类型
+    function switchHotspotType(type) {
+      document.getElementById('typeBtnJump').classList.toggle('active', type === 'jump');
+      document.getElementById('typeBtnDeco').classList.toggle('active', type === 'deco');
+      document.getElementById('typeBtnStart').classList.toggle('active', type === 'start');
+      document.getElementById('jumpField').classList.toggle('show', type === 'jump');
+      document.getElementById('decoField').classList.toggle('show', type === 'deco');
+      if (type === 'start') document.getElementById('hotspotEditName').value = '人物起始位置';
+      else if (type === 'deco') document.getElementById('hotspotEditName').value = '';
+    }
+
+
+
+    function resetDecoPreviews() {
+      ['sprite','css'].forEach(function(t) {
+        var preview = document.getElementById(t + 'Preview');
+        var emptyText = document.getElementById(t + 'EmptyText');
+        var uploadEl = document.getElementById(t + 'Upload');
+        if (preview) { preview.src = ''; preview.style.display = 'none'; }
+        if (emptyText) emptyText.style.display = '';
+        if (uploadEl) uploadEl.classList.remove('has-img');
+      });
+      document.getElementById('decoSpriteImg').value = '';
+      document.getElementById('decoCssImg').value = '';
+      document.getElementById('decoLottieData').value = '';
+      document.getElementById('lottieFileName').style.display = 'none';
+      document.getElementById('lottieEmptyText').style.display = '';
+      document.getElementById('lottieUpload').classList.remove('has-img');
+      document.getElementById('spriteCoordInput').value = '';
+      mapData._spriteCoordData = '';
+      document.getElementById('decoSubtype').value = 'sprite';
+      switchDecoSubtype();
+    }
+
+    // 上传雪碧图坐标文件
+    function uploadSpriteCoord() {
+      var f = document.getElementById('spriteCoordInput').files[0];
+      if (!f) return;
+      var r = new FileReader();
+      r.onload = function(e) {
+        mapData._spriteCoordData = e.target.result;
+      };
+      r.readAsText(f);
+    }
+    // 上传 Lottie 文件
+    function uploadLottieFile() {
+      var f = document.getElementById('lottieFileInput').files[0];
+      if (!f) return;
+      var fn = document.getElementById('lottieFileName');
+      fn.textContent = '✓ ' + f.name;
+      fn.style.display = 'block';
+      document.getElementById('lottieEmptyText').style.display = 'none';
+      document.getElementById('lottieUpload').classList.add('has-img');
+      // 存储文件名
+      document.getElementById('decoLottieData').value = f.name;
+    }
+
+    // 切换装饰子类型
+    function switchDecoSubtype() {
+      var v = document.getElementById('decoSubtype').value;
+      ['decoParamSprite','decoParamLottie','decoParamCss','decoParamParticle'].forEach(function(id) {
+        document.getElementById(id).style.display = 'none';
+      });
+      var paramId = v === 'sprite' ? 'decoParamSprite' : v === 'lottie' ? 'decoParamLottie' : v === 'css' ? 'decoParamCss' : 'decoParamParticle';
+      document.getElementById(paramId).style.display = 'block';
+    }
+
+    // 上传雪碧图
+    function uploadSpriteImage() {
+      var f = document.getElementById('spriteImgInput').files[0]; if (!f) return;
+      var r = new FileReader();
+      r.onload = function(e) {
+        document.getElementById('decoSpriteImg').value = e.target.result;
+        document.getElementById('spritePreview').src = e.target.result;
+        document.getElementById('spritePreview').style.display = 'block';
+        document.getElementById('spriteEmptyText').style.display = 'none';
+        document.getElementById('spriteUpload').classList.add('has-img');
+      };
+      r.readAsDataURL(f);
+      document.getElementById('spriteImgInput').value = '';
+    }
+    function uploadCssImage() {
+      var f = document.getElementById('cssImgInput').files[0]; if (!f) return;
+      var r = new FileReader();
+      r.onload = function(e) {
+        document.getElementById('decoCssImg').value = e.target.result;
+        document.getElementById('cssPreview').src = e.target.result;
+        document.getElementById('cssPreview').style.display = 'block';
+        document.getElementById('cssEmptyText').style.display = 'none';
+        document.getElementById('cssUpload').classList.add('has-img');
+      };
+      r.readAsDataURL(f);
+      document.getElementById('cssImgInput').value = '';
+    }
+
+    // 上传装饰图片（已废弃，保留避免报错）
+    function uploadDecoImage() {}
+
+    // 构建目标选择器（使用optgroup按场景分组）
+    function buildTargetSelect() {
+      var sel = document.getElementById('hotspotTarget');
+      sel.innerHTML = scenes.reduce(function(html, s) {
+        if (!s.images || s.images.length === 0) return html;
+        html += '<optgroup label="' + s.name + '">';
+        s.images.forEach(function(img) {
+          html += '<option value="' + s.id + '|' + img.imgId + '">' + img.name + '</option>';
+        });
+        html += '</optgroup>';
+        return html;
+      }, '<option value="">不跳转</option>');
+    }
+
+    function editHotspot(id) {
+      var h = mapData.hotspots.find(function(x) { return x.id === id; });
+      if (!h) return;
+      document.getElementById('hotspotEditId').value = id;
+      document.getElementById('hotspotEditName').value = h.name || '';
+      document.getElementById('hotspotModalTitle').textContent = '编辑热区';
+      buildTargetSelect();
+      // 类型
+      var type = h.type || 'jump';
+      switchHotspotType(type);
+      if (type === 'jump') {
+        document.getElementById('hotspotTarget').value = '';
+        if (h.toScene && h.toImg) {
+          document.getElementById('hotspotTarget').value = h.toScene + '|' + h.toImg;
+        }
+      } else if (type === 'deco') {
+        document.getElementById('hotspotDecoImg').value = h.decoImg || '';
+        // 装饰子类型回显
+        var dSub = h.decoSubtype || 'sprite';
+        document.getElementById('decoSubtype').value = dSub;
+        switchDecoSubtype();
+        document.getElementById('decoZIndex').value = h.decoZIndex || 5;
+        document.getElementById('decoWidth').value = h.decoWidth || 240;
+        if (dSub === 'sprite') {
+          document.getElementById('decoSpriteImg').value = h.decoSpriteImg || '';
+          document.getElementById('decoSpriteFrames').value = h.decoSpriteFrames || 6;
+          document.getElementById('decoSpriteSpeed').value = h.decoSpriteSpeed || 300;
+          if (h.decoSpriteImg) { document.getElementById('spritePreview').src = h.decoSpriteImg; document.getElementById('spritePreview').style.display = 'block'; document.getElementById('spriteEmptyText').style.display = 'none'; document.getElementById('spriteUpload').classList.add('has-img'); }
+        } else if (dSub === 'lottie') {
+          document.getElementById('decoLottieData').value = h.decoLottieFile || '';
+          if (h.decoLottieFile) {
+            document.getElementById('lottieFileName').textContent = '✓ ' + h.decoLottieFile;
+            document.getElementById('lottieFileName').style.display = 'block';
+            document.getElementById('lottieEmptyText').style.display = 'none';
+            document.getElementById('lottieUpload').classList.add('has-img');
+          }
+        } else if (dSub === 'css') {
+          document.getElementById('decoCssImg').value = h.decoCssImg || '';
+          document.getElementById('decoCssAnim').value = h.decoCssAnim || 'pulse';
+          if (h.decoCssImg) { document.getElementById('cssPreview').src = h.decoCssImg; document.getElementById('cssPreview').style.display = 'block'; document.getElementById('cssEmptyText').style.display = 'none'; document.getElementById('cssUpload').classList.add('has-img'); }
+        } else if (dSub === 'particle') {
+          document.getElementById('decoParticleType').value = h.decoParticleType || 'light-gold';
+          document.getElementById('decoParticleRate').value = h.decoParticleRate || 0.3;
+        }
+      }
+      document.getElementById('hotspotEditModal').querySelector('[onclick="deleteHotspotFromModal()"]').style.display = '';
+      document.getElementById('hotspotEditModal').classList.add('show');
+    }
+
+    // 装饰子类型字段更新
+    function updateDecoFields(h) {
+      var dSub = document.getElementById('decoSubtype').value;
+      h.decoSubtype = dSub;
+      h.decoZIndex = parseInt(document.getElementById('decoZIndex').value) || 5;
+      h.decoWidth = parseInt(document.getElementById('decoWidth').value) || 240;
+      if (dSub === 'sprite') {
+        h.decoSpriteImg = document.getElementById('decoSpriteImg').value || h.decoSpriteImg || '';
+        h.decoSpriteFrames = parseInt(document.getElementById('decoSpriteFrames').value) || 6;
+        h.decoSpriteSpeed = parseInt(document.getElementById('decoSpriteSpeed').value) || 300;
+        h.decoSpriteCoord = mapData._spriteCoordData || h.decoSpriteCoord || '';
+      } else if (dSub === 'lottie') {
+        h.decoLottieFile = document.getElementById('decoLottieData').value || h.decoLottieFile || '';
+      } else if (dSub === 'css') {
+        h.decoCssImg = document.getElementById('decoCssImg').value || h.decoCssImg || '';
+        h.decoCssAnim = document.getElementById('decoCssAnim').value;
+      } else if (dSub === 'particle') {
+        h.decoParticleType = document.getElementById('decoParticleType').value;
+        h.decoParticleRate = parseFloat(document.getElementById('decoParticleRate').value) || 0.3;
+      }
+    }
+
+    function closeHotspotModal() {
+      document.getElementById('hotspotEditModal').classList.remove('show');
+      cancelDrawing();
+      renderHotspots();
+      renderHotspotList();
+    }
+
+    function saveHotspot() {
+      var modal = document.getElementById('hotspotEditModal');
+      var editId = document.getElementById('hotspotEditId').value;
+      var name = document.getElementById('hotspotEditName').value.trim();
+      var type = document.getElementById('typeBtnJump').classList.contains('active') ? 'jump'
+        : document.getElementById('typeBtnDeco').classList.contains('active') ? 'deco' : 'start';
+      if (!name) { showToast('请输入热区名称', 'error'); return; }
+
+      var toScene = '', toImg = '', decoImg = '';
+      if (type === 'jump') {
+        var toVal = document.getElementById('hotspotTarget').value;
+        var toParts = toVal ? toVal.split('|') : [];
+        toScene = toParts[0] || '';
+        toImg = toParts[1] || '';
+      } else if (type === 'deco') {
+        var dSub = document.getElementById('decoSubtype').value;
+        decoImg = document.getElementById('hotspotDecoImg').value;
+        // 对非图片类型（lottie/particle）不做图片必填校验
+        if (dSub !== 'lottie' && dSub !== 'particle' && !decoImg) {
+          var needImg = dSub === 'sprite' ? document.getElementById('decoSpriteImg').value : dSub === 'css' ? document.getElementById('decoCssImg').value : '';
+          if (!needImg) { showToast('请上传装饰图片', 'error'); return; }
+        }
+      }
+
+      if (editId) {
+        var h = mapData.hotspots.find(function(x) { return x.id === editId; });
+        if (h) { h.name = name; h.type = type; h.toScene = toScene; h.toImg = toImg; h.decoImg = decoImg;
+          if (type === 'deco') updateDecoFields(h); }
+        showToast('热区已更新', 'success');
+      } else {
+        var newH = {
+          id: 'mh' + Date.now(), name: name, type: type,
+          x: Math.round(parseFloat(modal.dataset.tempX) * 10) / 10,
+          y: Math.round(parseFloat(modal.dataset.tempY) * 10) / 10,
+          w: Math.round(parseFloat(modal.dataset.tempW) * 10) / 10,
+          h: Math.round(parseFloat(modal.dataset.tempH) * 10) / 10,
+          toScene: toScene, toImg: toImg, decoImg: decoImg
+        };
+        if (type === 'deco') updateDecoFields(newH);
+        mapData.hotspots.push(newH);
+        showToast('热区已添加', 'success');
+      }
+      saveMapData();
+      closeHotspotModal();
+    }
+
+    function deleteHotspotFromModal() {
+      var id = document.getElementById('hotspotEditId').value;
+      if (!id) return;
+      if (confirm('确定删除该热区？')) {
+        mapData.hotspots = mapData.hotspots.filter(function(h) { return h.id !== id; });
+        saveMapData(); closeHotspotModal(); showToast('已删除', 'success');
+      }
+    }
+
+    function deleteHotspotItem(id) {
+      if (confirm('确定删除该热区？')) {
+        mapData.hotspots = mapData.hotspots.filter(function(h) { return h.id !== id; });
+        saveMapData(); renderHotspots(); renderHotspotList(); showToast('已删除', 'success');
+      }
+    }
+
+    function renderHotspotList() {
+      var empty = document.getElementById('emptyHotspotList');
+      if (!mapData.hotspots || mapData.hotspots.length === 0) {
+        ['jump','deco','start'].forEach(function(t){
+          document.getElementById(t + 'List').innerHTML = '';
+          document.getElementById(t + 'Count').textContent = '';
+          document.getElementById(t + 'Empty').style.display = 'none';
+        });
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+
+      var jumpHotspots = mapData.hotspots.filter(function(h) { return h.type !== 'deco' && h.type !== 'start'; });
+      var decoHotspots = mapData.hotspots.filter(function(h) { return h.type === 'deco'; });
+      var startHotspots = mapData.hotspots.filter(function(h) { return h.type === 'start'; });
+
+      document.getElementById('jumpCount').textContent = '(' + jumpHotspots.length + ')';
+      document.getElementById('decoCount').textContent = '(' + decoHotspots.length + ')';
+      document.getElementById('startCount').textContent = '(' + startHotspots.length + ')';
+
+      // 渲染跳转热区
+      var jumpContainer = document.getElementById('jumpList');
+      var jumpEmpty = document.getElementById('jumpEmpty');
+      if (jumpHotspots.length === 0) {
+        jumpContainer.innerHTML = '';
+        jumpEmpty.style.display = 'block';
+      } else {
+        jumpEmpty.style.display = 'none';
+        jumpContainer.innerHTML = jumpHotspots.map(function(h) {
+          var toLabel = '未设置';
+          if (h.toScene && h.toImg) {
+            var s = scenes.find(function(x) { return x.id === h.toScene; });
+            var img = s ? (s.images || []).find(function(x) { return x.imgId === h.toImg; }) : null;
+            toLabel = s ? (s.name + (img ? ' / ' + img.name : '')) : h.toScene;
+          }
+          return '<div class="hotspot-item">' +
+            '<div class="hi-info"><div class="hi-name">' + (h.name || '未命名') + '</div>' +
+            '<div class="hi-target">→ ' + toLabel + '</div>' +
+            '<div class="hi-pos">位置: ' + Math.round(h.x) + '%,' + Math.round(h.y) + '% | ' + (Math.round(h.w * 10) / 10) + '%×' + (Math.round(h.h * 10) / 10) + '%</div></div>' +
+            '<div class="hi-actions"><button class="hi-btn edit" onclick="editHotspot(\'' + h.id + '\')">编辑</button>' +
+            '<button class="hi-btn delete" onclick="deleteHotspotItem(\'' + h.id + '\')">删除</button></div></div>';
+        }).join('');
+      }
+
+      // 渲染装饰热区
+      var decoContainer = document.getElementById('decoList');
+      var decoEmpty = document.getElementById('decoEmpty');
+      if (decoHotspots.length === 0) {
+        decoContainer.innerHTML = '';
+        decoEmpty.style.display = 'block';
+      } else {
+        decoEmpty.style.display = 'none';
+        decoContainer.innerHTML = decoHotspots.map(function(h) {
+          var subLabel = { sprite: '🖼️雪碧图', lottie: '🎬Lottie', css: '✨CSS动效', particle: '🌟粒子' }[h.decoSubtype || 'sprite'] || '🖼️雪碧图';
+          return '<div class="hotspot-item">' +
+            '<div class="hi-info"><div class="hi-name">' + (h.name || '未命名') + ' <span class="hi-type-badge deco">' + subLabel + '</span></div>' +
+            '<div class="hi-target">z:' + (h.decoZIndex || 5) + ' | ' + (h.decoWidth || 240) + 'px | ' + subLabel + '</div>' +
+            '<div class="hi-pos">位置: ' + Math.round(h.x) + '%,' + Math.round(h.y) + '% | ' + (Math.round(h.w * 10) / 10) + '%×' + (Math.round(h.h * 10) / 10) + '%</div></div>' +
+            '<div class="hi-actions"><button class="hi-btn edit" onclick="editHotspot(\'' + h.id + '\')">编辑</button>' +
+            '<button class="hi-btn delete" onclick="deleteHotspotItem(\'' + h.id + '\')">删除</button></div></div>';
+        }).join('');
+      }
+
+      // 渲染起始位置
+      var startContainer = document.getElementById('startList');
+      var startEmpty = document.getElementById('startEmpty');
+      if (startHotspots.length === 0) {
+        startContainer.innerHTML = '';
+        startEmpty.style.display = 'block';
+      } else {
+        startEmpty.style.display = 'none';
+        startContainer.innerHTML = startHotspots.map(function(h) {
+          return '<div class="hotspot-item">' +
+            '<div class="hi-info"><div class="hi-name">' + (h.name || '未命名') + '</div>' +
+            '<div class="hi-target">🚶 人物起始点</div>' +
+            '<div class="hi-pos">位置: ' + Math.round(h.x) + '%,' + Math.round(h.y) + '% | ' + (Math.round(h.w * 10) / 10) + '%×' + (Math.round(h.h * 10) / 10) + '%</div></div>' +
+            '<div class="hi-actions"><button class="hi-btn edit" onclick="editHotspot(\'' + h.id + '\')">编辑</button>' +
+            '<button class="hi-btn delete" onclick="deleteHotspotItem(\'' + h.id + '\')">删除</button></div></div>';
+        }).join('');
+      }
+    }
+
+    function showToast(msg, type) {
+      var t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg;
+      document.body.appendChild(t); setTimeout(function() { t.remove(); }, 2000);
+    }
+
+    document.addEventListener('DOMContentLoaded', loadMapData);
+  </script>
+</body>
+</html>

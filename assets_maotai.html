@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>茅台数字资产</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:#fff;font-family:'PingFang SC','Microsoft YaHei',sans-serif;
+    display:flex;align-items:center;justify-content:center;
+    min-height:100vh;overflow:hidden;
+  }
+  .phone{
+    width:860px;height:430px;
+    border-radius:36px;background:#1a1a2e;
+    padding:12px;
+    box-shadow:0 30px 80px rgba(0,0,0,.7),inset 0 0 0 2px #333;
+    animation:in .7s ease-out;
+  }
+  @keyframes in{0%{opacity:0;transform:translateY(60px) scale(.92)}100%{opacity:1;transform:translateY(0) scale(1)}}
+  .screen{
+    width:100%;height:100%;border-radius:24px;
+    overflow:hidden;background:#0a0a1a;
+    display:flex;flex-direction:column;
+  }
+  .top{
+    display:flex;align-items:center;gap:8px;
+    padding:6px 12px;border-bottom:1px solid rgba(0,212,255,.08);
+    flex-shrink:0;
+  }
+  .back{
+    display:flex;align-items:center;gap:4px;
+    padding:6px 12px;border-radius:8px;
+    font-size:13px;font-weight:600;cursor:pointer;
+    background:rgba(255,255,255,.08);color:#fff;
+    border:1px solid rgba(255,255,255,.12);
+    transition:background .2s;
+  }
+  .back:hover{background:rgba(255,255,255,.15)}
+  .back:active{background:rgba(255,255,255,.05)}
+  .top-t{flex:1;font-size:13px;font-weight:600;color:#fff}
+  .grid{
+    flex:1;overflow-y:auto;padding:10px 14px 14px;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+    align-content:start;
+  }
+  .grid::-webkit-scrollbar{width:3px}
+  .grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+  .ac{
+    background:#121226;border:1px solid rgba(0,212,255,.06);
+    overflow:hidden;cursor:pointer;transition:.2s;color:#fff;
+  }
+  .ac:active{transform:scale(.95)}
+  .ai{height:80px;background-position:center;background-size:cover;background-repeat:no-repeat;position:relative}
+  .abody{padding:8px 10px}
+  .an{font-size:11px;font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ap{font-size:12px;color:#d4a547;font-weight:600}
+  .atg{font-size:9px;color:#8888a0;background:rgba(108,99,255,.12);padding:2px 8px;border-radius:4px;display:inline-block;margin-top:3px}
+  @media (max-width:768px){
+    body{background:#000}
+    .phone{width:100vw;height:100vh;border-radius:0;padding:0;box-shadow:none;animation:none}
+    .screen{border-radius:0}
+    .grid{grid-template-columns:repeat(3,1fr);padding:8px 10px 10px;gap:6px}
+    .ai{height:60px;font-size:28px}
+    .an{font-size:10px}
+    .ap{font-size:11px}
+  }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="screen">
+    <div class="top">
+      <div class="back" onclick="history.back()">← 返回</div>
+      <div class="top-t">💎 茅台数字资产</div>
+    </div>
+    <div class="grid" id="assetGrid"></div>
+  </div>
+</div>
+<script>
+  const assets = [
+    {n:'茅台生肖兔·典藏',p:'¥999',i:'茅台生肖兔·典藏.png',t:'限量999份'},
+    {n:'国酒·数字徽章',p:'¥99',i:'国酒·数字徽章.png',t:'数字藏品'},
+    {n:'巴拿马金奖·复刻',p:'¥3,299',i:'巴拿马金奖·复刻.png',t:'历史典藏'},
+    {n:'茅台1935',p:'¥599',i:'茅台1935.png',t:'数字珍藏',link:'product_maotai1935.html?from=assets'},
+    {n:'飞天茅台·元宇宙酒票',p:'¥299',i:'飞天茅台·元宇宙酒票.png',t:'限量发售'},
+  ];
+  const g=document.getElementById('assetGrid');
+  assets.forEach(a=>{
+    const c=document.createElement('div');c.className='ac';
+    c.innerHTML='<div class="ai" style="background-image:url(\''+a.i+'\')"></div><div class="abody"><div class="an">'+a.n+'</div><div class="ap">'+a.p+'</div><span class="atg">'+a.t+'</span></div>';
+    if(a.link)c.onclick=()=>window.location.href=a.link;
+    g.appendChild(c);
+  });
+</script>
+</body>
+</html>

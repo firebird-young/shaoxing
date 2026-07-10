@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>订单管理</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; justify-content: center; }
+.page { max-width: 430px; min-width: 320px; min-height: 100vh; background: #f6f7fb; position: relative; width: 100%; }
+
+/* ── 顶部导航 ── */
+.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #fff; border-bottom: 1px solid #f0f0f0; }
+.nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.nav-back svg { width: 20px; height: 20px; color: #333; display: block; }
+.nav-title { flex: 1; text-align: center; font-size: 16px; font-weight: 600; color: #1a1a2e; }
+.nav-placeholder { width: 32px; }
+
+/* ── 状态标签栏 ── */
+.status-tabs { display: flex; background: #fff; padding: 0 16px; border-bottom: 1px solid #f0f0f0; overflow-x: auto; }
+.status-tabs::-webkit-scrollbar { display: none; }
+.st-tab { padding: 14px 16px; font-size: 14px; color: #666; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.2s; }
+.st-tab:active { color: #D70C1F; }
+.st-tab.on { color: #D70C1F; border-bottom-color: #D70C1F; font-weight: 600; }
+
+/* ── 订单卡片 ── */
+.orders-container { padding: 12px 16px; }
+.order-card { background: #fff; border-radius: 16px; margin-bottom: 12px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
+.oc-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid #f5f5f7; }
+.oc-shop { display: flex; align-items: center; gap: 8px; }
+.oc-shop-icon { width: 24px; height: 24px; border-radius: 6px; background: linear-gradient(135deg, #D70C1F, #F12B3D); display: flex; align-items: center; justify-content: center; }
+.oc-shop-icon svg { width: 14px; height: 14px; color: #fff; }
+.oc-shop-name { font-size: 13px; font-weight: 600; color: #1a1a2e; }
+.oc-status { font-size: 12px; font-weight: 600; }
+.os-pending { color: #ff9800; }
+.os-paid { color: #2196f3; }
+.os-shipped { color: #9c27b0; }
+.os-completed { color: #07c160; }
+.os-cancelled { color: #999; }
+
+/* ── 商品列表 ── */
+.oc-goods { padding: 12px 16px; cursor: pointer; }
+.og-item { display: flex; gap: 12px; margin-bottom: 10px; }
+.og-item:last-child { margin-bottom: 0; }
+.og-img { width: 72px; height: 72px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: #f5f5f7; }
+.og-info { flex: 1; min-width: 0; }
+.og-name { font-size: 13px; font-weight: 600; color: #1a1a2e; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.og-desc { font-size: 11px; color: #999; margin-bottom: 4px; }
+.og-price { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.og-price-text { font-size: 14px; font-weight: 700; color: #D70C1F; }
+.og-count { font-size: 11px; color: #999; }
+
+/* ── 数字资产编号 ── */
+.og-asset-ids { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.asset-label { font-size: 11px; color: #999; }
+.asset-id { display: inline-block; padding: 2px 8px; background: linear-gradient(135deg, #D70C1F, #F12B3D); color: #fff; font-size: 11px; font-weight: 600; border-radius: 4px; }
+
+/* ── 订单底部 ── */
+.oc-footer { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-top: 1px solid #f5f5f7; }
+.oc-total { font-size: 12px; color: #666; }
+.oc-total strong { font-size: 14px; color: #D70C1F; }
+.oc-actions { display: flex; gap: 8px; }
+.oa-btn { height: 28px; padding: 0 14px; border-radius: 14px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+.oa-btn.default { border: 1px solid #ddd; background: #fff; color: #666; }
+.oa-btn.default:active { background: #f5f5f5; }
+.oa-btn.primary { border: 1px solid #D70C1F; background: #D70C1F; color: #fff; }
+.oa-btn.primary:active { background: #c60a1b; }
+
+/* ── 空状态 ── */
+.empty-state { padding: 80px 0; text-align: center; }
+.empty-icon { width: 80px; height: 80px; margin: 0 auto 16px; background: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.empty-icon svg { width: 40px; height: 40px; color: #ccc; }
+.empty-text { font-size: 14px; color: #999; }
+
+/* ── 订单详情弹窗 ── */
+.detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: flex-end; justify-content: center; z-index: 999; }
+.detail-overlay.show { display: flex; }
+.detail-box { background: #fff; border-radius: 20px 20px 0 0; width: 100%; max-width: 430px; max-height: 85vh; overflow-y: auto; animation: slideUp 0.3s ease; }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.detail-header { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid #f0f0f0; position: sticky; top: 0; background: #fff; }
+.detail-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+.detail-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.detail-close svg { width: 14px; height: 14px; color: #666; }
+.detail-content { padding: 16px; }
+.detail-section { margin-bottom: 20px; }
+.detail-section-title { font-size: 13px; font-weight: 600; color: #1a1a2e; margin-bottom: 10px; }
+.detail-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; }
+.detail-label { color: #999; }
+.detail-value { color: #333; }
+.detail-goods { background: #f9f9f9; border-radius: 12px; padding: 12px; margin-top: 10px; }
+.detail-total { font-size: 16px; font-weight: 600; color: #D70C1F; text-align: right; padding-top: 12px; border-top: 1px solid #f0f0f0; margin-top: 12px; }
+.detail-actions { padding: 16px; border-top: 1px solid #f0f0f0; display: flex; gap: 12px; position: sticky; bottom: 0; background: #fff; }
+.detail-btn { flex: 1; height: 44px; border-radius: 22px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+.detail-btn.cancel { background: #fff; color: #666; border: 1px solid #ddd; }
+.detail-btn.cancel:active { background: #f5f5f5; }
+.detail-btn.confirm { background: #D70C1F; color: #fff; }
+.detail-btn.confirm:active { opacity: 0.85; }
+.detail-btn.pay { background: #D70C1F; color: #fff; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- 顶部导航 -->
+<div class="top-bar">
+  <div class="nav-back" onclick="goBack()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </div>
+  <div class="nav-title">订单管理</div>
+  <div class="nav-placeholder"></div>
+</div>
+
+<!-- 状态标签栏 -->
+<div class="status-tabs">
+  <div class="st-tab on" data-status="all" onclick="switchTab('all')">全部</div>
+  <div class="st-tab" data-status="pending" onclick="switchTab('pending')">待支付</div>
+  <div class="st-tab" data-status="completed" onclick="switchTab('completed')">已完成</div>
+  <div class="st-tab" data-status="cancelled" onclick="switchTab('cancelled')">已取消</div>
+</div>
+
+<!-- 订单列表 -->
+<div class="orders-container" id="ordersContainer"></div>
+
+</div>
+
+<!-- 订单详情弹窗 -->
+<div class="detail-overlay" id="detailOverlay">
+  <div class="detail-box" id="detailBox">
+    <div class="detail-header">
+      <div class="detail-title">订单详情</div>
+      <div class="detail-close" onclick="closeDetail()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div class="detail-content" id="detailContent"></div>
+  </div>
+</div>
+
+<script>
+// 模拟订单数据
+const orders = [
+  {
+    id: 'DD2026060910001',
+    shopName: '茅台官方旗舰店',
+    status: 'pending',
+    createTime: '2026-06-09 15:30:25',
+    goods: [
+      { name: '茅台1935·时光窖藏', desc: '限量1935瓶', price: 599, count: 1, img: '茅台1935.png' }
+    ],
+    total: 599
+  },
+  {
+    id: 'DD2026060910002',
+    shopName: '王者荣耀官方商城',
+    status: 'pending',
+    createTime: '2026-06-09 14:20:15',
+    goods: [
+      { name: '王者荣耀·传说皮肤', desc: '数字资产', price: 999, count: 1, img: '王者荣耀·传说皮肤.png' }
+    ],
+    total: 999
+  },
+  {
+    id: 'DD2026060810003',
+    shopName: '茅台官方旗舰店',
+    status: 'completed',
+    createTime: '2026-06-08 10:20:15',
+    payTime: '2026-06-08 10:25:30',
+    completeTime: '2026-06-08 10:30:00',
+    goods: [
+      { name: '飞天茅台·元宇宙酒票', desc: '数字资产凭证', price: 299, count: 2, img: '飞天茅台·元宇宙酒票.png', assetIds: ['#34', '#55'] }
+    ],
+    total: 598
+  },
+  {
+    id: 'DD2026060710004',
+    shopName: '五粮液官方旗舰店',
+    status: 'completed',
+    createTime: '2026-06-07 09:15:40',
+    payTime: '2026-06-07 09:20:00',
+    completeTime: '2026-06-07 09:25:00',
+    goods: [
+      { name: '五粮液·数字珍藏', desc: '限量2024份', price: 599, count: 1, img: '五粮液·数字珍藏.png', assetIds: ['#128'] }
+    ],
+    total: 599
+  },
+  {
+    id: 'DD2026060610005',
+    shopName: '海底捞官方旗舰店',
+    status: 'completed',
+    createTime: '2026-06-06 20:30:00',
+    payTime: '2026-06-06 20:35:00',
+    completeTime: '2026-06-06 20:40:00',
+    goods: [
+      { name: '海底捞·黑海会员数字卡', desc: '会员权益', price: 199, count: 1, img: '海底捞·黑海会员数字卡.png', assetIds: ['#256'] }
+    ],
+    total: 199
+  },
+  {
+    id: 'DD2026060510006',
+    shopName: '茅台官方旗舰店',
+    status: 'cancelled',
+    createTime: '2026-06-05 12:00:00',
+    cancelTime: '2026-06-05 12:30:00',
+    goods: [
+      { name: '茅台生肖兔·典藏', desc: '限量365份', price: 2999, count: 1, img: '茅台生肖兔·典藏.png' }
+    ],
+    total: 2999
+  }
+];
+
+let currentStatus = 'all';
+
+function goBack() {
+  window.location.href = 'my.html';
+}
+
+function switchTab(status) {
+  currentStatus = status;
+  
+  // 更新标签样式
+  document.querySelectorAll('.st-tab').forEach(tab => {
+    tab.classList.toggle('on', tab.dataset.status === status);
+  });
+  
+  renderOrders();
+}
+
+function renderOrders() {
+  const container = document.getElementById('ordersContainer');
+  
+  // 过滤订单
+  const filteredOrders = currentStatus === 'all' 
+    ? orders 
+    : orders.filter(o => o.status === currentStatus);
+  
+  if (filteredOrders.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <div class="empty-text">暂无相关订单</div>
+      </div>
+    `;
+    return;
+  }
+  
+  container.innerHTML = filteredOrders.map(order => `
+    <div class="order-card">
+      <div class="oc-header">
+        <div class="oc-shop">
+          <div class="oc-shop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          </div>
+          <span class="oc-shop-name">${order.shopName}</span>
+        </div>
+        <span class="oc-status os-${order.status}">${getStatusText(order.status)}</span>
+      </div>
+      
+      <div class="oc-goods" onclick="showDetail('${order.id}')">
+        ${order.goods.map(g => `
+          <div class="og-item">
+            <img class="og-img" src="${g.img}" alt="${g.name}" onerror="this.style.background='#f5f5f5'; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23999%22 stroke-width=%222%22><rect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/><circle cx=%228.5%22 cy=%228.5%22 r=%221.5%22/><polyline points=%2221 15 16 10 5 21%22/></svg>'">
+            <div class="og-info">
+              <div class="og-name">${g.name}</div>
+              <div class="og-desc">${g.desc}</div>
+              <div class="og-price">
+                <span class="og-price-text">¥${g.price}</span>
+                <span class="og-count">x${g.count}</span>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      
+      <div class="oc-footer">
+        <div class="oc-total">共${order.goods.reduce((sum, g) => sum + g.count, 0)}件，合计<strong>¥${order.total}</strong></div>
+        <div class="oc-actions">
+          ${getOrderActions(order)}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function getStatusText(status) {
+  const statusMap = {
+    'pending': '待支付',
+    'completed': '已完成',
+    'cancelled': '已取消'
+  };
+  return statusMap[status] || status;
+}
+
+function getOrderActions(order) {
+  switch(order.status) {
+    case 'pending':
+      return `<button class="oa-btn default" onclick="cancelOrder('${order.id}')">取消订单</button>
+              <button class="oa-btn primary" onclick="payOrder('${order.id}')">去支付</button>`;
+    case 'completed':
+      return `<button class="oa-btn default" onclick="showDetail('${order.id}')">查看详情</button>`;
+    case 'cancelled':
+      return `<button class="oa-btn default" onclick="showDetail('${order.id}')">查看详情</button>`;
+    default:
+      return '';
+  }
+}
+
+function showDetail(orderId) {
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+  
+  const content = document.getElementById('detailContent');
+  
+  let actionsHtml = '';
+  switch(order.status) {
+    case 'pending':
+      actionsHtml = `
+        <button class="detail-btn cancel" onclick="cancelOrder('${order.id}'); closeDetail();">取消订单</button>
+        <button class="detail-btn pay" onclick="payOrder('${order.id}')">去支付</button>
+      `;
+      break;
+    default:
+      actionsHtml = `
+        <button class="detail-btn confirm" onclick="closeDetail()">确定</button>
+      `;
+  }
+  
+  content.innerHTML = `
+    <div class="detail-section">
+      <div class="detail-section-title">订单信息</div>
+      <div class="detail-row">
+        <span class="detail-label">订单编号</span>
+        <span class="detail-value">${order.id}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">下单时间</span>
+        <span class="detail-value">${order.createTime}</span>
+      </div>
+      ${order.payTime ? `
+      <div class="detail-row">
+        <span class="detail-label">支付时间</span>
+        <span class="detail-value">${order.payTime}</span>
+      </div>
+      ` : ''}
+      ${order.completeTime ? `
+      <div class="detail-row">
+        <span class="detail-label">完成时间</span>
+        <span class="detail-value">${order.completeTime}</span>
+      </div>
+      ` : ''}
+      ${order.cancelTime ? `
+      <div class="detail-row">
+        <span class="detail-label">取消时间</span>
+        <span class="detail-value">${order.cancelTime}</span>
+      </div>
+      ` : ''}
+    </div>
+    
+    <div class="detail-section">
+      <div class="detail-section-title">商品信息</div>
+      ${order.goods.map(g => `
+        <div class="detail-goods">
+          <div class="og-item">
+            <img class="og-img" src="${g.img}" alt="${g.name}" onerror="this.style.background='#f5f5f5'; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23999%22 stroke-width=%222%22><rect x=%223%22 y=%223%22 width=%2218%22 height=%2218%22 rx=%222%22/><circle cx=%228.5%22 cy=%228.5%22 r=%221.5%22/><polyline points=%2221 15 16 10 5 21%22/></svg>'">
+            <div class="og-info">
+              <div class="og-name">${g.name}</div>
+              <div class="og-desc">${g.desc}</div>
+              <div class="og-price">
+                <span class="og-price-text">¥${g.price}</span>
+                <span class="og-count">x${g.count}</span>
+              </div>
+              ${order.status === 'completed' && g.assetIds ? `
+              <div class="og-asset-ids">
+                <span class="asset-label">数字资产编号：</span>
+                ${g.assetIds.map(id => `<span class="asset-id">${id}</span>`).join('')}
+              </div>
+              ` : ''}
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    
+    <div class="detail-total">合计：¥${order.total}</div>
+    
+    <div class="detail-actions">${actionsHtml}</div>
+  `;
+  
+  document.getElementById('detailOverlay').classList.add('show');
+}
+
+function closeDetail() {
+  document.getElementById('detailOverlay').classList.remove('show');
+}
+
+// 点击遮罩关闭
+document.getElementById('detailOverlay').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeDetail();
+  }
+});
+
+function payOrder(orderId) {
+  alert('即将跳转到支付页面，订单号：' + orderId);
+}
+
+function cancelOrder(orderId) {
+  if (confirm('确定要取消该订单吗？')) {
+    const order = orders.find(o => o.id === orderId);
+    if (order) {
+      order.status = 'cancelled';
+      order.cancelTime = new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/\//g, '-');
+      renderOrders();
+      alert('订单已取消');
+    }
+  }
+}
+
+// 初始化
+renderOrders();
+</script>
+</body>
+</html>

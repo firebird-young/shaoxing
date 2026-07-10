@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>我的钱包</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; flex-direction: column; align-items: center; }
+.page { max-width: 430px; min-height: 100vh; background: #f6f7fb; position: relative; width: 100%; }
+.reset-btn { margin: 10px 0 6px; height: 32px; padding: 0 20px; border: 1px dashed rgba(255,255,255,0.3); border-radius: 16px; background: transparent; color: rgba(255,255,255,0.4); font-size: 11px; cursor: pointer; transition: all 0.2s; }
+.reset-btn:hover { border-color: rgba(255,255,255,0.6); color: rgba(255,255,255,0.8); }
+
+/* ── 顶部导航 ── */
+.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #fff; border-bottom: 1px solid #f0f0f0; }
+.nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.nav-back svg { width: 20px; height: 20px; color: #333; display: block; }
+.nav-title { flex: 1; text-align: center; font-size: 16px; font-weight: 600; color: #1a1a2e; }
+.nav-placeholder { width: 32px; }
+
+/* ── 钱包卡片 ── */
+.wallet-card { margin: 16px; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
+.wc-header { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid #f5f5f7; }
+.wc-header-left { display: flex; align-items: center; gap: 12px; }
+.wc-logo { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.wc-logo.hui { background: linear-gradient(135deg, #f5a623, #f89821); }
+.wc-logo.zhong { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+.wc-logo svg { width: 22px; height: 22px; color: #fff; display: block; }
+.wc-name { font-size: 15px; font-weight: 600; color: #1a1a2e; }
+.wc-arrow { width: 20px; height: 20px; cursor: pointer; opacity: 0; transition: opacity 0.2s; }
+.wallet-card.opened .wc-arrow { opacity: 1; }
+.wc-arrow svg { width: 100%; height: 100%; color: #999; display: block; }
+.wc-btn { height: 32px; padding: 0 20px; border-radius: 16px; background: #D70C1F; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+.wc-btn:active { opacity: 0.85; transform: scale(0.98); }
+.wallet-card.opened .wc-btn { display: none; }
+
+/* ── 未开通状态 ── */
+.wc-unopened { padding: 0 16px 16px; }
+.wc-unopened .wc-desc { font-size: 12px; color: #999; }
+.wallet-card.opened .wc-unopened { display: none; }
+
+/* ── 已开通状态 ── */
+.wc-opened { display: none; padding: 16px; }
+.wallet-card.opened .wc-opened { display: block; }
+.wc-balance-row { display: flex; justify-content: space-around; padding-bottom: 16px; border-bottom: 1px solid #f5f5f7; }
+.wb-item { text-align: center; }
+.wb-label { font-size: 12px; color: #999; margin-bottom: 6px; }
+.wb-value { font-size: 20px; font-weight: 700; color: #1a1a2e; }
+.wb-value.frozen { color: #999; }
+
+/* ── 操作按钮 ── */
+.wc-actions { display: flex; gap: 12px; margin-top: 16px; }
+.wc-action-btn { flex: 1; height: 40px; border-radius: 20px; border: 1px solid #e0e0e0; background: #fff; font-size: 13px; color: #333; cursor: pointer; transition: all 0.2s; }
+.wc-action-btn:active { background: #f5f5f7; }
+.wc-action-btn.primary { background: #D70C1F; color: #fff; border-color: #D70C1F; }
+.wc-action-btn.primary:active { background: #c60a1b; }
+
+/* ── 加载动画 ── */
+.loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 999; }
+.loading-overlay.show { display: flex; }
+.loading-content { background: #fff; border-radius: 16px; padding: 24px 32px; text-align: center; }
+.loading-spinner { width: 40px; height: 40px; border: 3px solid #f0f0f0; border-top-color: #D70C1F; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 14px; color: #666; }
+</style>
+</head>
+<body>
+<button class="reset-btn" onclick="resetAll()">清空开通</button>
+<div class="page">
+
+<!-- 顶部导航 -->
+<div class="top-bar">
+  <div class="nav-back" onclick="goBack()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </div>
+  <div class="nav-title">我的钱包</div>
+  <div class="nav-placeholder"></div>
+</div>
+
+<!-- 钱包列表 -->
+<div class="wallet-card" id="huiWallet">
+  <div class="wc-header">
+    <div class="wc-header-left">
+      <div class="wc-logo hui">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      </div>
+      <span class="wc-name">汇付钱包</span>
+    </div>
+    <div class="wc-arrow" onclick="viewWalletDetail('hui')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+    <button class="wc-btn" onclick="openWallet('hui')">去开通</button>
+  </div>
+  <div class="wc-unopened">
+    <div class="wc-desc">免费开通 快捷支付</div>
+  </div>
+  <div class="wc-opened">
+    <div class="wc-balance-row">
+      <div class="wb-item">
+        <div class="wb-label">账户余额</div>
+        <div class="wb-value">¥50.00</div>
+      </div>
+    </div>
+    <div class="wc-actions">
+      <button class="wc-action-btn" onclick="recharge('hui')">充值</button>
+      <button class="wc-action-btn primary" onclick="withdraw('hui')">提现</button>
+    </div>
+  </div>
+</div>
+
+<div class="wallet-card" id="zhongWallet">
+  <div class="wc-header">
+    <div class="wc-header-left">
+      <div class="wc-logo zhong">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+      <span class="wc-name">中金钱包</span>
+    </div>
+    <div class="wc-arrow" onclick="viewWalletDetail('zhong')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+    <button class="wc-btn" onclick="openWallet('zhong')">去开通</button>
+  </div>
+  <div class="wc-unopened">
+    <div class="wc-desc">免费开通 快捷支付</div>
+  </div>
+  <div class="wc-opened">
+    <div class="wc-balance-row">
+      <div class="wb-item">
+        <div class="wb-label">账户余额</div>
+        <div class="wb-value">¥0.00</div>
+      </div>
+    </div>
+    <div class="wc-actions">
+      <button class="wc-action-btn" onclick="recharge('zhong')">充值</button>
+      <button class="wc-action-btn primary" onclick="withdraw('zhong')">提现</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- 加载弹窗 -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-content">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loadingText">正在开通...</div>
+  </div>
+</div>
+
+<script>
+// 检查本地存储中钱包的开通状态
+document.addEventListener('DOMContentLoaded', function() {
+  const huiOpened = localStorage.getItem('huiWalletOpened') === 'true';
+  const zhongOpened = localStorage.getItem('zhongWalletOpened') === 'true';
+  
+  if (huiOpened) {
+    document.getElementById('huiWallet').classList.add('opened');
+  }
+  if (zhongOpened) {
+    document.getElementById('zhongWallet').classList.add('opened');
+  }
+});
+
+function goBack() {
+  window.location.href = 'my.html';
+}
+
+function openWallet(type) {
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  const loadingText = document.getElementById('loadingText');
+  
+  loadingText.textContent = '正在开通...';
+  loadingOverlay.classList.add('show');
+  
+  // 模拟开通过程
+  setTimeout(() => {
+    loadingText.textContent = '验证身份...';
+  }, 800);
+  
+  setTimeout(() => {
+    loadingText.textContent = '开通成功!';
+  }, 1600);
+  
+  setTimeout(() => {
+    loadingOverlay.classList.remove('show');
+    
+    // 更新钱包状态
+    if (type === 'hui') {
+      document.getElementById('huiWallet').classList.add('opened');
+      localStorage.setItem('huiWalletOpened', 'true');
+    } else {
+      document.getElementById('zhongWallet').classList.add('opened');
+      localStorage.setItem('zhongWalletOpened', 'true');
+    }
+  }, 2400);
+}
+
+function resetAll() {
+  localStorage.removeItem('huiWalletOpened');
+  localStorage.removeItem('zhongWalletOpened');
+  localStorage.removeItem('authenticated');
+  alert('已清空开通状态，页面将刷新');
+  window.location.reload();
+}
+
+function viewWalletDetail(type) {
+  alert('查看钱包详情: ' + (type === 'hui' ? '汇付钱包' : '中金钱包'));
+}
+
+function recharge(type) {
+  alert('充值功能: ' + (type === 'hui' ? '汇付钱包' : '中金钱包'));
+}
+
+function withdraw(type) {
+  alert('提现功能: ' + (type === 'hui' ? '汇付钱包' : '中金钱包'));
+}
+</script>
+</body>
+</html>

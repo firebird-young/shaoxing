@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>转赠记录</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; justify-content: center; }
+.page { max-width: 430px; min-height: 100vh; background: #f6f7fb; padding: 0 16px 20px; position: relative; width: 100%; }
+
+.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; background: #f6f7fb; }
+.nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.nav-back svg { width: 20px; height: 20px; color: #333; display: block; }
+.nav-title { flex: 1; text-align: center; font-size: 16px; font-weight: 600; color: #1a1a2e; }
+.nav-placeholder { width: 32px; }
+
+.tabs { display: flex; background: #fff; border-radius: 12px; padding: 4px; margin: 10px 0 14px; }
+.tab { flex: 1; text-align: center; padding: 8px 0; font-size: 13px; color: #999; cursor: pointer; border-radius: 10px; transition: all .2s; font-weight: 500; }
+.tab.on { background: #D70C1F; color: #fff; font-weight: 600; }
+
+.record-list { display: flex; flex-direction: column; gap: 10px; }
+.rec-card { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.03); }
+.rec-status { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.rec-badge { font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+.badge-out { background: #FFF2F3; color: #D70C1F; }
+.badge-in { background: #E6F9F0; color: #00b894; }
+.rec-time { font-size: 11px; color: #bbb; }
+
+.rec-asset { display: flex; align-items: center; gap: 10px; }
+.rec-thumb { width: 40px; height: 48px; border-radius: 8px; background-position: center; background-size: cover; flex-shrink: 0; background-color: #f5f5f7; }
+.rec-info { flex: 1; min-width: 0; }
+.rec-name { font-size: 13px; font-weight: 600; color: #1a1a2e; }
+.rec-spec { font-size: 11px; color: #999; margin-top: 2px; }
+.rec-counterparty { display: flex; align-items: center; gap: 4px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f5f5f7; font-size: 11px; color: #999; }
+.rec-counterparty .dir { font-size: 10px; color: #ccc; }
+.rec-hash { font-size: 10px; color: #bbb; font-family: 'SF Mono',Menlo,Consolas,monospace; cursor: pointer; word-break: break-all; }
+.rec-hash:active { color: #D70C1F; }
+
+.empty { text-align: center; padding: 60px 0; color: #ccc; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="top-bar">
+  <div class="nav-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </div>
+  <div class="nav-title">转赠记录</div>
+  <div class="nav-placeholder"></div>
+</div>
+
+<div class="tabs">
+  <div class="tab on" id="tabAll" onclick="switchTab('all')">全部</div>
+  <div class="tab" id="tabOut" onclick="switchTab('out')">我的赠与</div>
+  <div class="tab" id="tabIn" onclick="switchTab('in')">收到赠与</div>
+</div>
+
+<div class="record-list" id="recordList"></div>
+
+</div>
+
+<script>
+// ═══ 模拟转赠记录（后续可接KV持久化） ═══
+var records = [
+  { type:'out', date:'2026-06-10 14:22', series:'茅台1935·时光窖藏', spec:'凝时', id:'#54', img:'凝时.png', person:'张三', addr:'0xa1b2...c3d4', hash:'0x3f1a8b2c9d...7e6f' },
+  { type:'in',  date:'2026-06-08 10:15', series:'国酒·数字徽章', spec:'标准款', id:'#88', img:'国酒·数字徽章.png', person:'李四', addr:'0xe5f6...a7b8', hash:'0x9c4d5e6f1a...3b2c' },
+  { type:'out', date:'2026-05-20 16:30', series:'飞天茅台·元宇宙酒票', spec:'典藏版', id:'#28', img:'飞天茅台·元宇宙酒票.png', person:'王五', addr:'0xc9d0...e1f2', hash:'0x7a3b6c5d4e...1f9a' },
+  { type:'in',  date:'2026-05-12 09:00', series:'茅台生肖兔·典藏', spec:'兔年限定', id:'#09', img:'茅台生肖兔·典藏.png', person:'赵六', addr:'0x8b7c6d...5e4f', hash:'0x2d1e0f3a4b...6c7d' },
+];
+
+var currentTab = 'all';
+
+function switchTab(tab){
+  currentTab = tab;
+  document.getElementById('tabAll').className = 'tab' + (tab==='all'?' on':'');
+  document.getElementById('tabOut').className = 'tab' + (tab==='out'?' on':'');
+  document.getElementById('tabIn').className  = 'tab' + (tab==='in'?' on':'');
+  renderRecords();
+}
+
+function renderRecords(){
+  var list = records.slice();
+  if(currentTab === 'out') list = list.filter(function(r){ return r.type === 'out'; });
+  if(currentTab === 'in')  list = list.filter(function(r){ return r.type === 'in'; });
+  list.sort(function(a,b){ return b.date.localeCompare(a.date); });
+
+  if(!list.length){
+    document.getElementById('recordList').innerHTML = '<div class="empty">暂无转赠记录</div>';
+    return;
+  }
+  var h = '';
+  list.forEach(function(r){
+    var isOut = r.type === 'out';
+    h += '<div class="rec-card">';
+    h += '<div class="rec-status">';
+    h += '<span class="rec-badge '+(isOut?'badge-out':'badge-in')+'">'+(isOut?'赠与对方':'收到赠与')+'</span>';
+    h += '<span class="rec-time">'+r.date+'</span>';
+    h += '</div>';
+    h += '<div class="rec-asset">';
+    h += '<div class="rec-thumb" style="background-image:url(\''+r.img+'\')"></div>';
+    h += '<div class="rec-info"><div class="rec-name">'+r.series+'</div><div class="rec-spec">'+r.spec+' · '+r.id+'</div></div>';
+    h += '</div>';
+    h += '<div class="rec-counterparty">';
+    h += '<span class="dir">'+(isOut?'→':'←')+'</span>';
+    h += '<span>'+r.person+'</span>';
+    h += '<span style="margin-left:8px;font-size:10px;color:#ccc">'+r.addr+'</span>';
+    h += '</div>';
+    h += '<div style="margin-top:6px"><span class="rec-hash" onclick="copyIt(\''+r.hash+'\')">TxHash: '+r.hash+'</span></div>';
+    h += '</div>';
+  });
+  document.getElementById('recordList').innerHTML = h;
+}
+
+function copyIt(txt){
+  navigator.clipboard.writeText(txt).then(function(){alert('已复制');}).catch(function(){});
+}
+
+renderRecords();
+</script>
+
+</body>
+</html>

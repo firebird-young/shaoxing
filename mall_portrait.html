@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>元宇宙商场 · 竖屏</title>
+<style>
+  /* ── 全局重置 ── */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* ── 手机外框 (竖屏) ── */
+  .phone {
+    position: relative;
+    width: 430px;
+    height: 860px;
+    border-radius: 36px;
+    background: #1a1a2e;
+    padding: 12px;
+    box-shadow:
+      0 30px 80px rgba(0,0,0,.7),
+      inset 0 0 0 2px #333;
+    animation: phoneIn .7s ease-out;
+  }
+  @keyframes phoneIn {
+    0% { opacity: 0; transform: translateY(60px) scale(.92); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .phone-screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 24px;
+    overflow: hidden;
+    background: #000;
+  }
+
+  /* ── 场景图层 ── */
+  .scene-layer {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: opacity .8s ease, transform .8s ease;
+  }
+  .scene-layer.hidden {
+    opacity: 0;
+    transform: scale(1.06);
+    pointer-events: none;
+  }
+
+  /* ── 可拖拽地图 ── */
+  .map-pan {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 1;
+  }
+  .map-pan img {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    transition: transform .6s cubic-bezier(.25,.46,.45,.94);
+    pointer-events: none;
+  }
+  .scene-sub .map-pan img {
+    width: 120%; height: 120%;
+  }
+  .map-pan img.dragging {
+    transition: none;
+  }
+  .map-pan img.bounce-in {
+    transition: transform .8s cubic-bezier(.17,.67,.39,.97);
+  }
+
+  /* 拖拽提示 */
+  .drag-hint {
+    position: absolute;
+    left: 50%; top: 45%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    text-shadow: 0 2px 16px rgba(0,0,0,.8);
+    letter-spacing: 2px;
+    pointer-events: none;
+    opacity: 0;
+    animation: dragHintAnim 2.8s ease-out;
+    white-space: nowrap;
+  }
+  @keyframes dragHintAnim {
+    0% { opacity: 0; transform: translate(-50%, -50%) translateY(10px); }
+    15% { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
+    70% { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
+    100% { opacity: 0; transform: translate(-50%, -50%) translateY(-16px); }
+  }
+
+  /* ── 信息覆盖层 ── */
+  .scene-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .scene-overlay > * { pointer-events: auto; }
+
+  /* ── 场景名称 ── */
+  .scene-title {
+    position: absolute;
+    top: 14px;
+    left: 20px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    text-shadow: 0 2px 12px rgba(0,0,0,.7);
+    background: rgba(0,0,0,.45);
+    padding: 5px 14px;
+    border-radius: 20px;
+    backdrop-filter: blur(6px);
+    letter-spacing: 1px;
+  }
+
+  /* ── 角色头顶昵称 ── */
+  .origin-name {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    text-shadow: 0 1px 8px rgba(0,0,0,.8);
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(0,0,0,.5);
+    backdrop-filter: blur(4px);
+    margin-bottom: 4px;
+    pointer-events: none;
+  }
+
+  /* ── 动画方案按钮 + 弹窗 ── */
+  .anim-btn {
+    position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); z-index: 9999;
+    padding: 8px 18px; border-radius: 20px;
+    background: linear-gradient(135deg, rgba(30,30,50,.9), rgba(20,20,40,.9));
+    border: 1px solid rgba(255,215,0,.3);
+    color: #ffd700; font-size: 12px; font-weight: 600; cursor: pointer;
+    letter-spacing: 1px; box-shadow: 0 4px 16px rgba(0,0,0,.5);
+  }
+  .anim-modal-overlay {
+    position: fixed; inset: 0; z-index: 9998; display: none;
+    align-items: flex-start; justify-content: center;
+    background: rgba(0,0,0,.75); padding: 0 8px; overflow-y: auto;
+  }
+  .anim-modal-overlay.show { display: flex; }
+  .anim-modal {
+    background: #1a1a2e; border-radius: 16px; width: 100%; max-width: 400px;
+    margin: 20px 0 40px; padding: 20px 16px; color: #e0e0e0; font-size: 12px;
+    line-height: 1.7; position: relative;
+  }
+  .anim-modal h3 { font-size: 15px; color: #ffd700; margin: 14px 0 8px; }
+  .anim-modal h3:first-child { margin-top: 0; }
+  .anim-modal h4 { font-size: 13px; color: #667eea; margin: 10px 0 4px; }
+  .anim-modal .tag { display: inline-block; padding: 1px 6px; border-radius: 6px; font-size: 10px; margin-right: 4px; }
+  .anim-modal .tag-sprite { background: rgba(102,126,234,.2); color: #667eea; }
+  .anim-modal .tag-css { background: rgba(32,191,107,.2); color: #20bf6b; }
+  .anim-modal .tag-gif { background: rgba(255,107,107,.2); color: #ff6b6b; }
+  .anim-modal .tag-lottie { background: rgba(168,85,247,.2); color: #a855f7; }
+  .anim-modal .tag-particle { background: rgba(255,204,102,.2); color: #ffcc66; }
+  .anim-modal-close {
+    position: sticky; top: 8px; float: right; width: 28px; height: 28px;
+    border-radius: 50%; background: rgba(255,255,255,.1); display: flex;
+    align-items: center; justify-content: center; cursor: pointer; color: #999; font-size: 14px;
+  }
+
+  /* ── 活动悬浮横条 ── */
+  .scene-layer.hidden .event-banner { display:none; }
+  .event-banner {
+    position: absolute; top: 46px; left: 10px; right: 10px; z-index: 25;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 6px 14px; border-radius: 12px;
+    background: rgba(0,0,0,.45); backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,.18);
+    color: #ffd700; font-size: 12px; font-weight: 700;
+    text-decoration: none; cursor: pointer;
+    animation: eventBannerPulse 2s ease-in-out infinite;
+    letter-spacing: .5px;
+  }
+  .event-banner:hover { background: rgba(0,0,0,.6); }
+  @keyframes eventBannerPulse {
+    0%,100% { border-color: rgba(255,255,255,.18); }
+    50% { border-color: rgba(255,215,0,.5); }
+  }
+
+  /* ── 弹窗返回/关闭按钮 ── */
+  .role-modal-back {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    z-index: 10;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 14px;
+    color: rgba(255,255,255,.6);
+    font-size: 11px;
+    cursor: pointer;
+    padding: 3px 10px;
+    transition: background .2s, color .2s;
+    line-height: 1;
+  }
+  .role-modal-back:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+  /* ── 右上角用户信息 ── */
+  .user-info-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 50;
+    pointer-events: auto;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px 4px 4px;
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 18px;
+    background: rgba(0,0,0,.4);
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    transition: background .2s;
+  }
+  .user-info-btn:hover { background: rgba(0,0,0,.6); }
+  .user-info-btn .u-avatar {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .user-info-btn .u-name {
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ── 重置角色按钮（手机框外） ── */
+  .reset-role-btn {
+    position: absolute;
+    top: -30px;
+    right: 0;
+    z-index: 50;
+    padding: 3px 10px;
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 12px;
+    background: rgba(0,0,0,.4);
+    color: rgba(255,255,255,.5);
+    font-size: 11px;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: background .2s, color .2s;
+  }
+  .reset-role-btn:hover {
+    background: rgba(0,0,0,.6);
+    color: #fff;
+  }
+
+  .landscape-btn {
+    position: absolute;
+    top: -30px; left: 0;
+    z-index: 50;
+    padding: 3px 10px;
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 12px;
+    background: rgba(0,0,0,.4);
+    color: rgba(255,255,255,.5);
+    font-size: 11px;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: background .2s, color .2s;
+  }
+  .landscape-btn:hover { background: rgba(0,0,0,.6); color: #fff; }
+
+  /* ── 起点 ── */
+  .origin {
+    position: absolute;
+    width: 64px; height: 64px;
+    cursor: default;
+    z-index: 10;
+    transition: left 4s ease, top 4s ease;
+  }
+  .origin-dot {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    background: center / cover no-repeat;
+    box-shadow: 0 0 24px rgba(100,200,255,.6);
+    animation: float 2.4s ease-in-out infinite;
+  }
+  .origin-ring {
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 2px solid rgba(100,200,255,.4);
+    animation: ringPulse 2s ease-out infinite;
+  }
+  .origin-ring:nth-child(2) { animation-delay: .7s; }
+  .origin-ring:nth-child(3) { animation-delay: 1.4s; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+  /* ── 场景内雪碧图动画 ── */
+  .scene-sprite {
+    position: absolute; top: 50%; left: 20%; z-index: 20; width: 60px; pointer-events: none;
+    transform: translate(var(--map-dx,0px), calc(-50% + var(--map-dy,0px)));
+    filter: drop-shadow(0 3px 8px rgba(0,0,0,.5));
+  }
+  .scene-sprite #dufuInner, .scene-sprite #cunchaoInner {
+    width: 100%; background-repeat: no-repeat;
+    image-rendering: pixelated;
+    will-change: background-position;
+    transform: translateZ(0);
+  }
+  #dufuSprite { top: 40%; transform: translate(var(--map-dx,0px), calc(-50% + var(--map-dy,0px))) scaleY(0.8); }
+  .scene-sprite.cunchao { left: auto; right: 15%; width: 50px; }
+  .cat-lottie { position: absolute; right: 10%; bottom: 15%; width: 150px; height: 150px; z-index: 60; pointer-events: none; }
+  .biz-lottie { position: absolute; left: 10%; top: 15%; width: 100px; height: 100px; z-index: 60; pointer-events: none; }
+  .particle-canvas { position: absolute; inset: 0; z-index: 16; pointer-events: none; width: 100%; height: 100%; }
+  .building-glow {
+    position: absolute; right: -11%; top: 12%; z-index: 3; width: 250px; pointer-events: none;
+    transform: translate(var(--map-dx,0px), var(--map-dy,0px));
+    animation: bldPulse 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(255,215,0,.6));
+  }
+  @keyframes bldPulse {
+    0%,100% { transform: translate(var(--map-dx,0px), var(--map-dy,0px)) scale(1); }
+    50% { transform: translate(var(--map-dx,0px), var(--map-dy,0px)) scale(1.05); filter: drop-shadow(0 0 20px rgba(255,215,0,.9)); }
+  }
+
+  @keyframes ringPulse {
+    0% { transform: scale(1); opacity: .6; }
+    100% { transform: scale(1.6); opacity: 0; }
+  }
+
+  /* ── 商场点位 ── */
+  .mall-spot {
+    position: absolute;
+    cursor: pointer;
+    z-index: 8;
+    border: 2px solid rgba(255,255,255,.25);
+    border-radius: 8px;
+    background: rgba(255,255,255,.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border .25s, background .25s, transform .25s;
+  }
+  .mall-spot:hover {
+    border-color: rgba(70,180,255,.7);
+    background: rgba(70,180,255,.12);
+    box-shadow: 0 0 16px rgba(0,180,255,.3);
+  }
+  .mall-spot .label {
+    white-space: nowrap;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    text-shadow: 0 1px 6px rgba(0,0,0,.8);
+    pointer-events: none;
+  }
+
+  .origin {
+    transition: left 1.6s cubic-bezier(.34,1.56,.64,1),
+                top  1.6s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  /* ── 导航按钮 ── */
+  .nav-btn {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    z-index: 20;
+    pointer-events: auto;
+    cursor: pointer;
+    animation: navBounce 1.6s ease-in-out infinite;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,.5));
+    transition: transform .25s;
+  }
+  .nav-btn:hover { animation: none; transform: scale(1.12); }
+  .nav-btn:active { transform: scale(.92); }
+  .nav-btn img {
+    display: block;
+    width: 48px;
+    height: auto;
+  }
+  @keyframes navBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+
+  /* ── 主地图返回标准商城按钮 ── */
+  .mall-back-btn{
+    position:absolute;top:14px;left:14px;z-index:30;
+    pointer-events:auto;cursor:pointer;
+    display:flex;align-items:center;gap:4px;
+    padding:5px 12px;border-radius:16px;
+    background:rgba(0,0,0,.45);backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,.12);
+    color:#fff;font-size:12px;font-weight:500;
+    filter:drop-shadow(0 4px 8px rgba(0,0,0,.5));
+    transition:transform .2s;
+  }
+  .mall-back-btn:hover{transform:scale(1.05);background:rgba(0,0,0,.6)}
+  .mall-back-btn:active{transform:scale(.92)}
+  .mall-back-btn svg{width:14px;height:14px;flex-shrink:0}
+
+  /* ── 下一场景按钮 ── */
+  .next-scene-btn {
+    position: absolute;
+    z-index: 31;
+    pointer-events: auto;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,.5));
+    transition: transform .25s;
+  }
+  .next-scene-btn:hover { transform: translate(-50%, -50%) scale(1.12); }
+  .next-scene-btn:active { transform: translate(-50%, -50%) scale(.92); }
+  .next-scene-btn.left-arrow { animation: arrowBounceLeft 1.2s ease-in-out infinite; }
+  .next-scene-btn.right-arrow { animation: arrowBounceRight 1.2s ease-in-out infinite; }
+  .next-scene-btn img {
+    display: block;
+    width: 52px;
+    height: auto;
+  }
+  @keyframes arrowBounceLeft {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+    50% { transform: translate(-50%, -50%) translateY(8px); }
+  }
+  @keyframes arrowBounceRight {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+    50% { transform: translate(-50%, -50%) translateY(8px); }
+  }
+
+  /* ── 气泡弹窗 ── */
+  .scene-bubble {
+    position: absolute;
+    z-index: 30;
+    pointer-events: auto;
+    opacity: 0;
+    transform: translate(-50%, -100%) translateY(-10px) scale(.92);
+    transition: opacity .3s, transform .3s cubic-bezier(.34,1.56,.64,1);
+  }
+  .scene-bubble.show {
+    opacity: 1;
+    transform: translate(-50%, -100%) translateY(-16px) scale(1);
+  }
+  .bubble-content {
+    background: #1c1c38;
+    border-radius: 14px;
+    padding: 16px 20px 14px;
+    width: 240px;
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(0,0,0,.5);
+    border: 1px solid rgba(255,255,255,.08);
+    position: relative;
+  }
+  .bubble-content::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #1c1c38;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,.3));
+  }
+  .bubble-content h3 { color: #fff; font-size: 16px; margin-bottom: 2px; }
+  .bubble-content p { color: rgba(255,255,255,.55); font-size: 12px; margin-bottom: 14px; }
+  .bubble-content .btns { display: flex; gap: 10px; justify-content: center; }
+  .bubble-content .btns button {
+    border: none; padding: 7px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: transform .2s;
+  }
+  .bubble-content .btns button:active { transform: scale(.93); }
+  .bubble-content .btns .btn-cancel { background: rgba(255,255,255,.08); color: rgba(255,255,255,.6); }
+  .bubble-content .btns .btn-cancel:hover { background: rgba(255,255,255,.15); }
+  .bubble-content .btns .btn-enter { background: linear-gradient(135deg, #43e97b, #38f9d7); color: #1a1a2e; }
+
+  /* ── 角色选择弹窗 ── */
+  .role-modal-overlay {
+    position: absolute;
+    inset: 0; z-index: 9999;
+    background: rgba(0,0,0,.7);
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity .3s;
+  }
+  .role-modal-overlay.hidden { display: none; }
+  .role-modal {
+    background: #1e1e3a;
+    border-radius: 10px;
+    padding: 10px 14px 10px;
+    width: 80%;
+    max-width: 320px;
+    max-height: 100%;
+    overflow: hidden;
+    box-shadow: 0 6px 24px rgba(0,0,0,.5);
+    border: 1px solid rgba(255,255,255,.08);
+    animation: modalIn .3s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes modalIn {
+    0% { opacity: 0; transform: scale(.9) translateY(10px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .role-modal-title { text-align: center; color: #fff; font-size: 14px; font-weight: 700; margin-bottom: 1px; }
+  .role-modal-sub { text-align: center; color: rgba(255,255,255,.4); font-size: 10px; margin-bottom: 6px; }
+  .role-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 6px; }
+  .role-card {
+    cursor: pointer; border-radius: 6px; overflow: hidden;
+    background: rgba(255,255,255,.04); border: 1.5px solid transparent;
+    transition: border-color .2s, transform .2s, box-shadow .2s;
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  }
+  .role-card:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+  .role-card.selected { border-color: #667eea; box-shadow: 0 0 0 2px rgba(102,126,234,.3); }
+  .role-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .role-section-title { color: rgba(255,255,255,.4); font-size: 10px; font-weight: 600; margin-bottom: 1px; padding-left: 2px; grid-column: 1 / -1; }
+  .role-section-title:not(:first-child) { margin-top: 2px; }
+  .role-name-group { margin-bottom: 6px; }
+  .role-name-group label { display: block; color: rgba(255,255,255,.6); font-size: 10px; font-weight: 500; margin-bottom: 3px; }
+  .role-name-input { width: 100%; height: 30px; padding: 0 8px; border-radius: 6px; border: 1.5px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06); color: #fff; font-size: 12px; outline: none; transition: border-color .2s; }
+  .role-name-input:focus { border-color: #667eea; }
+  .role-name-input::placeholder { color: rgba(255,255,255,.25); }
+  .role-confirm-btn { width: 100%; height: 32px; border: none; border-radius: 6px; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity .2s, transform .15s; }
+  .role-confirm-btn:hover { opacity: .9; }
+  .role-confirm-btn:active { transform: scale(.97); }
+  .role-confirm-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+  /* ── 在线用户面板 ── */
+  .online-panel {
+    position: absolute;
+    bottom: 16px; left: 16px;
+    z-index: 100; pointer-events: auto;
+    background: rgba(0,0,0,.65);
+    backdrop-filter: blur(10px);
+    border-radius: 12px; padding: 10px 12px;
+    min-width: 140px;
+    border: 1px solid rgba(255,255,255,.08);
+    box-shadow: 0 4px 20px rgba(0,0,0,.4);
+    display: none;
+  }
+  .online-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .online-title { color: rgba(255,255,255,.6); font-size: 11px; font-weight: 500; }
+  .online-count { color: #4ade80; font-size: 13px; font-weight: 700; white-space: nowrap; }
+  .online-count::before { content: ''; display: inline-block; width: 6px; height: 6px; background: #4ade80; border-radius: 50%; margin-right: 4px; vertical-align: middle; animation: pulse 2s ease-in-out infinite; }
+  .online-list { display: flex; flex-direction: column; gap: 6px; max-height: 120px; overflow-y: auto; -ms-overflow-style: none; scrollbar-width: none; }
+  .online-list::-webkit-scrollbar { display: none; }
+  .online-item { display: flex; align-items: center; gap: 8px; }
+  .online-avatar { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,.15); }
+  .online-name { color: rgba(255,255,255,.7); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+
+  /* ── 响应式 ── */
+  @media (max-width: 480px) {
+    .phone { width: 100vw; height: 200vw; border-radius: 0; padding: 0; box-shadow: none; }
+    .phone-screen { border-radius: 0; }
+    body { background: #000; }
+  }
+</style>
+</head>
+<body>
+
+<div class="phone" id="phone">
+  <button class="reset-role-btn" id="resetRoleBtn" style="display:none" onclick="resetRole()">🔄 重置角色</button>
+  <button class="landscape-btn" onclick="window.location.href='mall.html'">📱 横屏模式</button>
+  <div class="phone-screen">
+
+    <!-- 场景1：元宇宙地图 -->
+    <div class="scene-layer" id="scene1">
+      <a class="event-banner" href="dice_game.html" onclick="event.stopPropagation()">🎲 本期活动：文旅大联盟</a>
+      <div class="map-pan" id="mapPan">
+        <img id="mapPanImg" src="元宇宙地图_new.png" alt="元宇宙地图">
+      </div>
+      <div class="scene-overlay" data-scene="1">
+        <div class="scene-title">元宇宙地图</div>
+      </div>
+    </div>
+
+    <!-- 场景2：食品区 -->
+    <div class="scene-layer hidden scene-sub" id="scene2">
+      <div class="map-pan"><img src="scene1_new.png" alt="食品区"></div>
+      <div class="scene-overlay" data-scene="2">
+        <div class="scene-title">食品区</div>
+      </div>
+    </div>
+
+    <!-- 场景3：影视区 -->
+    <div class="scene-layer hidden scene-sub" id="scene3">
+      <div class="map-pan"><img src="scene3_new.png" alt="影视区"></div>
+      <div class="scene-overlay" data-scene="3">
+        <div class="scene-title">影视区</div>
+      </div>
+    </div>
+
+    <!-- 场景4：文旅区 -->
+    <div class="scene-layer hidden scene-sub" id="scene4">
+      <div class="map-pan"><img src="scene2_new.png" alt="文旅区"></div>
+      <div class="scene-overlay" data-scene="4">
+        <div class="scene-title">文旅区</div>
+        <img class="building-glow" src="王者荣耀建筑.png" alt="">
+        <img class="building-glow" src="杜甫草堂建筑.png" alt="" style="right:auto;left:1%;top:30%;width:220px;z-index:3">
+        <img class="building-glow" src="贵州村超建筑.png" alt="" style="right:auto;left:48%;top:32%;width:280px;z-index:3">
+        <img class="building-glow" src="武侯祠建筑.png" alt="" style="right:auto;left:-1%;top:7%;width:200px;z-index:3">
+        <img class="building-glow" src="故宫建筑.png" alt="" style="right:auto;left:-15%;top:48%;width:320px;z-index:3">
+      </div>
+      <div class="scene-sprite" id="dufuSprite"><div id="dufuInner"></div></div>
+      <div class="scene-sprite cunchao" id="cunchaoSprite"><div id="cunchaoInner"></div></div>
+      <div class="cat-lottie" id="catLottie"></div>
+      <div class="biz-lottie" id="bizLottie"></div>
+      <canvas class="particle-canvas" id="particleCanvas"></canvas>
+    </div>
+
+    <!-- 右上角用户信息 -->
+    <div class="user-info-btn" id="userInfoBtn" onclick="openEditUser()">
+      <img class="u-avatar" id="uAvatar" src="" alt="">
+      <span class="u-name" id="uName"></span>
+    </div>
+
+    <!-- 在线用户面板 -->
+    <div class="online-panel" id="onlinePanel">
+      <div class="online-header">
+        <span class="online-title">在线用户</span>
+        <span class="online-count" id="onlineCount">128</span>
+      </div>
+      <div class="online-list" id="onlineList"></div>
+    </div>
+
+    <!-- 角色选择弹窗 -->
+    <div class="role-modal-overlay" id="roleModalOverlay">
+      <div class="role-modal">
+        <button class="role-modal-back" id="roleModalBack" onclick="onBackClick()">←</button>
+        <div class="role-modal-title">🎭 选择你的角色</div>
+        <div class="role-modal-sub">选择一个形象进入元宇宙商场</div>
+        <div class="role-grid" id="roleGrid"></div>
+        <div class="role-name-group">
+          <label>你的昵称</label>
+          <input class="role-name-input" id="roleNameInput" placeholder="请输入昵称" maxlength="12">
+        </div>
+        <button class="role-confirm-btn" id="roleConfirmBtn" disabled onclick="confirmRole()">确认进入</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 动画方案按钮（手机框外） -->
+<div class="anim-btn" onclick="document.getElementById('animModal').classList.add('show')">🎬 动画方案</div>
+
+<!-- 动画方案弹窗 -->
+<div class="anim-modal-overlay" id="animModal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="anim-modal">
+    <div class="anim-modal-close" onclick="document.getElementById('animModal').classList.remove('show')">✕</div>
+    <h3>APP 内嵌轻小游戏全套动画实现方案汇总</h3>
+    <p>分 5 大类，适配骰子走棋盘项目</p>
+
+    <h3>一、5 种主流动画方案</h3>
+
+    <h4><span class="tag tag-sprite">序列帧雪碧图</span> 游戏核心动画</h4>
+    <p><b>适用：</b>人物走路、骰子滚动、礼盒开盖、树苗生长</p>
+    <p><b>组成：</b>雪碧图 PNG + JSON 坐标文件</p>
+    <p><b>优点：</b>画质通透、可控性拉满、批量渲染强、体积远小于 GIF</p>
+    <p><b>缺点：</b>美术需 TexturePacker 打包</p>
+    <p><b>你的项目：</b>骰子、角色行走、中奖礼盒开盖</p>
+
+    <h4><span class="tag tag-css">单图+CSS/JS 位移</span> 极简循环微动效</h4>
+    <p><b>适用：</b>上下跳动、左右摇摆、闪烁、悬浮装饰</p>
+    <p><b>组成：</b>1 张静态素材即可</p>
+    <p><b>优点：</b>零额外素材、加载最快、无需图集</p>
+    <p><b>缺点：</b>无法形变（开盖、迈步做不了）</p>
+    <p><b>你的项目：</b>页面角落装饰礼盒、背景浮动光点</p>
+
+    <h4><span class="tag tag-gif">GIF 动图</span> 仅限临时过渡</h4>
+    <p><b>适用：</b>Demo、短期活动、单元素循环</p>
+    <p><b>优点：</b>美术直接导出，前端一行代码</p>
+    <p><b>致命短板：</b>透明锯齿、体积大、无法停帧、多元素卡顿</p>
+    <p><b>定位：</b>仅临时凑活，正式上线全换雪碧图</p>
+
+    <h4><span class="tag tag-lottie">Lottie 矢量动画</span> 精致轻量特效</h4>
+    <p><b>适用：</b>闪光粒子、中奖光效、弹窗彩带、UI 动效</p>
+    <p><b>组成：</b>1 份 JSON 矢量文件</p>
+    <p><b>优点：</b>无限放大不失真、体积极小、自带光影</p>
+    <p><b>缺点：</b>不适合复杂手绘角色行走</p>
+    <p><b>你的项目：</b>踩格子金光、抽奖弹窗彩带、闪烁星光</p>
+
+    <h4><span class="tag tag-particle">原生粒子/代码绘制</span> 零素材</h4>
+    <p><b>适用：</b>飘落花瓣、金币飞溅、光点、烟雾</p>
+    <p><b>优点：</b>体积最小、自定义强度、随时开关</p>
+    <p><b>缺点：</b>只能做简单几何，手绘效果差</p>
+    <p><b>你的项目：</b>中奖金币、花瓣飘落背景</p>
+
+    <h3>二、场景快速匹配</h3>
+    <p><span class="tag tag-sprite">雪碧</span> 人物行走、骰子、礼盒开盖<br>
+    <span class="tag tag-css">CSS</span> 角落悬浮礼盒、星星跳动<br>
+    <span class="tag tag-lottie">Lottie</span> 中奖金光、弹窗彩带<br>
+    <span class="tag tag-particle">粒子</span> 金币炸开、花瓣飘落<br>
+    <span class="tag tag-gif">GIF</span> 仅 Demo 过渡</p>
+
+    <h3>三、最简落地组合</h3>
+    <p><b>核心交互：</b>雪碧图集（角色、骰子、礼盒）<br>
+    <b>装饰微动效：</b>静态图+CSS<br>
+    <b>光效彩带：</b>Lottie<br>
+    <b>粒子和临时：</b>Canvas粒子 / GIF过渡</p>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// 场景配置
+// ═══════════════════════════════════════════════════════
+const SCENES = {
+  1: {
+    name: '元宇宙地图',
+    origin: { left: 50, top: 42 },
+    spots: [
+      { x: 40, y: 52, w: 20, h: 5, label: '食品区', toScene: 2 },
+      { x: 55, y: 30, w: 20, h: 5, label: '文旅区', toScene: 4 },
+      { x: 25,  y: 30, w: 20, h: 5, label: '影视区', toScene: 3 },
+    ],
+    arrows: []
+  },
+  2: {
+    name: '食品区',
+    origin: { left: 50, top: 80 },
+    spots: [
+      { x: 75, y: 30, w: 12, h: 10, label: '妙可蓝多' },
+      { x: 10, y: 20, w: 12, h: 10, label: '黄老五食品' },
+      { x: 10, y: 50, w: 12, h: 10, label: '五粮液' },
+      { x: 70, y: 70, w: 12, h: 10, label: '贵州茅台' },
+    ],
+    arrows: [
+      { to: 4, x: 50, y: 6, rot: 90,  cls: 'top-arrow' },
+      { to: 1, x: 50, y: 94, rot: 180, cls: 'bot-arrow' }
+    ]
+  },
+  3: {
+    name: '影视区',
+    origin: { left: 50, top: 80 },
+    spots: [
+      { x: 12, y: 25, w: 12, h: 10, label: '魔童哪吒' },
+      { x: 60, y: 20, w: 12, h: 10, label: '鬼吹灯' },
+      { x: 78, y: 35, w: 12, h: 10, label: '甄嬛传' },
+      { x: 25, y: 45, w: 12, h: 10, label: '三体' },
+      { x: 45, y: 85, w: 12, h: 10, label: '庆余年' },
+    ],
+    arrows: [
+      { to: 4, x: 50, y: 6, rot: -90, cls: 'top-arrow' },
+      { to: 2, x: 50, y: 94, rot: 180, cls: 'bot-arrow' }
+    ]
+  },
+  4: {
+    name: '文旅区',
+    origin: { left: 50, top: 80 },
+    spots: [
+      { x: 20, y: 28, w: 12, h: 10, label: '武侯祠' },
+      { x: 72, y: 60, w: 12, h: 10, label: '贵州村超' },
+      { x: 20, y: 50, w: 14, h: 10, label: '杜甫草堂博物馆'},
+      { x: 72, y: 28, w: 12, h: 10, label: '王者荣耀' },
+      { x: 20, y: 75, w: 12, h: 10, label: '故宫博物院' },
+    ],
+    arrows: [
+      { to: 3, x: 50, y: 6, rot: 90,  cls: 'top-arrow' },
+      { to: 2, x: 50, y: 94, rot: 180, cls: 'bot-arrow' }
+    ]
+  },
+};
+
+let currentScene = 1;
+
+// ═══════════════════════════════════════════════════════
+// 角色选择
+// ═══════════════════════════════════════════════════════
+const ROLE_DEFAULTS = [
+  { id:1, name:'茅台哥哥', gender:'male', src:'茅台哥哥.png', sprite:'茅台哥哥雪碧图.png', spriteFrames:6, spriteDir:'horizontal' },
+  { id:2, name:'茅台妹妹', gender:'female', src:'茅台妹妹.png', sprite:'茅台妹妹雪碧图.png', spriteFrames:6, spriteDir:'horizontal' }
+];
+// 优先读后台数据，否则用默认
+var roleRaw = JSON.parse(localStorage.getItem('metaMallRoles') || 'null');
+var ROLE_AVATARS = (roleRaw && roleRaw.length) ? roleRaw.map(function(r){ var a = r.avatar||r.sprite||r.img||''; var s = r.sprite||r.img||''; if (a.indexOf('data:')!==0&&a.indexOf('../')===0) a = a.slice(3); if (s.indexOf('data:')!==0&&s.indexOf('../')===0) s = s.slice(3); return { id:r.id, src:a, gender:r.gender, name:r.name, sprite:s, spriteFrames:r.spriteFrames||1, spriteDir:r.spriteDir||'horizontal', spriteCoords:r.spriteCoords||null }; }) : ROLE_DEFAULTS;
+const males = ROLE_AVATARS.filter(function(r){ return r.gender === 'male'; });
+const females = ROLE_AVATARS.filter(function(r){ return r.gender === 'female'; });
+let selectedAvatar = '';
+let userRole = null;
+let isEditingRole = false;
+
+(function initRole() {
+  var saved = localStorage.getItem('metaMallRole');
+  if (saved) { try { userRole = JSON.parse(saved); } catch(e) { userRole = null; } }
+  if (userRole && userRole.avatar && userRole.name) {
+    document.getElementById('roleModalOverlay').classList.add('hidden');
+    document.getElementById('resetRoleBtn').style.display = 'block';
+    updateSceneUI();
+  } else {
+    showRoleModal();
+    document.getElementById('resetRoleBtn').style.display = 'none';
+  }
+})();
+
+function showRoleModal() {
+  document.querySelectorAll('.scene-layer').forEach(function(el) {
+    el.classList.add('hidden'); el.style.display = 'none';
+  });
+  var overlay = document.getElementById('roleModalOverlay');
+  overlay.classList.remove('hidden');
+  document.getElementById('roleModalBack').textContent = isEditingRole ? '✕ 关闭' : '← 返回';
+  var grid = document.getElementById('roleGrid');
+  grid.innerHTML = '';
+  [[males, '👨 男角色'], [females, '👩 女角色']].forEach(function(group){
+    var list = group[0], title = group[1];
+    var titleEl = document.createElement('div');
+    titleEl.className = 'role-section-title'; titleEl.textContent = title;
+    titleEl.style.gridColumn = '1 / -1'; grid.appendChild(titleEl);
+    list.forEach(function(role) {
+      var card = document.createElement('div');
+      card.className = 'role-card'; card.dataset.avatar = role.src;
+      card.innerHTML = '<img src="' + role.src + '" alt="' + role.name + '">';
+      card.addEventListener('click', function() {
+        grid.querySelectorAll('.role-card').forEach(function(c) { c.classList.remove('selected'); });
+        card.classList.add('selected'); selectedAvatar = role.src; updateConfirmBtn();
+      });
+      grid.appendChild(card);
+    });
+  });
+  if (isEditingRole && userRole) {
+    selectedAvatar = userRole.avatar;
+    var preCard = grid.querySelector('.role-card[data-avatar="' + userRole.avatar + '"]');
+    if (preCard) preCard.classList.add('selected');
+  }
+  var savedNick = localStorage.getItem('metaMallNick') || 'user2980';
+  document.getElementById('roleNameInput').value = isEditingRole && userRole ? userRole.name : savedNick;
+  document.getElementById('roleNameInput').oninput = function() { updateConfirmBtn(); };
+  if (!isEditingRole) { selectedAvatar = ''; }
+  updateConfirmBtn();
+}
+
+function onBackClick() {
+  if (isEditingRole) { closeRoleModal(); }
+  else { window.location.href = 'user-index.html'; }
+}
+
+function closeRoleModal() {
+  document.getElementById('roleModalOverlay').classList.add('hidden');
+  isEditingRole = false;
+  document.querySelectorAll('.scene-layer').forEach(function(el) {
+    var sceneId = parseInt(el.id.replace('scene', ''));
+    if (sceneId === currentScene) {
+      el.style.display = 'block'; el.style.opacity = '1';
+      el.style.transform = 'none'; el.classList.remove('hidden');
+    } else { el.style.display = 'none'; el.classList.add('hidden'); }
+  });
+  updateSceneUI();
+}
+
+function openEditUser() { isEditingRole = true; showRoleModal(); }
+
+function resetRole() {
+  localStorage.removeItem('metaMallRole'); localStorage.removeItem('metaMallNick');
+  localStorage.removeItem('metaMapExplored');
+  userRole = null; isEditingRole = false;
+  document.getElementById('resetRoleBtn').style.display = 'none';
+  document.getElementById('userInfoBtn').style.display = 'none';
+  showRoleModal();
+}
+
+function updateConfirmBtn() {
+  var name = document.getElementById('roleNameInput').value.trim();
+  document.getElementById('roleConfirmBtn').disabled = !(selectedAvatar && name);
+}
+
+function updateSceneUI() {
+  if (!userRole) return;
+  document.getElementById('uAvatar').src = userRole.avatar;
+  document.getElementById('uName').textContent = userRole.name;
+  document.getElementById('userInfoBtn').style.display = 'flex';
+  document.getElementById('onlinePanel').style.display = 'block';
+}
+
+function confirmRole() {
+  var name = document.getElementById('roleNameInput').value.trim();
+  if (!selectedAvatar || !name) return;
+  // 找到对应角色获取雪碧图数据
+  var foundRole = ROLE_AVATARS.find(function(r){ return r.src === selectedAvatar; });
+  userRole = { avatar: selectedAvatar, name: name, sprite: (foundRole&&foundRole.sprite)||'', spriteFrames: (foundRole&&foundRole.spriteFrames)||1, spriteDir: (foundRole&&foundRole.spriteDir)||'horizontal', spriteCoords: (foundRole&&foundRole.spriteCoords)||null };
+  localStorage.setItem('metaMallRole', JSON.stringify(userRole));
+  localStorage.setItem('metaMallNick', name);
+  isEditingRole = false;
+  document.getElementById('roleModalOverlay').classList.add('hidden');
+  document.getElementById('resetRoleBtn').style.display = 'block';
+  [1,2,3,4].forEach(function(id){
+    var el = document.getElementById('scene' + id);
+    if (id === 1) {
+      el.style.display = 'block'; el.style.opacity = '1';
+      el.style.transform = 'none'; el.classList.remove('hidden');
+    } else { el.style.display = 'none'; el.classList.add('hidden'); }
+  });
+  [1,2,3,4].forEach(function(id){ renderScene(id); });
+  updateSceneUI();
+  initMapDrag();
+  var h = window.location.hash;
+  if (h === '#2' || h === '#3' || h === '#4') {
+    setTimeout(function(){ switchScene(parseInt(h.slice(1))); }, 100);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// 渲染场景
+// ═══════════════════════════════════════════════════════
+function renderScene(sceneId) {
+  const data = SCENES[sceneId];
+  const container = document.getElementById('scene'+sceneId);
+  const overlay = container.querySelector('.scene-overlay');
+  const titleEl = overlay.querySelector('.scene-title');
+  if (titleEl) titleEl.textContent = '🏬 ' + data.name;
+  overlay.querySelectorAll('.origin, .mall-spot, .nav-btn, .next-scene-btn, .nav-popup').forEach(el => el.remove());
+
+  const origin = document.createElement('div');
+  origin.className = 'origin';
+  origin.style.left = data.origin.left + '%';
+  origin.style.top  = data.origin.top + '%';
+  origin.style.transform = 'translate(calc(-50% + var(--map-dx,0px)), calc(-50% + var(--map-dy,0px)))';
+  var avatarUrl = (userRole && userRole.avatar) ? userRole.avatar : '李白待机.gif';
+  var nick = (userRole && userRole.name) ? userRole.name : '';
+  var nameTag = nick ? '<span class="origin-name">' + nick + '</span>' : '';
+  // 雪碧图动画：如果有角色雪碧图，用头像初始显示，移动时切雪碧图
+  var dotBg = avatarUrl;
+  var hasSprite = userRole && userRole.sprite && userRole.spriteFrames > 1;
+  var spriteImg = hasSprite ? userRole.sprite : '';
+  var spriteFrames = hasSprite ? userRole.spriteFrames : 0;
+  origin.innerHTML = '<div class="origin-ring"></div><div class="origin-ring"></div><div class="origin-ring"></div><div class="origin-dot" style="background-image:url(\''+dotBg+'\')"></div>'+nameTag;
+  overlay.appendChild(origin);
+
+  origin._walkTimer = null;
+  origin._spriteLoaded = false;
+  origin._spriteW = 0;
+  origin._spriteH = 0;
+  if (hasSprite) {
+    var probe = new Image();
+    probe.onload = function() {
+      origin._spriteLoaded = true;
+      origin._spriteW = probe.naturalWidth;
+      origin._spriteH = probe.naturalHeight;
+      origin.dataset.spriteFrames = spriteFrames;
+    };
+    probe.src = spriteImg;
+  }
+
+  origin.startWalk = function() {
+    if (!this._spriteLoaded) return;
+    var dot = this.querySelector('.origin-dot');
+    var frames = spriteFrames;
+    var tw = this._spriteW, th = this._spriteH;
+    var fw = tw / frames;
+    // 按单帧长边适配，保持人物不缩太小
+    var size = 100;
+    var dotW, dotH;
+    if (fw > th) { dotW = size; dotH = size * th / fw; }
+    else { dotH = size; dotW = size * fw / th; }
+    dot.style.backgroundImage = 'url(' + spriteImg + ')';
+    dot.style.backgroundSize = 'auto 100%';
+    dot.style.width = dotW + 'px';
+    dot.style.height = dotH + 'px';
+    dot.style.marginLeft = (-(dotW - 64) / 2) + 'px';
+    dot.style.marginTop = (-(dotH - 64) / 2) + 'px';
+    dot.style.borderRadius = '0';
+    dot.style.animation = 'none';
+    var idx = 0;
+    dot.style.backgroundPosition = '0 0';
+    clearInterval(this._walkTimer);
+    this._walkTimer = setInterval(function() {
+      idx = (idx + 1) % frames;
+      dot.style.backgroundPosition = (-idx * dotW) + 'px 0';
+    }, 300);
+  };
+  origin.stopWalk = function() {
+    clearInterval(this._walkTimer);
+    var dot = this.querySelector('.origin-dot');
+    dot.style.backgroundImage = 'url(' + dotBg + ')';
+    dot.style.backgroundSize = 'cover';
+    dot.style.width = '100%';
+    dot.style.height = '100%';
+    dot.style.marginLeft = '0';
+    dot.style.marginTop = '0';
+    dot.style.borderRadius = '50%';
+    dot.style.backgroundPosition = 'center';
+  };
+
+  data.spots.forEach((s, i) => {
+    const spot = document.createElement('div');
+    spot.className = 'mall-spot';
+    spot.dataset.idx = i;
+    spot.style.left = (s.x || s.left || 0) + '%';
+    spot.style.top  = (s.y || s.top || 0) + '%';
+    spot.style.width = (s.w || 10) + '%';
+    spot.style.height = (s.h || 10) + '%';
+    spot.style.transform = 'translate(var(--map-dx,0px), var(--map-dy,0px))';
+    spot.innerHTML = '<div class="label">'+s.label+'</div>';
+    spot.addEventListener('click', () => {
+      if (s.toScene) {
+        var origin = document.getElementById('scene'+sceneId).querySelector('.origin');
+        if (!origin) return;
+        if (window._moveTimer) clearTimeout(window._moveTimer);
+        // 人物移动到热区中心
+        var cx = (s.x || s.left || 0), cy = (s.y || s.top || 0);
+        origin.style.left = cx + '%';
+        origin.style.top = (cy - 3) + '%';
+        origin.startWalk && origin.startWalk();
+        window._moveTimer = setTimeout(function(){ try { origin.stopWalk && origin.stopWalk(); } catch(e){} switchScene(s.toScene); }, 2000);
+      } else { moveTo(sceneId, i); }
+    });
+    overlay.appendChild(spot);
+  });
+
+  if (sceneId === 1) {
+    const backBtn = document.createElement('div');
+    backBtn.className = 'mall-back-btn';
+    backBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>标准商城';
+    backBtn.addEventListener('click', () => { window.location.href = 'user-index.html'; });
+    overlay.appendChild(backBtn);
+  }
+
+  const navBtn = document.createElement('div');
+  navBtn.className = 'nav-btn';
+  navBtn.title = '回到主地图';
+  navBtn.innerHTML = '<img src="daohang.png" alt="回主地图">';
+  navBtn.addEventListener('click', () => { if (sceneId !== 1) switchScene(1); });
+  overlay.appendChild(navBtn);
+
+  data.arrows.forEach(function(ar){
+    const nextBtn = document.createElement('div');
+    nextBtn.className = 'next-scene-btn '+ar.cls;
+    nextBtn.style.left = ar.x + '%';
+    nextBtn.style.top = ar.y + '%';
+    var rotStyle = ar.rot ? 'transform:rotate('+ar.rot+'deg)' : '';
+    nextBtn.innerHTML = '<img src="arrow.png" alt="下一场景" style="'+rotStyle+'">';
+    nextBtn.addEventListener('click', function(){
+      const r = nextBtn.getBoundingClientRect();
+      const c = overlay.getBoundingClientRect();
+      const ax = ((r.left - c.left + r.width/2) / c.width) * 100;
+      const ay = ((r.top - c.top + r.height/2) / c.height) * 100;
+      const origin = overlay.querySelector('.origin');
+      if (origin) {
+        if (window._moveTimer) clearTimeout(window._moveTimer);
+        origin.style.left = ax + '%'; origin.style.top = ay + '%';
+        origin.startWalk && origin.startWalk();
+        window._moveTimer = setTimeout(function(){ try { origin.stopWalk && origin.stopWalk(); } catch(e){} switchScene(ar.to); }, 2000);
+      } else { switchScene(ar.to); }
+    });
+    overlay.appendChild(nextBtn);
+  });
+}
+
+function moveTo(sceneId, spotIdx) {
+  const data = SCENES[sceneId];
+  const spot = data.spots[spotIdx];
+  const container = document.getElementById('scene'+sceneId);
+  const origin = container.querySelector('.origin');
+  if (!origin) return;
+  if (window._moveTimer) clearTimeout(window._moveTimer);
+  var cx = (spot.x || spot.left || 0), cy = (spot.y || spot.top || 0);
+  origin.style.left = cx + '%'; origin.style.top = (cy - 5) + '%';
+  origin.startWalk && origin.startWalk();
+  window._moveTimer = setTimeout(() => {
+    try { origin.stopWalk && origin.stopWalk(); } catch(e){}
+    if (spot.label === '贵州茅台') { window.location.href = 'guizhoumaotai_portrait.html'; }
+  }, 2000);
+}
+
+// ═══════════════════════════════════════════════════════
+// 拖拽逻辑
+// ═══════════════════════════════════════════════════════
+let mapDrag = { x: 0, y: 0, startX: 0, startY: 0, px: 0, py: 0, active: false };
+
+function initMapDrag() {
+  var saved = localStorage.getItem('metaMapData');
+  var mapScale = 130; // 默认130%
+  if (saved) {
+    try {
+      var data = JSON.parse(saved);
+      if (data.image && data.image.indexOf('data:') === 0) {
+        var mimg = document.querySelector('#scene1 .map-pan img');
+        if (mimg) mimg.src = data.image;
+      }
+      if (data.scale) mapScale = data.scale;
+    } catch(e) {}
+  }
+  // 应用缩放
+  // 竖屏图片宽高比差异大，用实际自然尺寸计算可拖范围
+  var img1 = document.querySelector('#scene1 .map-pan img');
+  var sceneScale = (mapScale || 130) / 100;
+  if (img1) {
+    img1.style.width = mapScale + '%';
+    img1.style.height = mapScale + '%';
+    img1.style.objectFit = 'contain';
+  }
+
+  function clampDrag(x, y) {
+    var s = document.getElementById('scene'+currentScene);
+    var pan = s ? s.querySelector('.map-pan') : null;
+    var ci = s ? s.querySelector('.map-pan img') : null;
+    if (!pan) return;
+    var w = pan.clientWidth, h = pan.clientHeight;
+    var isSub = s.classList.contains('scene-sub');
+    if (isSub) {
+      var scl = 1.2;
+      var mx = w * (scl - 1) / 2, my = h * (scl - 1) / 2;
+    } else if (ci && ci.naturalWidth) {
+      // contain：完整显示不裁切，拖拽按实际渲染尺寸
+      var ew = w * sceneScale, eh = h * sceneScale;
+      var cs = Math.min(ew / ci.naturalWidth, eh / ci.naturalHeight);
+      var renderW = ci.naturalWidth * cs, renderH = ci.naturalHeight * cs;
+      var mx = Math.max(0, (renderW - w) / 2);
+      var my = Math.max(0, (renderH - h) / 2);
+    } else {
+      var mx = w * (sceneScale - 1) / 2, my = h * (sceneScale - 1) / 2;
+    }
+    mapDrag.x = Math.max(-mx, Math.min(mx, x));
+    mapDrag.y = Math.max(-my, Math.min(my, y));
+  }
+
+  function applyDragTransform() {
+    var s = document.getElementById('scene'+currentScene);
+    if (!s) return;
+    var img = s.querySelector('.map-pan img');
+    if (img) img.style.transform = 'translate(calc(-50% + '+mapDrag.x+'px), calc(-50% + '+mapDrag.y+'px))';
+    s.style.setProperty('--map-dx', mapDrag.x+'px');
+    s.style.setProperty('--map-dy', mapDrag.y+'px');
+  }
+
+  [1,2,3,4].forEach(function(id){
+    var pan = document.querySelector('#scene'+id+' .map-pan');
+    if (!pan) return;
+    pan.addEventListener('mousedown', function(e) {
+      if (currentScene !== id) return;
+      mapDrag.active = true;
+      mapDrag.startX = e.clientX; mapDrag.startY = e.clientY;
+      mapDrag.px = mapDrag.x; mapDrag.py = mapDrag.y;
+      var ci = document.getElementById('scene'+currentScene).querySelector('.map-pan img');
+      if (ci) ci.classList.add('dragging');
+    });
+    pan.addEventListener('touchstart', function(e) {
+      if (currentScene !== id || e.touches.length !== 1) return;
+      mapDrag.active = true;
+      mapDrag.startX = e.touches[0].clientX; mapDrag.startY = e.touches[0].clientY;
+      mapDrag.px = mapDrag.x; mapDrag.py = mapDrag.y;
+      var ci = document.getElementById('scene'+currentScene).querySelector('.map-pan img');
+      if (ci) ci.classList.add('dragging');
+    }, { passive: false });
+  });
+
+  window.addEventListener('mousemove', function(e) {
+    if (!mapDrag.active) return;
+    clampDrag(mapDrag.px + e.clientX - mapDrag.startX, mapDrag.py + e.clientY - mapDrag.startY);
+    applyDragTransform();
+  });
+  window.addEventListener('mouseup', function() {
+    if (!mapDrag.active) return;
+    mapDrag.active = false;
+    var ci = document.getElementById('scene'+currentScene);
+    if (ci) { var img = ci.querySelector('.map-pan img'); if (img) img.classList.remove('dragging'); }
+  });
+  window.addEventListener('touchmove', function(e) {
+    if (!mapDrag.active || e.touches.length !== 1) return;
+    clampDrag(mapDrag.px + e.touches[0].clientX - mapDrag.startX, mapDrag.py + e.touches[0].clientY - mapDrag.startY);
+    applyDragTransform();
+  }, { passive: false });
+  window.addEventListener('touchend', function() {
+    if (!mapDrag.active) return;
+    mapDrag.active = false;
+    var ci = document.getElementById('scene'+currentScene);
+    if (ci) { var img = ci.querySelector('.map-pan img'); if (img) img.classList.remove('dragging'); }
+  });
+
+  var pan1 = document.querySelector('#scene1 .map-pan');
+  var img1 = document.querySelector('#scene1 .map-pan img');
+  if (pan1 && img1) {
+    setTimeout(function() {
+      if (currentScene !== 1) return;
+      var explored = localStorage.getItem('metaMapExplored');
+      if (explored) return;
+      img1.style.transition = 'transform .5s cubic-bezier(.22,.61,.36,1)';
+      img1.style.transform = 'translate(calc(-50% + 100px), -50%)';
+      var hint = document.createElement('div'); hint.className = 'drag-hint';
+      hint.textContent = '👆 拖动探索地图'; pan1.appendChild(hint);
+      setTimeout(function(){ hint.remove(); }, 3000);
+      localStorage.setItem('metaMapExplored', '1');
+      setTimeout(function() {
+        img1.style.transition = 'transform .7s cubic-bezier(.17,.67,.39,.97)';
+        img1.style.transform = 'translate(-50%, -50%)';
+        setTimeout(function() { img1.style.transition = 'transform .6s cubic-bezier(.25,.46,.45,.94)'; }, 700);
+      }, 500);
+    }, 600);
+  }
+}
+
+function switchScene(targetId) {
+  if (targetId === currentScene) return;
+  currentScene = targetId;
+  if (targetId === 1) { mapDrag.x = 0; mapDrag.y = 0; }
+  [1,2,3,4].forEach(function(id){
+    var el = document.getElementById('scene'+id);
+    if (id === targetId) {
+      el.style.display = 'block'; el.style.opacity = '1';
+      el.style.transform = 'none'; el.classList.remove('hidden');
+    } else { el.classList.add('hidden'); el.style.display = 'none'; }
+  });
+  renderScene(targetId);
+}
+
+if (userRole) {
+  [1,2,3,4].forEach(function(id){
+    var el = document.getElementById('scene'+id);
+    if (id === 1) {
+      el.style.display = 'block'; el.style.opacity = '1';
+      el.style.transform = 'none'; el.classList.remove('hidden');
+    } else { el.style.display = 'none'; el.classList.add('hidden'); }
+  });
+  [1,2,3,4].forEach(function(id){ renderScene(id); });
+  initMapDrag();
+  // 杜甫雪碧图动画（文旅区4帧）
+  (function() {
+    var inner = document.getElementById('dufuInner');
+    if (!inner) return;
+    var probe = new Image();
+    probe.onload = function() {
+      var fw = probe.naturalWidth / 4;
+      inner.style.height = (60 * probe.naturalHeight / fw) + 'px';
+    };
+    probe.src = '杜甫雪碧图.png';
+    inner.style.backgroundImage = 'url(杜甫雪碧图.png)';
+    inner.style.backgroundSize = '400% 100%';
+    inner.style.backgroundPosition = '0 0';
+    var idx = 0;
+    setInterval(function() {
+      idx = (idx + 1) % 4;
+      inner.style.backgroundPosition = (-idx * 60) + 'px 0';
+    }, 350);
+  })();
+  // 村超雪碧图动画（5帧）
+  (function() {
+    var inner = document.getElementById('cunchaoInner');
+    if (!inner) return;
+    var probe2 = new Image();
+    probe2.onload = function() {
+      var fw = probe2.naturalWidth / 5;
+      inner.style.height = (50 * probe2.naturalHeight / fw) + 'px';
+    };
+    probe2.src = '村超雪碧图.png';
+    inner.style.backgroundImage = 'url(村超雪碧图.png)';
+    inner.style.backgroundSize = '500% 100%';
+    inner.style.backgroundPosition = '0 0';
+    var idx = 0;
+    setInterval(function() {
+      idx = (idx + 1) % 5;
+      inner.style.backgroundPosition = (-idx * 50) + 'px 0';
+    }, 300);
+  })();
+  var h = window.location.hash;
+  if (h === '#2' || h === '#3' || h === '#4') {
+    setTimeout(function(){ switchScene(parseInt(h.slice(1))); }, 100);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// 在线用户
+// ═══════════════════════════════════════════════════════
+const ONLINE_USER_AVATARS = ['李白待机.gif','诸葛亮待机.gif','都江堰待机.gif','娲皇宫待机.gif','安仁古镇待机.gif','李白纪念馆待机.gif'];
+const ONLINE_USER_NAMES = ['逍遥客','云中君','清风明月','梦里水乡','星河漫步','红尘过客','竹林听雨','墨染青衣','清风徐来','花开半夏','岁月如歌','烟雨江南','繁星点点','清风拂面','月色朦胧','春暖花开','清风入袖','梦里花落','云淡风轻','清风霁月'];
+let onlineUsers = [];
+let onlineCount = 128;
+function generateOnlineUsers() {
+  onlineUsers = [];
+  for (let i=0; i<Math.min(onlineCount,20); i++) {
+    onlineUsers.push({
+      id:i, avatar:ONLINE_USER_AVATARS[Math.floor(Math.random()*ONLINE_USER_AVATARS.length)],
+      name:ONLINE_USER_NAMES[Math.floor(Math.random()*ONLINE_USER_NAMES.length)]+Math.floor(Math.random()*100)
+    });
+  }
+}
+function renderOnlinePanel() {
+  document.getElementById('onlineCount').textContent = onlineCount;
+  document.getElementById('onlineList').innerHTML = onlineUsers.map(u => '<div class="online-item"><img class="online-avatar" src="'+u.avatar+'" alt="'+u.name+'"><span class="online-name">'+u.name+'</span></div>').join('');
+}
+function updateOnlineCount() {
+  onlineCount = Math.max(50, Math.min(200, onlineCount+Math.floor(Math.random()*5)-2));
+  generateOnlineUsers(); renderOnlinePanel();
+}
+(function(){ generateOnlineUsers(); renderOnlinePanel(); setInterval(updateOnlineCount, 2000+Math.random()*2000); })();
+
+// 文旅区粒子系统（光点+花瓣）
+(function() {
+  var canvas = document.getElementById('particleCanvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var particles = [];
+  var W = 430, H = 860; // 手机屏幕尺寸
+
+  function resize() {
+    var s4 = document.getElementById('scene4');
+    if (s4 && s4.clientWidth) { W = s4.clientWidth; H = s4.clientHeight; }
+    canvas.width = W; canvas.height = H;
+  }
+  resize();
+  setInterval(resize, 2000);
+
+  function createLight() {
+    return { type:'light', x:Math.random()*W, y:Math.random()*H, r:Math.random()*3+1,
+      vx:(Math.random()-0.5)*0.5, vy:(Math.random()-0.5)*0.5-0.3,
+      alpha:Math.random()*0.6+0.2, da:(Math.random()-0.5)*0.02,
+      color:Math.random()<0.5?'255,215,0':'255,255,200' };
+  }
+  function createPetal() {
+    return { type:'petal', x:Math.random()*W, y:-10, r:Math.random()*5+4,
+      vx:(Math.random()-0.5)*1.2, vy:Math.random()*1+0.5,
+      rot:Math.random()*360, dr:(Math.random()-0.5)*2, alpha:0.8,
+      color:['#ffb7c5','#ff9a9e','#fecfef','#ffd1dc'][Math.floor(Math.random()*4)] };
+  }
+
+  for (var i=0;i<30;i++) particles.push(createLight());
+  for (var i=0;i<15;i++) particles.push(createPetal());
+
+  function drawLight(p) {
+    ctx.save(); ctx.globalAlpha=p.alpha;
+    var g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*3);
+    g.addColorStop(0,'rgba('+p.color+',1)'); g.addColorStop(0.5,'rgba('+p.color+',0.4)'); g.addColorStop(1,'rgba('+p.color+',0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(p.x,p.y,p.r*3,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+  function drawPetal(p) {
+    ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180); ctx.globalAlpha=p.alpha;
+    ctx.fillStyle=p.color; ctx.beginPath(); ctx.ellipse(0,0,p.r,p.r*0.6,0,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
+  function update() {
+    resize();
+    ctx.clearRect(0,0,W,H);
+    if (Math.random()<0.3) particles.push(createLight());
+    if (Math.random()<0.15) particles.push(createPetal());
+
+    for (var i=particles.length-1;i>=0;i--) {
+      var p=particles[i];
+      if (p.type==='light') {
+        p.x+=p.vx;p.y+=p.vy;p.alpha+=p.da;
+        if (p.alpha<=0||p.alpha>=1) p.da=-p.da;
+        drawLight(p);
+      } else {
+        p.x+=p.vx;p.y+=p.vy;p.rot+=p.dr;p.alpha-=0.003;
+        drawPetal(p);
+      }
+      if (p.alpha<=0||p.y>H+30||p.x<-30||p.x>W+30) particles.splice(i,1);
+    }
+    if (particles.length>80) particles.splice(0,10);
+
+    var s4=document.getElementById('scene4');
+    if (s4 && !s4.classList.contains('hidden')) requestAnimationFrame(update);
+    else setTimeout(function(){requestAnimationFrame(update)},1000);
+  }
+  requestAnimationFrame(update);
+})();
+
+// 文旅区猫 Lottie 动画（需 HTTP 服务器：npx serve .）
+setTimeout(function() {
+  if (location.protocol === 'file:') { console.log('Lottie 需 HTTP 服务器：npx serve .'); return; }
+  var el = document.getElementById('catLottie');
+  if (!el) return;
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie.min.js';
+  s.onload = function() {
+    fetch('Cat playing animation.lottie')
+      .then(function(r) { return r.arrayBuffer(); })
+      .then(function(buf) {
+        var zs = document.createElement('script');
+        zs.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+        zs.onload = function() {
+          JSZip.loadAsync(buf).then(function(zip) {
+            var files = Object.keys(zip.files).filter(function(f) { return !zip.files[f].dir; });
+            var jsonFiles = files.filter(function(f) { return f.endsWith('.json'); });
+            var animFile = jsonFiles.find(function(f) { return f !== 'manifest.json'; }) || jsonFiles[0];
+            if (!animFile) throw new Error('No JSON in lottie');
+            return zip.file(animFile).async('text');
+          }).then(function(jsonStr) {
+            var animData = JSON.parse(jsonStr);
+            lottie.loadAnimation({
+              container: el, renderer: 'svg',
+              loop: true, autoplay: true,
+              animationData: animData
+            });
+            console.log('猫 Lottie 已加载');
+          }).catch(function(e) { console.log('Lottie error:', e); });
+        };
+        document.head.appendChild(zs);
+      });
+  };
+  document.head.appendChild(s);
+}, 1000);
+
+// 文旅区商人 Lottie 动画
+setTimeout(function() {
+  if (location.protocol === 'file:') return;
+  var el = document.getElementById('bizLottie');
+  if (!el) return;
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie.min.js';
+  s.onload = function() {
+    fetch('Footballer.lottie')
+      .then(function(r) { return r.arrayBuffer(); })
+      .then(function(buf) {
+        var zs = document.createElement('script');
+        zs.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+        zs.onload = function() {
+          JSZip.loadAsync(buf).then(function(zip) {
+            var files = Object.keys(zip.files).filter(function(f) { return !zip.files[f].dir; });
+            var jsonFiles = files.filter(function(f) { return f.endsWith('.json'); });
+            var animFile = jsonFiles.find(function(f) { return f !== 'manifest.json'; }) || jsonFiles[0];
+            if (!animFile) throw new Error('No JSON');
+            return zip.file(animFile).async('text');
+          }).then(function(jsonStr) {
+            lottie.loadAnimation({
+              container: el, renderer: 'svg',
+              loop: true, autoplay: true,
+              animationData: JSON.parse(jsonStr)
+            });
+          }).catch(function(e) { console.log('Biz Lottie error:', e); });
+        };
+        document.head.appendChild(zs);
+      });
+  };
+  document.head.appendChild(s);
+}, 1500);
+</script>
+</body>
+</html>

@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title>商家空间管理 - 元宇宙商城后台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f0f2f5; color: #333; }
+
+    .header { background: linear-gradient(135deg, #D70C1F, #F12B3D); color: #fff; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .header-title { font-size: 18px; font-weight: 600; }
+    .header-user { font-size: 14px; }
+    .main-container { display: flex; min-height: calc(100vh - 60px); }
+    .sidebar { width: 200px; background: #fff; border-right: 1px solid #e8e8e8; padding: 16px 0; }
+    .sidebar-group-title { padding: 8px 24px; font-size: 12px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .sidebar-item { padding: 10px 24px 10px 48px; font-size: 14px; color: #666; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+    .sidebar-item:hover { background: #f5f5f5; color: #D70C1F; }
+    .sidebar-item.active { background: rgba(215, 12, 31, 0.1); color: #D70C1F; font-weight: 600; }
+    .sidebar-item svg { width: 14px; height: 14px; }
+    .content { flex: 1; padding: 24px; overflow-y: auto; }
+    .content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .content-title { font-size: 18px; font-weight: 600; color: #1a1a2e; }
+    .btn { padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-primary { background: #D70C1F; color: #fff; }
+    .btn-primary:hover { background: #c60a1b; }
+    .btn-default { background: #fff; color: #666; border: 1px solid #ddd; }
+    .btn-default:hover { background: #f5f5f5; }
+    .card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .card-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #1a1a2e; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 14px; color: #666; margin-bottom: 8px; }
+    .form-input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .form-input:focus { border-color: #D70C1F; }
+    .form-select { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; outline: none; }
+
+    /* 商家表格 */
+    .merchant-table { width: 100%; border-collapse: collapse; }
+    .merchant-table th { text-align: left; padding: 12px 16px; font-size: 13px; color: #999; border-bottom: 2px solid #f0f0f0; font-weight: 600; }
+    .merchant-table td { padding: 14px 16px; border-bottom: 1px solid #f5f5f5; font-size: 14px; vertical-align: middle; }
+    .merchant-table tr:hover td { background: #fafafa; }
+    .ms-name { font-weight: 600; color: #1a1a2e; }
+    .ms-tag { font-size: 11px; color: #999; margin-left: 6px; }
+    .ms-status { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; }
+    .ms-status .dot { width: 7px; height: 7px; border-radius: 50%; }
+    .ms-status .dot.done { background: #20C997; }
+    .ms-status .dot.undone { background: #ccc; }
+    .ms-status.done { color: #20C997; }
+    .ms-status.undone { color: #999; }
+    .ms-btn { padding: 5px 16px; border-radius: 4px; font-size: 12px; border: none; cursor: pointer; }
+    .ms-btn.decorate { background: #D70C1F; color: #fff; }
+
+    /* 步骤指示器 */
+    .step-bar { display: flex; align-items: center; justify-content: center; margin-bottom: 20px; gap: 0; }
+    .step-dot { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; border: 2px solid #ddd; color: #999; background: #fff; transition: all 0.3s; }
+    .step-dot.active { border-color: #D70C1F; background: #D70C1F; color: #fff; }
+    .step-dot.done { border-color: #20C997; background: #20C997; color: #fff; }
+    .step-line { height: 2px; width: 60px; background: #ddd; transition: background 0.3s; }
+    .step-line.done { background: #20C997; }
+    .step-text { text-align: center; font-size: 11px; color: #999; margin-top: 4px; }
+
+    /* 热区类型切换 */
+    .type-toggle { display: flex; gap: 0; margin-bottom: 16px; }
+    .type-btn { flex: 1; padding: 10px 14px; font-size: 13px; border: 1px solid #ddd; background: #fff; cursor: pointer; text-align: center; transition: all 0.2s; }
+    .type-btn:first-child { border-radius: 6px 0 0 6px; }
+    .type-btn:last-child { border-radius: 0 6px 6px 0; }
+    .type-btn.active { background: #D70C1F; color: #fff; border-color: #D70C1F; }
+    .type-btn:hover:not(.active) { background: #f5f5f5; }
+    .type-field { display: none; }
+    .type-field.show { display: block; }
+
+    /* 装饰图片上传区 */
+    .deco-upload { border: 2px dashed #ddd; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; }
+    .deco-upload:hover { border-color: #667eea; background: rgba(102,126,234,.03); }
+    .deco-upload.has-img { padding: 8px; }
+    .deco-upload img { max-width: 100%; max-height: 120px; border-radius: 4px; }
+    .deco-upload-text { font-size: 14px; color: #999; }
+
+    /* 热区编辑 */
+    .hotspot-editor { position: relative; background: #f9f9f9; border-radius: 12px; overflow: hidden; user-select: none; }
+    .editor-image { display: block; max-width: 100%; height: auto; }
+    .hotspot-box { position: absolute; border: 2px dashed #D70C1F; background: rgba(215, 12, 31, 0.1); cursor: pointer; z-index: 10; }
+    .hotspot-box:hover { border-style: solid; background: rgba(215, 12, 31, 0.15); }
+    .hotspot-box.drawing { border-style: solid; border-color: #20C997; background: rgba(32, 201, 151, 0.2); }
+    .hotspot-box-label { position: absolute; bottom: -20px; left: 0; background: rgba(0,0,0,0.8); color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 3px; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+
+    .hotspot-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: #f9f9f9; border-radius: 8px; margin-bottom: 6px; }
+    .hi-info { flex: 1; }
+    .hi-name { font-size: 13px; font-weight: 600; color: #333; }
+    .hi-target { font-size: 11px; color: #D70C1F; margin-top: 2px; }
+    .hi-pos { font-size: 10px; color: #999; margin-top: 2px; }
+    .hi-actions { display: flex; gap: 6px; }
+    .hi-btn { padding: 4px 10px; font-size: 11px; border-radius: 4px; border: none; cursor: pointer; }
+    .hi-btn.edit { background: #f5f5f5; color: #666; }
+    .hi-btn.delete { background: #fff5f5; color: #D70C1F; }
+
+    /* 模态框 */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal-overlay.show { display: flex; }
+    .modal-box { background: #fff; border-radius: 16px; width: 100%; max-width: 700px; max-height: 85vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #f0f0f0; }
+    .modal-title { font-size: 16px; font-weight: 600; }
+    .modal-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .modal-close svg { width: 14px; height: 14px; color: #666; }
+    .modal-body { padding: 20px; }
+    .modal-footer { padding: 16px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+    /* 图片上传 */
+    .upload-area { border: 2px dashed #ddd; border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .upload-area:hover { border-color: #D70C1F; background: rgba(215, 12, 31, 0.02); }
+    .upload-icon { width: 48px; height: 48px; margin: 0 auto 12px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .upload-icon svg { width: 24px; height: 24px; color: #999; }
+    .upload-text { font-size: 14px; color: #666; }
+    .upload-hint { font-size: 12px; color: #999; margin-top: 4px; }
+    #uploadInput { display: none; }
+    .preview-img { display: none; max-width: 100%; margin-top: 12px; border-radius: 8px; }
+
+    /* 图片列表 */
+    .image-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; margin-top: 16px; }
+    .image-item { position: relative; border-radius: 8px; overflow: hidden; border: 2px solid #f0f0f0; cursor: grab; transition: all 0.2s; }
+    .image-item:active { cursor: grabbing; }
+    .image-item:hover { border-color: #D70C1F; }
+    .image-item.selected { border-color: #D70C1F; box-shadow: 0 0 0 2px rgba(215, 12, 31, 0.2); }
+    .image-item.dragging { opacity: 0.5; transform: scale(0.95); }
+    .image-item.drag-over { border-color: #667eea; border-style: dashed; background: rgba(102, 126, 234, 0.05); }
+    .image-item img { width: 100%; height: 90px; object-fit: cover; display: block; }
+    .image-item .delete-btn { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; background: rgba(0,0,0,0.6); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; opacity: 0; transition: opacity 0.2s; }
+    .image-item:hover .delete-btn { opacity: 1; }
+    .image-item .delete-btn:hover { background: #D70C1F; }
+
+    .empty-state { padding: 60px 0; text-align: center; }
+    .empty-icon { width: 64px; height: 64px; margin: 0 auto 16px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .empty-icon svg { width: 32px; height: 32px; color: #ccc; }
+    .empty-text { font-size: 14px; color: #999; }
+
+    .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); padding: 12px 20px; border-radius: 8px; font-size: 14px; z-index: 2000; animation: slideIn 0.3s ease; }
+    .toast.success { background: rgba(7, 193, 96, 0.9); color: #fff; }
+    .toast.error { background: rgba(215, 12, 31, 0.9); color: #fff; }
+    @keyframes slideIn { from { transform: translateX(-50%) translateY(-20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="header-title">元宇宙商城 - 后台管理</div>
+  <div class="header-user">管理员</div>
+</div>
+
+<div class="main-container">
+      <div class="sidebar">
+      <div class="sidebar-group-title">元宇宙管理</div>
+      <div class="sidebar-item" onclick="navigateTo('hotspot-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>场景和热区</div>
+      <div class="sidebar-item" onclick="navigateTo('path-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="12 19 19 12 12 5 5 12"/><circle cx="12" cy="12" r="3"/></svg>跳转路径</div>
+      <div class="sidebar-item" onclick="navigateTo('map-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3 9 12 15 21 9"/></svg>主地图管理</div>
+      <div class="sidebar-item active" onclick="navigateTo('space-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>商家元宇宙空间管理</div>
+      <div class="sidebar-item" onclick="navigateTo('role-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>角色管理</div>
+      <div class="sidebar-item" onclick="navigateTo('dashboard-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>元宇宙看板</div>
+      <div class="sidebar-group-title">数字资产</div>
+      <div class="sidebar-item" onclick="navigateTo('asset-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>数字资产管理</div>
+    <div class="sidebar-item" onclick="navigateTo('digital-asset-detail.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>数字资产详情</div>
+      <div class="sidebar-item" onclick="navigateTo('order-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>订单管理</div>
+      <div class="sidebar-group-title">会员管理</div>
+      <div class="sidebar-item" onclick="navigateTo('user-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>用户管理</div>
+      <div class="sidebar-item" onclick="navigateTo('merchant-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>商家管理</div>
+      <div class="sidebar-group-title">审核管理</div>
+      <div class="sidebar-item" onclick="navigateTo('cert-review.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>商家审核管理</div>
+    <div class="sidebar-item" onclick="navigateTo('story-review.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>文化故事审核</div>
+          <div class="sidebar-group-title">内容管理</div>
+    <div class="sidebar-item" onclick="navigateTo('message-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>消息管理</div>
+    <div class="sidebar-group-title">系统管理</div>
+      <div class="sidebar-item" onclick="navigateTo('wallet-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>钱包管理</div>
+    </div>
+
+  <div class="content">
+    <div class="content-header"><div class="content-title">商家空间管理</div></div>
+    <div class="card">
+      <div class="card-title">商家列表</div>
+      <table class="merchant-table">
+        <thead><tr><th>商家名称</th><th>标签</th><th width="120">空间状态</th><th width="100">操作</th></tr></thead>
+        <tbody id="merchantTbody"></tbody>
+      </table>
+      <div class="empty-state" id="emptyMerchants" style="display:none">
+        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+        <div class="empty-text">暂无商家数据</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 装修弹窗（两步） -->
+<div class="modal-overlay" id="decorateModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">装修空间 - <span id="decorateMerchantName"></span></div>
+      <div class="modal-close" onclick="closeDecorateModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div class="modal-body" id="decorateModalBody">
+      <!-- 步骤指示器 -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:24px">
+        <div style="text-align:center">
+          <div class="step-dot active" id="stepDot1">1</div>
+          <div class="step-text">上传图片</div>
+        </div>
+        <div class="step-line" id="stepLine" style="width:60px;height:2px;background:#ddd;margin:0 8px;margin-bottom:16px"></div>
+        <div style="text-align:center">
+          <div class="step-dot" id="stepDot2">2</div>
+          <div class="step-text">编辑热区</div>
+        </div>
+      </div>
+
+      <!-- 步骤1：上传图片 -->
+      <div id="step1Content">
+        <div class="form-group">
+          <label class="form-label">空间背景图</label>
+          <div class="upload-area" id="uploadArea" onclick="document.getElementById('uploadInput').click()">
+            <div class="upload-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+            <div class="upload-text">点击上传空间背景图</div>
+            <div class="upload-hint">支持 JPG、PNG，建议 1920×1080</div>
+            <input type="file" id="uploadInput" accept="image/*" multiple onchange="handleFileUpload()">
+          </div>
+          <div class="image-list" id="imageList"></div>
+        </div>
+      </div>
+
+      <!-- 步骤2：编辑热区 -->
+      <div id="step2Content" style="display:none">
+        <div class="hotspot-editor" id="hotspotEditor" style="margin-bottom:16px">
+          <img class="editor-image" id="editorImage" src="" alt="空间图片">
+        </div>
+        <div style="font-size:13px;font-weight:600;color:#333;margin-bottom:8px">热区列表</div>
+        <div id="hotspotList" style="margin-bottom:8px"></div>
+        <div class="empty-state" id="emptyHotspotList" style="display:none;padding:30px 0">
+          <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg></div>
+          <div class="empty-text">暂无热区，请在图片上拖拽框选绘制</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-default" onclick="closeDecorateModal()">取消</button>
+      <div>
+        <button class="btn btn-default" id="btnPrevStep" onclick="prevStep()" style="display:none;margin-right:8px">← 上一步</button>
+        <button class="btn btn-primary" id="btnNextStep" onclick="nextStep()">下一步 →</button>
+        <button class="btn btn-primary" id="btnSaveAll" onclick="saveAllDecorate()" style="display:none">保存并完成</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 热区编辑弹窗 -->
+<div class="modal-overlay" id="hotspotEditModal">
+  <div class="modal-box" style="max-width:500px">
+    <div class="modal-header">
+      <div class="modal-title" id="hotspotModalTitle">创建热区</div>
+      <div class="modal-close" onclick="closeHotspotModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div class="modal-body">
+        <input type="hidden" id="hotspotEditId">
+        <input type="hidden" id="hotspotDecoImg" value="">
+        <div class="form-group">
+          <label class="form-label">热区名称</label>
+          <input class="form-input" id="hotspotEditName" placeholder="输入热区名称">
+        </div>
+        <div class="form-group">
+          <label class="form-label">热区类型</label>
+          <div class="type-toggle">
+            <div class="type-btn active" onclick="switchHotspotType('jump')" id="typeBtnJump">📍 跳转热区</div>
+            <div class="type-btn" onclick="switchHotspotType('deco')" id="typeBtnDeco">🎨 装饰热区</div>
+            <div class="type-btn" onclick="switchHotspotType('start')" id="typeBtnStart">🚶 起始位置</div>
+          </div>
+        </div>
+        <div class="type-field show" id="jumpField">
+          <div class="form-group">
+            <label class="form-label">跳转目标（项目）</label>
+            <select class="form-select" id="hotspotJumpTarget" onchange="onJumpTargetChange()"></select>
+          </div>
+        </div>
+      <div class="form-group" id="imgUploadField">
+        <label class="form-label">装饰图片（非必填）</label>
+        <div class="deco-upload" id="decoUpload" onclick="document.getElementById('hsDecoImgInput').click()">
+          <div class="deco-upload-text" id="decoEmptyText">点击上传装饰图片</div>
+          <img id="hsDecoPreview" src="" alt="" style="display:none">
+        </div>
+        <input type="file" id="hsDecoImgInput" accept="image/*" onchange="uploadHsDecoImg()" style="display:none">
+        <div style="margin-top:6px;font-size:12px;color:#D70C1F;cursor:pointer;display:none" id="hsDecoClear" onclick="clearHsDecoImg()">✕ 移除图片</div>
+      </div>
+      <div class="deco-type-field" id="decoTypeField" style="display:none">
+        <div class="form-group">
+          <label class="form-label">装饰类型</label>
+          <select class="form-select" id="decoSubtype" onchange="switchDecoSubtype()">
+            <option value="sprite">🖼️ 雪碧图动画</option>
+            <option value="lottie">🎬 Lottie 动画</option>
+            <option value="css">✨ CSS 动画</option>
+            <option value="particle">🌟 原生粒子</option>
+          </select>
+        </div>
+        <div class="deco-param" id="decoParamSprite">
+          <div class="form-group">
+            <label class="form-label">雪碧图文件</label>
+            <input type="hidden" id="decoSpriteImg" value="">
+            <div class="deco-upload" id="spriteUpload" onclick="document.getElementById('spriteImgInput').click()">
+              <div class="deco-upload-text" id="spriteEmptyText">点击上传雪碧图</div>
+              <img id="spritePreview" src="" alt="" style="display:none">
+            </div>
+            <input type="file" id="spriteImgInput" accept="image/*" onchange="uploadSpriteImage()" style="display:none">
+          </div>
+          <div class="form-group"><label class="form-label">坐标文件（JSON，非必填）</label><input type="file" id="spriteCoordInput" accept=".json" onchange="uploadSpriteCoord()"></div>
+          <div style="display:flex;gap:12px">
+            <div class="form-group" style="flex:1"><label class="form-label">帧数</label><input class="form-input" id="decoSpriteFrames" type="number" min="1" max="64" value="6"></div>
+            <div class="form-group" style="flex:1"><label class="form-label">帧速(ms)</label><input class="form-input" id="decoSpriteSpeed" type="number" min="50" max="2000" value="300"></div>
+          </div>
+        </div>
+        <div class="deco-param" id="decoParamLottie" style="display:none">
+          <div class="form-group">
+            <input type="hidden" id="decoLottieData" value="">
+            <div class="deco-upload" id="lottieUpload" onclick="document.getElementById('lottieFileInput').click()">
+              <div class="deco-upload-text" id="lottieEmptyText">点击上传 .lottie 文件</div>
+              <div id="lottieFileName" style="font-size:13px;color:#20bf6b;display:none"></div>
+            </div>
+            <input type="file" id="lottieFileInput" accept=".lottie,.json" onchange="uploadLottieFile()" style="display:none">
+          </div>
+        </div>
+        <div class="deco-param" id="decoParamCss" style="display:none">
+          <div class="form-group">
+            <label class="form-label">静态图片</label>
+            <input type="hidden" id="decoCssImg" value="">
+            <div class="deco-upload" id="cssUpload" onclick="document.getElementById('cssImgInput').click()">
+              <div class="deco-upload-text" id="cssEmptyText">点击上传图片</div>
+              <img id="cssPreview" src="" alt="" style="display:none">
+            </div>
+            <input type="file" id="cssImgInput" accept="image/*" onchange="uploadCssImage()" style="display:none">
+          </div>
+          <div class="form-group">
+            <label class="form-label">CSS 动画效果</label>
+            <select class="form-select" id="decoCssAnim">
+              <option value="pulse">脉冲缩放</option><option value="float">上下浮动</option><option value="sway">左右摇摆</option>
+              <option value="glow">光晕呼吸</option><option value="rotate">旋转闪烁</option><option value="bounce">弹跳弹入</option>
+            </select>
+          </div>
+        </div>
+        <div class="deco-param" id="decoParamParticle" style="display:none">
+          <div class="form-group">
+            <label class="form-label">粒子类型</label>
+            <select class="form-select" id="decoParticleType">
+              <option value="light-gold">金色光点</option><option value="light-blue">蓝色星光</option>
+              <option value="petal-pink">粉色花瓣</option><option value="petal-red">红色花瓣</option><option value="snow">飘雪粒子</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">生成率 (0~1)</label><input class="form-input" id="decoParticleRate" type="number" min="0" max="1" step="0.01" value="0.3"></div>
+        </div>
+        <div style="display:flex;gap:12px">
+          <div class="form-group" style="flex:1"><label class="form-label">宽度(px)</label><input class="form-input" id="decoWidth" type="number" min="20" max="500" value="240"></div>
+          <div class="form-group" style="flex:1"><label class="form-label">Z轴序号 <span style="font-weight:400;font-size:11px;color:#999">（越大越靠上）</span></label><input class="form-input" id="decoZIndex" type="number" min="1" max="99" value="5"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-default" onclick="deleteHotspotFromModal()" style="background:#fff5f5;color:#D70C1F;border-color:#ffcccc">删除热区</button>
+      <button class="btn btn-default" id="redrawHotspotBtn" onclick="redrawHotspot()">重绘</button>
+      <button class="btn btn-primary" onclick="saveHotspot()">确认保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let merchants = [
+  { id: 'm1', name: '贵州茅台', type: 'food', tag: '数字酒庄 · 品牌馆', desc: '茅台酒起源于秦汉', active: true, spaceItems: [
+    { id: 'si1', name: 'VR云参观', img: '', type: 'vr', link: 'vr_maotai.html' },
+    { id: 'si2', name: '数字资产商城', img: '', type: 'page', link: 'assets_maotai.html' },
+    { id: 'si3', name: '酿酒工艺演示', img: '', type: 'page', link: 'brew_maotai.html' },
+    { id: 'si4', name: '茅小美·数字人', img: '', type: 'page', link: 'chat_maotai.html' }
+  ], spaceImages: [
+    { id: 'space_img_1', name: '茅台空间1', url: '../茅台空间_new.png' },
+    { id: 'space_img_2', name: '茅台空间2', url: '../茅台空间2_new.png' }
+  ], spaceImage: '', spaceHotspots: [] },
+  { id: 'm2', name: '王者荣耀', type: 'ent', tag: '游戏资产 · 数字皮肤', desc: '全球领先的MOBA手游', active: true, spaceItems: [], spaceImage: '', spaceHotspots: [] },
+  { id: 'm3', name: '五粮液', type: 'food', tag: '品牌馆 · 数字珍藏', desc: '中国浓香型白酒代表', active: true, spaceItems: [], spaceImage: '', spaceHotspots: [] },
+  { id: 'm4', name: '妙可蓝多', type: 'food', tag: '新零售 · 品牌馆', desc: '中国领先奶酪品牌', active: true, spaceItems: [], spaceImage: '', spaceHotspots: [] },
+  { id: 'm5', name: '杜甫草堂', type: 'tour', tag: '文旅 · 数字藏品', desc: '唐代大诗人杜甫故居', active: true, spaceItems: [], spaceImage: '', spaceHotspots: [] },
+  { id: 'm6', name: '海底捞', type: 'food', tag: '餐饮 · 会员数字卡', desc: '中国领先餐饮品牌', active: true, spaceItems: [], spaceImage: '', spaceHotspots: [] },
+  { id: 'm7', name: '鬼吹灯', type: 'film', tag: '影视 · 数字资产', desc: '经典盗墓题材IP', active: true, spaceItems: [], spaceImage: '', spaceHotspots: [] },
+  { id: 'm8', name: '三体', type: 'film', tag: '影视 · 数字资产', desc: '刘慈欣科幻巨著IP', active: true, spaceItems: [], spaceImage: '', spaceHotspots: [] }
+];
+
+let curStep = 1;
+let curMerchantId = null;
+let tempImages = []; // 弹窗内暂存的图片列表
+let selectedImageIndex = 0; // 当前选中的图片索引
+let isDrawing = false, drawStartX = 0, drawStartY = 0, drawingBox = null;
+
+function navigateTo(url) { window.location.href = url; }
+function cm() { return merchants.find(m => m.id === curMerchantId); }
+
+// ── 商家列表 ──
+function renderMerchantList() {
+  const tbody = document.getElementById('merchantTbody');
+  const empty = document.getElementById('emptyMerchants');
+  if (merchants.length === 0) {
+    document.querySelector('.merchant-table').style.display = 'none'; empty.style.display = 'block'; return;
+  }
+  document.querySelector('.merchant-table').style.display = ''; empty.style.display = 'none';
+  tbody.innerHTML = merchants.map(m => {
+    const decorated = !!(m.spaceImages && m.spaceImages.length > 0);
+    return `<tr>
+      <td><span class="ms-name">${m.name}</span><span class="ms-tag">${m.tag}</span></td>
+      <td style="font-size:12px;color:#999">${m.tag}</td>
+      <td><span class="ms-status ${decorated?'done':'undone'}"><span class="dot ${decorated?'done':'undone'}"></span>${decorated?'已装修':'未装修'}</span></td>
+      <td><button class="ms-btn decorate" onclick="openDecorateModal('${m.id}')">装修</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── 装修弹窗 ──
+function openDecorateModal(merchantId) {
+  const m = merchants.find(m => m.id === merchantId);
+  if (!m) return;
+  if (!m.spaceHotspots) m.spaceHotspots = [];
+  if (!m.spaceItems) m.spaceItems = [];
+  if (!m.spaceImages) m.spaceImages = [];
+  curMerchantId = merchantId;
+  curStep = 1;
+  document.getElementById('decorateMerchantName').textContent = m.name;
+  document.getElementById('decorateModal').dataset.merchantId = merchantId;
+  document.getElementById('uploadInput').value = '';
+  tempImages = [];
+
+  renderImageList();
+  renderStep();
+  document.getElementById('decorateModal').classList.add('show');
+}
+
+function closeDecorateModal() {
+  document.getElementById('decorateModal').classList.remove('show');
+  curMerchantId = null; tempImages = []; curStep = 1; selectedImageIndex = 0;
+}
+
+function handleFileUpload() {
+  const files = document.getElementById('uploadInput').files;
+  if (files.length === 0) return;
+
+  const m = merchants.find(m => m.id === curMerchantId);
+  if (!m) return;
+
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      tempImages.push({
+        id: Date.now() + Math.random(),
+        url: e.target.result,
+        name: file.name
+      });
+      renderImageList();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderImageList() {
+  const m = merchants.find(m => m.id === curMerchantId);
+  if (!m) return;
+
+  const allImages = [...(m.spaceImages || []), ...tempImages];
+  const container = document.getElementById('imageList');
+
+  if (allImages.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+
+  container.innerHTML = allImages.map((img, index) => `
+    <div class="image-item ${index === selectedImageIndex ? 'selected' : ''}" 
+         draggable="true" 
+         ondragstart="onDragStart(event, ${index})" 
+         ondragend="onDragEnd(event)"
+         ondragover="onDragOver(event)"
+         ondragleave="onDragLeave(event)"
+         ondrop="onDrop(event, ${index})"
+         onclick="selectImage(${index})">
+      <img src="${img.url}" alt="${img.name || '图片'}">
+      <div class="delete-btn" onclick="event.stopPropagation(); deleteImage(${index})">×</div>
+    </div>
+  `).join('');
+}
+
+let dragStartIndex = -1;
+
+function onDragStart(event, index) {
+  dragStartIndex = index;
+  event.target.classList.add('dragging');
+  event.dataTransfer.effectAllowed = 'move';
+}
+
+function onDragEnd(event) {
+  event.target.classList.remove('dragging');
+  dragStartIndex = -1;
+  document.querySelectorAll('.image-item').forEach(item => {
+    item.classList.remove('drag-over');
+  });
+}
+
+function onDragOver(event) {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = 'move';
+  const target = event.target.closest('.image-item');
+  if (target && !target.classList.contains('dragging')) {
+    target.classList.add('drag-over');
+  }
+}
+
+function onDragLeave(event) {
+  const target = event.target.closest('.image-item');
+  if (target) {
+    target.classList.remove('drag-over');
+  }
+}
+
+function onDrop(event, dropIndex) {
+  event.preventDefault();
+  event.target.classList.remove('drag-over');
+
+  if (dragStartIndex === -1 || dragStartIndex === dropIndex) {
+    return;
+  }
+
+  const m = merchants.find(m => m.id === curMerchantId);
+  if (!m) return;
+
+  // 先保存原状态映射（在修改之前）
+  const originalSavedIds = new Set((m.spaceImages || []).map(img => img.id));
+
+  // 获取合并列表
+  let allImages = [...(m.spaceImages || []), ...tempImages];
+  
+  // 执行拖拽交换
+  const draggedImage = allImages[dragStartIndex];
+  allImages.splice(dragStartIndex, 1);
+  allImages.splice(dropIndex, 0, draggedImage);
+
+  // 将排序后的图片重新分配到spaceImages和tempImages，保持排序
+  m.spaceImages = [];
+  tempImages = [];
+  
+  allImages.forEach(img => {
+    if (originalSavedIds.has(img.id)) {
+      m.spaceImages.push(img);
+    } else {
+      tempImages.push(img);
+    }
+  });
+
+  // 调整选中索引
+  if (selectedImageIndex === dragStartIndex) {
+    selectedImageIndex = dropIndex;
+  } else if (selectedImageIndex > dragStartIndex && selectedImageIndex <= dropIndex) {
+    selectedImageIndex--;
+  } else if (selectedImageIndex < dragStartIndex && selectedImageIndex >= dropIndex) {
+    selectedImageIndex++;
+  }
+
+  renderImageList();
+}
+
+function selectImage(index) {
+  selectedImageIndex = index;
+  renderImageList();
+}
+
+function deleteImage(index) {
+  const m = merchants.find(m => m.id === curMerchantId);
+  if (!m) return;
+
+  const allImages = [...(m.spaceImages || []), ...tempImages];
+  const imgToDelete = allImages[index];
+
+  // 删除已保存的图片
+  const savedIndex = m.spaceImages?.findIndex(img => img.id === imgToDelete.id);
+  if (savedIndex !== undefined && savedIndex >= 0) {
+    m.spaceImages.splice(savedIndex, 1);
+  }
+
+  // 删除临时图片
+  const tempIndex = tempImages.findIndex(img => img.id === imgToDelete.id);
+  if (tempIndex >= 0) {
+    tempImages.splice(tempIndex, 1);
+  }
+
+  // 调整选中索引
+  if (selectedImageIndex >= index && selectedImageIndex > 0) {
+    selectedImageIndex--;
+  }
+
+  renderImageList();
+}
+
+function renderStep() {
+  document.getElementById('step1Content').style.display = curStep === 1 ? 'block' : 'none';
+  document.getElementById('step2Content').style.display = curStep === 2 ? 'block' : 'none';
+  document.getElementById('btnPrevStep').style.display = curStep === 2 ? 'inline-block' : 'none';
+  document.getElementById('btnNextStep').style.display = curStep === 1 ? 'inline-block' : 'none';
+  document.getElementById('btnSaveAll').style.display = curStep === 2 ? 'inline-block' : 'none';
+
+  const dot1 = document.getElementById('stepDot1');
+  const dot2 = document.getElementById('stepDot2');
+  const line = document.getElementById('stepLine');
+  dot1.className = 'step-dot' + (curStep === 1 ? ' active' : ' done');
+  dot2.className = 'step-dot' + (curStep === 2 ? ' active' : '');
+  line.style.background = curStep >= 2 ? '#20C997' : '#ddd';
+
+  if (curStep === 2) renderStep2Editor();
+}
+
+function nextStep() {
+  const m = cm();
+  if (!m) return;
+  const allImages = [...(m.spaceImages || []), ...tempImages];
+  if (allImages.length === 0) { showToast('请先上传空间背景图', 'error'); return; }
+  curStep = 2;
+  renderStep();
+}
+
+function prevStep() {
+  curStep = 1;
+  renderStep();
+}
+
+// ── 步骤2：热区编辑器 ──
+function renderStep2Editor() {
+  const m = cm();
+  if (!m) return;
+  const allImages = [...(m.spaceImages || []), ...tempImages];
+  const selectedImg = allImages[selectedImageIndex] || allImages[0];
+
+  if (!selectedImg) {
+    showToast('请先选择一张图片', 'error');
+    curStep = 1;
+    renderStep();
+    return;
+  }
+
+  document.getElementById('editorImage').src = selectedImg.url;
+
+  const editor = document.getElementById('hotspotEditor');
+  editor.querySelectorAll('.hotspot-box').forEach(b => b.remove());
+
+  // 显示当前图片的热区
+  const currentHotspots = m.spaceHotspots?.filter(h => h.imageId === selectedImg.id) || [];
+  currentHotspots.forEach(h => {
+    const box = document.createElement('div');
+    box.className = 'hotspot-box';
+    box.style.left = h.x + '%'; box.style.top = h.y + '%';
+    box.style.width = (h.width || 80) + 'px'; box.style.height = (h.height || 60) + 'px';
+    box.dataset.hotspotId = h.id;
+    var isStart = h.type === 'start' || h.targetId === 'start_position';
+    if (isStart) {
+      box.style.border = '2px dashed #667eea';
+      box.style.background = 'rgba(102,126,234,.08)';
+      box.style.borderRadius = '50%';
+    }
+    if (h.jumpImg) {
+      box.style.border = '1px dashed #20bf6b';
+      box.style.background = 'none';
+      box.style.display = 'flex';
+      box.style.alignItems = 'center';
+      box.style.justifyContent = 'center';
+      box.style.borderRadius = '0';
+      box.innerHTML = '<img src="' + h.jumpImg + '" style="width:100%;height:100%;object-fit:contain;pointer-events:none" title="' + (h.name || '跳转') + '">';
+    } else if (h.decoImg) {
+      box.style.border = '1px dashed #667eea';
+      box.style.background = 'none';
+      box.style.display = 'flex';
+      box.style.alignItems = 'center';
+      box.style.justifyContent = 'center';
+      box.style.borderRadius = '0';
+      box.innerHTML = '<img src="' + h.decoImg + '" style="width:100%;height:100%;object-fit:contain;pointer-events:none" title="' + (h.name || '装饰') + '">';
+    } else {
+      box.innerHTML = '<div class="hotspot-box-label">' + (h.name || '热区') + '</div>';
+    }
+    box.onclick = function(ev) { ev.stopPropagation(); editHotspot(h.id); };
+    editor.appendChild(box);
+  });
+
+  editor.onmousedown = startDrawing;
+  editor.onmousemove = drawHotspot;
+  editor.onmouseup = finishDrawing;
+  editor.onmouseleave = cancelDrawing;
+  editor.ontouchstart = handleTouchStart;
+  editor.ontouchmove = handleTouchMove;
+  editor.ontouchend = finishDrawing;
+
+  renderHotspotList();
+}
+
+// ── 拖拽绘制 ──
+function startDrawing(e) {
+  if (!cm()) return;
+  const t = e.target || e.touches?.[0]?.target;
+  if (t.classList.contains('hotspot-box') || t.classList.contains('hotspot-box-label')) return;
+  if (drawingBox) { drawingBox.remove(); drawingBox = null; }
+  isDrawing = true;
+  const editor = document.getElementById('hotspotEditor');
+  const rect = editor.getBoundingClientRect();
+  const cx = e.clientX || e.touches?.[0]?.clientX || 0;
+  const cy = e.clientY || e.touches?.[0]?.clientY || 0;
+  drawStartX = ((cx - rect.left) / rect.width) * 100;
+  drawStartY = ((cy - rect.top) / rect.height) * 100;
+  drawingBox = document.createElement('div');
+  drawingBox.className = 'hotspot-box drawing';
+  drawingBox.style.left = drawStartX + '%'; drawingBox.style.top = drawStartY + '%';
+  drawingBox.style.width = '0px'; drawingBox.style.height = '0px';
+  editor.appendChild(drawingBox);
+}
+function drawHotspot(e) {
+  if (!isDrawing || !drawingBox) return;
+  const editor = document.getElementById('hotspotEditor');
+  const rect = editor.getBoundingClientRect();
+  const cx = e.clientX || e.touches?.[0]?.clientX || 0;
+  const cy = e.clientY || e.touches?.[0]?.clientY || 0;
+  const curX = ((cx - rect.left) / rect.width) * 100;
+  const curY = ((cy - rect.top) / rect.height) * 100;
+  const x = Math.min(Math.max(0, Math.min(drawStartX, curX)), 95);
+  const y = Math.min(Math.max(0, Math.min(drawStartY, curY)), 90);
+  const w = Math.abs(curX - drawStartX) * (rect.width / 100);
+  const h = Math.abs(curY - drawStartY) * (rect.height / 100);
+  drawingBox.style.left = x + '%'; drawingBox.style.top = y + '%';
+  drawingBox.style.width = Math.max(20, w) + 'px'; drawingBox.style.height = Math.max(20, h) + 'px';
+}
+function finishDrawing() {
+  if (!isDrawing || !drawingBox) return;
+  isDrawing = false;
+  const w = parseFloat(drawingBox.style.width), h = parseFloat(drawingBox.style.height);
+  if (w < 20 || h < 20) { cancelDrawing(); return; }
+  document.getElementById('hotspotEditId').value = '';
+  document.getElementById('hotspotEditName').value = '';
+  document.getElementById('hotspotJumpTarget').value = '';
+  clearHsDecoImg();
+  switchHotspotType('jump');
+  document.getElementById('hotspotModalTitle').textContent = '创建热区';
+  document.querySelector('#hotspotEditModal [onclick="deleteHotspotFromModal()"]').style.display = 'none';
+  document.getElementById('redrawHotspotBtn').style.display = '';
+  const modal = document.getElementById('hotspotEditModal');
+  modal.dataset.tempX = drawingBox.style.left; modal.dataset.tempY = drawingBox.style.top;
+  modal.dataset.tempWidth = drawingBox.style.width; modal.dataset.tempHeight = drawingBox.style.height;
+  modal.classList.add('show');
+}
+function cancelDrawing() { isDrawing = false; if (drawingBox) { drawingBox.remove(); drawingBox = null; } }
+
+// 装饰图片上传
+function uploadHsDecoImg() {
+  var f = document.getElementById('hsDecoImgInput').files[0];
+  if (!f) return;
+  var r = new FileReader();
+  r.onload = function(e) {
+    document.getElementById('hotspotDecoImg').value = e.target.result;
+    var preview = document.getElementById('hsDecoPreview');
+    preview.src = e.target.result; preview.style.display = 'block';
+    document.getElementById('decoEmptyText').style.display = 'none';
+    document.getElementById('decoUpload').classList.add('has-img');
+    document.getElementById('hsDecoClear').style.display = '';
+  };
+  r.readAsDataURL(f);
+  document.getElementById('hsDecoImgInput').value = '';
+}
+function clearHsDecoImg() {
+  document.getElementById('hotspotDecoImg').value = '';
+  document.getElementById('hsDecoPreview').src = '';
+  document.getElementById('hsDecoPreview').style.display = 'none';
+  document.getElementById('decoEmptyText').style.display = '';
+  document.getElementById('decoUpload').classList.remove('has-img');
+  document.getElementById('hsDecoClear').style.display = 'none';
+}
+// ── 装饰子类型 ──
+function switchDecoSubtype() {var v=document.getElementById('decoSubtype').value;
+  ['decoParamSprite','decoParamLottie','decoParamCss','decoParamParticle'].forEach(function(id){document.getElementById(id).style.display='none';});
+  document.getElementById('decoParam'+v.charAt(0).toUpperCase()+v.slice(1)).style.display='block';}
+function uploadSpriteImage(){var f=document.getElementById('spriteImgInput').files[0];if(!f)return;var r=new FileReader();
+  r.onload=function(e){document.getElementById('decoSpriteImg').value=e.target.result;document.getElementById('spritePreview').src=e.target.result;document.getElementById('spritePreview').style.display='block';document.getElementById('spriteEmptyText').style.display='none';};r.readAsDataURL(f);}
+function uploadCssImage(){var f=document.getElementById('cssImgInput').files[0];if(!f)return;var r=new FileReader();
+  r.onload=function(e){document.getElementById('decoCssImg').value=e.target.result;document.getElementById('cssPreview').src=e.target.result;document.getElementById('cssPreview').style.display='block';document.getElementById('cssEmptyText').style.display='none';};r.readAsDataURL(f);}
+function uploadLottieFile(){var f=document.getElementById('lottieFileInput').files[0];if(!f)return;
+  document.getElementById('decoLottieData').value=f.name;document.getElementById('lottieFileName').textContent='✓ '+f.name;
+  document.getElementById('lottieFileName').style.display='block';document.getElementById('lottieEmptyText').style.display='none';}
+function uploadSpriteCoord(){var f=document.getElementById('spriteCoordInput').files[0];if(!f)return;
+  var r=new FileReader();r.onload=function(e){window._spSpriteCoord=e.target.result;};r.readAsText(f);}
+function resetDecoTypeField(){document.getElementById('decoSubtype').value='sprite';switchDecoSubtype();
+  ['sprite','css','lottie'].forEach(function(t){var p=document.getElementById(t+'Preview');if(p){p.src='';p.style.display='none';}
+  var e=document.getElementById(t+'EmptyText');if(e)e.style.display='';var u=document.getElementById(t+'Upload');if(u)u.classList.remove('has-img');});
+  document.getElementById('decoSpriteImg').value='';document.getElementById('decoCssImg').value='';document.getElementById('decoLottieData').value='';
+  document.getElementById('lottieFileName').style.display='none';document.getElementById('lottieEmptyText').style.display='';
+  document.getElementById('spriteCoordInput').value='';window._spSpriteCoord='';}
+function fillDecoFields(h){h.decoSubtype=document.getElementById('decoSubtype').value;
+  h.decoZIndex=parseInt(document.getElementById('decoZIndex').value)||5;h.decoWidth=parseInt(document.getElementById('decoWidth').value)||240;
+  var ds=h.decoSubtype;
+  if(ds==='sprite'){h.decoSpriteImg=document.getElementById('decoSpriteImg').value||h.decoSpriteImg||'';h.decoSpriteFrames=parseInt(document.getElementById('decoSpriteFrames').value)||6;h.decoSpriteSpeed=parseInt(document.getElementById('decoSpriteSpeed').value)||300;h.decoSpriteCoord=window._spSpriteCoord||h.decoSpriteCoord||'';}
+  else if(ds==='lottie'){h.decoLottieFile=document.getElementById('decoLottieData').value||h.decoLottieFile||'';}
+  else if(ds==='css'){h.decoCssImg=document.getElementById('decoCssImg').value||h.decoCssImg||'';h.decoCssAnim=document.getElementById('decoCssAnim').value;}
+  else if(ds==='particle'){h.decoParticleType=document.getElementById('decoParticleType').value;h.decoParticleRate=parseFloat(document.getElementById('decoParticleRate').value)||0.3;}}
+function loadDecoFields(h){var ds=h.decoSubtype||'sprite';document.getElementById('decoSubtype').value=ds;switchDecoSubtype();
+  document.getElementById('decoZIndex').value=h.decoZIndex||5;document.getElementById('decoWidth').value=h.decoWidth||240;
+  if(ds==='sprite'){document.getElementById('decoSpriteImg').value=h.decoSpriteImg||'';document.getElementById('decoSpriteFrames').value=h.decoSpriteFrames||6;document.getElementById('decoSpriteSpeed').value=h.decoSpriteSpeed||300;if(h.decoSpriteImg){document.getElementById('spritePreview').src=h.decoSpriteImg;document.getElementById('spritePreview').style.display='block';document.getElementById('spriteEmptyText').style.display='none';}window._spSpriteCoord=h.decoSpriteCoord||'';}
+  else if(ds==='lottie'){document.getElementById('decoLottieData').value=h.decoLottieFile||'';if(h.decoLottieFile){document.getElementById('lottieFileName').textContent='✓ '+h.decoLottieFile;document.getElementById('lottieFileName').style.display='block';document.getElementById('lottieEmptyText').style.display='none';}}
+  else if(ds==='css'){document.getElementById('decoCssImg').value=h.decoCssImg||'';document.getElementById('decoCssAnim').value=h.decoCssAnim||'pulse';if(h.decoCssImg){document.getElementById('cssPreview').src=h.decoCssImg;document.getElementById('cssPreview').style.display='block';document.getElementById('cssEmptyText').style.display='none';}}
+  else if(ds==='particle'){document.getElementById('decoParticleType').value=h.decoParticleType||'light-gold';document.getElementById('decoParticleRate').value=h.decoParticleRate||0.3;}}
+function handleTouchStart(e) { e.preventDefault(); startDrawing(e); }
+function handleTouchMove(e) { e.preventDefault(); drawHotspot(e); }
+
+function switchHotspotType(type) {
+  document.getElementById('typeBtnJump').classList.toggle('active', type === 'jump');
+  document.getElementById('typeBtnDeco').classList.toggle('active', type === 'deco');
+  document.getElementById('typeBtnStart').classList.toggle('active', type === 'start');
+  document.getElementById('jumpField').classList.toggle('show', type === 'jump');
+  document.getElementById('imgUploadField').style.display = 'none';
+  document.getElementById('decoTypeField').style.display = (type === 'deco') ? 'block' : 'none';
+  if (type === 'deco') switchDecoSubtype();
+  if (type === 'start') document.getElementById('hotspotEditName').value = '人物起始位置';
+  else if (type === 'deco') document.getElementById('hotspotEditName').value = '';
+  if (type === 'jump') buildJumpTargetSelect();
+}
+
+function buildJumpTargetSelect() {
+  var m = cm();
+  var sel = document.getElementById('hotspotJumpTarget');
+  sel.innerHTML = '<option value="">不跳转</option>';
+  (m.spaceItems || []).forEach(function(si){ sel.innerHTML += '<option value="' + si.id + '">' + si.name + '</option>'; });
+}
+
+function onJumpTargetChange() {
+  var val = document.getElementById('hotspotJumpTarget').value;
+  if (val) {
+    var m = cm();
+    var si = (m.spaceItems || []).find(function(s){ return s.id === val; });
+    if (si) document.getElementById('hotspotEditName').value = si.name;
+  }
+}
+
+// ── 热区编辑 ──
+function editHotspot(hotspotId) {
+  const m = cm(); if (!m) return;
+  const h = m.spaceHotspots.find(h => h.id === hotspotId); if (!h) return;
+  document.getElementById('hotspotEditId').value = h.id;
+  document.getElementById('hotspotEditName').value = h.name || '';
+  document.getElementById('hotspotModalTitle').textContent = '编辑热区';
+  document.querySelector('#hotspotEditModal [onclick="deleteHotspotFromModal()"]').style.display = '';
+  document.getElementById('redrawHotspotBtn').style.display = 'none';
+
+  // 装饰图片
+  clearHsDecoImg();
+  document.getElementById('hotspotDecoImg').value = h.decoImg || '';
+  if (h.decoImg) {
+    document.getElementById('hsDecoPreview').src = h.decoImg;
+    document.getElementById('hsDecoPreview').style.display = 'block';
+    document.getElementById('decoEmptyText').style.display = 'none';
+    document.getElementById('decoUpload').classList.add('has-img');
+    document.getElementById('hsDecoClear').style.display = '';
+  }
+
+  // 类型
+  var tid = h.targetId || '';
+  var type = h.type || 'jump';
+  if (tid === 'start_position') type = 'start';
+  else if (tid === 'deco_element') type = 'deco';
+  else if (tid) type = 'jump';
+
+  switchHotspotType(type);
+  if (type === 'deco') { resetDecoTypeField(); loadDecoFields(h); }
+  if (type === 'jump' && tid && tid !== 'start_position' && tid !== 'deco_element') {
+    document.getElementById('hotspotJumpTarget').value = tid;
+  }
+
+  document.getElementById('hotspotEditModal').classList.add('show');
+}
+function saveHotspot() {
+  const m = cm(); if (!m) return;
+  const modal = document.getElementById('hotspotEditModal');
+  const editId = document.getElementById('hotspotEditId').value;
+  var type = document.getElementById('typeBtnJump').classList.contains('active') ? 'jump'
+    : document.getElementById('typeBtnDeco').classList.contains('active') ? 'deco' : 'start';
+  var targetId = '';
+  if (type === 'jump') targetId = document.getElementById('hotspotJumpTarget').value;
+  else if (type === 'start') targetId = 'start_position';
+  else if (type === 'deco') targetId = 'deco_element';
+  const name = document.getElementById('hotspotEditName').value.trim();
+  var decoImg = document.getElementById('hotspotDecoImg').value;
+  if (!name) { showToast('请输入热区名称', 'error'); return; }
+  if (type === 'deco') {
+    var ds = document.getElementById('decoSubtype').value;
+    if (ds === 'sprite' && !document.getElementById('decoSpriteImg').value) { showToast('雪碧图必须上传图片', 'error'); return; }
+    if (ds === 'css' && !document.getElementById('decoCssImg').value) { showToast('CSS动画必须上传图片', 'error'); return; }
+  }
+
+  const allImages = [...(m.spaceImages || []), ...tempImages];
+  const selectedImg = allImages[selectedImageIndex] || allImages[0];
+  const imageId = selectedImg ? selectedImg.id : null;
+
+  if (editId) {
+    const h = m.spaceHotspots.find(h => h.id === editId);
+    if (h) { h.targetId = targetId; h.name = name; h.decoImg = decoImg; h.type = type; if (type === 'deco') fillDecoFields(h); }
+    showToast('热区已更新', 'success');
+  } else {
+    var newH = {
+      id: 'h' + Date.now(),
+      x: Math.round(parseFloat(modal.dataset.tempX) * 10) / 10,
+      y: Math.round(parseFloat(modal.dataset.tempY) * 10) / 10,
+      width: Math.round(parseFloat(modal.dataset.tempWidth)),
+      height: Math.round(parseFloat(modal.dataset.tempHeight)),
+      targetId, name, imageId, decoImg, type
+    };
+    if (type === 'deco') fillDecoFields(newH);
+    m.spaceHotspots.push(newH);
+    showToast('热区已添加', 'success');
+  }
+  closeHotspotModal();
+}
+function closeHotspotModal() { document.getElementById('hotspotEditModal').classList.remove('show'); cancelDrawing(); renderStep2Editor(); }
+function redrawHotspot() { closeHotspotModal(); }
+function deleteHotspotFromModal() {
+  const m = cm(); const editId = document.getElementById('hotspotEditId').value;
+  if (!m || !editId) return;
+  if (confirm('确定要删除这个热区吗？')) { m.spaceHotspots = m.spaceHotspots.filter(h => h.id !== editId); closeHotspotModal(); showToast('热区已删除', 'success'); }
+}
+function deleteHotspotItem(hotspotId) {
+  const m = cm(); if (!m || !confirm('确定要删除这个热区吗？')) return;
+  m.spaceHotspots = m.spaceHotspots.filter(h => h.id !== hotspotId);
+  renderStep2Editor(); showToast('热区已删除', 'success');
+}
+
+function renderHotspotList() {
+  const m = cm(); const c = document.getElementById('hotspotList'); const e = document.getElementById('emptyHotspotList');
+
+  if (!m) { c.innerHTML = ''; e.style.display = 'block'; return; }
+
+  // 获取当前选中图片的热区
+  const allImages = [...(m.spaceImages || []), ...tempImages];
+  const selectedImg = allImages[selectedImageIndex] || allImages[0];
+
+  if (!selectedImg) {
+    c.innerHTML = ''; e.style.display = 'block'; return;
+  }
+
+  const currentHotspots = m.spaceHotspots?.filter(h => h.imageId === selectedImg.id) || [];
+
+  if (!currentHotspots || currentHotspots.length === 0) { c.innerHTML = ''; e.style.display = 'block'; return; }
+  e.style.display = 'none';
+  c.innerHTML = currentHotspots.map(h => {
+    var type = h.type || 'jump';
+    var isStart = type === 'start' || h.targetId === 'start_position';
+    var isDecoE = type === 'deco' || h.targetId === 'deco_element';
+    var typeBadge = '';
+    if (isStart) typeBadge = '<span style="font-size:10px;color:#667eea;margin-left:4px">起始</span>';
+    else if (isDecoE) typeBadge = '<span style="font-size:10px;color:#e6a23c;margin-left:4px">装饰</span>';
+    else typeBadge = '<span style="font-size:10px;color:#20bf6b;margin-left:4px">跳转</span>';
+    let tn = '未关联';
+    if (isStart) tn = '🚶 人物起始位置';
+    else if (isDecoE) {var sub={sprite:'🖼️雪碧图',lottie:'🎬Lottie',css:'✨CSS动效',particle:'🌟粒子'}[h.decoSubtype||'sprite']||'🖼️雪碧图';tn='🎨 '+sub+' | z:'+(h.decoZIndex||5);}
+    else { const si = (m.spaceItems || []).find(s => s.id === h.targetId); if (si) tn = '→ ' + si.name; }
+    var imgTag = h.decoImg ? ' 📷' : '';
+    return `<div class="hotspot-item">
+      <div class="hi-info"><div class="hi-name">${h.name||'未命名'}${typeBadge}${imgTag}</div><div class="hi-target">${tn}</div><div class="hi-pos">${Math.round(h.x)}%,${Math.round(h.y)}% · ${h.width||80}×${h.height||60}</div></div>
+      <div class="hi-actions"><button class="hi-btn edit" onclick="editHotspot('${h.id}')">编辑</button><button class="hi-btn delete" onclick="deleteHotspotItem('${h.id}')">删除</button></div>
+    </div>`;
+  }).join('');
+}
+
+// ── 保存所有 ──
+function saveAllDecorate() {
+  const m = cm(); if (!m) return;
+  // 保存所有图片
+  if (!m.spaceImages) m.spaceImages = [];
+  tempImages.forEach(img => {
+    if (!m.spaceImages.find(si => si.id === img.id)) {
+      m.spaceImages.push(img);
+    }
+  });
+  tempImages = [];
+  closeDecorateModal();
+  renderMerchantList();
+  showToast('空间装修已保存', 'success');
+}
+
+function showToast(msg, type) {
+  const t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function() { t.remove(); }, 2000);
+}
+
+document.addEventListener('DOMContentLoaded', renderMerchantList);
+</script>
+</body>
+</html>

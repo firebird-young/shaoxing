@@ -1,0 +1,267 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>入驻商家</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; justify-content: center; }
+.page { width: 430px; min-height: 100vh; background: #f6f7fb; padding: 0 16px 100px; position: relative; }
+@media(max-width:430px) { .page { width: 100%; } }
+
+/* ── 顶部导航 ── */
+.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; background: #f6f7fb; }
+.nav-back { width: 32px; height: 32px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.nav-back svg { width: 18px; height: 18px; color: #555; display: block; }
+.nav-back:active { background: #f0f0f0; }
+.nav-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+.nav-placeholder { width: 32px; }
+
+/* ── 商家卡片 ── */
+.merchant-card { background: #fff; border-radius: 16px; overflow: hidden; margin-top: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
+.mc-top { display: flex; gap: 14px; padding: 16px; }
+.mc-cover { width: 88px; height: 88px; border-radius: 12px; background-position: center; background-size: cover; flex-shrink: 0; }
+.mc-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+.mc-name { font-size: 16px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+.mc-tag { font-size: 11px; color: #999; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+.mc-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.mc-desc { font-size: 12px; color: #666; line-height: 1.5; }
+.mc-bottom { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-top: 1px solid #f5f5f7; }
+.mc-stats { font-size: 11px; color: #999; }
+.mc-btn { height: 32px; padding: 0 20px; border: none; border-radius: 16px; background: #D70C1F; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+.mc-btn:active { opacity: 0.85; }
+.mc-follow { height: 32px; padding: 0 12px; border: 1px solid #D70C1F; border-radius: 16px; background: #fff; color: #D70C1F; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .2s; margin-right: 8px; }
+.mc-follow.followed { background: #f5f5f5; color: #999; border-color: #ddd; }
+.ff-btn { flex: 1; height: 34px; padding: 0 12px; border-radius: 17px; border: 1px solid #e0e0e0; background: #fff; font-size: 13px; color: #666; cursor: pointer; transition: all .2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ff-btn.active { background: #D70C1F; color: #fff; border-color: #D70C1F; }
+
+/* ── 商家分类标签 ── */
+.mc-type-bar { margin-bottom: 6px; }
+.mt { display: inline-block; font-size: 10px; padding: 2px 10px; border-radius: 4px; font-weight: 500; }
+.mt.t-food { background: rgba(215,12,31,.1); color: #D70C1F; }
+.mt.t-ent { background: rgba(108,92,231,.1); color: #6c5ce7; }
+.mt.t-tour { background: rgba(0,184,148,.1); color: #00b894; }
+.mt.t-film { background: rgba(211,84,0,.1); color: #d35400; }
+
+
+/* ── 页面标题 ── */
+.page-title { display: flex; align-items: center; gap: 8px; padding: 16px 0 4px; }
+.page-title::before { content: ''; width: 3px; height: 16px; background: #D70C1F; border-radius: 2px; }
+.page-title span { font-size: 17px; font-weight: 700; color: #1a1a2e; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- 顶部导航 -->
+<div class="top-bar">
+  <div class="nav-back" onclick="window.location.href='user-index.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </div>
+  <div class="nav-title">入驻商家</div>
+  <div class="nav-placeholder"></div>
+</div>
+
+<div class="page-title"><span id="pageTitleText">全部商家</span></div>
+
+<!-- 关注筛选 -->
+<div class="follow-filter" style="display:flex;gap:8px;margin-bottom:12px">
+  <button class="ff-btn active" onclick="filterMerchants('all')">全部</button>
+  <button class="ff-btn" onclick="filterMerchants('followed')">⭐ 已关注</button>
+</div>
+<div id="followEmpty" style="display:none;padding:60px 0;text-align:center;color:#ccc;font-size:14px">暂未关注任何商家</div>
+
+<!-- 贵州茅台 · 酒水食品 -->
+<div class="merchant-card" data-merchant="maotai">
+  <div class="mc-top">
+    <div class="mc-cover" style="background-image:url('贵州茅台.jpg')"></div>
+    <div class="mc-info">
+      <div class="mc-type-bar"><span class="mt t-food">酒水食品</span></div>
+      <div class="mc-name">贵州茅台</div>
+      <div class="mc-tag">数字酒庄 · 品牌馆</div>
+      <div class="mc-desc">茅台酒起源于秦汉，成熟于明清，1915年巴拿马万国博览会金奖，与苏格兰威士忌、法国科涅克白兰地并称世界三大蒸馏名酒。</div>
+    </div>
+  </div>
+  <div class="mc-bottom">
+    <span class="mc-stats">23.6万 关注</span>
+    <button class="mc-follow" onclick="toggleFollowList('maotai',this)">+ 关注</button>
+    <button class="mc-btn" onclick="window.location.href='merchant_space.html'">查看空间</button>
+  </div>
+</div>
+
+<!-- 王者荣耀 · 文娱 -->
+<div class="merchant-card">
+  <div class="mc-top">
+    <div class="mc-cover" style="background-image:url('王者荣耀.jpeg')"></div>
+    <div class="mc-info">
+      <div class="mc-type-bar"><span class="mt t-ent">文娱</span></div>
+      <div class="mc-name">王者荣耀</div>
+      <div class="mc-tag">游戏资产 · 数字皮肤</div>
+      <div class="mc-desc">全球领先的MOBA手游，拥有海量英雄与皮肤数字资产，打造元宇宙游戏生态。</div>
+    </div>
+  </div>
+  <div class="mc-bottom">
+    <span class="mc-stats">89.2万 关注</span>
+    <button class="mc-follow" onclick="toggleFollowList('wzry',this)">+ 关注</button>
+    <button class="mc-btn">查看空间</button>
+  </div>
+</div>
+
+<!-- 五粮液 · 酒水食品 -->
+<div class="merchant-card">
+  <div class="mc-top">
+    <div class="mc-cover" style="background-image:url('五粮液·数字珍藏.png')"></div>
+    <div class="mc-info">
+      <div class="mc-type-bar"><span class="mt t-food">酒水食品</span></div>
+      <div class="mc-name">五粮液</div>
+      <div class="mc-tag">品牌馆 · 数字珍藏</div>
+      <div class="mc-desc">中国浓香型白酒的典型代表，以五粮酿造工艺闻名，推出限量数字珍藏资产。</div>
+    </div>
+  </div>
+  <div class="mc-bottom">
+    <span class="mc-stats">15.8万 关注</span>
+    <button class="mc-follow" onclick="toggleFollowList('wuliangye',this)">+ 关注</button>
+    <button class="mc-btn">查看空间</button>
+  </div>
+</div>
+
+<!-- 妙可蓝多 · 酒水食品 -->
+<div class="merchant-card">
+  <div class="mc-top">
+    <div class="mc-cover" style="background-image:url('妙可蓝多.jpeg')"></div>
+    <div class="mc-info">
+      <div class="mc-type-bar"><span class="mt t-food">酒水食品</span></div>
+      <div class="mc-name">妙可蓝多</div>
+      <div class="mc-tag">新零售 · 品牌馆</div>
+      <div class="mc-desc">中国领先的奶酪品牌，以「妙可蓝多，奶酪就选妙可蓝多」为品牌理念，布局数字化新零售。</div>
+    </div>
+  </div>
+  <div class="mc-bottom">
+    <span class="mc-stats">8.3万 关注</span>
+    <button class="mc-follow" onclick="toggleFollowList('miaoke',this)">+ 关注</button>
+    <button class="mc-btn">查看空间</button>
+  </div>
+</div>
+
+<!-- 杜甫草堂 · 文旅 -->
+<div class="merchant-card">
+  <div class="mc-top">
+    <div class="mc-cover" style="background-image:url('杜甫草堂·文旅数字藏品.png')"></div>
+    <div class="mc-info">
+      <div class="mc-type-bar"><span class="mt t-tour">文旅</span></div>
+      <div class="mc-name">杜甫草堂</div>
+      <div class="mc-tag">文旅 · 数字藏品</div>
+      <div class="mc-desc">中国唐代大诗人杜甫流寓成都时的故居，全国重点文物保护单位，推出文旅数字藏品系列。</div>
+    </div>
+  </div>
+  <div class="mc-bottom">
+    <span class="mc-stats">12.5万 关注</span>
+    <button class="mc-follow" onclick="toggleFollowList('dufu',this)">+ 关注</button>
+    <button class="mc-btn">查看空间</button>
+  </div>
+</div>
+
+<!-- 海底捞 · 酒水食品 -->
+<div class="merchant-card">
+  <div class="mc-top">
+    <div class="mc-cover" style="background-image:url('海底捞·黑海会员数字卡.png')"></div>
+    <div class="mc-info">
+      <div class="mc-type-bar"><span class="mt t-food">酒水食品</span></div>
+      <div class="mc-name">海底捞</div>
+      <div class="mc-tag">餐饮 · 会员数字卡</div>
+      <div class="mc-desc">中国领先的餐饮服务品牌，以极致服务体验著称，推出黑海会员数字卡等数字资产。</div>
+    </div>
+  </div>
+  <div class="mc-bottom">
+    <span class="mc-stats">56.7万 关注</span>
+    <button class="mc-follow" onclick="toggleFollowList('haidilao',this)">+ 关注</button>
+    <button class="mc-btn">查看空间</button>
+  </div>
+</div>
+
+<!-- 鬼吹灯 · 影视 -->
+<div class="merchant-card">
+  <div class="mc-top">
+    <div class="mc-cover" style="background-image:url('鬼吹灯.png')"></div>
+    <div class="mc-info">
+      <div class="mc-type-bar"><span class="mt t-film">影视</span></div>
+      <div class="mc-name">鬼吹灯</div>
+      <div class="mc-tag">影视 · 数字资产</div>
+      <div class="mc-desc">经典盗墓题材IP，推出摸金校尉系列数字藏品，探索地下秘境与元宇宙结合。</div>
+    </div>
+  </div>
+  <div class="mc-bottom">
+    <span class="mc-stats">28.4万 关注</span>
+    <button class="mc-follow" onclick="toggleFollowList('guichuideng',this)">+ 关注</button>
+    <button class="mc-btn">查看空间</button>
+  </div>
+</div>
+
+<!-- 三体 · 影视 -->
+<div class="merchant-card">
+  <div class="mc-top">
+    <div class="mc-cover" style="background-image:url('三体.png')"></div>
+    <div class="mc-info">
+      <div class="mc-type-bar"><span class="mt t-film">影视</span></div>
+      <div class="mc-name">三体</div>
+      <div class="mc-tag">影视 · 数字资产</div>
+      <div class="mc-desc">刘慈欣科幻巨著IP，推出三体文明系列数字资产，宇宙社会学与元宇宙碰撞。</div>
+    </div>
+  </div>
+  <div class="mc-bottom">
+    <span class="mc-stats">42.1万 关注</span>
+    <button class="mc-follow" onclick="toggleFollowList('santi',this)">+ 关注</button>
+    <button class="mc-btn">查看空间</button>
+  </div>
+</div>
+
+</div>
+<script>
+var curFilter = 'all';
+
+function initFollows() {
+  document.querySelectorAll('.mc-follow').forEach(function(btn) {
+    var id = btn.getAttribute('onclick').match(/'(\w+)'/)[1];
+    if (localStorage.getItem('follow_' + id) === '1') {
+      btn.textContent = '✓ 已关注';
+      btn.classList.add('followed');
+    }
+  });
+}
+
+function toggleFollowList(id, btn) {
+  var followed = localStorage.getItem('follow_' + id) === '1';
+  if (followed) {
+    localStorage.removeItem('follow_' + id);
+    btn.textContent = '+ 关注';
+    btn.classList.remove('followed');
+  } else {
+    localStorage.setItem('follow_' + id, '1');
+    btn.textContent = '✓ 已关注';
+    btn.classList.add('followed');
+  }
+  if (curFilter === 'followed') filterMerchants('followed');
+}
+
+function filterMerchants(filter) {
+  curFilter = filter;
+  document.querySelectorAll('.ff-btn').forEach(function(b, i) { b.classList.toggle('active', i === (filter === 'followed' ? 1 : 0)); });
+  document.getElementById('pageTitleText').textContent = filter === 'followed' ? '已关注商家' : '全部商家';
+  var ids = ['maotai','wzry','wuliangye','miaoke','dufu','haidilao','guichuideng','santi'];
+  var emptyEl = document.getElementById('followEmpty');
+  var visible = 0;
+  document.querySelectorAll('.merchant-card').forEach(function(card, i) {
+    if (filter === 'all') { card.style.display = ''; visible++; return; }
+    var id = ids[i] || '';
+    var followed = localStorage.getItem('follow_' + id) === '1';
+    card.style.display = followed ? '' : 'none';
+    if (followed) visible++;
+  });
+  if (emptyEl) emptyEl.style.display = (filter === 'followed' && visible === 0) ? 'block' : 'none';
+}
+
+initFollows();
+</script>
+</body>
+</html>

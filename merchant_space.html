@@ -1,0 +1,263 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>贵州茅台 · 商家空间</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; justify-content: center; }
+.page { max-width: 430px; min-height: 100vh; background: #f6f7fb; padding: 0 16px 60px; position: relative; }
+@media(max-width:430px) { .page { max-width: 100%; } }
+
+/* ── 顶部导航 ── */
+.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; background: #f6f7fb; }
+.nav-back { width: 32px; height: 32px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.nav-back svg { width: 18px; height: 18px; color: #555; display: block; }
+.nav-title { flex: 1; text-align: center; font-size: 16px; font-weight: 600; color: #1a1a2e; }
+.nav-placeholder { width: 32px; }
+
+/* ── 商家头部 ── */
+.merchant-header { margin: 8px 0 12px; background: linear-gradient(135deg, #1a1a2e, #2d1f1f); border-radius: 20px; padding: 16px 16px 12px; text-align: center; position: relative; overflow: hidden; }
+.merchant-header::after { content: ''; position: absolute; top: -50%; right: -20%; width: 140px; height: 140px; background: radial-gradient(circle, rgba(215,12,31,0.1), transparent 60%); }
+.mh-logo { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.2); margin-bottom: 8px; position: relative; z-index: 1; }
+.mh-name { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 2px; position: relative; z-index: 1; }
+.mh-stats { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 11px; color: rgba(255,255,255,0.65); position: relative; z-index: 1; margin-bottom: 4px; }
+.mh-stats .star { color: #f5a623; }
+.mh-desc { font-size: 11px; color: rgba(255,255,255,0.55); position: relative; z-index: 1; }
+
+.follow-btn { display: inline-block; position: relative; z-index: 1; margin: 6px 0; padding: 6px 24px; border-radius: 20px; border: 1.5px solid rgba(255,255,255,.5); background: transparent; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .25s; }
+.follow-btn:hover { background: rgba(255,255,255,.15); }
+.follow-btn.followed { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.3); color: rgba(255,255,255,.7); }
+
+/* ── 商户介绍 ── */
+.intro-card { background: #fff; border-radius: 16px; padding: 16px 18px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); margin-bottom: 12px; }
+.intro-title { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.intro-title::before { content: ''; width: 3px; height: 14px; background: #D70C1F; border-radius: 2px; }
+.intro-title span { font-size: 15px; font-weight: 700; color: #1a1a2e; }
+.intro-text { font-size: 13px; color: #666; line-height: 1.8; margin: 0; }
+
+/* ── 数字资产标题 ── */
+.asset-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 0 10px; }
+.asset-header .ah-title { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: #1a1a2e; }
+.asset-header .ah-title::before { content: ''; width: 3px; height: 14px; background: #D70C1F; border-radius: 2px; }
+
+/* ── 搜索 + 筛选 ── */
+.search-filter { margin-bottom: 10px; }
+.search-box { display: flex; align-items: center; gap: 8px; background: #fff; border-radius: 10px; padding: 0 12px; height: 38px; margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+.search-box svg { width: 16px; height: 16px; color: #999; flex-shrink: 0; }
+.search-box input { flex: 1; border: none; outline: none; font-size: 12px; color: #333; background: transparent; height: 100%; }
+.search-box input::placeholder { color: #bbb; }
+.filter-row { display: flex; gap: 8px; }
+.filter-btn { height: 30px; padding: 0 12px; border-radius: 15px; border: 1px solid #e0e0e0; background: #fff; font-size: 11px; color: #666; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.filter-btn:active { background: #f5f5f7; }
+.filter-btn.on { background: #D70C1F; color: #fff; border-color: #D70C1F; }
+.filter-btn.on svg { stroke: #fff; }
+.filter-btn svg { width: 12px; height: 12px; }
+.filter-wrap { position: relative; display: inline-flex; }
+.filter-dropdown { display: none; position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%); background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.12); padding: 6px 0; z-index: 20; min-width: 140px; }
+.filter-dropdown.show { display: block; }
+.filter-dropdown .fdi { padding: 10px 16px; font-size: 12px; color: #666; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.filter-dropdown .fdi:active { background: #f5f5f7; }
+.fdi .check { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #ddd; }
+.fdi .check.on { border-color: #D70C1F; background: #D70C1F; }
+.fdi .check svg { width: 8px; height: 8px; color: #fff; display: none; }
+.fdi .check.on svg { display: block; }
+
+/* ── 商品网格 ── */
+.goods-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.goods-card { background: #fff; border-radius: 14px; overflow: hidden; cursor: pointer; box-shadow: 0 1px 6px rgba(0,0,0,0.04); transition: transform 0.2s; }
+.goods-card:active { transform: scale(0.96); }
+.goods-card .img-wrap { height: 110px; background-position: center; background-size: cover; position: relative; }
+.goods-card .img-wrap .badge { position: absolute; top: 8px; left: 8px; font-size: 9px; padding: 2px 8px; border-radius: 4px; color: #fff; font-weight: 600; background: #D70C1F; }
+.goods-card .info { padding: 8px 10px 10px; }
+.goods-card .info h4 { font-size: 12px; font-weight: 600; margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #1a1a2e; }
+.goods-card .info .meta { font-size: 9px; color: #999; margin-bottom: 3px; }
+.goods-card .info .meta span { background: #f5f5f7; padding: 1px 5px; border-radius: 3px; }
+.goods-card .info .price { color: #D70C1F; font-size: 16px; font-weight: 700; }
+.goods-card .info .sold { color: #999; font-size: 9px; margin-top: 3px; }
+
+/* ── 功能板块 ── */
+/* ── 特色服务（横向滑动） ── */
+.service-scroll { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
+.service-scroll::-webkit-scrollbar { display: none; }
+.sv-item { flex-shrink: 0; width: 140px; background: #fff; border-radius: 14px; padding: 16px 14px; cursor: pointer; box-shadow: 0 1px 6px rgba(0,0,0,0.04); transition: transform 0.15s; display: flex; flex-direction: column; gap: 10px; }
+.sv-item:active { transform: scale(0.96); }
+.sv-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sv-icon.brew { background: linear-gradient(135deg, #d4a547, #f0c850); }
+.sv-icon.ai { background: linear-gradient(135deg, #00b894, #55efc4); }
+.sv-icon svg { width: 22px; height: 22px; color: #fff; display: block; }
+.sv-name { font-size: 14px; font-weight: 600; color: #1a1a2e; }
+.sv-desc { font-size: 11px; color: #999; line-height: 1.4; }
+
+/* ── 空状态 ── */
+.empty-state { text-align: center; padding: 30px; color: #999; font-size: 13px; display: none; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- 顶部导航 -->
+<div class="top-bar">
+  <div class="nav-back" onclick="window.location.href='user-index.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </div>
+  <div class="nav-title">商家空间</div>
+  <div class="nav-placeholder"></div>
+</div>
+
+<!-- 商家头部 -->
+<div class="merchant-header">
+  <img class="mh-logo" src="贵州茅台.jpg" alt="贵州茅台">
+  <div class="mh-name">贵州茅台</div>
+  <div class="mh-stats"><span id="followCount">23.6万</span> 关注</div>
+  <button class="follow-btn" id="followBtn" onclick="toggleFollow()">+ 关注</button>
+  <div class="mh-desc">中国酱香型白酒 · 数字酒庄 · 元宇宙空间</div>
+</div>
+
+<!-- 商户介绍 -->
+<div class="intro-card">
+  <div class="intro-title"><span>商户介绍</span></div>
+  <p class="intro-text">茅台酒起源于秦汉，成熟于明清，1915年巴拿马万国博览会金奖，与苏格兰威士忌、法国科涅克白兰地并称世界三大蒸馏名酒。贵州茅台酒股份有限公司是中国酱香型白酒的领军企业，以「12987」酿造工艺享誉世界，年营收超千亿。</p>
+</div>
+
+<!-- 特色服务 -->
+<div class="asset-header">
+  <div class="ah-title">特色服务</div>
+</div>
+<div class="service-scroll">
+  <div class="sv-item" onclick="window.location.href='brew_maotai.html'">
+    <div class="sv-icon brew">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16"/><path d="M12 10v10"/><line x1="8" y1="14" x2="8" y2="18"/><line x1="16" y1="14" x2="16" y2="18"/></svg>
+    </div>
+    <div class="sv-name">酿酒工艺演示</div>
+    <div class="sv-desc">传承千年古法酿造工艺全流程展示</div>
+  </div>
+  <div class="sv-item" onclick="window.location.href='chat_maotai.html'">
+    <div class="sv-icon ai">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M3 21c0-4.4 4-8 9-8s9 3.6 9 8"/><line x1="12" y1="14" x2="12" y2="22"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+    </div>
+    <div class="sv-name">茅小美·数字人</div>
+    <div class="sv-desc">AI 数字人客服，智能问答与品牌互动</div>
+  </div>
+</div>
+
+<!-- 数字资产 -->
+<div class="asset-header">
+  <div class="ah-title">数字资产</div>
+</div>
+
+<!-- 搜索 + 筛选 -->
+<div class="search-filter">
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="搜索茅台数字资产" id="searchInput" oninput="applyFilters()">
+  </div>
+  <div class="filter-row">
+    <div class="filter-wrap">
+      <button class="filter-btn" id="dateBtn" onclick="toggleDropdown()">发行时间 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+      <div class="filter-dropdown" id="dateDropdown">
+        <div class="fdi" data-value="" onclick="selectDateSort('', this)"><span>不限</span><span class="check on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+        <div class="fdi" data-value="desc" onclick="selectDateSort('desc', this)"><span>最近发行</span><span class="check"></span></div>
+        <div class="fdi" data-value="asc" onclick="selectDateSort('asc', this)"><span>最早发行</span><span class="check"></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 数字资产列表 -->
+<div class="goods-grid" id="goodsGrid"></div>
+<div class="empty-state" id="emptyState">暂无匹配资产</div>
+
+</div>
+
+<script>
+// 关注功能
+var isFollowed = localStorage.getItem('follow_maotai') === '1';
+var followNum = 236000;
+
+function updateFollowUI() {
+  var btn = document.getElementById('followBtn');
+  var count = document.getElementById('followCount');
+  if (isFollowed) {
+    btn.textContent = '✓ 已关注';
+    btn.className = 'follow-btn followed';
+    count.textContent = formatNum(followNum + 1);
+  } else {
+    btn.textContent = '+ 关注';
+    btn.className = 'follow-btn';
+    count.textContent = formatNum(followNum);
+  }
+}
+
+function toggleFollow() {
+  isFollowed = !isFollowed;
+  localStorage.setItem('follow_maotai', isFollowed ? '1' : '0');
+  updateFollowUI();
+}
+
+function formatNum(n) { return n >= 10000 ? (n / 10000).toFixed(1) + '万' : n; }
+
+updateFollowUI();
+
+const assets = [
+  { id: 0, name: '茅台1935·时光窖藏', img: '茅台1935.png', price: 599, total: 1935, sold: 677, date: '2026-06-01' },
+  { id: 1, name: '飞天茅台·元宇宙酒票', img: '飞天茅台·元宇宙酒票.png', price: 299, total: 3000, sold: 2280, date: '2026-05-20' },
+  { id: 2, name: '巴拿马金奖·复刻', img: '巴拿马金奖·复刻.png', price: 1999, total: 500, sold: 160, date: '2026-05-01' },
+  { id: 3, name: '国酒·数字徽章', img: '国酒·数字徽章.png', price: 99, total: 8888, sold: 3210, date: '2026-04-20' },
+  { id: 4, name: '茅台生肖兔·典藏', img: '茅台生肖兔·典藏.png', price: 2999, total: 365, sold: 289, date: '2026-03-15' },
+];
+
+let dateSort = '';
+
+function render() {
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  let list = [...assets];
+  if (searchTerm) list = list.filter(a => a.name.includes(searchTerm));
+  if (dateSort === 'desc') list.sort((a, b) => b.date.localeCompare(a.date));
+  else if (dateSort === 'asc') list.sort((a, b) => a.date.localeCompare(b.date));
+
+  const grid = document.getElementById('goodsGrid');
+  const empty = document.getElementById('emptyState');
+  if (list.length === 0) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  grid.innerHTML = list.map(a => `
+    <div class="goods-card" onclick="${a.id === 0 ? "window.location.href='product_maotai1935.html'" : ''}">
+      <div class="img-wrap" style="background-image:url('${a.img}')">
+        <span class="badge">酒水食品</span>
+      </div>
+      <div class="info">
+        <h4>${a.name}</h4>
+        <div class="meta"><span>限量${a.total}</span></div>
+        <div class="price">¥${a.price}</div>
+        <div class="sold">已售 ${a.sold}/${a.total}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function applyFilters() { render(); }
+
+function toggleDropdown() {
+  document.getElementById('dateDropdown').classList.toggle('show');
+}
+
+function selectDateSort(val, el) {
+  dateSort = val;
+  document.querySelectorAll('#dateDropdown .check').forEach(c => c.classList.remove('on'));
+  el.querySelector('.check').classList.add('on');
+  document.getElementById('dateDropdown').classList.remove('show');
+  render();
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.filter-wrap')) {
+    document.getElementById('dateDropdown').classList.remove('show');
+  }
+});
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+首页   dashboard.html
+数字资产 ▾
+├── 数字资产管理         asset-management.html
+
+订单管理 ▾
+├── 订单管理  order-management.html
+├── 发货管理  delivery-management.html
+
+系统管理 ▾
+├── 操作员管理 operator-management.html

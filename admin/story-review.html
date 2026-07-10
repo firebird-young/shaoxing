@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title>文化故事审核 - 元宇宙商城后台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f0f2f5; color: #333; }
+
+    .header { background: linear-gradient(135deg, #D70C1F, #F12B3D); color: #fff; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .header-title { font-size: 18px; font-weight: 600; }
+    .header-user { font-size: 14px; }
+
+    .main-container { display: flex; min-height: calc(100vh - 60px); }
+    .sidebar { width: 200px; background: #fff; border-right: 1px solid #e8e8e8; padding: 16px 0; }
+    .sidebar-group-title { padding: 8px 24px; font-size: 12px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .sidebar-item { padding: 10px 24px 10px 48px; font-size: 14px; color: #666; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 8px; }
+    .sidebar-item:hover { background: #f5f5f5; color: #D70C1F; }
+    .sidebar-item.active { background: rgba(215,12,31,.1); color: #D70C1F; font-weight: 600; }
+    .sidebar-item svg { width: 14px; height: 14px; }
+
+    .content { flex: 1; padding: 24px; overflow-y: auto; }
+    .content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .content-title { font-size: 20px; font-weight: 700; color: #1a1a2e; }
+
+    .card { background: #fff; border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    .btn { padding: 8px 18px; border-radius: 8px; font-size: 14px; cursor: pointer; border: none; transition: all .2s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary { background: #D70C1F; color: #fff; }
+    .btn-primary:hover { opacity: .9; }
+    .btn-sm { padding: 4px 10px; font-size: 12px; border-radius: 6px; }
+    .btn-success { background: rgba(7,193,96,.1); color: #07c160; border: 1px solid rgba(7,193,96,.3); }
+    .btn-success:hover { background: rgba(7,193,96,.15); }
+    .btn-danger { background: #fff5f5; color: #e74c3c; border: 1px solid #ffcccc; }
+    .btn-danger:hover { background: #ffeaea; }
+    .btn-warning { background: #fff7e6; color: #fa8c16; border: 1px solid rgba(250,140,22,.3); }
+    .btn-warning:hover { background: rgba(250,140,22,.1); }
+
+    .status-tag { display: inline-block; font-size: 12px; padding: 3px 10px; border-radius: 12px; font-weight: 600; }
+    .status-tag.pending { background: #fff7e6; color: #fa8c16; }
+    .status-tag.approved { background: #e6f7ff; color: #1890ff; }
+    .status-tag.rejected { background: #fff1f0; color: #e74c3c; }
+    .status-tag.online { background: #f6ffed; color: #52c41a; }
+    .status-tag.offline { background: #f5f5f5; color: #999; }
+
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .filter-btn { padding: 6px 14px; font-size: 13px; border-radius: 20px; border: 1px solid #e0e0e0; background: #fff; cursor: pointer; }
+    .filter-btn.active { background: #D70C1F; color: #fff; border-color: #D70C1F; }
+
+    .story-list { display: flex; flex-direction: column; gap: 12px; }
+    .story-item { display: flex; gap: 16px; padding: 16px; background: #fafafa; border-radius: 12px; align-items: center; }
+    .story-item:hover { background: #f5f5f5; }
+    .story-cover { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; background: #eee; flex-shrink: 0; }
+    .story-info { flex: 1; min-width: 0; }
+    .story-title { font-size: 15px; font-weight: 600; color: #1a1a2e; }
+    .story-detail { font-size: 12px; color: #888; margin-top: 4px; }
+    .story-col-time { font-size: 12px; color: #999; flex-shrink: 0; width: 100px; text-align: center; }
+    .story-col-status { flex-shrink: 0; width: 90px; text-align: center; }
+    .story-col-actions { flex-shrink: 0; display: flex; gap: 6px; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal-overlay.show { display: flex; }
+    .modal-box { background: #fff; border-radius: 16px; width: 100%; max-width: 700px; max-height: 85vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #f0f0f0; }
+    .modal-title { font-size: 16px; font-weight: 600; }
+    .modal-close { width: 30px; height: 30px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; }
+    .modal-body { padding: 20px; }
+    .modal-cover { width: 100%; max-height: 300px; object-fit: cover; border-radius: 8px; margin-bottom: 16px; }
+    .modal-content { font-size: 14px; color: #333; line-height: 1.8; white-space: pre-wrap; }
+    .modal-footer { padding: 16px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px; }
+
+    .empty-state { padding: 60px 0; text-align: center; color: #ccc; }
+    .count-badge { background: #D70C1F; color: #fff; font-size: 11px; padding: 1px 7px; border-radius: 10px; margin-left: 4px; }
+    .search-bar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; align-items: flex-end; }
+    .search-input { flex: 1; min-width: 200px; padding: 8px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; }
+    .search-input:focus { border-color: #D70C1F; }
+    .search-select { padding: 8px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; min-width: 180px; }
+    .reject-reason { margin-top: 12px; }
+    .form-group { margin-top: 16px; }
+    .form-label { display: block; font-size: 14px; font-weight: 600; color: #555; margin-bottom: 8px; }
+    .form-textarea { width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; min-height: 80px; resize: vertical; outline: none; }
+    .form-textarea:focus { border-color: #D70C1F; }
+
+    .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); padding: 12px 20px; border-radius: 8px; font-size: 14px; z-index: 2000; animation: slideIn .3s ease; color: #fff; }
+    .toast.success { background: rgba(7,193,96,.9); }
+    .toast.error { background: rgba(231,76,60,.9); }
+    @keyframes slideIn { from { transform: translateX(-50%) translateY(-20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-title">元宇宙商城 - 后台管理</div>
+    <div class="header-user">管理员</div>
+  </div>
+
+  <div class="main-container">
+    <div class="sidebar">
+      <div class="sidebar-group-title">元宇宙管理</div>
+      <div class="sidebar-item" onclick="navigateTo('hotspot-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>场景和热区</div>
+      <div class="sidebar-item" onclick="navigateTo('path-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="12 19 19 12 12 5 5 12"/><circle cx="12" cy="12" r="3"/></svg>跳转路径</div>
+      <div class="sidebar-item" onclick="navigateTo('map-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3 9 12 15 21 9"/></svg>主地图管理</div>
+      <div class="sidebar-item" onclick="navigateTo('space-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>商家元宇宙空间管理</div>
+      <div class="sidebar-item" onclick="navigateTo('role-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>角色管理</div>
+      <div class="sidebar-item" onclick="navigateTo('dashboard-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>元宇宙看板</div>
+      <div class="sidebar-item" onclick="navigateTo('dice-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><text x="12" y="17" text-anchor="middle" font-size="10">?</text></svg>🎲 骰子游戏</div>
+      <div class="sidebar-group-title">数字资产</div>
+      <div class="sidebar-item" onclick="navigateTo('asset-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>数字资产管理</div>
+      <div class="sidebar-item" onclick="navigateTo('digital-asset-detail.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>数字资产详情</div>
+      <div class="sidebar-item" onclick="navigateTo('order-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>订单管理</div>
+      <div class="sidebar-group-title">会员管理</div>
+      <div class="sidebar-item" onclick="navigateTo('user-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>用户管理</div>
+      <div class="sidebar-item" onclick="navigateTo('merchant-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>商家管理</div>
+      <div class="sidebar-group-title">审核管理</div>
+      <div class="sidebar-item" onclick="navigateTo('cert-review.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>商家审核管理</div>
+      <div class="sidebar-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>文化故事审核</div>
+      <div class="sidebar-group-title">内容管理</div>
+      <div class="sidebar-item" onclick="navigateTo('message-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>消息管理</div>
+      <div class="sidebar-group-title">系统管理</div>
+      <div class="sidebar-item" onclick="navigateTo('wallet-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>钱包管理</div>
+    </div>
+
+    <div class="content">
+      <div class="content-header">
+        <div class="content-title">📋 文化故事审核</div>
+      </div>
+
+      <div class="card">
+        <div class="search-bar">
+          <input class="search-input" id="searchInput" placeholder="🔍 搜索故事标题..." oninput="renderStories()">
+          <select class="search-select" id="merchantFilter" onchange="renderStories()">
+            <option value="">全部商户</option>
+          </select>
+        </div>
+        <div class="filter-bar" id="filterBar">
+          <button class="filter-btn active" onclick="filterStories('all')">全部</button>
+          <button class="filter-btn" onclick="filterStories('pending')">待审核 <span class="count-badge" id="pendingCount">0</span></button>
+          <button class="filter-btn" onclick="filterStories('approved')">审核通过</button>
+          <button class="filter-btn" onclick="filterStories('rejected')">审核不通过</button>
+          <button class="filter-btn" onclick="filterStories('online')">已上线</button>
+          <button class="filter-btn" onclick="filterStories('offline')">已下线</button>
+        </div>
+        <div class="story-list" id="storyList"></div>
+        <div class="empty-state" id="emptyState" style="display:none">暂无待审核的故事</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 详情弹窗 -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="detailTitle">文化故事详情</div>
+        <div class="modal-close" onclick="closeDetailModal()">✕</div>
+      </div>
+      <div class="modal-body">
+        <img class="modal-cover" id="detailCover" src="" alt="" style="display:none">
+        <div style="font-size:20px;font-weight:700;margin-bottom:8px" id="detailName"></div>
+        <div class="modal-content" id="detailContent"></div>
+        <div style="margin-top:12px;font-size:12px;color:#999" id="detailMeta"></div>
+        <div class="form-group reject-reason" id="rejectReasonWrap" style="display:none">
+          <label class="form-label">拒绝原因（选填）</label>
+          <textarea class="form-textarea" id="rejectReason" placeholder="请输入拒绝原因..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" onclick="reviewStory('rejected')" id="btnReject">❌ 拒绝</button>
+        <button class="btn btn-warning" onclick="reviewStory('pending')" id="btnRevert" style="display:none">↩ 退回待审</button>
+        <button class="btn btn-success" onclick="reviewStory('approved')" id="btnApprove">✅ 审核通过</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var STORAGE = 'merchantStories';
+    var stories = [];
+    var currentFilter = 'all';
+    var viewingStory = null;
+
+    function navigateTo(url) { window.location.href = url; }
+
+    var imgStore = {};
+
+    function loadStories() {
+      var raw = localStorage.getItem(STORAGE);
+      if (raw) {
+        try {
+          stories = JSON.parse(raw);
+        } catch(e) { stories = []; }
+      }
+      stories = stories.filter(function(s) { return s.status !== 'draft'; });
+      loadImgStore(function() {
+        stories.forEach(function(s) {
+          if (s.cover && s.cover.indexOf('[IMG:') === 0 && imgStore[s.id]) s.cover = imgStore[s.id];
+          if (!s.merchantName) s.merchantName = '贵州茅台';
+        });
+        renderStories();
+      });
+    }
+
+    function openDB(cb) {
+      var req = indexedDB.open('MetaMallImgs', 1);
+      req.onupgradeneeded = function(e) { e.target.result.createObjectStore('covers', {keyPath:'id'}); };
+      req.onsuccess = function(e) { cb(e.target.result); };
+    }
+    function loadImgStore(cb) {
+      openDB(function(db) {
+        var tx = db.transaction('covers', 'readonly'), store = tx.objectStore('covers');
+        var req = store.getAll();
+        req.onsuccess = function() { (req.result || []).forEach(function(r) { imgStore[r.id] = r.data; }); cb(); };
+        req.onerror = function() { cb(); };
+      });
+    }
+
+    function saveData() {
+      var light = stories.map(function(s) {
+        var l = { id:s.id, title:s.title, content:s.content, status:s.status, createdAt:s.createdAt, updatedAt:s.updatedAt, merchantId:s.merchantId, merchantName:s.merchantName, rejectReason:s.rejectReason };
+        if (s.cover && s.cover.indexOf('data:') === 0) { imgStore[s.id] = s.cover; l.cover = '[IMG:' + s.id + ']'; }
+        else l.cover = s.cover || '';
+        return l;
+      });
+      localStorage.setItem(STORAGE, JSON.stringify(light));
+      // 图片存 IndexedDB
+      if (Object.keys(imgStore).length > 0) {
+        openDB(function(db) {
+          var tx = db.transaction('covers', 'readwrite'), store = tx.objectStore('covers');
+          Object.keys(imgStore).forEach(function(k) { store.put({id:k, data:imgStore[k]}); });
+        });
+      }
+    }
+
+    function renderStories() {
+      var searchText = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+      var merchantFilter = document.getElementById('merchantFilter').value;
+      var filtered = currentFilter === 'all' ? stories : stories.filter(function(s) { return s.status === currentFilter; });
+      if (searchText) filtered = filtered.filter(function(s) { return s.title.toLowerCase().indexOf(searchText) >= 0; });
+      if (merchantFilter) filtered = filtered.filter(function(s) { return s.merchantId === merchantFilter; });
+      var container = document.getElementById('storyList');
+      var empty = document.getElementById('emptyState');
+      document.getElementById('pendingCount').textContent = stories.filter(function(s) { return s.status === 'pending'; }).length;
+
+      // 更新商户筛选下拉
+      var presetMerchants = ['贵州茅台','妙可蓝多','王者荣耀','鬼吹灯'];
+      var sel = document.getElementById('merchantFilter');
+      var curVal = sel.value;
+      sel.innerHTML = '<option value="">全部商家</option>' + presetMerchants.map(function(m) { return '<option value="' + m + '">' + m + '</option>'; }).join('');
+      sel.value = curVal;
+
+      if (filtered.length === 0) { container.innerHTML = ''; empty.style.display = 'block'; return; }
+      empty.style.display = 'none';
+      var statusMap = { pending:'待审核', approved:'审核通过', rejected:'审核不通过', online:'已上线', offline:'已下线' };
+
+      container.innerHTML = filtered.map(function(s) {
+        var coverHtml = s.cover ? '<img class="story-cover" src="' + s.cover + '">' : '<div class="story-cover" style="display:flex;align-items:center;justify-content:center;font-size:28px;color:#ccc">📖</div>';
+        var merchantName = '贵州茅台';
+        var actions = '<button class="btn btn-sm" style="background:#f5f5f5" onclick="viewDetail(\'' + s.id + '\')">查看详情</button>';
+        if (s.status === 'pending') {
+          actions += '<button class="btn btn-sm btn-success" onclick="quickApprove(\'' + s.id + '\')">通过</button>';
+          actions += '<button class="btn btn-sm btn-danger" onclick="quickReject(\'' + s.id + '\')">拒绝</button>';
+        }
+        if (s.status === 'online') {
+          actions += '<button class="btn btn-sm btn-danger" onclick="quickOffline(\'' + s.id + '\')">下线</button>';
+        }
+        var rejectInfo = s.status === 'rejected' && s.rejectReason ? '<div style="font-size:11px;color:#e74c3c;margin-top:2px">' + s.rejectReason + '</div>' : '';
+
+        return '<div class="story-item">' + coverHtml +
+          '<div class="story-info"><div class="story-title">' + s.title + '</div>' +
+          '<div class="story-detail"><span>🏪 ' + merchantName + '</span>' + rejectInfo + '</div></div>' +
+          '<div class="story-col-status"><span class="status-tag ' + s.status + '">' + (statusMap[s.status] || s.status) + '</span></div>' +
+          '<div class="story-col-time">' + (s.updatedAt || s.createdAt || '') + '</div>' +
+          '<div class="story-col-actions">' + actions + '</div></div>';
+      }).join('');
+    }
+
+    function filterStories(f) {
+      currentFilter = f;
+      document.querySelectorAll('#filterBar .filter-btn').forEach(function(b) { b.classList.toggle('active', false); });
+      event.target.classList.add('active');
+      renderStories();
+    }
+
+    function viewDetail(id) {
+      viewingStory = stories.find(function(s) { return s.id === id; });
+      if (!viewingStory) return;
+      var statusCN = { pending:'待审核', approved:'审核通过', rejected:'审核不通过', online:'已上线', offline:'已下线' }[viewingStory.status] || viewingStory.status;
+      document.getElementById('detailName').textContent = viewingStory.title;
+      document.getElementById('detailContent').innerHTML = viewingStory.content || '';
+      document.getElementById('detailMeta').textContent = '🏪 贵州茅台 | 状态：' + statusCN + ' | ' + (viewingStory.updatedAt || '');
+      if (viewingStory.cover) { document.getElementById('detailCover').src = viewingStory.cover; document.getElementById('detailCover').style.display = 'block'; }
+      else document.getElementById('detailCover').style.display = 'none';
+
+      document.getElementById('rejectReasonWrap').style.display = 'none';
+      document.getElementById('rejectReason').value = '';
+      document.getElementById('btnApprove').style.display = '';
+      document.getElementById('btnReject').style.display = '';
+      document.getElementById('btnRevert').style.display = 'none';
+      if (viewingStory.status === 'approved') { document.getElementById('btnApprove').style.display = 'none'; document.getElementById('btnReject').style.display = 'none'; }
+      if (viewingStory.status === 'rejected') { document.getElementById('btnApprove').style.display = 'none'; document.getElementById('btnReject').style.display = 'none'; document.getElementById('btnRevert').style.display = 'none'; }
+      if (viewingStory.status === 'online') { document.getElementById('btnApprove').style.display = 'none'; document.getElementById('btnReject').style.display = 'none'; }
+      if (viewingStory.status === 'offline') { document.getElementById('btnApprove').style.display = 'none'; document.getElementById('btnReject').style.display = 'none'; document.getElementById('btnRevert').style.display = 'none'; }
+
+      document.getElementById('detailModal').classList.add('show');
+    }
+
+    function closeDetailModal() { document.getElementById('detailModal').classList.remove('show'); viewingStory = null; }
+
+    function reviewStory(newStatus) {
+      if (!viewingStory) return;
+      if (newStatus === 'rejected') {
+        document.getElementById('rejectReasonWrap').style.display = 'block';
+        return; // 先展开拒绝原因输入，再次点击触发
+      }
+      viewingStory.status = newStatus;
+      viewingStory.updatedAt = new Date().toLocaleDateString('zh-CN');
+      if (newStatus === 'approved') { delete viewingStory.rejectReason; }
+      var reason = document.getElementById('rejectReason').value.trim();
+      if (reason) viewingStory.rejectReason = reason;
+      saveData();
+      closeDetailModal();
+      renderStories();
+      showToast(newStatus === 'approved' ? '审核通过' : newStatus === 'rejected' ? '已拒绝' : '状态已更新', 'success');
+    }
+
+    function quickApprove(id) {
+      var s = stories.find(function(x) { return x.id === id; });
+      if (!s) return;
+      s.status = 'approved';
+      s.updatedAt = new Date().toLocaleDateString('zh-CN');
+      saveData();
+      renderStories();
+      showToast('审核通过', 'success');
+    }
+
+    function quickOffline(id) {
+      var s = stories.find(function(x) { return x.id === id; });
+      if (!s) return;
+      s.status = 'offline';
+      s.updatedAt = new Date().toLocaleDateString('zh-CN');
+      saveData();
+      renderStories();
+      showToast('已下线', 'success');
+    }
+
+    function quickOnline(id) {
+      var s = stories.find(function(x) { return x.id === id; });
+      if (!s) return;
+      s.status = 'online';
+      s.updatedAt = new Date().toLocaleDateString('zh-CN');
+      saveData();
+      renderStories();
+      showToast('已重新上线', 'success');
+    }
+
+    function quickReject(id) {
+      var reason = prompt('请输入拒绝原因（选填）：');
+      var s = stories.find(function(x) { return x.id === id; });
+      if (!s) return;
+      s.status = 'rejected';
+      s.updatedAt = new Date().toLocaleDateString('zh-CN');
+      if (reason) s.rejectReason = reason;
+      saveData();
+      renderStories();
+      showToast('已拒绝', 'success');
+    }
+
+    function showToast(msg, type) {
+      var t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg;
+      document.body.appendChild(t); setTimeout(function() { t.remove(); }, 2000);
+    }
+
+    loadStories();
+  </script>
+</body>
+</html>

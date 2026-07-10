@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>数字资产详情 - 商家中心</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:#f5f7fa;color:#333}
+.header{background:#fff;padding:16px 24px;box-shadow:0 2px 4px rgba(0,0,0,.05);display:flex;justify-content:space-between;align-items:center}
+.header-left h1{font-size:18px;font-weight:600}
+.header-right{display:flex;align-items:center;gap:16px}
+.back-link{font-size:13px;color:#667eea;text-decoration:none;cursor:pointer;display:flex;align-items:center;gap:4px}
+.back-link:hover{text-decoration:underline}
+.merchant-name{font-weight:500;color:#667eea}
+.sidebar{position:fixed;left:0;top:60px;bottom:0;width:200px;background:#2c3e50;padding:20px 0;overflow-y:auto}
+.sidebar-menu{list-style:none;padding:0;margin:0}
+.menu-title{display:flex;align-items:center;gap:10px;padding:12px 20px;color:#b8c7ce;font-size:14px;text-decoration:none;transition:all .2s}
+.menu-title svg{width:18px;height:18px;flex-shrink:0}
+a.menu-title:hover{background:rgba(255,255,255,.1);color:#fff}
+.submenu{list-style:none;padding:0;margin:0}
+.submenu-item{display:block;padding:10px 20px 10px 50px;color:#8a9aa8;font-size:13px;text-decoration:none;transition:all .2s}
+.submenu-item:hover{background:rgba(255,255,255,.1);color:#fff}
+.submenu-item.active{background:rgba(102,126,234,.3);color:#fff}
+.content{margin-left:200px;padding:24px}
+.content-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.content-title{font-size:18px;font-weight:600;color:#1a1a2e}
+.card{background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.search-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.search-input{padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;outline:none;min-width:150px;flex:1;max-width:200px}
+.search-input:focus{border-color:#D70C1F}
+.search-btn{padding:8px 16px;border:none;border-radius:6px;background:#D70C1F;color:#fff;font-size:13px;cursor:pointer}
+.search-btn:hover{background:#c60a1b}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid #f0f0f0;font-size:12px}
+th{background:#fafafa;font-weight:600;color:#666;white-space:nowrap}
+tr:hover{background:#fafafa}
+.asset-thumb{width:40px;height:50px;border-radius:6px;object-fit:cover;background:#f5f5f7}
+.on-chain-link{color:#667eea;font-size:11px;font-family:monospace;text-decoration:none;cursor:pointer}
+.on-chain-link:hover{text-decoration:underline;color:#D70C1F}
+.tag{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;display:inline-block}
+.tag-sold{background:#f6ffed;color:#52c41a}
+.tag-unsold{background:#f0f5ff;color:#1890ff}
+.tag-used{background:#f6ffed;color:#52c41a}
+.tag-partial{background:#fff7e6;color:#fa8c16}
+.tag-unused{background:#fff2f3;color:#D70C1F}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.modal-overlay.show{display:flex}
+.modal-box{background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:85vh;overflow-y:auto}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #f0f0f0}
+.modal-title{font-size:16px;font-weight:600}
+.modal-close{width:28px;height:28px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:#666}
+.modal-close:hover{background:#e8e8e8}
+.modal-body{padding:20px}
+.detail-section{margin-bottom:16px}
+.detail-section-title{font-size:14px;font-weight:600;color:#1a1a2e;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #f0f0f0}
+.detail-row{display:flex;padding:6px 0;font-size:13px}
+.detail-label{width:100px;color:#999;flex-shrink:0}
+.detail-value{flex:1;color:#333;word-break:break-all}
+.chain-link{color:#667eea;font-size:13px;font-family:monospace;text-decoration:none}
+.chain-link:hover{text-decoration:underline;color:#D70C1F}
+.benefit-item{display:flex;align-items:center;padding:8px 12px;background:#f9f9f9;border-radius:8px;margin-bottom:6px}
+.benefit-item:last-child{margin-bottom:0}
+.benefit-name{flex:1;font-size:13px;color:#333}
+.benefit-status{font-size:11px;font-weight:500}
+.benefit-time{font-size:10px;color:#999;margin-left:8px;white-space:nowrap}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:8px;font-size:13px;z-index:2000;animation:slideIn .3s ease}
+.toast.success{background:rgba(7,193,96,.9);color:#fff}
+@keyframes slideIn{from{transform:translateX(-50%) translateY(-20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left"><h1>商家中心</h1></div>
+  <div class="header-right">
+    <span class="merchant-name">贵州茅台</span>
+    <span class="back-link" onclick="window.location.href='dashboard.html'">← 返回首页</span>
+  </div>
+</div>
+
+<div class="sidebar">
+  <ul class="sidebar-menu">
+    <li><a class="menu-title" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>首页</a></li>
+    <li>
+      <div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><polyline points="21 15 16 10 5 21"/></svg>数字资产</div>
+      <ul class="submenu">
+        <li><a class="submenu-item" href="asset-management.html">数字资产管理</a></li>
+        <li><a class="submenu-item active" href="digital-asset-detail.html">数字资产详情</a></li>
+      </ul>
+    </li>
+    <li>
+      <div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>订单管理</div>
+      <ul class="submenu"><li><a class="submenu-item" href="order-management.html">订单管理</a></li><li><a class="submenu-item" href="delivery-management.html">发货管理</a></li></ul>
+    </li>
+    <li>
+      <div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>营销管理</div>
+      <ul class="submenu"><li><a class="submenu-item" href="marketing.html">空间管理</a></li><li><a class="submenu-item" href="task-management.html">任务管理</a></li></ul>
+    </li>
+    <li>
+      <div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>内容管理</div>
+      <ul class="submenu"><li><a class="submenu-item" href="story-admin.html">文化故事管理</a></li></ul>
+    </li>
+    <li>
+      <div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>系统管理</div>
+      <ul class="submenu"><li><a class="submenu-item" href="operator-management.html">操作员管理</a></li><li><a class="submenu-item" href="role-management.html">角色管理</a></li></ul>
+    </li>
+  </ul>
+</div>
+
+<div class="content">
+  <div class="content-header">
+    <div class="content-title">📦 数字资产详情</div>
+  </div>
+
+  <div class="card">
+    <div class="search-bar">
+      <input class="search-input" id="sName" placeholder="数字资产名称">
+      <input class="search-input" id="sSpec" placeholder="款式">
+      <input class="search-input" id="sNumber" placeholder="编号">
+      <button class="search-btn" onclick="applyFilter()">🔍 搜索</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:52px">缩略图</th>
+          <th>资产名称</th>
+          <th>款式/规格</th>
+          <th>编号</th>
+          <th>当前持有人</th>
+          <th>链上地址</th>
+          <th>销售状态</th>
+          <th>权益状态</th>
+          <th style="width:70px">操作</th>
+        </tr>
+      </thead>
+      <tbody id="listBody"></tbody>
+    </table>
+    <div id="emptyState" class="search-bar" style="justify-content:center;padding:40px 0;color:#999;font-size:13px;display:none">暂无匹配数据</div>
+  </div>
+</div>
+
+<!-- 详情弹窗 -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">数字资产详情</div>
+      <div class="modal-close" onclick="document.getElementById('detailModal').classList.remove('show')">✕</div>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" style="display:none"></div>
+
+<script>
+var EXPLORER_URL = 'https://can.ihaichain.com/item?params=0x82a595e8c7d3b479ce9af9b797cbc9224656ec4d';
+
+var assets = [
+  { id:'A001', name:'茅台1935·时光窖藏', spec:'凝时', img:'../茅台1935.png', number:'#1935-0001', phone:'13800138888', holderAddr:'0x1a2B...9F3c', chainAddr:'0xabc123def4567890abcdef1234567890abcdef12', saleStatus:'sold', benefitStatus:'partial',
+    benefits:[{name:'限量编号证书', status:'used', claimTime:'2026-06-12 14:30'},{name:'VIP专属通道', status:'unused'}] },
+  { id:'A002', name:'飞天茅台·元宇宙酒票', spec:'标准款', img:'../飞天茅台·元宇宙酒票.png', number:'#MT-2026-0025', phone:'13900146666', holderAddr:'0x2b3C...8E2d', chainAddr:'0xdef4567890abcdef1234567890abcdef12345678', saleStatus:'sold', benefitStatus:'partial',
+    benefits:[{name:'线下品鉴会入场资格', status:'unused'},{name:'专属客服服务', status:'used', claimTime:'2026-06-10 09:15'}] },
+  { id:'A003', name:'王者荣耀·传说皮肤', spec:'限定款', img:'../王者荣耀·传说皮肤.png', number:'#WZ-2026-0888', phone:'13500153333', holderAddr:'0x3c4D...7F1b', chainAddr:'0x7890abcdef1234567890abcdef1234567890abcd', saleStatus:'sold', benefitStatus:'used',
+    benefits:[{name:'限定皮肤体验', status:'used', claimTime:'2026-06-08 16:45'},{name:'游戏内称号', status:'used', claimTime:'2026-06-09 10:00'}] },
+  { id:'A004', name:'五粮液·数字珍藏', spec:'典藏款', img:'../五粮液·数字珍藏.png', number:'#WLY-2024-0001', phone:'13600154444', holderAddr:'0x4d5E...6G0a', chainAddr:'0xabcdef1234567890abcdef1234567890abcdef34', saleStatus:'unsold', benefitStatus:'unused',
+    benefits:[{name:'五粮液数字证书', status:'unused'},{name:'年份酒兑换券', status:'unused'}] },
+  { id:'A005', name:'杜甫草堂·文旅数字藏品', spec:'标准款', img:'../杜甫草堂·文旅数字藏品.png', number:'#DF-2026-0100', phone:'13700155555', holderAddr:'0x5e6F...5H2c', chainAddr:'0x1234567890abcdef1234567890abcdef12345678', saleStatus:'sold', benefitStatus:'used',
+    benefits:[{name:'杜甫草堂数字门票', status:'used', claimTime:'2026-06-11 08:20'},{name:'诗词数字手稿', status:'used', claimTime:'2026-06-11 08:25'}] },
+  { id:'A006', name:'巴拿马金奖·复刻', spec:'典藏款', img:'../巴拿马金奖·复刻.png', number:'#BNM-1915-0005', phone:'13400142222', holderAddr:'0x6f7A...4I1d', chainAddr:'0x567890abcdef1234567890abcdef1234567890ab', saleStatus:'unsold', benefitStatus:'unused',
+    benefits:[{name:'金奖复刻证书', status:'unused'},{name:'VIP品鉴会', status:'unused'}] },
+  { id:'A007', name:'海底捞·黑海会员数字卡', spec:'黑海会员卡', img:'../海底捞·黑海会员数字卡.png', number:'#HDL-2026-0369', phone:'13900146666', holderAddr:'0x7f8A...3J0e', chainAddr:'0x7890abcdef1234567890abcdef1234567890abcd', saleStatus:'sold', benefitStatus:'partial',
+    benefits:[{name:'黑海会员权益', status:'used', claimTime:'2026-06-07 11:30'},{name:'优先订座', status:'unused'}] },
+  { id:'A008', name:'鬼吹灯·数字资产', spec:'标准款', img:'../鬼吹灯.png', number:'#GCD-2026-0128', phone:'13800138888', holderAddr:'0x8f9B...2K1f', chainAddr:'0xabcdef1234567890abcdef1234567890abcdef56', saleStatus:'sold', benefitStatus:'partial',
+    benefits:[{name:'摸金校尉勋章', status:'used', claimTime:'2026-06-09 14:00'},{name:'场景解锁权', status:'unused'}] },
+  { id:'A009', name:'三体·数字资产', spec:'标准款', img:'../三体.png', number:'#ST-2026-0256', phone:'13200140000', holderAddr:'0x9f0A...1L2g', chainAddr:'0x34567890abcdef1234567890abcdef1234567890', saleStatus:'unsold', benefitStatus:'unused',
+    benefits:[{name:'三体文明数字凭证', status:'unused'}] }
+];
+
+var saleMap = { sold:'已售出', unsold:'未售出' };
+var saleCls = { sold:'tag-sold', unsold:'tag-unsold' };
+var benMap = { used:'已核销', partial:'部分核销', unused:'未核销' };
+var benCls = { used:'tag-used', partial:'tag-partial', unused:'tag-unused' };
+
+function renderList(list) {
+  var body = document.getElementById('listBody');
+  var empty = document.getElementById('emptyState');
+  if (list.length === 0) { body.innerHTML = ''; empty.style.display = 'flex'; return; }
+  empty.style.display = 'none';
+  body.innerHTML = list.map(function(a) {
+    return '<tr>' +
+      '<td><img class="asset-thumb" src="' + a.img + '" alt=""></td>' +
+      '<td style="font-weight:600">' + a.name + '</td>' +
+      '<td style="color:#666">' + a.spec + '</td>' +
+      '<td style="font-size:11px;color:#999;font-family:monospace">' + a.number + '</td>' +
+      '<td>' + a.phone + '</td>' +
+      '<td><a class="on-chain-link" href="' + EXPLORER_URL + '&token_id=' + (Math.floor(Math.random()*50)+1) + '" target="_blank" title="点击查看链上记录">' + a.chainAddr.substring(0,10) + '...</a></td>' +
+      '<td><span class="tag ' + saleCls[a.saleStatus] + '">' + saleMap[a.saleStatus] + '</span></td>' +
+      '<td><span class="tag ' + benCls[a.benefitStatus] + '">' + benMap[a.benefitStatus] + '</span></td>' +
+      '<td><button class="search-btn" style="padding:4px 10px;font-size:11px" onclick="showDetail(\'' + a.id + '\')">详情</button></td>' +
+      '</tr>';
+  }).join('');
+}
+
+function applyFilter() {
+  var name = document.getElementById('sName').value.trim().toLowerCase();
+  var spec = document.getElementById('sSpec').value.trim().toLowerCase();
+  var number = document.getElementById('sNumber').value.trim().toLowerCase();
+  var list = assets.filter(function(a) {
+    if (name && a.name.toLowerCase().indexOf(name) < 0) return false;
+    if (spec && a.spec.toLowerCase().indexOf(spec) < 0) return false;
+    if (number && a.number.toLowerCase().indexOf(number) < 0) return false;
+    return true;
+  });
+  renderList(list);
+}
+
+function showDetail(id) {
+  var a = assets.find(function(x) { return x.id === id; });
+  if (!a) return;
+  var h = '';
+  h += '<div class="detail-section">';
+  h += '<div class="detail-section-title">基本信息</div>';
+  h += '<div style="display:flex;gap:12px;margin-bottom:12px">';
+  h += '<img src="' + a.img + '" style="width:60px;height:74px;border-radius:8px;object-fit:cover;background:#f5f5f7">';
+  h += '<div><div style="font-size:15px;font-weight:600;margin-bottom:4px">' + a.name + '</div><div style="font-size:12px;color:#666">' + a.spec + '</div></div>';
+  h += '</div>';
+  h += '<div class="detail-row"><span class="detail-label">编号</span><span class="detail-value">' + a.number + '</span></div>';
+  h += '<div class="detail-row"><span class="detail-label">当前持有人</span><span class="detail-value">' + a.phone + '</span></div>';
+  h += '<div class="detail-row"><span class="detail-label">持有人地址</span><span class="detail-value" style="font-family:monospace;font-size:12px">' + a.holderAddr + '</span></div>';
+  h += '<div class="detail-row"><span class="detail-label">链上地址</span><span class="detail-value"><a class="chain-link" href="' + EXPLORER_URL + '&token_id=' + (Math.floor(Math.random()*50)+1) + '" target="_blank" title="点击查看链上交易记录">' + a.chainAddr + '</a></span></div>';
+  h += '<div class="detail-row"><span class="detail-label">销售状态</span><span class="detail-value"><span class="tag ' + saleCls[a.saleStatus] + '">' + saleMap[a.saleStatus] + '</span></span></div>';
+  h += '<div class="detail-row"><span class="detail-label">权益状态</span><span class="detail-value"><span class="tag ' + benCls[a.benefitStatus] + '">' + benMap[a.benefitStatus] + '</span></span></div>';
+  h += '</div>';
+
+  h += '<div class="detail-section">';
+  h += '<div class="detail-section-title">权益详情</div>';
+  if (a.benefits && a.benefits.length) {
+    h += '<div style="background:#f5f7fa;border-radius:10px;padding:10px">';
+    a.benefits.forEach(function(b) {
+      var bCls = b.status === 'used' ? 'tag-used' : 'tag-unused';
+      var bLabel = b.status === 'used' ? '已核销' : '未核销';
+      var timeHtml = b.status === 'used' && b.claimTime ? '<span class="benefit-time">' + b.claimTime + '</span>' : '';
+      h += '<div class="benefit-item"><span class="benefit-name">' + b.name + '</span>' + timeHtml + '<span class="benefit-status tag ' + bCls + '">' + bLabel + '</span></div>';
+    });
+    h += '</div>';
+  } else {
+    h += '<div style="padding:12px 0;font-size:13px;color:#999;text-align:center">暂无权益信息</div>';
+  }
+  h += '</div>';
+
+  document.getElementById('detailBody').innerHTML = h;
+  document.getElementById('detailModal').classList.add('show');
+}
+
+renderList(assets);
+</script>
+</body>
+</html>

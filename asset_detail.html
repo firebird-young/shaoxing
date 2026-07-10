@@ -1,0 +1,502 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>资产详情</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; flex-direction: column; align-items: center; }
+.page { max-width: 430px; min-height: 100vh; background: #f6f7fb; padding: 0 16px 60px; position: relative; width: 100%; }
+
+.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; background: #f6f7fb; }
+.nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.nav-back svg { width: 20px; height: 20px; color: #333; display: block; }
+.nav-title { flex: 1; text-align: center; font-size: 16px; font-weight: 600; color: #1a1a2e; }
+.nav-placeholder { width: 32px; }
+
+.overview-card { background: linear-gradient(135deg, #1a1a2e, #2d1f1f); border-radius: 20px; padding: 16px 18px; margin: 10px 0 14px; display: flex; align-items: center; gap: 14px; }
+.ov-img { width: 64px; height: 78px; border-radius: 12px; background-position: center; background-size: cover; flex-shrink: 0; background-color: rgba(255,255,255,0.05); }
+.ov-info { flex: 1; min-width: 0; }
+.ov-name { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+.ov-hold { display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.1); border-radius: 20px; padding: 4px 12px; }
+.ov-hold-num { font-size: 18px; font-weight: 700; color: #fff; }
+.ov-hold-label { font-size: 11px; color: rgba(255,255,255,0.6); }
+
+.sec-title { display: flex; align-items: center; gap: 8px; padding: 14px 0 8px; }
+.sec-title::before { content: ''; width: 4px; height: 16px; background: #D70C1F; border-radius: 2px; flex-shrink: 0; }
+.sec-title span { font-size: 15px; font-weight: 700; color: #1a1a2e; }
+
+.asset-instance { background: #fff; border-radius: 16px; margin-bottom: 10px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); overflow: hidden; }
+.ai-header { padding: 12px 14px; cursor: pointer; transition: background 0.12s; }
+.ai-header:active { background: #fafafa; }
+.ai-header-row1 { display: flex; align-items: center; margin-bottom: 6px; }
+.ai-thumb { width: 44px; height: 54px; border-radius: 8px; background-position: center; background-size: cover; flex-shrink: 0; background-color: #f5f5f7; margin-right: 10px; }
+.ai-header-left { display: flex; align-items: center; flex: 1; min-width: 0; }
+.ai-number { font-size: 15px; font-weight: 700; color: #1a1a2e; display: flex; align-items: center; gap: 4px; }
+.ai-spec-name { font-size: 12px; font-weight: 600; color: #666; }
+.ai-number svg { width: 16px; height: 16px; color: #D70C1F; flex-shrink: 0; }
+.ai-header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.ai-sum-tag { font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
+.st-verified { background: #E6F9F0; color: #00b894; }
+.st-partial  { background: #FFF8EC; color: #f0ad4e; }
+.st-unverified { background: #FFF2F3; color: #D70C1F; }
+.ai-expand { width: 16px; flex-shrink: 0; }
+.ai-expand svg { width: 14px; height: 14px; color: #ccc; transition: transform 0.25s; }
+.ai-expand.open svg { transform: rotate(180deg); }
+.ai-header-row2 { display: flex; align-items: center; gap: 6px; padding-left: 2px; }
+.ai-time { font-size: 11px; color: #aaa; }
+.ai-dot { color: #ddd; font-size: 10px; }
+.ai-hash { font-size: 11px; color: #bbb; font-family: 'SF Mono','Menlo','Consolas',monospace; cursor: pointer; }
+.ai-hash:active { color: #D70C1F; }
+
+.ai-benefits { display: none; border-top: 1px solid #f5f5f7; }
+.ai-benefits.show { display: block; }
+.ai-benefit { display: flex; align-items: center; padding: 10px 14px; border-bottom: 1px solid #fafafc; cursor: pointer; transition: background 0.12s; }
+.ai-benefit:last-child { border-bottom: none; }
+.ai-benefit:active { background: #fafafa; }
+.ai-bf-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 10px; }
+.ai-bf-icon svg { width: 15px; height: 15px; }
+.ai-bf-name { font-size: 13px; font-weight: 600; color: #1a1a2e; flex: 1; min-width: 0; }
+.ai-bf-extra { font-size: 10px; color: #bbb; margin-right: 8px; flex-shrink: 0; }
+.ai-bf-tag { font-size: 10px; padding: 2px 10px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
+.bt-verified { background: #E6F9F0; color: #00b894; }
+.bt-unverified { background: #FFF2F3; color: #D70C1F; }
+
+.hint-text { text-align: center; font-size: 11px; color: #bbb; padding: 12px 0 8px; }
+
+.action-bar { display: flex; gap: 10px; padding: 14px 0; }
+.btn-outline { flex: 1; height: 44px; border: 1px solid #e0e0e5; border-radius: 12px; background: #fff; color: #666; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-outline:active { background: #f5f5f7; }
+.btn-primary { flex: 1; height: 44px; border: none; border-radius: 12px; background: #D70C1F; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-primary:active { opacity: 0.9; }
+.btn-outline svg, .btn-primary svg { width: 16px; height: 16px; }
+
+.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 999; display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+.modal-mask.show { opacity: 1; pointer-events: auto; }
+.modal-card { width: 100%; max-width: 430px; max-height: 80vh; background: #fff; border-radius: 20px 20px 0 0; padding: 0 20px 24px; overflow-y: auto; transform: translateY(100%); transition: transform 0.35s cubic-bezier(.4,0,.2,1); }
+.modal-mask.show .modal-card { transform: translateY(0); }
+.modal-handle { width: 36px; height: 4px; background: #ddd; border-radius: 2px; margin: 12px auto 16px; }
+.modal-title { font-size: 17px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+.modal-sub { font-size: 12px; color: #999; margin-bottom: 18px; }
+
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 12px; color: #888; margin-bottom: 6px; display: block; font-weight: 500; }
+.form-input { width: 100%; height: 44px; border: 1px solid #e8e8ec; border-radius: 10px; padding: 0 14px; font-size: 14px; color: #333; outline: none; transition: border 0.2s; }
+.form-input:focus { border-color: #D70C1F; }
+textarea.form-input { height: 80px; padding: 12px 14px; resize: none; }
+.form-submit { width: 100%; height: 48px; border: none; border-radius: 12px; background: #D70C1F; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 6px; }
+.form-submit:active { opacity: 0.9; }
+.form-submit.loading { opacity: 0.7; pointer-events: none; }
+
+.logistics { padding: 4px 0; }
+.logis-item { display: flex; gap: 12px; padding: 12px 0; position: relative; }
+.logis-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; position: relative; z-index: 1; }
+.logis-dot.active { background: #D70C1F; box-shadow: 0 0 0 4px rgba(215,12,31,0.12); }
+.logis-dot.done { background: #00b894; }
+.logis-dot.pending { background: #ddd; }
+.logis-info { flex: 1; min-width: 0; }
+.logis-info .l-tit { font-size: 13px; font-weight: 600; color: #1a1a2e; margin-bottom: 2px; }
+.logis-info .l-time { font-size: 11px; color: #bbb; margin-bottom: 2px; }
+.logis-info .l-desc { font-size: 11px; color: #999; }
+.logis-line { position: absolute; left: 4px; top: 22px; width: 2px; height: calc(100% - 10px); background: #eee; z-index: 0; }
+.logis-item:last-child .logis-line { display: none; }
+
+.shipping-info { background: #f8f9fb; border-radius: 12px; padding: 14px; margin-bottom: 16px; }
+.si-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 12px; }
+.si-row .si-l { color: #999; }
+.si-row .si-r { color: #1a1a2e; font-weight: 500; }
+
+.success-box { text-align: center; padding: 24px 0 8px; }
+.success-box .s-check { width: 56px; height: 56px; border-radius: 50%; background: #E6F9F0; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+.success-box .s-check svg { width: 28px; height: 28px; color: #00b894; }
+.success-box .s-tit { font-size: 16px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+.success-box .s-desc { font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="top-bar">
+  <div class="nav-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </div>
+  <div class="nav-title">资产详情</div>
+  <div class="nav-placeholder"></div>
+</div>
+
+<div class="overview-card" id="overviewCard"></div>
+<div class="sec-title"><span>持有数字资产</span></div>
+<div id="instanceList"></div>
+<div class="hint-text">点击数字资产查看权益核销详情</div>
+<div class="action-bar">
+  <button class="btn-outline" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    返回
+  </button>
+  <button class="btn-primary" id="btnProduct">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+    查看产品
+  </button>
+</div>
+
+</div>
+
+<div class="modal-mask" id="modalMask" onclick="closeModal(event)">
+  <div class="modal-card" id="modalCard" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+var ICONS = {
+  '实物酒兑换':       { bg:'#FFF2F3', c:'#D70C1F', s:'<path d="M17 2H7l1 7c.5 3.5 2 6 4 6s3.5-2.5 4-6l1-7z"/><line x1="12" y1="15" x2="12" y2="22"/><line x1="8" y1="18" x2="16" y2="18"/>' },
+  '线下品鉴会资格':   { bg:'#F3F0FF', c:'#6c5ce7', s:'<path d="M3 8l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>' },
+  '超值优惠券':       { bg:'#E8F4FD', c:'#2980b9', s:'<rect x="2" y="4" width="20" height="16" rx="2"/><line x1="7" y1="10" x2="17" y2="10"/><line x1="7" y1="14" x2="13" y2="14"/>' }
+};
+
+var STA = { verified:['已核销','bt-verified'], unverified:['未核销','bt-unverified'] };
+var SUM = { verified:{t:'已核销',c:'st-verified'}, partial:{t:'部分核销',c:'st-partial'}, unverified:{t:'未核销',c:'st-unverified'} };
+
+var params = new URLSearchParams(window.location.search);
+var prod = params.get('product') || 'maotai1935';
+
+var DB = {
+  maotai1935: {
+    name:'茅台1935·时光窖藏', img:'茅台1935.png', n:'×3', url:'product_maotai1935.html',
+    list:[
+      { id:'#54', t:'2025-06-15 14:32', h:'0x7a3e8f2b1c9d...1a2b', spec:'凝时', img:'凝时.png',
+        bf:[
+          { n:'实物酒兑换', v:true, d:'2025-09-20 10:15:30', a:'贵阳市茅台大厦一楼体验店', cd:'HX202509200001',
+            logistics:[
+              { s:'done', t:'2025-09-26 10:22:35', d:'包裹已签收，感谢您的兑换', loc:'贵阳市观山湖区' },
+              { s:'done', t:'2025-09-25 08:15:20', d:'包裹正在派送中，快递员：张师傅 138****5678', loc:'贵阳市' },
+              { s:'done', t:'2025-09-24 22:30:45', d:'包裹已到达贵阳分拣中心', loc:'贵阳分拣中心' },
+              { s:'done', t:'2025-09-23 14:00:10', d:'包裹已从仁怀茅台镇发出', loc:'仁怀市茅台镇' },
+              { s:'done', t:'2025-09-20 10:15:30', d:'核销成功，商家正在备货中', loc:'茅台酒厂' }
+            ],
+            shipping:{ name:'张三', phone:'138****5678', addr:'贵州省贵阳市观山湖区茅台大厦1201室', exp:'顺丰速运', expNo:'SF1234567890123' }
+          },
+          { n:'线下品鉴会资格', v:false, x:'共2次 未使用' },
+          { n:'超值优惠券', v:true, d:'2025-07-03 14:30:00', ch:'茅台云商App', cd:'YH202507030012' }
+        ]
+      },
+      { id:'#77', t:'2025-08-22 09:15', h:'0x9c2d1e8f5a3b...3e4f', spec:'守岁', img:'守岁.png',
+        bf:[
+          { n:'实物酒兑换', v:true, d:'2025-10-18 10:15:45', a:'贵阳市茅台大厦一楼体验店', cd:'HX202510180003',
+            logistics:[
+              { s:'done', t:'2025-10-24 16:08', d:'包裹已签收，感谢您的兑换', loc:'成都市锦江区' },
+              { s:'done', t:'2025-10-23 11:30', d:'包裹正在派送中', loc:'成都市' },
+              { s:'done', t:'2025-10-22 19:45', d:'包裹已到达成都分拣中心', loc:'成都分拣中心' },
+              { s:'done', t:'2025-10-20 08:00', d:'包裹已从仁怀茅台镇发出', loc:'仁怀市茅台镇' },
+              { s:'done', t:'2025-10-18 10:15:45', d:'核销成功，商家正在备货中', loc:'茅台酒厂' }
+            ],
+            shipping:{ name:'李四', phone:'139****4321', addr:'四川省成都市锦江区太古里茅台文化体验中心', exp:'顺丰速运', expNo:'SF9876543210987' }
+          },
+          { n:'线下品鉴会资格', v:true, d:'2025-11-08 09:30:00', a:'成都太古里茅台文化体验中心', x:'已核2/2次' },
+          { n:'超值优惠券', v:true, d:'2025-12-15 16:45:20', ch:'茅台云商App', cd:'YH202512150020' }
+        ]
+      },
+      { id:'#102', t:'2026-03-10 11:20', h:'0xd5f8a3c2e7b1...9a6c', spec:'溯年', img:'溯年.png',
+        bf:[
+          { n:'实物酒兑换', v:false, x:'未核销' },
+          { n:'线下品鉴会资格', v:false, x:'共2次 未使用' },
+          { n:'超值优惠券', v:false, x:'未核销' }
+        ]
+      }
+    ]
+  },
+  feitian: {
+    name:'飞天茅台·元宇宙酒票', img:'飞天茅台·元宇宙酒票.png', n:'×1', url:'product_maotai1935.html',
+    list:[
+      { id:'#28', t:'2025-08-22 09:15', h:'0x3b5c9d1e8f2a...7d8e', spec:'典藏版', img:'飞天茅台·元宇宙酒票.png',
+        bf:[
+          { n:'实物酒兑换', v:true, d:'2025-10-12 14:00:20', a:'茅台国际大酒店', cd:'HX202510120001',
+            logistics:[
+              { s:'done', t:'2025-10-18 09:30:55', d:'包裹已签收', loc:'贵阳市' },
+              { s:'done', t:'2025-10-12 14:00:20', d:'核销成功，商家正在备货中', loc:'茅台酒厂' }
+            ],
+            shipping:{ name:'王五', phone:'137****9012', addr:'贵州省贵阳市南明区茅台国际大酒店', exp:'京东物流', expNo:'JD202510120001' }
+          },
+          { n:'线下品鉴会资格', v:false, x:'共2次 未使用' },
+          { n:'超值优惠券', v:true, d:'2025-12-01 11:20:10', ch:'茅台云商App', cd:'YH202512010003' }
+        ]
+      }
+    ]
+  },
+  guojiu: {
+    name:'国酒·数字徽章', img:'国酒·数字徽章.png', n:'×1', url:'product_maotai1935.html',
+    list:[
+      { id:'#08', t:'2025-04-10 15:00', h:'0xae1c3f5b8d2e...9f0a', spec:'标准款', img:'国酒·数字徽章.png',
+        bf:[
+          { n:'超值优惠券', v:true, d:'2025-05-20 10:00:00', ch:'茅台云商App', cd:'YH202505200008' },
+          { n:'线下品鉴会资格', v:false, x:'共1次 未使用' }
+        ]
+      }
+    ]
+  },
+  banana: {
+    name:'巴拿马金奖·复刻', img:'巴拿马金奖·复刻.png', n:'×1', url:'product_maotai1935.html',
+    list:[
+      { id:'#03', t:'2025-03-05 10:00', h:'0x1f8c7d3a5b6e...2d4c', spec:'典藏款', img:'巴拿马金奖·复刻.png',
+        bf:[
+          { n:'实物酒兑换', v:true, d:'2025-06-15 09:00:15', a:'茅台国际大酒店', cd:'HX202506150005',
+            logistics:[
+              { s:'done', t:'2025-06-22 14:00', d:'包裹已签收', loc:'广州市' },
+              { s:'done', t:'2025-06-15 09:00:15', d:'核销成功，商家正在备货中', loc:'茅台酒厂' }
+            ],
+            shipping:{ name:'赵六', phone:'136****3456', addr:'广东省广州市天河区茅台体验中心', exp:'顺丰速运', expNo:'SF5678901234567' }
+          },
+          { n:'线下品鉴会资格', v:true, d:'2026-01-08 10:30:00', a:'广州茅台文化体验中心', x:'已核1/1次' }
+        ]
+      }
+    ]
+  },
+  shengxiao: {
+    name:'茅台生肖兔·典藏', img:'茅台生肖兔·典藏.png', n:'×1', url:'product_maotai1935.html',
+    list:[
+      { id:'#12', t:'2026-01-15 12:00', h:'0xb2e4d8c1a5f7...3e6d', spec:'兔年限定', img:'茅台生肖兔·典藏.png',
+        bf:[
+          { n:'实物酒兑换', v:false, x:'未核销' },
+          { n:'线下品鉴会资格', v:false, x:'共1次 未使用' },
+          { n:'超值优惠券', v:false, x:'未核销' }
+        ]
+      }
+    ]
+  },
+  guichuideng: {
+    name:'鬼吹灯·数字资产', img:'鬼吹灯.png', n:'×1', url:'product_maotai1935.html',
+    list:[
+      { id:'#36', t:'2026-05-10 10:00', h:'0x7c8d9e0f1a...2b3c', spec:'标准款', img:'鬼吹灯.png',
+        bf:[
+          { n:'超值优惠券', v:true, d:'2026-05-18', ch:'鬼吹灯商城', cd:'G001' }
+        ]
+      }
+    ]
+  },
+  santi: {
+    name:'三体·数字资产', img:'三体.png', n:'×1', url:'product_maotai1935.html',
+    list:[
+      { id:'#42', t:'2026-06-01 14:00', h:'0x8e0f1a2b3c...4d5', spec:'标准款', img:'三体.png',
+        bf:[
+          { n:'超值优惠券', v:false, x:'未核销' }
+        ]
+      }
+    ]
+  }
+};
+
+var data = DB[prod] || DB.maotai1935;
+
+document.getElementById('overviewCard').innerHTML =
+  '<div class="ov-img" style="background-image:url(\''+data.img+'\')"></div>'+
+  '<div class="ov-info">'+
+    '<div class="ov-name">'+data.name+'</div>'+
+    '<div class="ov-hold"><span class="ov-hold-num">'+data.n+'</span><span class="ov-hold-label">持有数量</span></div>'+
+  '</div>';
+document.getElementById('btnProduct').onclick = function(){ location.href = data.url; };
+
+function calcSummary(bf){
+  var allV = true, noneV = true;
+  for(var i=0;i<bf.length;i++){
+    if(bf[i].v) noneV = false; else allV = false;
+  }
+  if(allV) return 'verified';
+  if(noneV) return 'unverified';
+  return 'partial';
+}
+
+var listEl = document.getElementById('instanceList');
+data.list.forEach(function(inst, idx){
+  var sum = calcSummary(inst.bf);
+  var sm = SUM[sum];
+  var cid = 'card_'+idx;
+
+  var bfRows = '';
+  inst.bf.forEach(function(bf, bi){
+    var ico = ICONS[bf.n] || ICONS['实物酒兑换'];
+    var st = STA[bf.v ? 'verified' : 'unverified'];
+    var extra = '';
+    if(bf.v){ extra = bf.d || bf.x || ''; }
+    else { extra = bf.x || ''; }
+
+    bfRows +=
+      '<div class="ai-benefit" onclick="event.stopPropagation();onBenefit('+idx+','+bi+')">'+
+        '<div class="ai-bf-icon" style="background:'+ico.bg+'">'+
+          '<svg viewBox="0 0 24 24" fill="none" stroke="'+ico.c+'" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+ico.s+'</svg>'+
+        '</div>'+
+        '<div class="ai-bf-name">'+bf.n+'</div>'+
+        (extra ? '<div class="ai-bf-extra">'+extra+'</div>' : '')+
+        (bf.v ? '<span class="ai-bf-tag '+st[1]+'">'+st[0]+'</span>' : '')+
+      '</div>';
+  });
+
+  var card = document.createElement('div');
+  card.className = 'asset-instance';
+  card.id = cid;
+  card.innerHTML =
+    '<div class="ai-header" onclick="toggleCard(\''+cid+'\')">'+
+      '<div class="ai-header-row1">'+
+        (inst.img ? '<div class="ai-thumb" style="background-image:url(\''+inst.img+'\')"></div>' : '')+
+        '<div class="ai-header-left"><div style="display:flex;flex-direction:column">'+
+          '<div class="ai-number">'+
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="7" width="3" height="3"/><rect x="14" y="7" width="3" height="3"/><rect x="7" y="14" width="3" height="3"/><rect x="14" y="14" width="3" height="3"/></svg>'+
+            inst.id+
+          '</div>'+
+          (inst.spec ? '<div class="ai-spec-name">'+inst.spec+'</div>' : '')+
+        '</div></div>'+
+        '<div class="ai-header-right">'+
+          '<span class="ai-sum-tag '+sm.c+'">'+sm.t+'</span>'+
+          '<div class="ai-expand">'+
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="ai-header-row2">'+
+        '<span class="ai-time">'+inst.t+'</span>'+
+        '<span class="ai-dot">·</span>'+
+        '<a class="ai-hash" style="text-decoration:none" href="https://can.ihaichain.com/item?params=0x82a595e8c7d3b479ce9af9b797cbc9224656ec4d&token_id='+(Math.floor(Math.random()*51))+'" target="_blank" title="查看链上记录">'+inst.h.substring(0,12)+'...</a>'+
+      '</div>'+
+    '</div>'+
+    '<div class="ai-benefits" id="bf_'+idx+'">'+bfRows+'</div>';
+  listEl.appendChild(card);
+});
+
+function toggleCard(cid){
+  var card = document.getElementById(cid);
+  var bf = card.querySelector('.ai-benefits');
+  var exp = card.querySelector('.ai-expand');
+  if(bf.classList.contains('show')){
+    bf.classList.remove('show'); exp.classList.remove('open');
+  } else {
+    document.querySelectorAll('.ai-benefits.show').forEach(function(el){
+      el.classList.remove('show');
+      el.parentNode.querySelector('.ai-expand').classList.remove('open');
+    });
+    bf.classList.add('show'); exp.classList.add('open');
+  }
+}
+
+function copyIt(txt, lb){
+  navigator.clipboard.writeText(txt).then(function(){ alert(lb+'已复制'); }).catch(function(){ alert('复制失败'); });
+}
+
+function onBenefit(idx, bi){
+  var bf = data.list[idx].bf[bi];
+  var modal = document.getElementById('modalMask');
+  var content = document.getElementById('modalContent');
+
+  if(bf.n === '线下品鉴会资格'){
+    content.innerHTML =
+      '<div class="modal-title">权益核销工作由发行方平台承接</div>'+
+      '<div class="modal-sub">请使用登记手机号登录茅台微信小程序，在【我的资产】板块操作使用对应权益产品。</div>';
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    return;
+  }
+
+  if(bf.n === '超值优惠券'){
+    content.innerHTML =
+      '<div class="modal-title">权益核销工作由发行方平台承接</div>'+
+      '<div class="modal-sub">请使用登记手机号登录茅台微信小程序，在【我的资产】板块操作使用对应权益产品。</div>';
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    return;
+  }
+
+  if(bf.n !== '实物酒兑换') return;
+
+  if(bf.v){
+    var ship = bf.shipping || {};
+    var logisticsHTML = '';
+    (bf.logistics || []).forEach(function(l, li){
+      var cls = li === 0 ? 'active' : (l.s === 'done' ? 'done' : 'pending');
+      logisticsHTML +=
+        '<div class="logis-item">'+
+          '<div class="logis-line"></div>'+
+          '<div class="logis-dot '+cls+'"></div>'+
+          '<div class="logis-info">'+
+            '<div class="l-tit">'+l.d+'</div>'+
+            '<div class="l-time">'+l.t+'</div>'+
+            '<div class="l-desc">'+l.loc+'</div>'+
+          '</div>'+
+        '</div>';
+    });
+
+    content.innerHTML =
+      '<div class="modal-title">物流详情</div>'+
+      '<div class="modal-sub">该数字资产已完成实物酒兑换</div>'+
+      '<div class="shipping-info">'+
+        '<div class="si-row"><span class="si-l">收件人</span><span class="si-r">'+(ship.name || '--')+'</span></div>'+
+        '<div class="si-row"><span class="si-l">联系电话</span><span class="si-r">'+(ship.phone || '--')+'</span></div>'+
+        '<div class="si-row"><span class="si-l">收货地址</span><span class="si-r">'+(ship.addr || '--')+'</span></div>'+
+        '<div class="si-row"><span class="si-l">快递公司</span><span class="si-r">'+(ship.exp || '--')+'</span></div>'+
+        '<div class="si-row"><span class="si-l">快递单号</span><span class="si-r" style="color:#D70C1F;cursor:pointer" onclick="event.stopPropagation();copyIt(\''+(ship.expNo||'')+'\',\'快递单号\')">'+(ship.expNo || '--')+'</span></div>'+
+      '</div>'+
+      '<div class="sec-title"><span>物流轨迹</span></div>'+
+      '<div class="logistics">'+logisticsHTML+'</div>';
+  } else {
+    content.innerHTML =
+      '<div class="modal-title">填写收货地址</div>'+
+      '<div class="modal-sub">核销该数字资产后，将安排实物茅台1935发货</div>'+
+      '<div class="form-group"><label class="form-label">收件人姓名</label><input class="form-input" id="fName" placeholder="请输入收件人姓名"></div>'+
+      '<div class="form-group"><label class="form-label">联系电话</label><input class="form-input" id="fPhone" type="tel" placeholder="请输入手机号码"></div>'+
+      '<div class="form-group"><label class="form-label">详细地址</label><textarea class="form-input" id="fAddr" placeholder="省/市/区/街道/门牌号"></textarea></div>'+
+      '<button class="form-submit" id="fSubmit" onclick="submitAddress('+idx+','+bi+')">确认核销并提交</button>';
+  }
+
+  modal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function submitAddress(idx, bi){
+  var name = document.getElementById('fName').value.trim();
+  var phone = document.getElementById('fPhone').value.trim();
+  var addr = document.getElementById('fAddr').value.trim();
+  if(!name){ alert('请输入收件人姓名'); return; }
+  if(!phone){ alert('请输入联系电话'); return; }
+  if(!addr){ alert('请输入详细地址'); return; }
+
+  var btn = document.getElementById('fSubmit');
+  btn.textContent = '提交中...';
+  btn.classList.add('loading');
+
+  setTimeout(function(){
+    var bf = data.list[idx].bf[bi];
+    bf.v = true;
+    bf.d = '2026-06-10';
+    bf.a = addr;
+    bf.cd = 'HX2026061000'+(idx+1);
+    delete bf.x;
+    bf.shipping = {
+      name: name,
+      phone: phone.substring(0,3)+'****'+phone.substring(phone.length-4),
+      addr: addr,
+      exp: '顺丰速运',
+      expNo: 'SF'+Date.now().toString().substring(5)
+    };
+    bf.logistics = [
+      { s:'active', t:'2026-06-10 '+new Date().toTimeString().substring(0,8), d:'核销成功，商家正在备货中', loc:'茅台酒厂' }
+    ];
+
+    var content = document.getElementById('modalContent');
+    content.innerHTML =
+      '<div class="success-box">'+
+        '<div class="s-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>'+
+        '<div class="s-tit">核销提交成功</div>'+
+        '<div class="s-desc">商家将在1-3个工作日内安排发货，届时可在此查看物流信息</div>'+
+        '<button class="form-submit" style="margin-top:20px" onclick="closeModal();location.reload()">我知道了</button>'+
+      '</div>';
+  }, 1200);
+}
+
+function closeModal(e){
+  if(e && e.target !== document.getElementById('modalMask')) return;
+  document.getElementById('modalMask').classList.remove('show');
+  document.body.style.overflow = '';
+}
+</script>
+
+</body>
+</html>

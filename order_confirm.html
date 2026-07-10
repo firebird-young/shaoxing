@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>确认订单</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; justify-content: center; }
+.page { max-width: 430px; min-height: 100vh; background: #f6f7fb; padding-bottom: 100px; position: relative; }
+@media(max-width:430px) { .page { max-width: 100%; } }
+
+.nav-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #fff; }
+.nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.nav-back svg { width: 20px; height: 20px; color: #333; display: block; }
+.nav-title { flex: 1; text-align: center; font-size: 16px; font-weight: 600; color: #1a1a2e; }
+.nav-placeholder { width: 32px; }
+
+/* ── 订单商品 ── */
+.order-card { margin: 12px 16px; background: #fff; border-radius: 16px; padding: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
+.order-prod { display: flex; gap: 12px; align-items: center; }
+.order-img { width: 64px; height: 78px; border-radius: 10px; background-position: center; background-size: cover; flex-shrink: 0; background-color: #f5f5f7; }
+.order-info { flex: 1; min-width: 0; }
+.order-name { font-size: 14px; font-weight: 600; color: #1a1a2e; margin-bottom: 2px; }
+.order-spec { font-size: 11px; color: #999; margin-bottom: 6px; }
+.order-bfs { display: flex; gap: 4px; flex-wrap: wrap; }
+.order-bf { font-size: 9px; padding: 1px 6px; border-radius: 3px; background: #f5f5f7; color: #888; }
+.order-price-row { display: flex; align-items: baseline; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f5f5f7; }
+.order-qty { font-size: 12px; color: #999; }
+.order-total { font-size: 18px; font-weight: 700; color: #D70C1F; margin-left: auto; }
+
+/* ── 分区卡片 ── */
+.section-card { margin: 12px 16px; background: #fff; border-radius: 16px; padding: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
+.sec-title { font-size: 14px; font-weight: 700; color: #1a1a2e; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.sec-title::before { content: ''; width: 3px; height: 14px; background: #D70C1F; border-radius: 2px; }
+
+/* ── 支付方式 ── */
+.pay-item { display: flex; align-items: center; padding: 14px 0; border-bottom: 1px solid #f5f5f7; cursor: pointer; }
+.pay-item:last-child { border-bottom: none; }
+.pay-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.pay-icon.hf { background: linear-gradient(135deg, #ff6b6b, #ee5a24); }
+.pay-icon.zj { background: linear-gradient(135deg, #c41e3a, #8b1a1a); }
+.pay-info { flex: 1; min-width: 0; }
+.pay-name { font-size: 14px; font-weight: 600; color: #1a1a2e; margin-bottom: 2px; display: flex; align-items: center; gap: 8px; }
+.pay-limit { font-size: 11px; color: #999; }
+.pay-status { font-size: 12px; color: #D70C1F; margin-right: 8px; }
+.pay-status.disabled { color: #999; }
+.pay-check { width: 20px; height: 20px; border: 2px solid #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.pay-check.active { border-color: #D70C1F; background: #D70C1F; }
+.pay-check svg { width: 12px; height: 12px; color: #fff; display: none; }
+.pay-check.active svg { display: block; }
+
+/* ── 协议 ── */
+.agreement-section { margin: 12px 16px; }
+.agreement-item { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+.agreement-check { width: 18px; height: 18px; border: 2px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.agreement-check.active { border-color: #D70C1F; background: #D70C1F; }
+.agreement-check svg { width: 12px; height: 12px; color: #fff; display: none; }
+.agreement-check.active svg { display: block; }
+.agreement-text { font-size: 12px; color: #666; line-height: 1.6; }
+.agreement-text a { color: #D70C1F; text-decoration: none; }
+.agreement-text .warning { color: #D70C1F; margin-top: 4px; display: block; }
+
+/* ── 底部 ── */
+.bottom-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); padding: 12px 16px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 4px)); z-index: 100; display: flex; align-items: center; justify-content: space-between; }
+.total-price { display: flex; align-items: baseline; gap: 4px; }
+.total-label { font-size: 13px; color: #666; }
+.total-value { font-size: 22px; font-weight: 700; color: #D70C1F; }
+.total-value small { font-size: 13px; }
+.btn-submit { height: 44px; padding: 0 32px; border: none; border-radius: 22px; background: #D70C1F; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
+.btn-submit:active { opacity: 0.9; }
+.btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+
+.toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background: rgba(0,0,0,0.8); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 14px; opacity: 0; pointer-events: none; transition: all 0.3s; z-index: 999; }
+.toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="nav-bar">
+  <div class="nav-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </div>
+  <div class="nav-title">确认订单</div>
+  <div class="nav-placeholder"></div>
+</div>
+
+<div class="order-card">
+  <div class="order-prod">
+    <div class="order-img" id="orderImg"></div>
+    <div class="order-info">
+      <div class="order-name" id="orderSeries"></div>
+      <div class="order-spec" id="orderSpec"></div>
+      <div class="order-bfs" id="orderBfs"></div>
+    </div>
+  </div>
+  <div class="order-price-row">
+    <span class="order-qty" id="orderQty">×1</span>
+    <span class="order-total" id="orderTotal">¥599</span>
+  </div>
+</div>
+
+<div class="section-card">
+  <div class="sec-title">选择支付方式</div>
+  <div class="pay-item" onclick="selectPay(this, false)">
+    <div class="pay-icon hf">汇</div>
+    <div class="pay-info">
+      <div class="pay-name">汇付钱包<span class="pay-status disabled">服务维护中</span></div>
+      <div class="pay-limit">查看限额</div>
+    </div>
+    <div class="pay-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+  </div>
+  <div class="pay-item" onclick="selectPay(this, true)">
+    <div class="pay-icon zj">中</div>
+    <div class="pay-info">
+      <div class="pay-name">中金钱包</div>
+      <div class="pay-limit">查看限额</div>
+    </div>
+    <div class="pay-check active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+  </div>
+</div>
+
+<div class="agreement-section">
+  <div class="agreement-item" onclick="toggleAgreement()">
+    <div class="agreement-check" id="agreementCheck">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="agreement-text">
+      同意<a href="#">《深文数购买协议》</a>
+      <span class="warning">*您所购买商品因属性及价格的特殊性，同意购买商品后不支持7天无理由退款</span>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="bottom-bar">
+  <div class="total-price">
+    <span class="total-label">合计：</span>
+    <span class="total-value"><small>¥</small><span id="totalPrice">599</span></span>
+  </div>
+  <button class="btn-submit" id="submitBtn" onclick="submitOrder()">提交订单</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var params = new URLSearchParams(window.location.search);
+var specName = decodeURIComponent(params.get('spec') || '');
+var specImg  = decodeURIComponent(params.get('img') || '茅台1935.png');
+var price    = parseInt(params.get('price') || '599');
+var qty      = parseInt(params.get('qty') || '1');
+var bfStr    = decodeURIComponent(params.get('bfs') || '');
+var series   = decodeURIComponent(params.get('series') || '1935·时光窖藏');
+var total    = price * qty;
+
+var agreementChecked = false;
+var selectedPay = '中金钱包';
+
+// render
+document.getElementById('orderImg').style.backgroundImage = 'url('+specImg+')';
+document.getElementById('orderSeries').textContent = series;
+document.getElementById('orderSpec').textContent = specName;
+document.getElementById('orderBfs').innerHTML = bfStr.split(',').map(function(b){ return '<span class="order-bf">'+b+'</span>'; }).join('');
+document.getElementById('orderQty').textContent = '×'+qty;
+document.getElementById('orderTotal').textContent = '¥'+total;
+document.getElementById('totalPrice').textContent = total;
+
+function selectPay(el, available){
+  if(!available){ showToast('该支付方式暂不可用'); return; }
+  document.querySelectorAll('.pay-check').forEach(function(c){ c.classList.remove('active'); });
+  el.querySelector('.pay-check').classList.add('active');
+  selectedPay = el.querySelector('.pay-name').childNodes[0].textContent.trim();
+}
+
+function toggleAgreement(){
+  agreementChecked = !agreementChecked;
+  document.getElementById('agreementCheck').classList.toggle('active', agreementChecked);
+}
+
+function submitOrder(){
+  if(!agreementChecked){ showToast('请同意购买协议'); return; }
+  location.href = 'pay_success.html?qty='+qty+'&pay='+encodeURIComponent(selectedPay)+'&total='+total+'&spec='+encodeURIComponent(specName);
+}
+
+function showToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2000);
+}
+</script>
+
+</body>
+</html>

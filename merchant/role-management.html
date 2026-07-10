@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>角色管理 - 商家中心</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #f5f7fa; color: #333; }
+
+    .header { background: white; padding: 16px 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+    .header-left h1 { font-size: 18px; font-weight: 600; }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .merchant-name { font-weight: 500; color: #667eea; }
+    .btn-logout { padding: 8px 16px; background: #f5f5f5; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; color: #666; }
+    .btn-logout:hover { background: #e8ecf0; }
+
+    .sidebar { position: fixed; left: 0; top: 60px; bottom: 0; width: 200px; background: #2c3e50; padding: 20px 0; }
+    .sidebar-menu { list-style: none; padding: 0; margin: 0; }
+    .menu-title { display: flex; align-items: center; gap: 10px; padding: 12px 20px; color: #b8c7ce; font-size: 14px; text-decoration: none; }
+    .menu-title svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .submenu { list-style: none; padding: 0; margin: 0; display: block; }
+    .submenu-item { display: block; padding: 10px 20px 10px 50px; color: #8a9aa8; font-size: 13px; text-decoration: none; transition: all 0.2s; }
+    .submenu-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .submenu-item.active { background: rgba(102,126,234,0.3); color: #fff; }
+
+    .main-content { margin-left: 200px; padding: 24px; }
+    .page-title { font-size: 20px; font-weight: 600; color: #1a1a2e; margin-bottom: 24px; }
+
+    .card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .card-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+
+    .btn { padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-primary { background: #667eea; color: #fff; }
+    .btn-primary:hover { background: #5a6fd6; }
+    .btn-default { background: #fff; color: #666; border: 1px solid #ddd; }
+    .btn-default:hover { background: #f5f5f5; }
+    .btn-info { background: #1890ff; color: #fff; }
+    .btn-danger { background: #ff4d4f; color: #fff; }
+    .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 12px 16px; font-size: 13px; color: #999; border-bottom: 2px solid #f0f0f0; font-weight: 600; }
+    td { padding: 14px 16px; border-bottom: 1px solid #f5f5f5; font-size: 14px; vertical-align: middle; }
+    tr:hover td { background: #fafafa; }
+
+    .badge { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+    .badge-active { background: #f6ffed; color: #52c41a; }
+    .badge-frozen { background: #fff2f0; color: #ff4d4f; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal-overlay.show { display: flex; }
+    .modal-box { background: #fff; border-radius: 12px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; }
+    .modal-box.wide { max-width: 680px; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #f0f0f0; }
+    .modal-title { font-size: 16px; font-weight: 600; }
+    .modal-close { width: 28px; height: 28px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .modal-close svg { width: 14px; height: 14px; color: #666; }
+    .modal-body { padding: 20px; }
+    .modal-footer { padding: 16px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; font-weight: 500; }
+    .form-input { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; outline: none; transition: border-color 0.2s; }
+    .form-input:focus { border-color: #667eea; }
+    .form-textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; outline: none; resize: vertical; min-height: 60px; }
+    .form-textarea:focus { border-color: #667eea; }
+
+    .perm-section { margin-bottom: 8px; }
+    .perm-menu-row { display: flex; align-items: center; gap: 8px; padding: 6px 12px; }
+    .perm-menu-row .menu-cb { width: 16px; height: 16px; cursor: pointer; accent-color: #667eea; }
+    .perm-menu-row label { font-size: 14px; font-weight: 500; color: #333; cursor: pointer; }
+    .perm-btns { margin-left: 28px; padding: 4px 0 10px; display: none; flex-wrap: wrap; gap: 6px; }
+    .perm-btns.show { display: flex; }
+    .perm-check { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #555; cursor: pointer; padding: 2px 6px; background: #f8fafc; border-radius: 4px; }
+    .perm-check input { width: 14px; height: 14px; cursor: pointer; accent-color: #667eea; }
+
+    .empty-state { text-align: center; padding: 60px 0; color: #999; font-size: 14px; }
+
+    .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); padding: 12px 20px; border-radius: 8px; font-size: 14px; z-index: 2000; animation: slideIn 0.3s ease; }
+    .toast.success { background: rgba(7,193,96,0.9); color: #fff; }
+    .toast.error { background: rgba(215,12,31,0.9); color: #fff; }
+    @keyframes slideIn { from { transform: translateX(-50%) translateY(-20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="header-left"><h1>商家中心</h1></div>
+  <div class="header-right">
+    <span class="merchant-name" id="merchantName">贵州茅台集团</span>
+    <button class="btn-logout" onclick="window.location.href='register.html'">退出登录</button>
+  </div>
+</div>
+
+<div class="sidebar">
+  <ul class="sidebar-menu">
+    <li><a class="menu-title" href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>首页</a></li>
+    <li><div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><polyline points="21 15 16 10 5 21"/></svg>数字资产</div><ul class="submenu"><li><a class="submenu-item" href="asset-management.html">数字资产管理</a></li>
+        <li><a class="submenu-item" href="digital-asset-detail.html">数字资产详情</a></li></ul></li>
+    <li><div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>订单管理</div><ul class="submenu"><li><a class="submenu-item" href="order-management.html">订单管理</a></li><li><a class="submenu-item" href="delivery-management.html">发货管理</a></li></ul></li>
+    <li><div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>营销管理</div><ul class="submenu"><li><a class="submenu-item" href="marketing.html">空间管理</a></li><li><a class="submenu-item" href="task-management.html">任务管理</a></li></ul></li>
+    <li><div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>内容管理</div><ul class="submenu"><li><a class="submenu-item" href="story-admin.html">文化故事管理</a></li></ul></li>
+    <li><div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>系统管理</div><ul class="submenu"><li><a class="submenu-item" href="operator-management.html">操作员管理</a></li><li><a class="submenu-item active" href="role-management.html">角色管理</a></li></ul></li>
+  </ul>
+</div>
+
+<div class="main-content">
+  <div class="page-title">角色管理</div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">角色列表</div>
+      <button class="btn btn-primary" onclick="openAddModal()">+ 新建角色</button>
+    </div>
+    <table>
+      <thead><tr><th>角色名称</th><th>描述</th><th>菜单权限</th><th>操作员数</th><th>创建时间</th><th style="width:200px">操作</th></tr></thead>
+      <tbody id="roleTbody"></tbody>
+    </table>
+    <div class="empty-state" id="emptyState" style="display:none">暂无角色，点击上方按钮新建</div>
+  </div>
+</div>
+
+<!-- 新建/编辑角色弹窗 -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="addModalTitle">新建角色</div>
+      <div class="modal-close" onclick="closeAddModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editRoleId">
+      <div class="form-group">
+        <label class="form-label">角色名称</label>
+        <input class="form-input" id="roleName" placeholder="请输入角色名称（如：管理员、运营专员）">
+      </div>
+      <div class="form-group">
+        <label class="form-label">角色描述</label>
+        <textarea class="form-textarea" id="roleDesc" placeholder="请输入角色描述"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-default" onclick="closeAddModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveRole()">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- 权限分配弹窗 -->
+<div class="modal-overlay" id="permModal">
+  <div class="modal-box wide">
+    <div class="modal-header">
+      <div class="modal-title">分配权限 - <span id="permRoleName">-</span></div>
+      <div class="modal-close" onclick="closePermModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="permRoleId">
+      <div class="perm-section">
+        <div class="perm-menu-row"><input type="checkbox" class="menu-cb" id="permMenu_dashboard" onchange="toggleMenuPerm('dashboard')"><label for="permMenu_dashboard">首页和顶栏</label></div>
+        <div class="perm-btns" id="permBtns_dashboard">
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_dashboard_info">商家信息管理</label>
+        </div>
+
+        <div class="perm-menu-row"><input type="checkbox" class="menu-cb" id="permMenu_asset" onchange="toggleMenuPerm('asset')"><label for="permMenu_asset">数字资产管理</label></div>
+        <div class="perm-btns" id="permBtns_asset">
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_asset_add">新增</label>
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_asset_edit">编辑</label>
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_asset_del">删除</label>
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_asset_recall">撤回</label>
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_asset_submit">提交审核</label>
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_asset_publish">设置发行模式</label>
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_asset_view">查看发行信息</label>
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_asset_mint">查看铸造信息</label>
+        </div>
+
+        <div class="perm-menu-row"><input type="checkbox" class="menu-cb" id="permMenu_order" onchange="toggleMenuPerm('order')"><label for="permMenu_order">订单管理</label></div>
+        <div class="perm-btns" id="permBtns_order">
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_order_view">查看详情</label>
+        </div>
+
+        <div class="perm-menu-row"><input type="checkbox" class="menu-cb" id="permMenu_delivery" onchange="toggleMenuPerm('delivery')"><label for="permMenu_delivery">发货管理</label></div>
+        <div class="perm-btns" id="permBtns_delivery">
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_delivery_batch">批量发货</label>
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_delivery_ship">发货</label>
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_delivery_logistics">查看物流</label>
+        </div>
+
+        <div class="perm-menu-row"><input type="checkbox" class="menu-cb" id="permMenu_operator" onchange="toggleMenuPerm('operator')"><label for="permMenu_operator">操作员管理</label></div>
+        <div class="perm-btns" id="permBtns_operator">
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_operator_add">新建</label>
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_operator_role">分配角色</label>
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_operator_pwd">重置密码</label>
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_operator_freeze">冻结</label>
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_operator_unfreeze">解冻</label>
+        </div>
+
+        <div class="perm-menu-row"><input type="checkbox" class="menu-cb" id="permMenu_role" onchange="toggleMenuPerm('role')"><label for="permMenu_role">角色管理</label></div>
+        <div class="perm-btns" id="permBtns_role">
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_role_add">新建</label>
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_role_edit">编辑</label>
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_role_del">删除</label>
+          <label class="perm-check"><input type="checkbox" class="btn-cb" id="permBtn_role_perm">分配权限</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-default" onclick="closePermModal()">取消</button>
+      <button class="btn btn-primary" onclick="savePermission()">保存权限</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var merchant = JSON.parse(localStorage.getItem('merchantLogin') || 'null') || { name: '贵州茅台集团', account: 'moutai_admin', certStatus: 'verified' };
+document.getElementById('merchantName').textContent = merchant.name;
+
+var roles = JSON.parse(localStorage.getItem('merchantRoles') || 'null') || [
+  { id: 'r1', name: '超级管理员', desc: '拥有全部菜单和操作权限', menus: ['dashboard','asset','order','delivery','operator','role'], btns: ['dashboard_info','asset_add','asset_edit','asset_del','asset_recall','asset_submit','asset_publish','asset_view','asset_mint','order_view','delivery_batch','delivery_ship','delivery_logistics','operator_add','operator_role','operator_pwd','operator_freeze','operator_unfreeze','role_add','role_edit','role_del','role_perm'], ctime: '2025-06-01 09:00' },
+  { id: 'r2', name: '运营专员', desc: '可管理数字资产和订单发货', menus: ['dashboard','asset','order','delivery'], btns: ['dashboard_info','asset_add','asset_edit','asset_submit','asset_view','order_view','delivery_ship','delivery_logistics'], ctime: '2025-06-10 10:00' },
+  { id: 'r3', name: '仓管员', desc: '仅负责订单发货', menus: ['dashboard','delivery'], btns: ['dashboard_info','delivery_batch','delivery_ship','delivery_logistics'], ctime: '2025-06-15 14:00' }
+];
+
+function renderList() {
+  var tbody = document.getElementById('roleTbody');
+  var empty = document.getElementById('emptyState');
+  if (roles.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  var menuMap = { dashboard: '首页', asset: '数字资产', order: '订单管理', delivery: '发货管理', operator: '操作员管理', role: '角色管理' };
+  tbody.innerHTML = roles.map(function(r) {
+    var menuNames = (r.menus||[]).map(function(m) { return menuMap[m]||''; }).filter(Boolean).join('、');
+    return '<tr>' +
+      '<td style="font-weight:600;color:#1a1a2e">' + r.name + '</td>' +
+      '<td style="font-size:13px;color:#666">' + (r.desc||'-') + '</td>' +
+      '<td style="font-size:12px;color:#666">' + (menuNames||'-') + '</td>' +
+      '<td style="color:#667eea;font-weight:500">' + (r.operatorCount||0) + '</td>' +
+      '<td style="font-size:12px;color:#999">' + r.ctime + '</td>' +
+      '<td><button class="btn btn-sm btn-info" onclick="openPermModal(\'' + r.id + '\')">分配权限</button> <button class="btn btn-sm btn-default" onclick="editRole(\'' + r.id + '\')">编辑</button> <button class="btn btn-sm btn-danger" onclick="deleteRole(\'' + r.id + '\')">删除</button></td></tr>';
+  }).join('');
+}
+
+function openAddModal() {
+  document.getElementById('editRoleId').value = '';
+  document.getElementById('roleName').value = '';
+  document.getElementById('roleDesc').value = '';
+  document.getElementById('addModalTitle').textContent = '新建角色';
+  document.getElementById('addModal').classList.add('show');
+}
+function closeAddModal() { document.getElementById('addModal').classList.remove('show'); }
+
+function editRole(id) {
+  var r = roles.find(function(r) { return r.id === id; });
+  if (!r) return;
+  document.getElementById('editRoleId').value = r.id;
+  document.getElementById('roleName').value = r.name;
+  document.getElementById('roleDesc').value = r.desc || '';
+  document.getElementById('addModalTitle').textContent = '编辑角色';
+  document.getElementById('addModal').classList.add('show');
+}
+
+function saveRole() {
+  var name = document.getElementById('roleName').value.trim();
+  var desc = document.getElementById('roleDesc').value.trim();
+  var editId = document.getElementById('editRoleId').value;
+  if (!name) { toast('请输入角色名称', 'error'); return; }
+
+  if (editId) {
+    var r = roles.find(function(r) { return r.id === editId; });
+    if (r) { r.name = name; r.desc = desc; }
+  } else {
+    if (roles.some(function(r) { return r.name === name; })) { toast('角色名称已存在', 'error'); return; }
+    roles.push({ id: 'r' + Date.now(), name: name, desc: desc, menus: [], btns: [], ctime: new Date().toISOString().substring(0,16).replace('T',' ') });
+  }
+  closeAddModal();
+  saveRoles();
+  renderList();
+  toast(editId ? '已更新' : '已创建', 'success');
+}
+
+function deleteRole(id) {
+  var r = roles.find(function(r) { return r.id === id; });
+  if (!r) return;
+  if (r.operatorCount > 0) { toast('有操作员正在使用该角色，无法删除', 'error'); return; }
+  if (!confirm('确定删除角色「' + r.name + '」吗？')) return;
+  roles = roles.filter(function(r) { return r.id !== id; });
+  saveRoles();
+  renderList();
+  toast('已删除', 'success');
+}
+
+// ============ 权限分配 ============
+function openPermModal(id) {
+  var r = roles.find(function(r) { return r.id === id; });
+  if (!r) return;
+  document.getElementById('permRoleId').value = id;
+  document.getElementById('permRoleName').textContent = r.name;
+
+  // 重置
+  document.querySelectorAll('#permModal .menu-cb, #permModal .btn-cb').forEach(function(cb) { cb.checked = false; });
+  document.querySelectorAll('.perm-btns').forEach(function(el) { el.classList.remove('show'); });
+
+  // 设置菜单权限
+  (r.menus||[]).forEach(function(m) {
+    var cb = document.getElementById('permMenu_' + m);
+    if (cb) { cb.checked = true; toggleMenuPerm(m, true); }
+  });
+  // 设置按钮权限
+  (r.btns||[]).forEach(function(b) {
+    var cb = document.getElementById('permBtn_' + b);
+    if (cb) cb.checked = true;
+  });
+
+  document.getElementById('permModal').classList.add('show');
+}
+function closePermModal() { document.getElementById('permModal').classList.remove('show'); }
+
+function toggleMenuPerm(menu, keep) {
+  var btns = document.getElementById('permBtns_' + menu);
+  var cb = document.getElementById('permMenu_' + menu);
+  if (keep) { btns.classList.add('show'); }
+  else { btns.classList.toggle('show', cb.checked); }
+}
+
+function savePermission() {
+  var id = document.getElementById('permRoleId').value;
+  var r = roles.find(function(r) { return r.id === id; });
+  if (!r) return;
+
+  var menus = [];
+  ['dashboard','asset','order','delivery','operator','role'].forEach(function(m) {
+    if (document.getElementById('permMenu_' + m).checked) menus.push(m);
+  });
+  r.menus = menus;
+
+  var btns = [];
+  document.querySelectorAll('#permModal .btn-cb:checked').forEach(function(cb) {
+    btns.push(cb.id.replace('permBtn_', ''));
+  });
+  r.btns = btns;
+
+  closePermModal();
+  saveRoles();
+  renderList();
+  toast('权限已保存', 'success');
+}
+
+function saveRoles() { localStorage.setItem('merchantRoles', JSON.stringify(roles)); }
+
+function toast(msg, type) {
+  var t = document.getElementById('toast');
+  t.className = 'toast ' + (type||'success');
+  t.textContent = msg;
+  clearTimeout(t._t);
+  t._t = setTimeout(function() { t.classList.remove('success','error'); t.textContent = ''; }, 2000);
+}
+
+renderList();
+</script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>我的资产</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; flex-direction: column; align-items: center; }
+.page { max-width: 430px; min-height: 100vh; background: #f6f7fb; padding: 0 16px 80px; position: relative; width: 100%; }
+
+/* ── 顶部导航 ── */
+.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #fff; border-bottom: 1px solid #f0f0f0; margin: 0 -16px; }
+.nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.nav-back svg { width: 20px; height: 20px; color: #333; display: block; }
+.nav-title { flex: 1; text-align: center; font-size: 16px; font-weight: 600; color: #1a1a2e; }
+.nav-placeholder { width: 32px; }
+
+/* ── 总览卡片 ── */
+.overview { background: linear-gradient(135deg, #1a1a2e, #2d1f1f); border-radius: 20px; padding: 20px; margin: 14px 0; display: flex; justify-content: space-around; text-align: center; }
+.ov-item { position: relative; z-index: 1; flex: 1; }
+.ov-num { font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+.ov-label { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+/* ── 资产列表 ── */
+.asset-list { display: flex; flex-direction: column; gap: 10px; }
+.asset-card { background: #fff; border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); cursor: pointer; transition: transform 0.15s; }
+.asset-card:active { transform: scale(0.98); }
+.ac-img { width: 56px; height: 56px; border-radius: 10px; background-position: center; background-size: cover; flex-shrink: 0; }
+.ac-info { flex: 1; min-width: 0; }
+.ac-name { font-size: 14px; font-weight: 600; color: #1a1a2e; margin-bottom: 4px; }
+.ac-tag { font-size: 10px; color: #999; background: #f5f5f7; padding: 2px 8px; border-radius: 4px; display: inline-block; }
+.ac-right { text-align: right; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ac-hold { font-size: 16px; font-weight: 700; color: #D70C1F; }
+.ac-hold-label { font-size: 10px; color: #999; }
+.ac-arrow svg { width: 16px; height: 16px; color: #ccc; }
+
+/* ── 底部TabBar ── */
+.bnav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; height: 64px; background: rgba(255,255,255,.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(0,0,0,.05); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; padding-bottom: env(safe-area-inset-bottom, 4px); z-index: 100; }
+.bnav .ni { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; border: none; background: none; padding: 4px 10px; font-size: 10px; color: #999; transition: color .2s; }
+.bnav .ni .ico { width: 22px; height: 22px; transition: transform .15s; }
+.bnav .ni .ico svg { display: block; width: 100%; height: 100%; }
+.bnav .ni:active .ico { transform: scale(.8); }
+.bnav .ni.on { color: #D70C1F; }
+.bnav .ni.on .ico { transform: scale(1.05); }
+.bnav .ni span:last-child { font-size: 10px; display: block; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- 顶部导航 -->
+<div class="top-bar">
+  <div class="nav-back" onclick="window.location.href='my.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </div>
+  <div class="nav-title">我的资产</div>
+  <a href="transfer.html" style="border:none;background:none;color:#D70C1F;cursor:pointer;display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;text-decoration:none;padding:4px 8px">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    赠与管理
+  </a>
+</div>
+
+<!-- 总览 -->
+<div class="overview">
+  <div class="ov-item">
+    <div class="ov-num" id="totalCount">8</div>
+    <div class="ov-label">持有资产</div>
+  </div>
+</div>
+
+<!-- 资产列表 -->
+<div class="asset-list">
+  <div class="asset-card" onclick="window.location.href='asset_detail.html?product=maotai1935'">
+    <div class="ac-img" style="background-image:url('茅台1935.png')"></div>
+    <div class="ac-info">
+      <div class="ac-name">茅台1935·时光窖藏</div>
+      <span class=\"ac-tag\">发行方：贵州茅台</span>
+    </div>
+    <div class="ac-right">
+      <div class="ac-hold">×3</div>
+      <div class="ac-hold-label">持有</div>
+    </div>
+  </div>
+
+  <div class="asset-card" onclick="window.location.href='asset_detail.html?product=feitian'">
+    <div class="ac-img" style="background-image:url('飞天茅台·元宇宙酒票.png')"></div>
+    <div class="ac-info">
+      <div class="ac-name">飞天茅台·元宇宙酒票</div>
+      <span class=\"ac-tag\">发行方：贵州茅台</span>
+    </div>
+    <div class="ac-right">
+      <div class="ac-hold">×1</div>
+      <div class="ac-hold-label">持有</div>
+    </div>
+  </div>
+
+  <div class="asset-card" onclick="window.location.href='asset_detail.html?product=guojiu'">
+    <div class="ac-img" style="background-image:url('国酒·数字徽章.png')"></div>
+    <div class="ac-info">
+      <div class="ac-name">国酒·数字徽章</div>
+      <span class=\"ac-tag\">发行方：贵州茅台</span>
+    </div>
+    <div class="ac-right">
+      <div class="ac-hold">×1</div>
+      <div class="ac-hold-label">持有</div>
+    </div>
+  </div>
+
+  <div class="asset-card" onclick="window.location.href='asset_detail.html?product=banana'">
+    <div class="ac-img" style="background-image:url('巴拿马金奖·复刻.png')"></div>
+    <div class="ac-info">
+      <div class="ac-name">巴拿马金奖·复刻</div>
+      <span class=\"ac-tag\">发行方：贵州茅台</span>
+    </div>
+    <div class="ac-right">
+      <div class="ac-hold">×1</div>
+      <div class="ac-hold-label">持有</div>
+    </div>
+  </div>
+
+  <div class="asset-card" onclick="window.location.href='asset_detail.html?product=shengxiao'">
+    <div class="ac-img" style="background-image:url('茅台生肖兔·典藏.png')"></div>
+    <div class="ac-info">
+      <div class="ac-name">茅台生肖兔·典藏</div>
+      <span class=\"ac-tag\">发行方：贵州茅台</span>
+    </div>
+    <div class="ac-right">
+      <div class="ac-hold">×1</div>
+      <div class="ac-hold-label">持有</div>
+    </div>
+  </div>
+
+  <div class="asset-card" onclick="window.location.href='asset_detail.html?product=guichuideng'">
+    <div class="ac-img" style="background-image:url('鬼吹灯.png')"></div>
+    <div class="ac-info">
+      <div class="ac-name">鬼吹灯·数字资产</div>
+      <span class="ac-tag">发行方：鬼吹灯</span>
+    </div>
+    <div class="ac-right">
+      <div class="ac-hold">×1</div>
+      <div class="ac-hold-label">持有</div>
+    </div>
+  </div>
+
+  <div class="asset-card" onclick="window.location.href='asset_detail.html?product=santi'">
+    <div class="ac-img" style="background-image:url('三体.png')"></div>
+    <div class="ac-info">
+      <div class="ac-name">三体·数字资产</div>
+      <span class="ac-tag">发行方：三体</span>
+    </div>
+    <div class="ac-right">
+      <div class="ac-hold">×1</div>
+      <div class="ac-hold-label">持有</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- 底部TabBar -->
+<div class="bnav">
+  <button class="ni" onclick="window.location.href='user-index.html'">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+    <span>首页</span>
+  </button>
+  <button class="ni">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+    <span>发现</span>
+  </button>
+  <button class="ni on">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 16 7 12 15 8 7 12 2"/><line x1="12" y1="15" x2="12" y2="22"/><line x1="8" y1="19" x2="16" y2="19"/></svg></span>
+    <span>资产</span>
+  </button>
+  <button class="ni" onclick="window.location.href='asset_market.html'">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><line x1="6" y1="16" x2="6" y2="20"/><line x1="10" y1="12" x2="10" y2="20"/><line x1="14" y1="8" x2="14" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/></svg></span>
+    <span>市场</span>
+  </button>
+  <button class="ni" onclick="window.location.href='my.html'">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+    <span>我的</span>
+  </button>
+</div>
+
+</body>
+</html>

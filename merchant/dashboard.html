@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商家首页 - 商家中心</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:#f5f7fa;color:#333}
+
+    .header{background:#fff;padding:16px 24px;box-shadow:0 2px 4px rgba(0,0,0,.05);display:flex;justify-content:space-between;align-items:center}
+    .header-left{display:flex;align-items:center;gap:8px}
+    .header-left h1{font-size:18px;font-weight:600}
+    .header-right{display:flex;align-items:center;gap:12px}
+    .merchant-name{font-weight:500;color:#667eea;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .2s}
+    .merchant-name:hover{background:rgba(102,126,234,.08)}
+    .verify-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:50%;color:#fff}
+    .verify-badge svg{width:12px;height:12px}
+    .btn-logout{padding:8px 16px;background:#f5f5f5;border:none;border-radius:6px;cursor:pointer;font-size:13px;color:#666}
+    .btn-logout:hover{background:#e8ecf0}
+
+    .sidebar{position:fixed;left:0;top:60px;bottom:0;width:200px;background:#2c3e50;padding:20px 0;z-index:10;display:none}
+    .sidebar.show{display:block}
+    .sidebar-menu{list-style:none;padding:0;margin:0}
+    .menu-title{display:flex;align-items:center;gap:10px;padding:12px 20px;color:#b8c7ce;font-size:14px;text-decoration:none;transition:all .2s}
+    .menu-title svg{width:18px;height:18px;flex-shrink:0}
+    a.menu-title:hover{background:rgba(255,255,255,.1);color:#fff}
+    .menu-title.active{background:rgba(102,126,234,.3);color:#fff}
+    .submenu{list-style:none;padding:0;margin:0;display:block}
+    .submenu-item{display:block;padding:10px 20px 10px 50px;color:#8a9aa8;font-size:13px;text-decoration:none;transition:all .2s}
+    .submenu-item:hover{background:rgba(255,255,255,.1);color:#fff}
+    .submenu-item.active{background:rgba(102,126,234,.3);color:#fff}
+
+    .main-content{margin-left:0;padding:24px}
+    .has-sidebar .main-content{margin-left:200px}
+    .page-title{font-size:20px;font-weight:600;color:#1a1a2e;margin-bottom:24px}
+
+    .status-tabs{display:flex;gap:0;margin-bottom:24px;background:#fff;border-radius:12px;padding:6px;box-shadow:0 2px 8px rgba(0,0,0,.04);width:fit-content;margin-left:auto;margin-right:auto}
+    .status-tab{height:40px;padding:0 24px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:#999}
+    .status-tab.active{background:#667eea;color:#fff}
+
+    .card{background:#fff;border-radius:12px;padding:32px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+
+    /* 认证表单 */
+    .cert-form .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .form-group{margin-bottom:16px}
+    .form-label{display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:500}
+    .form-input{width:100%;height:44px;padding:0 14px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:14px;color:#333;outline:none;transition:border .25s;background:#fff}
+    .form-input:focus{border-color:#667eea}
+    .form-input::placeholder{color:#ccc}
+    .form-select{width:100%;height:44px;padding:0 14px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:14px;color:#333;outline:none;background:#fff;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+    .upload-id{display:flex;align-items:center;gap:12px}
+    .upload-box{width:120px;height:80px;border:2px dashed #ddd;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border .2s;overflow:hidden;background-size:cover;background-position:center;background-repeat:no-repeat;flex-shrink:0}
+    .upload-box:hover{border-color:#667eea}
+    .upload-box svg{width:28px;height:28px;color:#ccc}
+    .upload-tip{font-size:11px;color:#999;flex:1;line-height:1.5}
+    .upload-box-small{width:80px;height:80px;border:2px dashed #ddd;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border .2s;overflow:hidden;background-size:cover;background-position:center;background-repeat:no-repeat;flex-shrink:0}
+    .upload-box-small:hover{border-color:#667eea}
+    .upload-box-small svg{width:22px;height:22px;color:#ccc}
+    #logoUpload,#certUpload{display:none}
+    .submit-btn{width:100%;height:46px;border:none;border-radius:10px;background:#667eea;color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:16px;transition:opacity .2s}
+    .submit-btn:hover{background:#5a6fd6}
+    .submit-btn:active{opacity:.9}
+
+    /* 认证中 */
+    .verifying-box{text-align:center;padding:20px 0}
+    .verifying-icon{width:72px;height:72px;border-radius:50%;background:rgba(245,166,35,.1);margin:0 auto 16px;display:flex;align-items:center;justify-content:center}
+    .verifying-icon svg{width:36px;height:36px;color:#f5a623;animation:spin 2s linear infinite}
+    @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+    .verifying-title{font-size:18px;font-weight:700;color:#1a1a2e;margin-bottom:8px}
+    .verifying-desc{font-size:13px;color:#999;line-height:1.8}
+
+    /* 已认证欢迎 */
+    .welcome-box{text-align:center;padding:20px 0}
+    .welcome-icon{font-size:48px;margin-bottom:12px}
+    .welcome-title{font-size:20px;font-weight:700;color:#1a1a2e;margin-bottom:8px}
+    .welcome-desc{font-size:13px;color:#999;line-height:1.8;margin-bottom:24px}
+
+    /* 弹窗 */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+    .modal-overlay.show{display:flex}
+    .modal-box{background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:80vh;overflow-y:auto}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #f0f0f0}
+    .modal-title{font-size:16px;font-weight:600}
+    .modal-close{width:28px;height:28px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;cursor:pointer}
+    .modal-close svg{width:14px;height:14px;color:#666}
+    .modal-body{padding:20px}
+    .modal-footer{padding:16px 20px;border-top:1px solid #f0f0f0;display:flex;justify-content:flex-end;gap:12px}
+    .info-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f5f5f5;font-size:13px}
+    .info-row .info-label{color:#999}
+    .info-row .info-value{color:#333;font-weight:500;text-align:right;max-width:65%}
+    .info-section-title{font-size:14px;font-weight:600;color:#1a1a2e;margin:20px 0 10px;padding-bottom:8px;border-bottom:1px solid #e0e0e0}
+    .cert-img-placeholder{width:100%;height:120px;background:#f5f7fa;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-top:8px;overflow:hidden}
+    .cert-img-placeholder img{width:100%;height:100%;object-fit:contain}
+    
+    .tag-item{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#f0f0ff;color:#4a4ae0;border-radius:4px;font-size:12px}
+    .tag-item .tag-remove{cursor:pointer;font-size:14px;color:#999}
+    .tag-item .tag-remove:hover{color:#D70C1F}
+
+    .toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.78);color:#fff;font-size:14px;padding:14px 28px;border-radius:8px;z-index:2000;pointer-events:none;opacity:0;transition:opacity .3s}
+    .toast.show{opacity:1}
+  </style>
+</head>
+<body>
+<a href="../index.html" style="position:fixed;top:10px;left:10px;z-index:9999;background:rgba(0,0,0,.5);color:rgba(255,255,255,.7);padding:5px 10px;border-radius:14px;font-size:11px;text-decoration:none;backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.12)">📁 目录</a>
+
+<div class="header">
+  <div class="header-left">
+    <h1>商家中心</h1>
+  </div>
+  <div class="header-right">
+    <span class="merchant-name" id="merchantName" onclick="openInfoModal()">贵州茅台集团</span>
+    <span class="verify-badge" id="certBadge" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+    </span>
+    <button class="btn-logout" onclick="window.location.href='register.html'">退出登录</button>
+  </div>
+</div>
+
+<div class="sidebar" id="sidebar">
+  <ul class="sidebar-menu">
+    <li><a class="menu-title active" href="dashboard.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      首页
+    </a></li>
+    <li>
+      <div class="menu-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><polyline points="21 15 16 10 5 21"/></svg>
+        数字资产
+      </div>
+      <ul class="submenu">
+        <li><a class="submenu-item" href="asset-management.html">数字资产管理</a></li>
+        <li><a class="submenu-item" href="digital-asset-detail.html">数字资产详情</a></li>
+      </ul>
+    </li>
+    <li>
+      <div class="menu-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        订单管理
+      </div>
+      <ul class="submenu">
+        <li><a class="submenu-item" href="order-management.html">订单管理</a></li>
+        <li><a class="submenu-item" href="delivery-management.html">发货管理</a></li>
+      </ul>
+    </li>
+    <li>
+      <div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>营销管理</div>
+      <ul class="submenu"><li><a class="submenu-item" href="marketing.html">空间管理</a></li><li><a class="submenu-item" href="task-management.html">任务管理</a></li></ul>
+    </li>
+    <li>
+      <div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>内容管理</div>
+      <ul class="submenu">
+        <li><a class="submenu-item" href="story-admin.html">文化故事管理</a></li>
+      </ul>
+    </li>
+    <li>
+      <div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>系统管理</div>
+      <ul class="submenu">
+        <li><a class="submenu-item" href="operator-management.html">操作员管理</a></li>
+        <li><a class="submenu-item" href="role-management.html">角色管理</a></li>
+      </ul>
+    </li>
+  </ul>
+</div>
+
+<div class="main-content" id="mainContent">
+  <div class="page-title">首页</div>
+  <div class="status-tabs">
+    <button class="status-tab active" onclick="showTab('unauth')">未认证</button>
+    <button class="status-tab" onclick="showTab('verifying')">认证中</button>
+    <button class="status-tab" onclick="showTab('verified')">已认证</button>
+  </div>
+  <div id="contentArea"></div>
+</div>
+
+<!-- 商家信息弹窗 -->
+<div class="modal-overlay" id="infoModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">商家信息</div>
+      <div class="modal-close" onclick="closeInfoModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div class="modal-body">
+      <!-- 可编辑部分 -->
+      <div class="info-section-title">基础信息（可编辑）</div>
+      <div class="form-group">
+        <label class="form-label">Logo</label>
+        <div class="upload-id">
+          <div class="upload-box-small" id="editLogoBox" onclick="document.getElementById('editLogoUpload').click()" style="background-image:url('')"></div>
+          <input type="file" id="editLogoUpload" accept="image/*" onchange="handleEditLogo(this)" style="display:none">
+          <span class="upload-tip" style="color:#999">点击图片可以更换</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">商家简称</label>
+        <input class="form-input" id="editName" placeholder="请输入商家简称">
+      </div>
+      <div class="form-group">
+        <label class="form-label">标签</label>
+        <div id="editTagDisplay" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+        <div style="display:flex;gap:8px">
+          <input class="form-input" id="editTagInput" placeholder="输入标签，按回车添加" style="flex:1" onkeypress="if(event.key==='Enter'){event.preventDefault();addEditTag()}">
+          <button class="submit-btn" style="width:auto;padding:0 16px;font-size:13px" onclick="addEditTag()">添加</button>
+        </div>
+      </div>
+
+      <!-- 不可编辑部分 -->
+      <div class="info-section-title">认证信息（不可编辑）</div>
+      <div class="info-row"><span class="info-label">企业名称</span><span class="info-value" id="infoCompany">-</span></div>
+      <div class="info-row"><span class="info-label">所属行业</span><span class="info-value" id="infoIndustry">-</span></div>
+      <div class="info-row"><span class="info-label">法人姓名</span><span class="info-value" id="infoLegalName">-</span></div>
+      <div class="info-row"><span class="info-label">法人手机号</span><span class="info-value" id="infoLegalPhone">-</span></div>
+      <div class="info-row"><span class="info-label">联系人姓名</span><span class="info-value" id="infoContact">-</span></div>
+      <div class="info-row"><span class="info-label">联系人手机号</span><span class="info-value" id="infoContactPhone">-</span></div>
+      <div class="info-row"><span class="info-label">统一社会信用代码</span><span class="info-value" id="infoCreditCode">-</span></div>
+      <div class="form-group" style="margin-top:12px">
+        <label class="form-label">企业证件照</label>
+        <div class="cert-img-placeholder" id="infoCertImg">
+          <span style="color:#ccc;font-size:13px">证件照预览</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeInfoModal()" style="padding:8px 20px;background:#f5f5f5;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:13px;color:#666">取消</button>
+      <button onclick="saveEditInfo()" style="padding:8px 24px;background:#667eea;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600">保存修改</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// 模拟已登录商家（贵州茅台集团）
+var merchant = {
+  name: '贵州茅台集团',
+  account: 'moutai_admin',
+  certStatus: 'verified',
+  logo: '../贵州茅台.jpg',
+  tag: ['白酒', '中华老字号', '酱香型', '品牌馆'],
+  certData: {
+    logo: '../贵州茅台.jpg',
+    company: '贵州茅台酒股份有限公司',
+    industry: 'food',
+    legalName: '丁雄军',
+    legalPhone: '13885200000',
+    contact: '张三',
+    contactPhone: '13985201000',
+    creditCode: '9152000021441686XK',
+    certImg: ''
+  }
+};
+
+var stored = JSON.parse(localStorage.getItem('merchantLogin') || 'null');
+if (stored) {
+  merchant.name = stored.name || merchant.name;
+  merchant.account = stored.account || merchant.account;
+  merchant.certStatus = stored.certStatus || merchant.certStatus;
+  merchant.logo = stored.logo || merchant.logo;
+  merchant.tag = stored.tag || merchant.tag;
+  merchant.certData = stored.certData || merchant.certData;
+} else {
+  localStorage.setItem('merchantLogin', JSON.stringify(merchant));
+}
+
+document.getElementById('merchantName').textContent = merchant.name;
+
+function showTab(status) {
+  updateSidebar(status);
+  document.getElementById('certBadge').style.display = status === 'verified' ? 'inline-flex' : 'none';
+
+  document.querySelectorAll('.status-tab').forEach(function(b, i) {
+    b.classList.toggle('active', (i === 0 && status === 'unauth') || (i === 1 && status === 'verifying') || (i === 2 && status === 'verified'));
+  });
+
+  if (status === 'unauth') renderUnauth();
+  else if (status === 'verifying') renderVerifying();
+  else renderVerified();
+}
+
+function updateSidebar(status) {
+  var sb = document.getElementById('sidebar');
+  var mc = document.getElementById('mainContent');
+  if (status === 'verified') {
+    sb.classList.add('show');
+    mc.classList.add('has-sidebar');
+  } else {
+    sb.classList.remove('show');
+    mc.classList.remove('has-sidebar');
+  }
+}
+
+function toast(msg) { var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(function() { t.classList.remove('show') }, 2000); }
+
+// ============ 商家认证表单 ============
+function renderUnauth() {
+  var h = '<div class="card"><div class="cert-form">';
+  h += '<h3 style="font-size:16px;font-weight:700;color:#1a1a2e;margin-bottom:20px">商家认证</h3>';
+  h += '<div class="form-group"><label class="form-label">企业名称</label><input class="form-input" id="certCompany" placeholder="请输入企业全称"></div>';
+  h += '<div class="form-group"><label class="form-label">企业简称</label><input class="form-input" id="certShortName" placeholder="请输入企业简称"></div>';
+  h += '<div class="form-group"><label class="form-label">企业Logo</label><div class="upload-id"><div class="upload-box-small" id="certLogoBox" onclick="document.getElementById(\'logoUpload\').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><input type="file" id="logoUpload" accept="image/*" onchange="handleUpload(this,\'certLogoBox\')"><span class="upload-tip">上传Logo</span></div></div>';
+  h += '<div class="form-group"><label class="form-label">商家分类</label><select class="form-select" id="certIndustry"><option value="">请选择商家分类</option><option value="food">食品</option><option value="tour">文旅</option><option value="film">影视</option><option value="ent">娱乐</option></select></div>';
+  h += '<div class="form-group"><label class="form-label">法人姓名</label><input class="form-input" id="certLegalName" placeholder="请输入法人姓名"></div>';
+  h += '<div class="form-group"><label class="form-label">法人手机号</label><input class="form-input" id="certLegalPhone" placeholder="请输入法人手机号" type="tel"></div>';
+  h += '<div class="form-group"><label class="form-label">联系人姓名</label><input class="form-input" id="certContact" placeholder="请输入联系人姓名"></div>';
+  h += '<div class="form-group"><label class="form-label">联系人手机号</label><input class="form-input" id="certContactPhone" placeholder="请输入联系人手机号" type="tel"></div>';
+  h += '<div class="form-group"><label class="form-label">统一社会信用代码</label><input class="form-input" id="certCreditCode" placeholder="请输入18位统一社会信用代码"></div>';
+  h += '<div class="form-group"><label class="form-label">企业证件照</label><div class="upload-id"><div class="upload-box" id="certImgBox" onclick="document.getElementById(\'certUpload\').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><input type="file" id="certUpload" accept="image/*" onchange="handleUpload(this,\'certImgBox\')"><div class="upload-tip">请上传营业执照或相关证件照<br>支持 JPG、PNG 格式</div></div></div>';
+  h += '<button class="submit-btn" onclick="submitCert()">提交认证</button>';
+  h += '</div></div>';
+  document.getElementById('contentArea').innerHTML = h;
+}
+
+function handleUpload(input, boxId) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var box = document.getElementById(boxId);
+    box.style.backgroundImage = 'url(' + e.target.result + ')';
+    box.innerHTML = '';
+    box.dataset.img = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function submitCert() {
+  var logo = document.getElementById('certLogoBox').dataset.img || '';
+  var shortName = document.getElementById('certShortName').value.trim();
+  var company = document.getElementById('certCompany').value.trim();
+  var industry = document.getElementById('certIndustry').value;
+  var legalName = document.getElementById('certLegalName').value.trim();
+  var legalPhone = document.getElementById('certLegalPhone').value.trim();
+  var contact = document.getElementById('certContact').value.trim();
+  var contactPhone = document.getElementById('certContactPhone').value.trim();
+  var creditCode = document.getElementById('certCreditCode').value.trim();
+  var certImg = document.getElementById('certImgBox').dataset.img || '';
+  if (!company) { toast('请输入企业名称'); return; }
+  if (!industry) { toast('请选择所属行业'); return; }
+  if (!legalName) { toast('请输入法人姓名'); return; }
+  if (!legalPhone) { toast('请输入法人手机号'); return; }
+  if (!contact) { toast('请输入联系人姓名'); return; }
+  if (!contactPhone) { toast('请输入联系人手机号'); return; }
+  if (!creditCode) { toast('请输入统一社会信用代码'); return; }
+  if (!certImg) { toast('请上传企业证件照'); return; }
+
+  if (shortName) merchant.name = shortName;
+  if (logo) merchant.logo = logo;
+  merchant.certStatus = 'verifying';
+  merchant.certData = { logo: logo, company: company, industry: industry, legalName: legalName, legalPhone: legalPhone, contact: contact, contactPhone: contactPhone, creditCode: creditCode, certImg: certImg };
+  localStorage.setItem('merchantLogin', JSON.stringify(merchant));
+  document.getElementById('merchantName').textContent = merchant.name;
+  toast('认证信息已提交，请等待审核');
+  setTimeout(function() { showTab('verifying'); }, 800);
+}
+
+// ============ 认证中 ============
+function renderVerifying() {
+  var h = '<div class="card"><div class="verifying-box">';
+  h += '<div class="verifying-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>';
+  h += '<div class="verifying-title">认证审核中</div>';
+  h += '<div class="verifying-desc">您的商家认证信息已提交成功，平台将会在<strong style="color:#f5a623">1-3个工作日</strong>内完成审核。<br><br>审核期间请保持联系方式畅通，如有疑问请联系客服。</div>';
+  h += '</div></div>';
+  document.getElementById('contentArea').innerHTML = h;
+}
+
+// ============ 已认证 ============
+function renderVerified() {
+  var h = '<div class="card"><div class="welcome-box">';
+  h += '<div class="welcome-icon">🏆</div>';
+  h += '<div class="welcome-title">欢迎您，<span style="color:#667eea;cursor:pointer;text-decoration:underline" onclick="openInfoModal()">' + merchant.name + '</span></div>';
+  h += '<div class="welcome-desc">您的商家已通过认证，可以开始管理数字资产并处理订单。</div>';
+  h += '</div></div>';
+  document.getElementById('contentArea').innerHTML = h;
+}
+
+// ============ 商家信息弹窗 ============
+var editTags = [];
+
+function addEditTag() {
+  var input = document.getElementById('editTagInput');
+  var tag = input.value.trim();
+  if (!tag) return;
+  if (editTags.includes(tag)) { toast('标签已存在'); return; }
+  editTags.push(tag);
+  input.value = '';
+  renderEditTags();
+}
+
+function removeEditTag(tag) {
+  editTags = editTags.filter(t => t !== tag);
+  renderEditTags();
+}
+
+function renderEditTags() {
+  var container = document.getElementById('editTagDisplay');
+  container.innerHTML = editTags.map(tag => '<span class="tag-item">' + tag + '<span class="tag-remove" onclick="removeEditTag(\'' + tag + '\')">×</span></span>').join('');
+}
+
+function openInfoModal() {
+  var cd = merchant.certData || {};
+  document.getElementById('editLogoBox').style.backgroundImage = merchant.logo ? 'url(' + merchant.logo + ')' : '';
+  if (merchant.logo) document.getElementById('editLogoBox').innerHTML = '';
+  document.getElementById('editName').value = merchant.name;
+  
+  editTags = Array.isArray(merchant.tag) ? merchant.tag : (merchant.tag ? merchant.tag.split('·').map(t => t.trim()).filter(t => t) : []);
+  renderEditTags();
+  document.getElementById('editTagInput').value = '';
+
+  var industryMap = { food: '食品', ent: '娱乐', film: '影视', tour: '文旅', retail: '零售', tech: '科技', edu: '教育', other: '其他' };
+  document.getElementById('infoCompany').textContent = cd.company || '-';
+  document.getElementById('infoIndustry').textContent = industryMap[cd.industry] || cd.industry || '-';
+  document.getElementById('infoLegalName').textContent = cd.legalName || '-';
+  document.getElementById('infoLegalPhone').textContent = cd.legalPhone || '-';
+  document.getElementById('infoContact').textContent = cd.contact || '-';
+  document.getElementById('infoContactPhone').textContent = cd.contactPhone || '-';
+  document.getElementById('infoCreditCode').textContent = cd.creditCode || '-';
+  var imgBox = document.getElementById('infoCertImg');
+  if (cd.certImg) {
+    imgBox.innerHTML = '<img src="' + cd.certImg + '" style="width:100%;height:100%;object-fit:contain">';
+  } else {
+    imgBox.innerHTML = '<span style="color:#ccc;font-size:13px">证件照预览</span>';
+  }
+  document.getElementById('infoModal').classList.add('show');
+}
+
+function closeInfoModal() { document.getElementById('infoModal').classList.remove('show'); }
+
+function handleEditLogo(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('editLogoBox').style.backgroundImage = 'url(' + e.target.result + ')';
+    document.getElementById('editLogoBox').innerHTML = '';
+    document.getElementById('editLogoBox').dataset.img = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveEditInfo() {
+  var logo = document.getElementById('editLogoBox').dataset.img || merchant.logo;
+  var name = document.getElementById('editName').value.trim();
+  if (!name) { toast('请输入商家简称'); return; }
+  merchant.logo = logo;
+  merchant.name = name;
+  merchant.tag = editTags;
+  document.getElementById('merchantName').textContent = name;
+  localStorage.setItem('merchantLogin', JSON.stringify(merchant));
+  closeInfoModal();
+  toast('商家信息已更新');
+}
+
+// 初始
+showTab(merchant.certStatus || 'unauth');
+</script>
+</body>
+</html>

@@ -5,27 +5,39 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>支付成功</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; justify-content: center; }
-.page { max-width: 430px; min-height: 100vh; background: #f6f7fb; padding: 16px 16px 0; position: relative; display: flex; flex-direction: column; align-items: center; }
-@media(max-width:430px) { .page { max-width: 100%; } }
+:root{
+  --accent:#3F8B6D;--accent-contrast:#fff;--link:#3F8B6D;--muted:#a0a0a0;
+  --bg:#fff;--ink:#222;--ink-muted:#555;--ink-subtle:#888;
+  --border:#e0e0e0;--page-bg:#F0F0F0;
+  --radius-sm:7px;--radius-card:7px;--radius-pill:9999px;
+  --font-display:"Helvetica Neue",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+  --font-body:"Inter",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-muted);min-height:100%}
+body{display:flex;justify-content:center}
+.page{max-width:430px;width:100%;min-height:100vh;background:var(--page-bg);position:relative;box-sizing:border-box;padding-bottom:90px}
 
-.success-wrap { display: flex; flex-direction: column; align-items: center; padding: 60px 0 30px; text-align: center; width: 100%; }
-.check-circle { width: 64px; height: 64px; border-radius: 50%; background: #52c41a; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
-.check-circle svg { width: 32px; height: 32px; display: block; }
-.success-title { font-size: 18px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
-.success-sub { font-size: 12px; color: #999; margin-bottom: 28px; }
-.order-card { background: #fff; border-radius: 12px; padding: 16px 20px; width: 100%; box-shadow: 0 1px 4px rgba(0,0,0,0.03); }
-.order-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; }
-.order-row .lbl { color: #999; }
-.order-row .val { color: #1a1a2e; font-weight: 500; }
-.order-row .val.price { color: #D70C1F; font-weight: 700; font-size: 20px; }
-.btn-group { margin-top: 32px; display: flex; gap: 12px; padding: 0 16px; }
-.btn { width: 130px; height: 42px; border-radius: 21px; font-size: 14px; cursor: pointer; font-weight: 500; display: inline-flex; align-items: center; justify-content: center; }
-.btn-outline { border: 1px solid #ddd; background: #fff; color: #666; }
-.btn-outline:active { background: #f5f5f7; }
-.btn-primary { border: none; background: #D70C1F; color: #fff; }
-.btn-primary:active { opacity: 0.9; }
+.success-wrap{display:flex;flex-direction:column;align-items:center;padding:60px 16px 30px;text-align:center;width:100%}
+.check-circle{width:64px;height:64px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:20px;animation:popIn .4s ease-out}
+.check-circle svg{width:32px;height:32px;display:block}
+.success-title{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.success-sub{font-size:12px;color:var(--ink-subtle);margin-bottom:28px}
+
+.order-card{background:var(--bg);border-radius:var(--radius-card);padding:16px 20px;width:100%;box-shadow:0 1px 4px rgba(0,0,0,.03)}
+.order-row{display:flex;justify-content:space-between;padding:8px 0;font-size:13px}
+.order-row .lbl{color:var(--ink-subtle)}
+.order-row .val{color:var(--ink);font-weight:500}
+.order-row .val.price{color:var(--accent);font-weight:700;font-size:20px}
+
+.btn-group{margin-top:32px;display:flex;gap:12px;padding:0 16px}
+.btn{width:130px;height:42px;border-radius:var(--radius-pill);font-size:14px;cursor:pointer;font-weight:500;display:inline-flex;align-items:center;justify-content:center;transition:background .2s}
+.btn-outline{border:1px solid var(--border);background:var(--bg);color:var(--ink-muted)}
+.btn-outline:active{background:var(--page-bg)}
+.btn-primary{border:none;background:var(--accent);color:#fff}
+.btn-primary:active{opacity:.9}
+
+@keyframes popIn{0%{transform:scale(0);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
 </style>
 </head>
 <body>
@@ -40,9 +52,11 @@ body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC'
   <div class="success-sub">您的订单已完成支付</div>
 
   <div class="order-card">
-    <div class="order-row"><span class="lbl">商品</span><span class="val" id="goodsInfo">茅台1935·时光窖藏 ×1</span></div>
+    <div class="order-row"><span class="lbl">商品</span><span class="val" id="goodsInfo">兰亭雅集</span></div>
+    <div class="order-row"><span class="lbl">款式</span><span class="val" id="specInfo">畅行版</span></div>
+    <div class="order-row"><span class="lbl">数量</span><span class="val" id="qtyInfo">×1</span></div>
     <div class="order-row"><span class="lbl">支付方式</span><span class="val" id="payMethod">中金钱包</span></div>
-    <div class="order-row"><span class="lbl">实付金额</span><span class="val price" id="payAmount">¥599</span></div>
+    <div class="order-row"><span class="lbl">实付金额</span><span class="val price" id="payAmount">¥199</span></div>
   </div>
 
   <div class="btn-group">
@@ -54,11 +68,16 @@ body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC'
 </div>
 
 <script>
-// 从 URL 参数读取订单信息
-const params = new URLSearchParams(window.location.search);
-document.getElementById('goodsInfo').textContent = `茅台1935·时光窖藏 ×${params.get('qty') || 1}`;
+var params = new URLSearchParams(window.location.search);
+var series = decodeURIComponent(params.get('series') || '兰亭雅集');
+var spec   = decodeURIComponent(params.get('spec') || '畅行版');
+var qty    = params.get('qty') || 1;
+document.getElementById('goodsInfo').textContent = series;
+document.getElementById('specInfo').textContent = spec;
+document.getElementById('qtyInfo').textContent = '×' + qty;
 document.getElementById('payMethod').textContent = params.get('pay') || '中金钱包';
-document.getElementById('payAmount').textContent = `¥${params.get('total') || 599}`;
+document.getElementById('payAmount').textContent = '¥' + (params.get('total') || 199);
 </script>
+
 </body>
 </html>

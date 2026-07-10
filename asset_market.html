@@ -5,108 +5,85 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>数字资产市场</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; justify-content: center; }
-.page { max-width: 430px; min-width: 320px; min-height: 100vh; background: #f6f7fb; padding: 0 16px 80px; position: relative; width: 100%; }
+:root{
+  --accent:#3F8B6D;--accent-contrast:#fff;--link:#3F8B6D;--muted:#a0a0a0;
+  --bg:#fff;--ink:#222;--ink-muted:#555;--ink-subtle:#888;
+  --border:#e0e0e0;--page-bg:#F0F0F0;
+  --radius-sm:7px;--radius-card:7px;--radius-pill:9999px;
+  --font-display:"Helvetica Neue",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+  --font-body:"Inter",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-muted);display:flex;justify-content:center;min-height:100%}
+.page{max-width:430px;width:100%;min-height:100vh;background:var(--page-bg);padding:16px;padding-bottom:80px;position:relative;box-sizing:border-box}
+@media(max-width:430px){.page{max-width:100%}}
 
-/* ── 顶部导航 ── */
-.top-bar { display: flex; align-items: center; justify-content: center; padding: 12px 0; background: #f6f7fb; }
-.nav-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+.top-bar{display:flex;align-items:center;justify-content:center;padding:0 0 16px}
+.nav-title{font-size:17px;font-weight:700;color:var(--ink)}
 
-/* ── 搜索框 ── */
-.search-box { display: flex; align-items: center; gap: 8px; background: #fff; border-radius: 10px; padding: 0 12px; height: 40px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
-.search-box svg { width: 18px; height: 18px; color: #999; flex-shrink: 0; }
-.search-box input { flex: 1; border: none; outline: none; font-size: 13px; color: #333; background: transparent; height: 100%; }
-.search-box input::placeholder { color: #bbb; }
+.search-box{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:var(--radius-sm);padding:0 12px;height:40px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.search-box svg{width:18px;height:18px;color:var(--ink-subtle);flex-shrink:0}
+.search-box input{flex:1;border:none;outline:none;font-size:13px;color:var(--ink);background:transparent;height:100%}
+.search-box input::placeholder{color:#bbb}
 
 /* ── 筛选栏 ── */
-.filter-bar { display: flex; gap: 8px; margin-bottom: 12px; }
-.filter-btn { height: 32px; padding: 0 14px; border-radius: 16px; border: 1px solid #e0e0e0; background: #fff; font-size: 12px; color: #666; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
-.filter-btn:active { background: #f5f5f7; }
-.filter-btn.on { background: #D70C1F; color: #fff; border-color: #D70C1F; }
-.filter-btn.on svg { stroke: #fff; }
-.filter-btn svg { width: 14px; height: 14px; }
-.filter-wrap { position: relative; display: inline-flex; }
+.filter-bar{display:flex;gap:8px;margin:12px 0}
+.filter-btn{height:32px;padding:0 14px;border-radius:var(--radius-pill);border:1px solid var(--border);background:var(--bg);font-size:12px;color:var(--ink-muted);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.filter-btn:active{background:var(--page-bg)}
+.filter-btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.filter-btn.on svg{stroke:#fff}
+.filter-btn svg{width:14px;height:14px}
+.filter-wrap{position:relative;display:inline-flex}
+.filter-dropdown{display:none;position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--bg);border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.12);padding:8px 0;z-index:20;min-width:140px}
+.filter-dropdown.show{display:block}
+.filter-dropdown-item{padding:10px 16px;font-size:13px;color:var(--ink-muted);cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .15s}
+.filter-dropdown-item:active{background:var(--page-bg)}
+.filter-dropdown-item .check{width:16px;height:16px;border-radius:50%;border:2px solid #ddd;display:flex;align-items:center;justify-content:center}
+.filter-dropdown-item .check.on{border-color:var(--accent);background:var(--accent)}
+.filter-dropdown-item .check svg{width:10px;height:10px;color:#fff;display:none}
+.filter-dropdown-item .check.on svg{display:block}
 
-/* ── 下拉浮层 ── */
-.filter-dropdown { display: none; position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%); background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.12); padding: 8px 0; z-index: 20; min-width: 160px; }
-.filter-dropdown.show { display: block; }
-.filter-dropdown-item { padding: 10px 16px; font-size: 13px; color: #666; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.15s; }
-.filter-dropdown-item:active { background: #f5f5f7; }
-.filter-dropdown-item .check { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #ddd; display: flex; align-items: center; justify-content: center; }
-.filter-dropdown-item .check.on { border-color: #D70C1F; background: #D70C1F; }
-.filter-dropdown-item .check svg { width: 10px; height: 10px; color: #fff; display: none; }
-.filter-dropdown-item .check.on svg { display: block; }
+.goods-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.goods-card{background:var(--bg);border-radius:var(--radius-card);overflow:hidden;cursor:pointer;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:transform .2s;display:flex;flex-direction:column}
+.goods-card:active{transform:scale(.96)}
+.goods-card .img-wrap{width:100%;aspect-ratio:1/1;background-position:center;background-size:cover;position:relative}
+.goods-card .info{padding:12px 12px 14px;flex:1;display:flex;flex-direction:column;gap:6px}
+.goods-card .info h4{font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.goods-card .info .tags{display:flex;gap:4px;flex-wrap:wrap}
+.goods-card .info .tags span{font-size:9px;padding:2px 8px;border-radius:4px;font-weight:500;display:inline-block}
+.t-sale-all{color:#2980b9;background:#E8F4FD}
+.t-sale-prior{color:#f0ad4e;background:#FFF8EC}
+.t-sale-lottery{color:#6c5ce7;background:#F3F0FF}
+.goods-card .info .issuer{font-size:10px;color:var(--ink-subtle);display:inline-block;padding:2px 8px;margin-top:-2px;background:var(--page-bg);border-radius:4px;align-self:flex-start}
+.goods-card .info .price{color:var(--accent);font-size:20px;font-weight:700}
+.goods-card .info .price small{font-size:11px;font-weight:400;color:var(--ink-subtle)}
+.goods-card .info .sold{color:var(--ink-subtle);font-size:10px}
 
-/* ── 商品网格 ── */
-.goods-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.goods-card { background: #fff; border-radius: 16px; overflow: hidden; cursor: pointer; box-shadow: 0 1px 6px rgba(0,0,0,0.04); transition: transform 0.2s; }
-.goods-card:active { transform: scale(0.96); }
-.goods-card .img-wrap { height: 120px; background-position: center; background-size: cover; position: relative; }
-.goods-card .img-wrap .badge { position: absolute; top: 8px; left: 8px; font-size: 9px; padding: 2px 8px; border-radius: 4px; color: #fff; font-weight: 600; }
-.badge-food { background: #D70C1F; } .badge-ent { background: #6c5ce7; } .badge-tour { background: #00b894; } .badge-film { background: #d35400; }
-.badge-sale { position: absolute; top: 8px; right: 8px; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 600; color: #fff; }
-.sale-all { background: #2980b9; } .sale-prior { background: #f0ad4e; } .sale-lottery { background: #6c5ce7; } .sale-combo { background: #00b894; }
-.goods-card .info { padding: 10px 10px 12px; }
-.goods-card .info h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #1a1a2e; }
-.goods-card .info .meta { font-size: 9px; color: #999; margin-bottom: 4px; display: flex; gap: 4px; }
-.goods-card .info .meta span { background: #f5f5f7; padding: 1px 6px; border-radius: 3px; }
-.goods-card .info .meta .meta-sale { color: #fff; font-weight: 500; }
-.meta-sale-all { background: #2980b9 !important; } .meta-sale-prior { background: #f0ad4e !important; } .meta-sale-lottery { background: #6c5ce7 !important; } .meta-sale-combo { background: #00b894 !important; }
-.goods-card .info .price { color: #D70C1F; font-size: 18px; font-weight: 700; }
-.goods-card .info .price small { font-size: 10px; font-weight: 400; color: #999; }
-.goods-card .info .sold { color: #999; font-size: 9px; margin-top: 4px; }
+.empty-state{text-align:center;padding:60px 0;color:var(--ink-subtle);font-size:14px;display:none}
 
-/* ── 空状态 ── */
-.empty-state { text-align: center; padding: 60px 0; color: #999; font-size: 14px; display: none; }
-
-/* ── 底部TabBar ── */
-.bnav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; height: 64px; background: rgba(255,255,255,.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(0,0,0,.05); display: flex; align-items: center; justify-content: space-around; padding: 0 16px; padding-bottom: env(safe-area-inset-bottom, 4px); z-index: 100; }
-.bnav .ni { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; border: none; background: none; padding: 4px 10px; font-size: 10px; color: #999; transition: color .2s; }
-.bnav .ni .ico { width: 22px; height: 22px; transition: transform .15s; }
-.bnav .ni .ico svg { display: block; width: 100%; height: 100%; }
-.bnav .ni:active .ico { transform: scale(.8); }
-.bnav .ni.on { color: #D70C1F; }
-.bnav .ni.on .ico { transform: scale(1.05); }
-.bnav .ni span:last-child { font-size: 10px; display: block; }
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:64px;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:space-between;padding:0 16px;padding-bottom:env(safe-area-inset-bottom,4px);z-index:100;box-sizing:border-box}
+.bnav .ni{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border:none;background:none;padding:4px 10px;font-size:10px;color:var(--ink-subtle);transition:color .2s}
+.bnav .ni .ico{width:22px;height:22px;transition:transform .15s}
+.bnav .ni .ico svg{display:block;width:100%;height:100%}
+.bnav .ni:active .ico{transform:scale(.8)}
+.bnav .ni.on{color:var(--accent)}
+.bnav .ni.on .ico{transform:scale(1.05)}
+.bnav .ni span:last-child{font-size:10px;display:block}
 </style>
 </head>
 <body>
 <div class="page">
 
-<!-- 顶部导航 -->
 <div class="top-bar">
   <div class="nav-title">数字资产市场</div>
 </div>
 
-<!-- 搜索框 -->
 <div class="search-box">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-  <input type="text" placeholder="搜索数字资产名称" id="searchInput" oninput="applyFilters()">
+  <input type="text" placeholder="搜索数字资产名称" id="searchInput" oninput="render()">
 </div>
 
-<!-- 筛选栏 -->
 <div class="filter-bar">
-  <div class="filter-wrap">
-    <button class="filter-btn" id="categoryBtn" onclick="toggleDropdown('category')">分类 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
-    <div class="filter-dropdown" id="categoryDropdown">
-      <div class="filter-dropdown-item" data-value="" onclick="selectFilter('category', '', this)"><span>全部</span><span class="check on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>
-      <div class="filter-dropdown-item" data-value="food" onclick="selectFilter('category', 'food', this)"><span>酒水食品</span><span class="check"></span></div>
-      <div class="filter-dropdown-item" data-value="ent" onclick="selectFilter('category', 'ent', this)"><span>文娱</span><span class="check"></span></div>
-      <div class="filter-dropdown-item" data-value="tour" onclick="selectFilter('category', 'tour', this)"><span>文旅</span><span class="check"></span></div>
-      <div class="filter-dropdown-item" data-value="film" onclick="selectFilter('category', 'film', this)"><span>影视</span><span class="check"></span></div>
-    </div>
-  </div>
-  <div class="filter-wrap">
-    <button class="filter-btn" id="saleBtn" onclick="toggleDropdown('sale')">销售类型 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
-    <div class="filter-dropdown" id="saleDropdown">
-      <div class="filter-dropdown-item" data-value="" onclick="selectFilter('sale', '', this)"><span>全部</span><span class="check on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>
-      <div class="filter-dropdown-item" data-value="all" onclick="selectFilter('sale', 'all', this)"><span>全民购</span><span class="check"></span></div>
-      <div class="filter-dropdown-item" data-value="prior" onclick="selectFilter('sale', 'prior', this)"><span>优先购</span><span class="check"></span></div>
-      <div class="filter-dropdown-item" data-value="lottery" onclick="selectFilter('sale', 'lottery', this)"><span>抽签购</span><span class="check"></span></div>
-      <div class="filter-dropdown-item" data-value="combo" onclick="selectFilter('sale', 'combo', this)"><span>组合购</span><span class="check"></span></div>
-    </div>
-  </div>
   <div class="filter-wrap">
     <button class="filter-btn" id="dateBtn" onclick="toggleDropdown('date')">按发行时间 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
     <div class="filter-dropdown" id="dateDropdown">
@@ -116,21 +93,20 @@ body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC'
     </div>
   </div>
   <div class="filter-wrap">
-    <button class="filter-btn" id="followBtn" onclick="toggleDropdown('follow')">全部 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
-    <div class="filter-dropdown" id="followDropdown">
-      <div class="filter-dropdown-item" data-value="" onclick="selectFilter('follow', '', this)"><span>全部</span><span class="check on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>
-      <div class="filter-dropdown-item" data-value="followed" onclick="selectFilter('follow', 'followed', this)"><span>⭐ 已关注</span><span class="check"></span></div>
+    <button class="filter-btn" id="statusBtn" onclick="toggleDropdown('status')">销售状态 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+    <div class="filter-dropdown" id="statusDropdown">
+      <div class="filter-dropdown-item" data-value="" onclick="selectFilter('status', '', this)"><span>不限</span><span class="check on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+      <div class="filter-dropdown-item" data-value="selling" onclick="selectFilter('status', 'selling', this)"><span>未售罄</span><span class="check"></span></div>
+      <div class="filter-dropdown-item" data-value="soldout" onclick="selectFilter('status', 'soldout', this)"><span>已售罄</span><span class="check"></span></div>
     </div>
   </div>
 </div>
 
-<!-- 资产列表 -->
 <div class="goods-grid" id="goodsGrid"></div>
 <div class="empty-state" id="emptyState">暂无匹配资产</div>
 
 </div>
 
-<!-- 底部TabBar -->
 <div class="bnav">
   <button class="ni" onclick="window.location.href='user-index.html'">
     <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
@@ -155,83 +131,59 @@ body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC'
 </div>
 
 <script>
-const merchantAssetMap = { 'maotai':'贵州茅台', 'wzry':'王者荣耀', 'wuliangye':'五粮液', 'dufu':'杜甫草堂', 'haidilao':'海底捞', 'guichuideng':'鬼吹灯', 'santi':'三体' };
-const assets = [
-  { id: 0, name: '茅台1935·时光窖藏', img: '茅台1935.png', cat: 'food', sale: 'combo', price: 599, total: 1935, sold: 677, date: '2026-06-01', mid: 'maotai' },
-  { id: 1, name: '飞天茅台·元宇宙酒票', img: '飞天茅台·元宇宙酒票.png', cat: 'food', sale: 'lottery', price: 299, total: 3000, sold: 2280, date: '2026-05-20', mid: 'maotai' },
-  { id: 2, name: '王者荣耀·传说皮肤', img: '王者荣耀·传说皮肤.png', cat: 'ent', sale: 'all', price: 999, total: 999, sold: 450, date: '2026-06-05', mid: 'wzry' },
-  { id: 3, name: '五粮液·数字珍藏', img: '五粮液·数字珍藏.png', cat: 'food', sale: 'lottery', price: 599, total: 2024, sold: 607, date: '2026-05-15', mid: 'wuliangye' },
-  { id: 4, name: '杜甫草堂·文旅数字藏品', img: '杜甫草堂·文旅数字藏品.png', cat: 'tour', sale: 'prior', price: 99, total: 5000, sold: 4400, date: '2026-06-10', mid: 'dufu' },
-  { id: 5, name: '巴拿马金奖·复刻', img: '巴拿马金奖·复刻.png', cat: 'food', sale: 'prior', price: 1999, total: 500, sold: 160, date: '2026-05-01', mid: 'maotai' },
-  { id: 6, name: '国酒·数字徽章', img: '国酒·数字徽章.png', cat: 'food', sale: 'all', price: 99, total: 8888, sold: 3210, date: '2026-04-20', mid: 'maotai' },
-  { id: 7, name: '茅台生肖兔·典藏', img: '茅台生肖兔·典藏.png', cat: 'food', sale: 'combo', price: 2999, total: 365, sold: 289, date: '2026-03-15', mid: 'maotai' },
-  { id: 8, name: '海底捞·黑海会员数字卡', img: '海底捞·黑海会员数字卡.png', cat: 'food', sale: 'combo', price: 199, total: 888, sold: 195, date: '2026-04-01', mid: 'haidilao' },
-  { id: 9, name: '鬼吹灯·数字资产', img: '鬼吹灯.png', cat: 'film', sale: 'lottery', price: 499, total: 888, sold: 128, date: '2026-06-10', mid: 'guichuideng' },
-  { id: 10, name: '三体·数字资产', img: '三体.png', cat: 'film', sale: 'prior', price: 699, total: 666, sold: 256, date: '2026-06-12', mid: 'santi' },
+var assets = [
+  { name:'兰亭碑刻·数字藏品', img:'asset/兰亭碑刻封面图.png', sale:'优先购', saleCls:'t-sale-prior', issuer:'绍兴兰亭产业数资', price:299, sold:128, total:888, date:'2026-05-11', link:'#' },
+  { name:'兰亭春禊·数字藏品', img:'asset/兰亭春禊封面图.png', sale:'全民购', saleCls:'t-sale-all', issuer:'绍兴兰亭产业数资', price:199, sold:256, total:888, date:'2026-05-11', link:'#' },
+  { name:'兰亭雅集·数字藏品', img:'asset/兰亭雅集产品图.png', sale:'抽签购', saleCls:'t-sale-lottery', issuer:'绍兴兰亭产业数资', price:399, sold:67, total:666, date:'2026-05-12', link:'product_maotai1935.html' }
 ];
 
-const catLabels = { food: '酒水食品', ent: '文娱', tour: '文旅', film: '影视' };
-const catBadge = { food: 'badge-food', ent: 'badge-ent', tour: 'badge-tour', film: 'badge-film' };
-const saleLabels = { all: '全民购', prior: '优先购', lottery: '抽签购', combo: '组合购' };
-const saleCls = { all: 'sale-all', prior: 'sale-prior', lottery: 'sale-lottery', combo: 'sale-combo' };
-const metaSaleCls = { all: 'meta-sale-all', prior: 'meta-sale-prior', lottery: 'meta-sale-lottery', combo: 'meta-sale-combo' };
-let currentCategory = '';
-let currentDateSort = '';
-let currentSale = '';
-let currentFollow = '';
+var currentDateSort = '';
+var currentStatus = '';
 
-function render() {
-  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-  let list = [...assets];
-  if (searchTerm) list = list.filter(a => a.name.includes(searchTerm));
-  if (currentCategory) list = list.filter(a => a.cat === currentCategory);
-  if (currentSale) list = list.filter(a => a.sale === currentSale);
-  if (currentFollow === 'followed') list = list.filter(a => localStorage.getItem('follow_' + a.mid) === '1');
-  if (currentDateSort === 'desc') list.sort((a, b) => b.date.localeCompare(a.date));
-  else if (currentDateSort === 'asc') list.sort((a, b) => a.date.localeCompare(b.date));
-  const grid = document.getElementById('goodsGrid');
-  const empty = document.getElementById('emptyState');
-  if (list.length === 0) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+function render(){
+  var kw = document.getElementById('searchInput').value.toLowerCase();
+  var list = assets.filter(function(a){ return a.name.toLowerCase().includes(kw); });
+  if(currentStatus === 'soldout') list = list.filter(function(a){ return a.sold >= a.total; });
+  else if(currentStatus === 'selling') list = list.filter(function(a){ return a.sold < a.total; });
+  if(currentDateSort === 'desc') list.sort(function(a,b){ return b.date.localeCompare(a.date); });
+  else if(currentDateSort === 'asc') list.sort(function(a,b){ return a.date.localeCompare(b.date); });
+  var grid = document.getElementById('goodsGrid');
+  var empty = document.getElementById('emptyState');
+  if(list.length === 0){ grid.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
-  grid.innerHTML = list.map(a => `
-    <div class="goods-card" onclick="window.location.href='${a.id === 0 ? 'product_maotai1935.html' : '#'}'">
-      <div class="img-wrap" style="background-image:url('${a.img}')">
-        <span class="badge ${catBadge[a.cat]}">${catLabels[a.cat]}</span>
-        <span class="badge-sale ${saleCls[a.sale]}">${saleLabels[a.sale]}</span>
-      </div>
-      <div class="info">
-        <h4>${a.name}</h4>
-        <div class="meta"><span>限量${a.total}</span><span class="meta-sale ${metaSaleCls[a.sale]}">${saleLabels[a.sale]}</span></div>
-        <div class="price">¥${a.price}<small>起</small></div>
-        <div class="sold">已售 ${a.sold}/${a.total}</div>
-      </div>
-    </div>
-  `).join('');
+  grid.innerHTML = list.map(function(a){
+    var s = a.sold >= a.total ? '<span style="color:#999;font-size:10px;margin-left:4px">已售罄</span>' : '';
+    return '<div class="goods-card" onclick="window.location.href=\''+a.link+'\'">'+
+      '<div class="img-wrap" style="background-image:url(\''+a.img+'\')"></div>'+
+      '<div class="info">'+
+        '<h4>'+a.name+'</h4>'+
+        '<div class="tags"><span class="'+a.saleCls+'">'+a.sale+'</span></div>'+
+        '<div class="issuer">发行方：'+a.issuer+'</div>'+
+        '<div class="price">¥'+a.price+'</div>'+
+        '<div class="sold">已售 '+a.sold+'/'+a.total+s+'</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
 }
 
-function applyFilters() { render(); }
-function toggleDropdown(type) {
-  document.querySelectorAll('.filter-dropdown').forEach(d => { if (d.id !== type + 'Dropdown') d.classList.remove('show'); });
+function toggleDropdown(type){
+  document.querySelectorAll('.filter-dropdown').forEach(function(d){ if(d.id !== type + 'Dropdown') d.classList.remove('show'); });
   document.getElementById(type + 'Dropdown').classList.toggle('show');
 }
-function selectFilter(type, value, el) {
-  const dropdownId = type + 'Dropdown';
-  document.querySelectorAll('#' + dropdownId + ' .check').forEach(c => c.classList.remove('on'));
+function selectFilter(type, value, el){
+  var dropdownId = type + 'Dropdown';
+  document.querySelectorAll('#' + dropdownId + ' .check').forEach(function(c){ c.classList.remove('on'); });
   el.querySelector('.check').classList.add('on');
-  if (type === 'category') currentCategory = value;
-  else if (type === 'date') currentDateSort = value;
-  else if (type === 'sale') currentSale = value;
-  else if (type === 'follow') {
-    currentFollow = value;
-    document.getElementById('followBtn').innerHTML = (value === 'followed' ? '⭐ 已关注' : '全部') + ' <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
-  }
+  if(type === 'date') currentDateSort = value;
+  else if(type === 'status') currentStatus = value;
   document.getElementById(dropdownId).classList.remove('show');
   render();
 }
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('.filter-wrap')) document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.remove('show'));
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.filter-wrap')) document.querySelectorAll('.filter-dropdown').forEach(function(d){ d.classList.remove('show'); });
 });
 render();
 </script>
+
 </body>
 </html>

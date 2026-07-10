@@ -5,69 +5,83 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>选择规格</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; justify-content: center; }
-.page { max-width: 430px; min-height: 100vh; background: #f6f7fb; padding-bottom: 100px; position: relative; }
-@media(max-width:430px) { .page { max-width: 100%; } }
+:root{
+  --accent:#3F8B6D;--accent-contrast:#fff;--link:#3F8B6D;--muted:#a0a0a0;
+  --bg:#fff;--ink:#222;--ink-muted:#555;--ink-subtle:#888;
+  --border:#e0e0e0;--page-bg:#F0F0F0;
+  --radius-sm:7px;--radius-card:7px;--radius-pill:9999px;
+  --font-display:"Helvetica Neue",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+  --font-body:"Inter",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-muted);display:flex;justify-content:center;min-height:100%}
+.page{max-width:430px;width:100%;min-height:100vh;background:var(--page-bg);position:relative;box-sizing:border-box;padding-bottom:90px}
 
-.nav-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #fff; }
-.nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.nav-back svg { width: 20px; height: 20px; color: #333; display: block; }
-.nav-title { flex: 1; text-align: center; font-size: 16px; font-weight: 600; color: #1a1a2e; }
-.nav-placeholder { width: 32px; }
+/* ── 顶部导航 ── */
+.nav-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--accent)}
+.nav-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff}
+.nav-back svg{width:20px;height:20px;display:block;color:#fff}
+.nav-title{flex:1;text-align:center;font-size:16px;font-weight:600;color:#fff}
+.nav-placeholder{width:32px}
 
-.series-card { margin: 12px 16px; background: linear-gradient(135deg, #1a1a2e, #2d1f1f); border-radius: 16px; padding: 16px; display: flex; gap: 12px; }
-.series-img { width: 72px; height: 88px; border-radius: 10px; background-position: center; background-size: cover; flex-shrink: 0; background-color: rgba(255,255,255,0.05); }
-.series-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
-.series-name { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-.series-desc { font-size: 11px; color: rgba(255,255,255,0.5); }
-.series-tag { display: inline-block; font-size: 10px; padding: 2px 10px; border-radius: 20px; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); margin-top: 6px; }
+/* ── 系列卡片 ── */
+.series-card{margin:12px 16px;background:var(--bg);border-radius:var(--radius-card);padding:16px;display:flex;gap:12px;box-shadow:0 1px 6px rgba(0,0,0,.04)}
+.series-img{width:72px;aspect-ratio:1/1;border-radius:var(--radius-sm);background-position:center;background-size:cover;flex-shrink:0;background-color:#f5f5f5}
+.series-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.series-name{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.series-desc{font-size:11px;color:var(--ink-subtle)}
+.series-tag{display:inline-block;font-size:10px;padding:2px 10px;border-radius:var(--radius-pill);background:rgba(63,139,109,.1);color:var(--accent);margin-top:6px;font-weight:600}
 
-.section-card { margin: 12px 16px; background: #fff; border-radius: 16px; padding: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
-.sec-title { font-size: 14px; font-weight: 700; color: #1a1a2e; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-.sec-title::before { content: ''; width: 3px; height: 14px; background: #D70C1F; border-radius: 2px; }
-.sec-sub { font-size: 11px; color: #999; font-weight: 400; margin-left: 4px; }
+/* ── 区块卡片 ── */
+.section-card{margin:12px 16px;background:var(--bg);border-radius:var(--radius-card);padding:16px;box-shadow:0 1px 6px rgba(0,0,0,.04)}
+.sec-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.sec-title::before{content:'';width:3px;height:14px;background:var(--accent);border-radius:2px}
+.sec-sub{font-size:11px;color:var(--ink-subtle);font-weight:400;margin-left:4px}
 
-.spec-list { display: flex; flex-direction: column; gap: 8px; }
-.spec-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1.5px solid #f0f0f0; border-radius: 12px; cursor: pointer; transition: all 0.2s; position: relative; }
-.spec-item:active { background: #fafafa; }
-.spec-item.selected { border-color: #D70C1F; background: #FFF9F9; }
-.spec-item.sold-out { opacity: .5; cursor: not-allowed; background: #f9f9f9; }
-.spec-item.sold-out:active { background: #f9f9f9; }
-.spec-item.sold-out .spec-price { color: #bbb; }
-.spec-sold-tag { position: absolute; top: 8px; right: 8px; font-size: 9px; padding: 2px 8px; border-radius: 4px; background: #eee; color: #999; font-weight: 600; }
-.spec-img { width: 48px; height: 58px; border-radius: 8px; background-position: center; background-size: cover; flex-shrink: 0; background-color: #f5f5f7; }
-.spec-info { flex: 1; min-width: 0; }
-.spec-name { font-size: 13px; font-weight: 600; color: #1a1a2e; margin-bottom: 3px; }
-.spec-benefits { display: flex; gap: 4px; flex-wrap: wrap; }
-.spec-bf { font-size: 9px; padding: 1px 6px; border-radius: 3px; background: #f5f5f7; color: #888; }
-.spec-price { font-size: 16px; font-weight: 700; color: #D70C1F; flex-shrink: 0; }
-.spec-check { width: 20px; height: 20px; border: 2px solid #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.spec-item.selected .spec-check { border-color: #D70C1F; background: #D70C1F; }
-.spec-check svg { width: 12px; height: 12px; color: #fff; display: none; }
-.spec-item.selected .spec-check svg { display: block; }
+/* ── 规格列表 ── */
+.spec-list{display:flex;flex-direction:column;gap:8px}
+.spec-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;transition:all .2s;position:relative}
+.spec-item:active{background:var(--page-bg)}
+.spec-item.selected{border-color:var(--accent);background:rgba(63,139,109,.04)}
+.spec-item.sold-out{opacity:.5;cursor:not-allowed;background:#f9f9f9}
+.spec-item.sold-out:active{background:#f9f9f9}
+.spec-item.sold-out .spec-price{color:#bbb}
+.spec-sold-tag{position:absolute;top:8px;right:8px;font-size:9px;padding:2px 8px;border-radius:4px;background:#eee;color:var(--ink-subtle);font-weight:600}
+.spec-img{width:48px;aspect-ratio:1/1;border-radius:8px;background-position:center;background-size:cover;flex-shrink:0;background-color:#f5f5f7}
+.spec-info{flex:1;min-width:0}
+.spec-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.spec-benefits{display:flex;gap:4px;flex-wrap:wrap}
+.spec-bf{font-size:9px;padding:1px 6px;border-radius:3px;background:var(--page-bg);color:var(--ink-subtle)}
+.spec-price{font-size:16px;font-weight:700;color:var(--accent);flex-shrink:0}
+.spec-check{width:20px;height:20px;border:2px solid #ddd;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.spec-item.selected .spec-check{border-color:var(--accent);background:var(--accent)}
+.spec-check svg{width:12px;height:12px;color:#fff;display:none}
+.spec-item.selected .spec-check svg{display:block}
 
-.quantity-row { display: flex; align-items: center; justify-content: space-between; }
-.quantity-label { font-size: 14px; color: #666; }
-.quantity-ctrl { display: flex; align-items: center; border: 1px solid #e8e8ec; border-radius: 8px; overflow: hidden; }
-.quantity-ctrl button { width: 36px; height: 36px; border: none; background: #f5f5f7; font-size: 18px; color: #666; cursor: pointer; }
-.quantity-ctrl button:active { background: #e8e8ec; }
-.quantity-ctrl button:disabled { color: #ccc; cursor: not-allowed; }
-.quantity-ctrl input { width: 50px; height: 36px; border: none; border-left: 1px solid #e8e8ec; border-right: 1px solid #e8e8ec; text-align: center; font-size: 15px; font-weight: 600; color: #1a1a2e; outline: none; }
+/* ── 数量选择 ── */
+.quantity-row{display:flex;align-items:center;justify-content:space-between}
+.quantity-label{font-size:14px;color:var(--ink-muted)}
+.quantity-ctrl{display:flex;align-items:center;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.quantity-ctrl button{width:36px;height:36px;border:none;background:var(--page-bg);font-size:18px;color:var(--ink-muted);cursor:pointer}
+.quantity-ctrl button:active{background:#e8e8e8}
+.quantity-ctrl button:disabled{color:#ccc;cursor:not-allowed}
+.quantity-ctrl input{width:50px;height:36px;border:none;border-left:1px solid var(--border);border-right:1px solid var(--border);text-align:center;font-size:15px;font-weight:600;color:var(--ink);outline:none;background:var(--bg)}
 
-.bottom-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); padding: 12px 16px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 4px)); z-index: 100; display: flex; align-items: center; justify-content: space-between; }
-.bottom-left { display: flex; flex-direction: column; gap: 2px; }
-.total-price { display: flex; align-items: baseline; gap: 4px; }
-.total-label { font-size: 13px; color: #666; }
-.total-value { font-size: 22px; font-weight: 700; color: #D70C1F; }
-.total-value small { font-size: 13px; }
-.stock-warn { font-size: 11px; color: #D70C1F; }
-.btn-submit { height: 44px; padding: 0 32px; border: none; border-radius: 22px; background: #D70C1F; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
-.btn-submit:active { opacity: 0.9; }
-.btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+/* ── 底部栏 ── */
+.bottom-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--bg);border-top:1px solid rgba(0,0,0,.05);padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom,4px));z-index:100;display:flex;align-items:center;justify-content:space-between}
+.bottom-left{display:flex;flex-direction:column;gap:2px}
+.total-price{display:flex;align-items:baseline;gap:4px}
+.total-label{font-size:13px;color:var(--ink-muted)}
+.total-value{font-size:22px;font-weight:700;color:var(--accent)}
+.total-value small{font-size:13px}
+.stock-warn{font-size:11px;color:var(--accent)}
+.btn-submit{height:44px;padding:0 32px;border:none;border-radius:var(--radius-pill);background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+.btn-submit:active{opacity:.9}
+.btn-submit:disabled{background:#ccc;cursor:not-allowed}
 
-.toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(0,0,0,.78); color: #fff; font-size: 14px; padding: 12px 24px; border-radius: 8px; z-index: 200; opacity: 0; pointer-events: none; transition: opacity .25s; white-space: nowrap; }
-.toast.show { opacity: 1; }
+/* ── Toast ── */
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.78);color:#fff;font-size:14px;padding:12px 24px;border-radius:8px;z-index:200;opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap}
+.toast.show{opacity:1}
 </style>
 </head>
 <body>
@@ -82,11 +96,9 @@ body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC'
 </div>
 
 <div class="series-card">
-  <div class="series-img" id="seriesImg" style="background-image:url('茅台1935.png')"></div>
+  <div class="series-img" id="seriesImg" style="background-image:url('asset/兰亭雅集封面图.png')"></div>
   <div class="series-info">
-    <div class="series-name">1935·时光窖藏</div>
-    <div class="series-desc">茅台经典系列数字资产</div>
-
+    <div class="series-name">兰亭雅集</div>
   </div>
 </div>
 
@@ -113,7 +125,7 @@ body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC'
   <div class="bottom-left">
     <div class="total-price">
       <span class="total-label">合计：</span>
-      <span class="total-value"><small>¥</small><span id="totalPrice">599</span></span>
+      <span class="total-value"><small>¥</small><span id="totalPrice">199</span></span>
     </div>
     <div class="stock-warn" id="stockWarn" style="display:none"></div>
   </div>
@@ -124,11 +136,9 @@ body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC'
 
 <script>
 var specs = [
-  { name:'凝时', img:'凝时.png', price:599, benefits:['实物酒兑换','超值优惠券'], stock:1 },
-  { name:'守岁', img:'守岁.png', price:699, benefits:['实物酒兑换','线下品鉴会资格'] },
-  { name:'溯年', img:'溯年.png', price:899, benefits:['实物酒兑换','超值优惠券','线下品鉴会资格'] },
-  { name:'沉光', img:'沉光.png', price:599, benefits:['实物酒兑换'] },
-  { name:'驻痕', img:'驻痕.png', price:799, benefits:['实物酒兑换','超值优惠券'], soldOut: true }
+  { name:'畅行版', img:'asset/畅行版.png', price:199, benefits:['景区VIP通行权'], stock:999 },
+  { name:'学韵版', img:'asset/学韵版.png', price:299, benefits:['景区VIP通行权','研学课程'] },
+  { name:'优享版', img:'asset/优享版.png', price:399, benefits:['景区VIP通行权','研学课程','AR互动体验','跨城特权'] }
 ];
 
 var selIdx = 0;
@@ -171,7 +181,6 @@ function updateTotal(){
 function updateControls(){
   var sp = specs[selIdx];
   updateTotal();
-  // 有限购：允许加到stock+1触发toast；无限购：无上限
   var btnMax = sp.stock ? sp.stock + 1 : 999;
   document.getElementById('btnMinus').disabled = quantity <= 1;
   document.getElementById('btnPlus').disabled = quantity >= btnMax || sp.soldOut;
@@ -201,7 +210,7 @@ function showToast(msg){
 function goConfirm(){
   var sp = specs[selIdx];
   if(sp.soldOut || (sp.stock && quantity > sp.stock)) return;
-  location.href = 'order_confirm.html?spec='+encodeURIComponent(sp.name)+'&img='+encodeURIComponent(sp.img)+'&price='+sp.price+'&qty='+quantity+'&bfs='+encodeURIComponent(sp.benefits.join(','))+'&series=1935·时光窖藏';
+  location.href = 'order_confirm.html?spec='+encodeURIComponent(sp.name)+'&img='+encodeURIComponent(sp.img)+'&price='+sp.price+'&qty='+quantity+'&bfs='+encodeURIComponent(sp.benefits.join(','))+'&series=兰亭雅集';
 }
 
 renderSpecs();

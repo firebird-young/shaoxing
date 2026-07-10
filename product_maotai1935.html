@@ -3,351 +3,283 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<title>1935 时光窖藏 · 数字资产</title>
+<title>兰亭雅集 · 数字藏品</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; justify-content: center; overflow-x: hidden; }
-.page { max-width: 430px; width: 100%; height: 100vh; background: #f6f7fb; position: relative; box-sizing: border-box; overflow: hidden; }
-.page-scroll { height: 100%; overflow-y: auto; padding-bottom: 100px; box-sizing: border-box; }
-@media(max-width:430px) { .page { max-width: 100%; } }
+:root{
+  --accent:#3F8B6D;--accent-contrast:#fff;--link:#3F8B6D;--muted:#a0a0a0;
+  --bg:#fff;--ink:#222;--ink-muted:#555;--ink-subtle:#888;
+  --border:#e0e0e0;--page-bg:#F0F0F0;
+  --radius-sm:7px;--radius-card:7px;--radius-pill:9999px;
+  --font-display:"Helvetica Neue",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+  --font-body:"Inter",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-muted);display:flex;justify-content:center;min-height:100%}
+.page{max-width:430px;width:100%;min-height:100vh;background:var(--page-bg);position:relative;box-sizing:border-box;padding-bottom:100px}
+@media(max-width:430px){.page{max-width:100%}}
 
-/* ── 顶部导航 ── */
-.nav-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; background: #fff; }
-.nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.nav-back svg { width: 20px; height: 20px; color: #333; display: block; }
-.nav-title { flex: 1; text-align: center; font-size: 16px; font-weight: 600; color: #1a1a2e; }
+/* ── 顶部导航（透明覆盖） ── */
+.nav-bar{position:absolute;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:linear-gradient(rgba(0,0,0,.4),transparent)}
+.nav-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(0,0,0,.25);border-radius:50%}
+.nav-back svg{width:20px;height:20px;display:block;color:#fff}
+.nav-title{flex:1;text-align:center;font-size:16px;font-weight:600;color:#fff}
+.nav-placeholder{width:32px}
 
-/* ── 主卡片 ── */
-.main-card { margin: 12px 16px; background: linear-gradient(135deg, #D70C1F, #F12B3D); border-radius: 20px; padding: 20px; position: relative; overflow: hidden; }
-.main-card::after { content: ''; position: absolute; top: 50%; right: -30px; transform: translateY(-50%); width: 120px; height: 120px; background: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><polygon points=\"50,10 60,35 85,35 65,55 75,80 50,65 25,80 35,55 15,35 40,35\" fill=\"rgba(255,255,255,0.08)\"/></svg>'); opacity: 0.6; }
-.main-row { display: flex; gap: 16px; position: relative; z-index: 1; }
-.main-img { width: 100px; height: 120px; border-radius: 12px; background: url('茅台1935.png') center/contain no-repeat; background-color: rgba(0,0,0,0.1); flex-shrink: 0; }
-.main-info { flex: 1; min-width: 0; }
-.main-title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 10px; }
-.main-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-.main-tags span { font-size: 10px; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.1); }
-.main-badge { display: inline-block; font-size: 11px; padding: 4px 12px; border-radius: 20px; background: #fff; color: #D70C1F; font-weight: 600; margin-bottom: 12px; }
-.main-progress { margin-top: 4px; }
-.main-progress .bar { height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
-.main-progress .bar div { height: 100%; background: #fff; border-radius: 2px; width: 35%; }
-.main-progress .nums { display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.8); }
+/* ── 封面大图 ── */
+.hero-cover{width:100%;height:380px;overflow:hidden;position:relative}
+.hero-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-cover::after{content:'';position:absolute;bottom:0;left:0;right:0;height:100px;background:linear-gradient(transparent,rgba(0,0,0,.55))}
 
-/* ── 3D欣赏 ── */
-.block-3d { margin: 12px 16px; background: #fff; border-radius: 16px; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
-.block-3d:active { transform: scale(0.98); }
-.block-3d-left { display: flex; align-items: center; gap: 10px; }
-.block-3d-left svg { width: 24px; height: 24px; color: #333; }
-.block-3d-left span { font-size: 14px; font-weight: 600; color: #1a1a2e; }
-.block-3d-right svg { width: 16px; height: 16px; color: #999; }
+/* ── 标题信息区 ── */
+.hero-info{background:var(--bg);padding:20px 16px 20px;text-align:center;position:relative;overflow:hidden;margin:0 16px;margin-top:-30px;border-radius:var(--radius-card);box-shadow:0 1px 6px rgba(0,0,0,.06);z-index:2}
+.hero-title{font-size:22px;font-weight:700;color:var(--accent);margin-bottom:14px;position:relative;z-index:1}
+.hero-leaf{position:absolute;top:50%;transform:translateY(-50%);width:22px;height:48px;z-index:0;opacity:.2}
+.hero-leaf.left{left:10px}
+.hero-leaf.right{right:10px;transform:translateY(-50%) scaleX(-1)}
+.hero-tags{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
+.hero-tags span{font-size:12px;padding:5px 14px;border-radius:999px;font-weight:600;white-space:nowrap}
+.tag-limit{background:linear-gradient(135deg,#3F8B6D,#4FA889);color:#fff}
+.tag-dark{background:#E8F4F0;color:#3a6b52}
+
+/* ── 横版时间轴 ── */
+.htimeline{margin:12px 16px;background:var(--bg);border-radius:var(--radius-card);padding:20px 16px 16px;box-shadow:0 1px 6px rgba(0,0,0,.04);overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-x;cursor:grab}
+.htimeline::-webkit-scrollbar{display:none}
+.htimeline .stl-title{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:16px;display:flex;align-items:center;gap:6px;padding-left:4px}
+.htimeline .stl-title::before{content:'';width:4px;height:16px;background:var(--accent);border-radius:2px}
+.htimeline-track{display:inline-flex;gap:0;padding:0 8px 0 4px;align-items:flex-start}
+.htimeline-node{display:flex;flex-direction:column;align-items:center;width:80px;flex-shrink:0;position:relative;padding-top:10px}
+.htimeline-top{display:flex;align-items:center;width:100%;position:relative}
+.htimeline-dot{width:12px;height:12px;border-radius:50%;background:#d0d0d0;flex-shrink:0;position:relative;z-index:1;margin:0 auto}
+.htimeline-dot.active{background:var(--accent);box-shadow:0 0 0 4px rgba(63,139,109,.18)}
+.htimeline-dot.done{background:var(--accent)}
+.htimeline-conn{position:absolute;top:5px;left:calc(50% + 6px);width:74px;height:2px;background:#e0e0e0;pointer-events:none}
+.htimeline-conn.done{background:var(--accent)}
+.htimeline-node:last-child .htimeline-conn{display:none}
+.htimeline-label{font-size:11px;color:var(--ink-subtle);text-align:center;margin-top:10px;white-space:nowrap;line-height:1.3}
+.htimeline-label.active{color:var(--accent);font-weight:600}
+.htimeline-time{font-size:10px;color:#999;text-align:center;margin-top:3px;white-space:nowrap}
 
 /* ── 区块标题 ── */
-.sec-title { display: flex; align-items: center; gap: 8px; padding: 16px 16px 10px; }
-.sec-title::before { content: ''; width: 4px; height: 16px; background: #D70C1F; border-radius: 2px; }
-.sec-title span { font-size: 15px; font-weight: 700; color: #1a1a2e; }
+.sec-title{display:flex;align-items:center;gap:8px;padding:16px 16px 10px}
+.sec-title::before{content:'';width:4px;height:16px;background:var(--accent);border-radius:2px}
+.sec-title span{font-size:15px;font-weight:700;color:var(--ink)}
 
-/* ── 信息列表 ── */
-.info-list { margin: 0 16px; background: #fff; border-radius: 16px; padding: 8px 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
-.info-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f5f5f7; }
-.info-item:last-child { border-bottom: none; }
-.info-item-left { display: flex; align-items: center; gap: 10px; }
-.info-item-left svg { width: 18px; height: 18px; color: #999; }
-.info-item-left span { font-size: 13px; color: #666; }
-.info-item-right { font-size: 13px; color: #1a1a2e; font-weight: 500; }
+/* ── 信息网格 ── */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 16px}
+.info-tile{background:var(--bg);border-radius:var(--radius-card);padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:8px}
+.info-tile .it-icon{width:20px;height:20px;color:var(--accent)}
+.info-tile .it-label{font-size:11px;color:var(--ink-subtle)}
+.info-tile .it-value{font-size:14px;font-weight:600;color:var(--ink)}
 
 /* ── 图片详情 ── */
-.detail-img { margin: 12px 16px; border-radius: 16px; overflow: hidden; }
-.detail-img img { width: 100%; display: block; }
+.detail-img{margin:12px 16px;border-radius:var(--radius-card);overflow:hidden}
+.detail-img img{width:100%;display:block}
 
 /* ── 底部购买栏 ── */
-.buy-bar { position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; max-width: 430px; display: flex; gap: 12px; padding: 12px 16px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 4px)); background: #fff; border-top: 1px solid rgba(0,0,0,0.05); z-index: 100; box-sizing: border-box; }
-.btn-collect { flex-shrink: 0; width: 80px; height: 48px; border: 1px solid #e8e8ec; border-radius: 12px; background: #fff; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; font-size: 13px; color: #666; }
-.btn-collect:active { background: #f5f5f7; }
-.btn-collect.active{color:#f0ad4e;border-color:#f0ad4e;background:#FFF8EC}.btn-collect svg { width: 18px; height: 18px; }
-.btn-buy { flex: 1; height: 48px; border: none; border-radius: 12px; background: #D70C1F; color: #fff; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
-.btn-buy:active { opacity: 0.9; }
-.btn-buy svg { width: 18px; height: 18px; }
+.buy-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;display:flex;gap:12px;padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom,4px));background:var(--bg);border-top:1px solid rgba(0,0,0,.05);z-index:100;box-sizing:border-box}
+.btn-collect{flex-shrink:0;width:80px;height:48px;border:1px solid var(--border);border-radius:12px;background:var(--bg);display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;font-size:13px;color:var(--ink-muted)}
+.btn-collect:active{background:var(--page-bg)}
+.btn-collect.active{color:#F08A24;border-color:#F08A24;background:#FFF2E5}
+.btn-collect svg{width:18px;height:18px}
+.btn-buy{flex:1;height:48px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}
+.btn-buy:active{opacity:.9}
+.btn-buy svg{width:18px;height:18px}
 
-/* ── 3D浮层 ── */
-.d3-mask { position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.35s; }
-.d3-mask.show { opacity: 1; pointer-events: auto; }
-.d3-box { width: 280px; height: 280px; position: relative; perspective: 800px; margin-bottom: 20px; }
-.d3-model { width: 100%; height: 100%; background: url('茅台1935.png') center/contain no-repeat; animation: d3spin 8s linear infinite; transform-style: preserve-3d; }
-@keyframes d3spin { 0% { transform: rotateY(0deg) rotateX(5deg); } 50% { transform: rotateY(180deg) rotateX(5deg); } 100% { transform: rotateY(360deg) rotateX(5deg); } }
-.d3-hint { color: rgba(255,255,255,0.3); font-size: 11px; margin-bottom: 16px; }
-.d3-close { height: 44px; padding: 0 36px; border: none; border-radius: 22px; background: rgba(255,255,255,0.1); color: #fff; font-size: 13px; cursor: pointer; border: 1px solid rgba(255,255,255,0.15); }
-.d3-close:active { background: rgba(255,255,255,0.2); }
-
-/* ── 发售时间轴 ── */
-.sale-timeline { margin: 12px 16px; background: #fff; border-radius: 16px; padding: 16px 18px 10px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
-.sale-timeline .stl-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-.sale-timeline .stl-title::before { content: ''; width: 4px; height: 16px; background: #D70C1F; border-radius: 2px; }
-.stl-scroll { max-height: 170px; overflow-y: auto; scrollbar-width: none; }
-.stl-scroll::-webkit-scrollbar { display: none; }
-.stl-item { display: flex; gap: 10px; padding: 6px 0; position: relative; }
-.stl-dot-wrap { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 14px; }
-.stl-dot { width: 10px; height: 10px; border-radius: 50%; background: #D70C1F; flex-shrink: 0; position: relative; z-index: 1; }
-.stl-dot.done { background: #bbb; }
-.stl-line { width: 2px; flex: 1; background: #f0f0f0; min-height: 20px; }
-.stl-info { flex: 1; padding-bottom: 13px; }
-.stl-info .stl-label { font-size: 13px; font-weight: 600; color: #1a1a2e; margin-bottom: 2px; }
-.stl-info .stl-label.done { color: #bbb; }
-.stl-info .stl-desc { font-size: 11px; color: #999; }
-.stl-info .stl-desc .active { color: #D70C1F; font-weight: 600; }
-.stl-item:last-child .stl-line { display: none; }
-.tl-tag { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600; margin-left: 6px; vertical-align: middle; }
-.tl-tag.now { background: #FFF2F3; color: #D70C1F; }
-.tl-tag.done-tag { background: #f5f5f7; color: #bbb; }
-
-/* ── 浏览倒计时条 ── */
-.browse-timer-bar{
-  position:absolute;right:8px;top:50%;transform:translateY(-50%);
-  display:flex;flex-direction:column;align-items:center;gap:8px;
-  background:rgba(26,26,46,.92);border-radius:14px;
-  padding:10px 8px;border:1px solid rgba(255,255,255,.12);
-  box-shadow:0 4px 20px rgba(0,0,0,.4);
-  backdrop-filter:blur(8px);
-  z-index:200;
-  transition:opacity .3s,transform .3s;
-}
-.browse-timer-bar.hidden{opacity:0;pointer-events:none;transform:translateY(-50%) scale(.8)}
-.browse-timer-circle{
-  position:relative;width:48px;height:48px;
-}
-.browse-timer-circle svg{width:48px;height:48px;transform:rotate(-90deg)}
-.browse-timer-circle .bg{fill:none;stroke:rgba(255,255,255,.1);stroke-width:3}
-.browse-timer-circle .fg{fill:none;stroke:#26de81;stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset .3s linear}
-.browse-timer-text{
-  position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  font-size:16px;font-weight:700;color:#fff;
-}
-.browse-timer-label{
-  font-size:10px;color:rgba(255,255,255,.6);
-  text-align:center;line-height:1.3;
-}
-.browse-timer-done{
-  display:none;flex-direction:column;align-items:center;gap:6px;
-}
-.browse-timer-bar.done .browse-timer-circle{display:none}
-.browse-timer-bar.done .browse-timer-label{display:none}
-.browse-timer-bar.done .browse-timer-done{display:flex}
-.browse-timer-done-icon{font-size:32px}
-.browse-timer-done-text{font-size:11px;color:#26de81;font-weight:600;text-align:center}
-.browse-timer-back-btn{
-  margin-top:2px;padding:4px 12px;
-  background:linear-gradient(135deg,#26de81,#20bf6b);
-  border:none;border-radius:12px;
-  color:#fff;font-size:11px;font-weight:600;cursor:pointer;
-  transition:transform .2s;
-}
-.browse-timer-back-btn:active{transform:scale(.9)}
+/* ── 动画 ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
-<div class="page">
+<div class="page" style="position:relative">
 
-<div class="page-scroll">
-
-<!-- 顶部导航 -->
+<!-- 顶部导航（覆盖在图片上） -->
 <div class="nav-bar">
   <div class="nav-back" onclick="history.back()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
   </div>
-  <div class="nav-title">数字资产</div>
-  <div style="width:32px"></div>
+  <div class="nav-title"></div>
+  <div class="nav-placeholder"></div>
 </div>
 
-<!-- 主卡片 -->
-<div class="main-card">
-  <div class="main-row">
-    <div class="main-img"></div>
-    <div class="main-info">
-      <div class="main-title">1935 时光窖藏</div>
-      <div class="main-tags">
-        <span>酱香型</span>
-        <span>限量 1935 份</span>
-        <span>可赠送</span>
-        <span>实物绑定</span>
-      </div>
-      <div class="main-badge">可赠送</div>
-      <div class="main-progress">
-        <div class="bar"><div></div></div>
-        <div class="nums"><span>已售 677</span><span>限量 1,935</span></div>
-      </div>
-    </div>
+<!-- 封面大图 -->
+<div class="hero-cover">
+  <img src="asset/兰亭雅集封面图.png" alt="兰亭雅集">
+</div>
+
+<!-- 标题信息区 -->
+<div class="hero-info">
+  <!-- 月桂叶装饰（左） -->
+  <svg class="hero-leaf left" viewBox="0 0 60 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M30 5C15 20 10 40 15 55C10 65 8 80 13 95C10 105 13 120 20 130C23 135 28 138 30 140" stroke="#C9A96A" stroke-width="1" opacity="0.5"/>
+    <path d="M30 5C45 20 50 40 45 55C50 65 52 80 47 95C50 105 47 120 40 130C37 135 32 138 30 140" stroke="#C9A96A" stroke-width="1" opacity="0.5"/>
+    <ellipse cx="15" cy="25" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(-30 15 25)"/>
+    <ellipse cx="45" cy="25" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(30 45 25)"/>
+    <ellipse cx="12" cy="40" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(-35 12 40)"/>
+    <ellipse cx="48" cy="40" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(35 48 40)"/>
+    <ellipse cx="10" cy="55" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(-40 10 55)"/>
+    <ellipse cx="50" cy="55" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(40 50 55)"/>
+    <ellipse cx="12" cy="70" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(-35 12 70)"/>
+    <ellipse cx="48" cy="70" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(35 48 70)"/>
+    <ellipse cx="15" cy="85" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(-30 15 85)"/>
+    <ellipse cx="45" cy="85" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(30 45 85)"/>
+    <ellipse cx="20" cy="100" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(-25 20 100)"/>
+    <ellipse cx="40" cy="100" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(25 40 100)"/>
+  </svg>
+  <!-- 月桂叶装饰（右） -->
+  <svg class="hero-leaf right" viewBox="0 0 60 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M30 5C15 20 10 40 15 55C10 65 8 80 13 95C10 105 13 120 20 130C23 135 28 138 30 140" stroke="#C9A96A" stroke-width="1" opacity="0.5"/>
+    <path d="M30 5C45 20 50 40 45 55C50 65 52 80 47 95C50 105 47 120 40 130C37 135 32 138 30 140" stroke="#C9A96A" stroke-width="1" opacity="0.5"/>
+    <ellipse cx="15" cy="25" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(-30 15 25)"/>
+    <ellipse cx="45" cy="25" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(30 45 25)"/>
+    <ellipse cx="12" cy="40" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(-35 12 40)"/>
+    <ellipse cx="48" cy="40" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(35 48 40)"/>
+    <ellipse cx="10" cy="55" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(-40 10 55)"/>
+    <ellipse cx="50" cy="55" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(40 50 55)"/>
+    <ellipse cx="12" cy="70" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(-35 12 70)"/>
+    <ellipse cx="48" cy="70" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(35 48 70)"/>
+    <ellipse cx="15" cy="85" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(-30 15 85)"/>
+    <ellipse cx="45" cy="85" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(30 45 85)"/>
+    <ellipse cx="20" cy="100" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(-25 20 100)"/>
+    <ellipse cx="40" cy="100" rx="10" ry="4" fill="rgba(201,169,106,0.15)" transform="rotate(25 40 100)"/>
+  </svg>
+  <div class="hero-title">兰亭雅集</div>
+  <div class="hero-tags">
+    <span class="tag-limit">限量 666 份</span>
+    <span class="tag-dark">兰亭文化</span>
+    <span class="tag-dark">王羲之</span>
   </div>
 </div>
 
-<!-- 3D欣赏 -->
-<div class="block-3d" onclick="show3D()" style="padding:0;overflow:hidden">
-  <img src="3d.png" alt="3D欣赏" style="width:100%;display:block">
-</div>
-
-<!-- 发售时间轴 -->
-<div class="sale-timeline">
+<!-- 横版时间轴 -->
+<div class="htimeline">
   <div class="stl-title">发售时间轴</div>
-  <div class="stl-scroll">
-    <div class="stl-item">
-      <div class="stl-dot-wrap"><div class="stl-dot done"></div><div class="stl-line"></div></div>
-      <div class="stl-info">
-        <div class="stl-label done">提前预约 <span class="tl-tag done-tag">已结束</span></div>
-        <div class="stl-desc">06月01日 10:00 - 06月05日 23:59</div>
+  <div class="htimeline-track">
+    <div class="htimeline-node">
+      <div class="htimeline-top">
+        <div class="htimeline-dot done"></div>
+        <div class="htimeline-conn done"></div>
       </div>
+      <div class="htimeline-label">抽签预约</div>
+      <div class="htimeline-time">06/01</div>
     </div>
-    <div class="stl-item">
-      <div class="stl-dot-wrap"><div class="stl-dot done"></div><div class="stl-line"></div></div>
-      <div class="stl-info">
-        <div class="stl-label done">优先购阶段 <span class="tl-tag done-tag">已结束</span></div>
-        <div class="stl-desc">06月06日 10:00 - 14:00 · 仅限白银及以上用户</div>
+    <div class="htimeline-node">
+      <div class="htimeline-top">
+        <div class="htimeline-dot done"></div>
+        <div class="htimeline-conn done"></div>
       </div>
+      <div class="htimeline-label">预约结束<br>及抽签</div>
+      <div class="htimeline-time">06/05</div>
     </div>
-    <div class="stl-item">
-      <div class="stl-dot-wrap"><div class="stl-dot"></div></div>
-      <div class="stl-info">
-        <div class="stl-label">公开销售 <span class="tl-tag now">进行中</span></div>
-        <div class="stl-desc"><span class="active">06月09日 10:00起</span> · 售完即止</div>
+    <div class="htimeline-node">
+      <div class="htimeline-top">
+        <div class="htimeline-dot done"></div>
+        <div class="htimeline-conn done"></div>
       </div>
+      <div class="htimeline-label">优先购<br>开始</div>
+      <div class="htimeline-time">06/06</div>
+    </div>
+    <div class="htimeline-node">
+      <div class="htimeline-top">
+        <div class="htimeline-dot done"></div>
+        <div class="htimeline-conn done"></div>
+      </div>
+      <div class="htimeline-label">优先购<br>结束</div>
+      <div class="htimeline-time">06/07</div>
+    </div>
+    <div class="htimeline-node">
+      <div class="htimeline-top">
+        <div class="htimeline-dot active"></div>
+        <div class="htimeline-conn"></div>
+      </div>
+      <div class="htimeline-label active">抽签购<br>开始</div>
+      <div class="htimeline-time">06/08</div>
+    </div>
+    <div class="htimeline-node">
+      <div class="htimeline-top">
+        <div class="htimeline-dot"></div>
+        <div class="htimeline-conn"></div>
+      </div>
+      <div class="htimeline-label">抽签购<br>结束</div>
+      <div class="htimeline-time">06/09</div>
+    </div>
+    <div class="htimeline-node">
+      <div class="htimeline-top">
+        <div class="htimeline-dot"></div>
+      </div>
+      <div class="htimeline-label">全民购<br>开始</div>
+      <div class="htimeline-time">06/10</div>
     </div>
   </div>
 </div>
 
 <!-- 发行信息 -->
 <div class="sec-title"><span>发行信息</span></div>
-<div class="info-list">
-  <div class="info-item">
-    <div class="info-item-left">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
-      <span>发行方</span>
-    </div>
-    <div class="info-item-right">贵州茅台酒股份有限公司</div>
+<div class="info-grid">
+  <div class="info-tile">
+    <svg class="it-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+    <span class="it-label">发行方</span>
+    <span class="it-value">绍兴兰亭产业数资</span>
   </div>
-  <div class="info-item">
-    <div class="info-item-left">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      <span>发行数量</span>
-    </div>
-    <div class="info-item-right">1,935 份</div>
+  <div class="info-tile">
+    <svg class="it-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span class="it-label">发行数量</span>
+    <span class="it-value">666 份</span>
   </div>
-  <div class="info-item">
-    <div class="info-item-left">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-      <span>链上地址</span>
-    </div>
-    <div class="info-item-right">0x7a3e...f2b1</div>
+  <div class="info-tile">
+    <svg class="it-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+    <span class="it-label">链上地址</span>
+    <span class="it-value">0x7a3e...f2b1</span>
   </div>
-  <div class="info-item">
-    <div class="info-item-left">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="7" width="3" height="3"/><rect x="14" y="7" width="3" height="3"/><rect x="7" y="14" width="3" height="3"/><rect x="14" y="14" width="3" height="3"/></svg>
-      <span>链上协议</span>
-    </div>
-    <div class="info-item-right">ERC-721</div>
+  <div class="info-tile">
+    <svg class="it-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="7" width="3" height="3"/><rect x="14" y="7" width="3" height="3"/><rect x="7" y="14" width="3" height="3"/><rect x="14" y="14" width="3" height="3"/></svg>
+    <span class="it-label">链上协议</span>
+    <span class="it-value">ERC-721</span>
   </div>
-  <div class="info-item">
-    <div class="info-item-left">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="4" y1="9" x2="9" y2="9"/><line x1="15" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="9" y2="15"/><line x1="15" y1="15" x2="20" y2="15"/></svg>
-      <span>区块链平台</span>
-    </div>
-    <div class="info-item-right">艺海链</div>
+  <div class="info-tile">
+    <svg class="it-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="4" y1="9" x2="9" y2="9"/><line x1="15" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="9" y2="15"/><line x1="15" y1="15" x2="20" y2="15"/></svg>
+    <span class="it-label">区块链平台</span>
+    <span class="it-value">艺海链</span>
   </div>
 </div>
 
-
-
-
 <!-- 数字资产详情 -->
 <div class="sec-title"><span>数字资产详情</span></div>
-<!-- 图片详情 -->
 <div class="detail-img">
-  <img src="1935详情.png" alt="1935详情">
+  <img src="asset/兰亭雅集产品图.png" alt="兰亭雅集详情">
 </div>
 
 <div style="height:20px"></div>
 
-<!-- 底部购买栏 --><div class="buy-bar">
+<!-- 底部购买栏 -->
+<div class="buy-bar">
   <button class="btn-collect" id="btnCollect" onclick="toggleCollect()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
     <span id="collectText">收藏</span>
   </button>
   <button class="btn-buy" onclick="window.location.href='order_maotai1935.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2L6 22H18L15 2H9Z"/><line x1="7" y1="6" x2="17" y2="6"/></svg>
-    立即购买 ¥599
+    立即参与 ¥399
   </button>
-</div>
-
-</div><!-- /page-scroll -->
-
-<!-- 浏览倒计时条（absolute固定在手机框中部右侧，不随滚动移动） -->
-<div class="browse-timer-bar hidden" id="browseTimerBar">
-  <div class="browse-timer-circle">
-    <svg viewBox="0 0 48 48">
-      <circle class="bg" cx="24" cy="24" r="21"/>
-      <circle class="fg" id="browseTimerFg" cx="24" cy="24" r="21" stroke-dasharray="131.95" stroke-dashoffset="0"/>
-    </svg>
-    <span class="browse-timer-text" id="browseTimerText">10</span>
-  </div>
-  <div class="browse-timer-label">浏览<br>倒计时</div>
-  <div class="browse-timer-done">
-    <span class="browse-timer-done-icon">🎁</span>
-    <span class="browse-timer-done-text">奖励已获取</span>
-    <button class="browse-timer-back-btn" onclick="goBackWithReward()">点击返回</button>
-  </div>
-</div>
 </div>
 
 </div><!-- /page -->
 
-<!-- 3D浮层 -->
-<div class="d3-mask" id="d3Mask" onclick="hide3D()">
-  <div class="d3-box"><div class="d3-model"></div></div>
-  <div class="d3-hint">360° 旋转查看</div>
-  <button class="d3-close" onclick="hide3D()">关闭</button>
-</div>
-
 <script>
-var PID="maotai1935";
-
-// ── 浏览倒计时逻辑 ──
-(function initBrowseTimer(){
-  // 检查是否从 assets_maotai.html 进入
-  var ref = document.referrer || '';
-  var fromAssets = ref.indexOf('assets_maotai.html') !== -1;
-  // 也支持通过 URL 参数标记（兜底）
-  var params = new URLSearchParams(window.location.search);
-  var fromTask = params.get('from') === 'assets';
-
-  if(fromAssets || fromTask){
-    var timerBar = document.getElementById('browseTimerBar');
-    var timerFg = document.getElementById('browseTimerFg');
-    var timerText = document.getElementById('browseTimerText');
-    var totalSeconds = 10;
-    var remaining = totalSeconds;
-    var circumference = 131.95; // 2*π*21
-
-    // 显示倒计时条
-    timerBar.classList.remove('hidden');
-
-    var countdown = setInterval(function(){
-      remaining--;
-      timerText.textContent = remaining;
-      // 更新环形进度
-      var offset = circumference * (1 - (totalSeconds - remaining) / totalSeconds);
-      timerFg.style.strokeDashoffset = circumference - offset;
-
-      if(remaining <= 0){
-        clearInterval(countdown);
-        // 显示完成状态
-        timerBar.classList.add('done');
-        // 设置奖励标记，供任务中心读取
-        localStorage.setItem('metaProductRewardFlag', '1');
-      }
-    }, 1000);
-  }
+// ═══ 横版时间轴拖拽滚动 ═══
+(function(){
+  var el = document.querySelector('.htimeline');
+  if(!el)return;
+  var isDown=false,startX,scrollLeft;
+  el.addEventListener('mousedown',function(e){isDown=true;startX=e.pageX-el.offsetLeft;scrollLeft=el.scrollLeft;el.style.cursor='grabbing'});
+  el.addEventListener('mouseleave',function(){isDown=false;el.style.cursor='grab'});
+  el.addEventListener('mouseup',function(){isDown=false;el.style.cursor='grab'});
+  el.addEventListener('mousemove',function(e){if(!isDown)return;e.preventDefault();var x=e.pageX-el.offsetLeft;el.scrollLeft=scrollLeft-(x-startX)});
+  el.addEventListener('touchstart',function(e){isDown=true;startX=e.touches[0].pageX-el.offsetLeft;scrollLeft=el.scrollLeft});
+  el.addEventListener('touchend',function(){isDown=false});
+  el.addEventListener('touchmove',function(e){if(!isDown)return;var x=e.touches[0].pageX-el.offsetLeft;el.scrollLeft=scrollLeft-(x-startX)});
 })();
 
-function goBackWithReward(){
-  localStorage.setItem('metaProductRewardFlag', '1');
-  history.back();
-}
+var PID="lantingyaji";
 
 function toggleCollect(){
   var list = JSON.parse(localStorage.getItem("favorites") || "[]");
@@ -365,9 +297,7 @@ function toggleCollect(){
   }
   localStorage.setItem("favorites", JSON.stringify(list));
 }
-function show3D(){ document.getElementById('d3Mask').classList.add('show'); }
-function hide3D(e){ if(e&&e.target!==document.getElementById('d3Mask'))return;document.getElementById('d3Mask').classList.remove('show'); }
-// init
+
 (function(){
   var list = JSON.parse(localStorage.getItem("favorites") || "[]");
   if (list.indexOf(PID) >= 0) {
@@ -376,5 +306,7 @@ function hide3D(e){ if(e&&e.target!==document.getElementById('d3Mask'))return;do
     if (t) t.textContent = "已收藏";
   }
 })();
-</script></body>
+</script>
+
+</body>
 </html>

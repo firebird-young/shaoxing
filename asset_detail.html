@@ -5,113 +5,146 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>资产详情</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; flex-direction: column; align-items: center; }
-.page { max-width: 430px; min-height: 100vh; background: #f6f7fb; padding: 0 16px 60px; position: relative; width: 100%; }
+:root{
+  --accent:#3F8B6D;--accent-contrast:#fff;--link:#3F8B6D;--muted:#a0a0a0;
+  --bg:#fff;--ink:#222;--ink-muted:#555;--ink-subtle:#888;
+  --border:#e0e0e0;--page-bg:#F0F0F0;
+  --radius-sm:7px;--radius-card:7px;--radius-pill:9999px;
+  --font-display:"Helvetica Neue",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+  --font-body:"Inter",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{margin:0;width:100%;min-height:100%}
+body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(--ink-muted);display:flex;justify-content:center;min-height:100%}
+.page{max-width:430px;width:100%;min-height:100vh;background:linear-gradient(180deg,#3F8B6D 0%,#a8c9bb 8%,#f0f0f0 20%);padding:16px;padding-bottom:80px;position:relative;box-sizing:border-box}
+@media(max-width:430px){.page{max-width:100%}}
 
-.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; background: #f6f7fb; }
-.nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.nav-back svg { width: 20px; height: 20px; color: #333; display: block; }
-.nav-title { flex: 1; text-align: center; font-size: 16px; font-weight: 600; color: #1a1a2e; }
-.nav-placeholder { width: 32px; }
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:0 0 16px}
+.nav-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(255,255,255,.2);border-radius:50%}
+.nav-back svg{width:20px;height:20px;display:block;color:#fff}
+.nav-title{flex:1;text-align:center;font-size:17px;font-weight:700;color:#fff}
+.nav-placeholder{width:32px}
 
-.overview-card { background: linear-gradient(135deg, #1a1a2e, #2d1f1f); border-radius: 20px; padding: 16px 18px; margin: 10px 0 14px; display: flex; align-items: center; gap: 14px; }
-.ov-img { width: 64px; height: 78px; border-radius: 12px; background-position: center; background-size: cover; flex-shrink: 0; background-color: rgba(255,255,255,0.05); }
-.ov-info { flex: 1; min-width: 0; }
-.ov-name { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 10px; }
-.ov-hold { display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.1); border-radius: 20px; padding: 4px 12px; }
-.ov-hold-num { font-size: 18px; font-weight: 700; color: #fff; }
-.ov-hold-label { font-size: 11px; color: rgba(255,255,255,0.6); }
+.overview-card{background:var(--bg);border-radius:var(--radius-card);padding:16px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 6px rgba(0,0,0,.04)}
+.ov-img{width:64px;aspect-ratio:1/1;border-radius:var(--radius-sm);background-position:center;background-size:cover;flex-shrink:0}
+.ov-info{flex:1;min-width:0}
+.ov-name{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:10px}
+.ov-hold{display:inline-flex;align-items:center;gap:4px;background:var(--page-bg);border-radius:var(--radius-pill);padding:4px 12px}
+.ov-hold-num{font-size:18px;font-weight:700;color:var(--accent)}
+.ov-hold-label{font-size:11px;color:var(--ink-subtle)}
 
-.sec-title { display: flex; align-items: center; gap: 8px; padding: 14px 0 8px; }
-.sec-title::before { content: ''; width: 4px; height: 16px; background: #D70C1F; border-radius: 2px; flex-shrink: 0; }
-.sec-title span { font-size: 15px; font-weight: 700; color: #1a1a2e; }
+.sec-title{display:flex;align-items:center;gap:8px;padding:14px 0 8px}
+.sec-title::before{content:'';width:4px;height:16px;background:var(--accent);border-radius:2px;flex-shrink:0}
+.sec-title span{font-size:15px;font-weight:700;color:var(--ink)}
 
-.asset-instance { background: #fff; border-radius: 16px; margin-bottom: 10px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); overflow: hidden; }
-.ai-header { padding: 12px 14px; cursor: pointer; transition: background 0.12s; }
-.ai-header:active { background: #fafafa; }
-.ai-header-row1 { display: flex; align-items: center; margin-bottom: 6px; }
-.ai-thumb { width: 44px; height: 54px; border-radius: 8px; background-position: center; background-size: cover; flex-shrink: 0; background-color: #f5f5f7; margin-right: 10px; }
-.ai-header-left { display: flex; align-items: center; flex: 1; min-width: 0; }
-.ai-number { font-size: 15px; font-weight: 700; color: #1a1a2e; display: flex; align-items: center; gap: 4px; }
-.ai-spec-name { font-size: 12px; font-weight: 600; color: #666; }
-.ai-number svg { width: 16px; height: 16px; color: #D70C1F; flex-shrink: 0; }
-.ai-header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.ai-sum-tag { font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
-.st-verified { background: #E6F9F0; color: #00b894; }
-.st-partial  { background: #FFF8EC; color: #f0ad4e; }
-.st-unverified { background: #FFF2F3; color: #D70C1F; }
-.ai-expand { width: 16px; flex-shrink: 0; }
-.ai-expand svg { width: 14px; height: 14px; color: #ccc; transition: transform 0.25s; }
-.ai-expand.open svg { transform: rotate(180deg); }
-.ai-header-row2 { display: flex; align-items: center; gap: 6px; padding-left: 2px; }
-.ai-time { font-size: 11px; color: #aaa; }
-.ai-dot { color: #ddd; font-size: 10px; }
-.ai-hash { font-size: 11px; color: #bbb; font-family: 'SF Mono','Menlo','Consolas',monospace; cursor: pointer; }
-.ai-hash:active { color: #D70C1F; }
+.asset-instance{background:var(--bg);border-radius:20px;margin-bottom:14px;box-shadow:var(--shadow,0 4px 20px rgba(0,0,0,.06));overflow:hidden}
+.ai-header{padding:16px 18px;cursor:pointer;transition:all .2s}
+.ai-header:active{background:var(--page-bg)}
+.ai-header-row1{display:flex;align-items:center;gap:14px}
+.ai-thumb{width:52px;aspect-ratio:1/1;border-radius:14px;background-position:center;background-size:cover;flex-shrink:0}
+.ai-header-left{flex:1;min-width:0}
+.ai-number{font-size:16px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.ai-spec-name{font-size:12px;font-weight:500;color:var(--ink-muted)}
+.ai-number svg{width:18px;height:18px;color:var(--accent);flex-shrink:0}
+.ai-header-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.ai-sum-tag{font-size:11px;padding:5px 14px;border-radius:var(--radius-pill);font-weight:600;white-space:nowrap}
+.st-verified{background:rgba(63,139,109,.1);color:var(--accent)}
+.st-partial{background:#FFF8EC;color:#f0ad4e}
+.st-unverified{background:var(--page-bg);color:var(--ink-subtle)}
+.ai-expand{width:24px;height:24px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--page-bg);transition:all .25s}
+.ai-expand.open{background:rgba(63,139,109,.08)}
+.ai-expand svg{width:14px;height:14px;color:var(--ink-subtle);transition:transform .25s}
+.ai-expand.open svg{transform:rotate(180deg);color:var(--accent)}
+.ai-header-row2{display:flex;align-items:center;gap:10px;padding-top:10px;margin-top:10px}
+.ai-time{font-size:11px;color:var(--ink-subtle)}
+.ai-dot{color:var(--border);font-size:10px}
+.ai-hash{font-size:11px;color:var(--ink-subtle);font-family:'SF Mono','Menlo','Consolas',monospace;cursor:pointer;text-decoration:none}
+.ai-hash:active{color:var(--accent)}
 
-.ai-benefits { display: none; border-top: 1px solid #f5f5f7; }
-.ai-benefits.show { display: block; }
-.ai-benefit { display: flex; align-items: center; padding: 10px 14px; border-bottom: 1px solid #fafafc; cursor: pointer; transition: background 0.12s; }
-.ai-benefit:last-child { border-bottom: none; }
-.ai-benefit:active { background: #fafafa; }
-.ai-bf-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-right: 10px; }
-.ai-bf-icon svg { width: 15px; height: 15px; }
-.ai-bf-name { font-size: 13px; font-weight: 600; color: #1a1a2e; flex: 1; min-width: 0; }
-.ai-bf-extra { font-size: 10px; color: #bbb; margin-right: 8px; flex-shrink: 0; }
-.ai-bf-tag { font-size: 10px; padding: 2px 10px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
-.bt-verified { background: #E6F9F0; color: #00b894; }
-.bt-unverified { background: #FFF2F3; color: #D70C1F; }
+.ai-benefits{display:none;padding:4px 0 8px}
+.ai-benefits.show{display:block;animation:slideDown .25s ease-out}
+@keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:500px}}
+.ai-benefit{display:flex;align-items:center;padding:12px 18px;cursor:pointer;transition:background .15s;gap:12px}
+.ai-benefit:hover{background:var(--page-bg)}
+.ai-bf-icon{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ai-bf-icon svg{width:18px;height:18px}
+.ai-bf-name{font-size:14px;font-weight:600;color:var(--ink);flex:1;min-width:0}
+.ai-bf-extra{font-size:11px;color:var(--ink-subtle);margin-right:8px;flex-shrink:0}
+.ai-bf-tag{font-size:11px;padding:4px 12px;border-radius:var(--radius-pill);font-weight:600;white-space:nowrap}
+.bt-verified{background:rgba(63,139,109,.1);color:var(--accent)}
+.bt-unverified{background:var(--page-bg);color:var(--ink-subtle)}
 
-.hint-text { text-align: center; font-size: 11px; color: #bbb; padding: 12px 0 8px; }
+.hint-text{text-align:center;font-size:11px;color:var(--ink-subtle);padding:12px 0 8px}
 
-.action-bar { display: flex; gap: 10px; padding: 14px 0; }
-.btn-outline { flex: 1; height: 44px; border: 1px solid #e0e0e5; border-radius: 12px; background: #fff; color: #666; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
-.btn-outline:active { background: #f5f5f7; }
-.btn-primary { flex: 1; height: 44px; border: none; border-radius: 12px; background: #D70C1F; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
-.btn-primary:active { opacity: 0.9; }
-.btn-outline svg, .btn-primary svg { width: 16px; height: 16px; }
+.action-bar{display:flex;gap:10px;padding:14px 0}
+.btn-outline{flex:1;height:44px;border:1px solid var(--border);border-radius:12px;background:var(--bg);color:var(--ink-muted);font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-outline:active{background:var(--page-bg)}
+.btn-primary{flex:1;height:44px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-primary:active{opacity:.9}
+.btn-outline svg,.btn-primary svg{width:16px;height:16px}
 
-.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 999; display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-.modal-mask.show { opacity: 1; pointer-events: auto; }
-.modal-card { width: 100%; max-width: 430px; max-height: 80vh; background: #fff; border-radius: 20px 20px 0 0; padding: 0 20px 24px; overflow-y: auto; transform: translateY(100%); transition: transform 0.35s cubic-bezier(.4,0,.2,1); }
-.modal-mask.show .modal-card { transform: translateY(0); }
-.modal-handle { width: 36px; height: 4px; background: #ddd; border-radius: 2px; margin: 12px auto 16px; }
-.modal-title { font-size: 17px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
-.modal-sub { font-size: 12px; color: #999; margin-bottom: 18px; }
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-mask.show{opacity:1;pointer-events:auto}
+.modal-card{width:100%;max-width:430px;max-height:80vh;background:var(--bg);border-radius:var(--radius-card) var(--radius-card) 0 0;padding:0 20px 24px;overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1)}
+.modal-mask.show .modal-card{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 16px}
+.modal-title{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--ink-subtle);margin-bottom:18px}
 
-.form-group { margin-bottom: 14px; }
-.form-label { font-size: 12px; color: #888; margin-bottom: 6px; display: block; font-weight: 500; }
-.form-input { width: 100%; height: 44px; border: 1px solid #e8e8ec; border-radius: 10px; padding: 0 14px; font-size: 14px; color: #333; outline: none; transition: border 0.2s; }
-.form-input:focus { border-color: #D70C1F; }
-textarea.form-input { height: 80px; padding: 12px 14px; resize: none; }
-.form-submit { width: 100%; height: 48px; border: none; border-radius: 12px; background: #D70C1F; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 6px; }
-.form-submit:active { opacity: 0.9; }
-.form-submit.loading { opacity: 0.7; pointer-events: none; }
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;color:var(--ink-subtle);margin-bottom:6px;display:block;font-weight:500}
+.form-input{width:100%;height:44px;border:1px solid var(--border);border-radius:10px;padding:0 14px;font-size:14px;color:var(--ink);outline:none;transition:border .2s}
+.form-input:focus{border-color:var(--accent)}
+textarea.form-input{height:80px;padding:12px 14px;resize:none}
+.form-submit{width:100%;height:48px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:6px}
+.form-submit:active{opacity:.9}
+.form-submit.loading{opacity:.7;pointer-events:none}
 
-.logistics { padding: 4px 0; }
-.logis-item { display: flex; gap: 12px; padding: 12px 0; position: relative; }
-.logis-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; position: relative; z-index: 1; }
-.logis-dot.active { background: #D70C1F; box-shadow: 0 0 0 4px rgba(215,12,31,0.12); }
-.logis-dot.done { background: #00b894; }
-.logis-dot.pending { background: #ddd; }
-.logis-info { flex: 1; min-width: 0; }
-.logis-info .l-tit { font-size: 13px; font-weight: 600; color: #1a1a2e; margin-bottom: 2px; }
-.logis-info .l-time { font-size: 11px; color: #bbb; margin-bottom: 2px; }
-.logis-info .l-desc { font-size: 11px; color: #999; }
-.logis-line { position: absolute; left: 4px; top: 22px; width: 2px; height: calc(100% - 10px); background: #eee; z-index: 0; }
-.logis-item:last-child .logis-line { display: none; }
+.logistics{padding:4px 0}
+.logis-item{display:flex;gap:12px;padding:12px 0;position:relative}
+.logis-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px;position:relative;z-index:1}
+.logis-dot.active{background:var(--accent);box-shadow:0 0 0 4px rgba(63,139,109,.12)}
+.logis-dot.done{background:var(--accent)}
+.logis-dot.pending{background:#ddd}
+.logis-info{flex:1;min-width:0}
+.logis-info .l-tit{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.logis-info .l-time{font-size:11px;color:var(--ink-subtle);margin-bottom:2px}
+.logis-info .l-desc{font-size:11px;color:var(--ink-subtle)}
+.logis-line{position:absolute;left:4px;top:22px;width:2px;height:calc(100% - 10px);background:var(--border);z-index:0}
+.logis-item:last-child .logis-line{display:none}
 
-.shipping-info { background: #f8f9fb; border-radius: 12px; padding: 14px; margin-bottom: 16px; }
-.si-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 12px; }
-.si-row .si-l { color: #999; }
-.si-row .si-r { color: #1a1a2e; font-weight: 500; }
+.shipping-info{background:var(--page-bg);border-radius:12px;padding:14px;margin-bottom:16px}
+.si-row{display:flex;justify-content:space-between;padding:6px 0;font-size:12px}
+.si-row .si-l{color:var(--ink-subtle)}
+.si-row .si-r{color:var(--ink);font-weight:500}
 
-.success-box { text-align: center; padding: 24px 0 8px; }
-.success-box .s-check { width: 56px; height: 56px; border-radius: 50%; background: #E6F9F0; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
-.success-box .s-check svg { width: 28px; height: 28px; color: #00b894; }
-.success-box .s-tit { font-size: 16px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
-.success-box .s-desc { font-size: 12px; color: #999; }
+.success-box{text-align:center;padding:24px 0 8px}
+.success-box .s-check{width:56px;height:56px;border-radius:50%;background:rgba(63,139,109,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.success-box .s-check svg{width:28px;height:28px;color:var(--accent)}
+.success-box .s-tit{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.success-box .s-desc{font-size:12px;color:var(--ink-subtle)}
+
+/* ── 权益弹窗 ── */
+.benefit-modal .modal-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.benefit-modal .modal-hdr .mh-left{flex:1}
+.benefit-modal .modal-hdr .mh-left .modal-title{margin-bottom:0}
+.benefit-modal .modal-hdr .mh-left .modal-sub{margin-bottom:0;margin-top:4px}
+.benefit-status{flex-shrink:0;font-size:12px;font-weight:600;padding:5px 14px;border-radius:var(--radius-pill);white-space:nowrap}
+.benefit-status.valid{background:rgba(63,139,109,.1);color:var(--accent)}
+.benefit-status.partial{background:#FFF8EC;color:#f0ad4e}
+.benefit-status.used{background:var(--page-bg);color:var(--ink-muted);border:1px solid var(--border)}
+
+.benefit-desc{font-size:13px;color:var(--ink-muted);line-height:1.6;background:var(--page-bg);padding:14px 16px;border-radius:12px;margin-bottom:18px}
+
+.qr-section{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;padding:4px 0 8px;-webkit-overflow-scrolling:touch}
+.qr-section::-webkit-scrollbar{display:none}
+.qr-card{flex-shrink:0;width:170px;background:var(--bg);border-radius:14px;padding:14px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.06);position:relative}
+.qr-card .qr-img{width:140px;height:140px;border-radius:10px;overflow:hidden;position:relative;border:2px solid var(--border);padding:4px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)}
+.qr-card .qr-img img{width:100%;height:100%;object-fit:contain;display:block;border-radius:6px}
+.qr-card .qr-used{position:absolute;inset:4px;background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;border-radius:6px;z-index:1}
+.qr-card .qr-used span{background:var(--page-bg);color:var(--ink-subtle);font-size:13px;font-weight:600;padding:5px 16px;border-radius:6px;border:1px solid var(--border)}
+.qr-expiry{font-size:12px;color:var(--ink-subtle);margin-top:14px;display:flex;align-items:center;gap:6px;padding-top:12px;border-top:1px dashed var(--border)}
+.qr-expiry svg{width:14px;height:14px;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -151,16 +184,17 @@ textarea.form-input { height: 80px; padding: 12px 14px; resize: none; }
 
 <script>
 var ICONS = {
-  '实物酒兑换':       { bg:'#FFF2F3', c:'#D70C1F', s:'<path d="M17 2H7l1 7c.5 3.5 2 6 4 6s3.5-2.5 4-6l1-7z"/><line x1="12" y1="15" x2="12" y2="22"/><line x1="8" y1="18" x2="16" y2="18"/>' },
-  '线下品鉴会资格':   { bg:'#F3F0FF', c:'#6c5ce7', s:'<path d="M3 8l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>' },
-  '超值优惠券':       { bg:'#E8F4FD', c:'#2980b9', s:'<rect x="2" y="4" width="20" height="16" rx="2"/><line x1="7" y1="10" x2="17" y2="10"/><line x1="7" y1="14" x2="13" y2="14"/>' }
+  '景区VIP通行权':    { bg:'rgba(63,139,109,.1)', c:'#3F8B6D', s:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>' },
+  '研学课程':         { bg:'rgba(206,147,216,.12)', c:'#8A5CFF', s:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/>' },
+  '文创实物':         { bg:'rgba(79,195,247,.12)', c:'#398BFF', s:'<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>' },
+  '跨城特权':         { bg:'rgba(255,183,77,.12)', c:'#F08A24', s:'<path d="M3 3h18v18H3z"/><path d="M13 3v18"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/>' }
 };
 
 var STA = { verified:['已核销','bt-verified'], unverified:['未核销','bt-unverified'] };
 var SUM = { verified:{t:'已核销',c:'st-verified'}, partial:{t:'部分核销',c:'st-partial'}, unverified:{t:'未核销',c:'st-unverified'} };
 
 var params = new URLSearchParams(window.location.search);
-var prod = params.get('product') || 'maotai1935';
+var prod = params.get('product') || 'lantingyaji';
 
 var DB = {
   maotai1935: {
@@ -284,6 +318,32 @@ var DB = {
         ]
       }
     ]
+  },
+  lantingyaji: {
+    name:'兰亭雅集', img:'asset/兰亭雅集封面图.png', n:'×3', url:'product_maotai1935.html',
+    list:[
+      { id:'#01', t:'2026-05-15 10:00', h:'0x7a3e8f2b1c9d...1a2b', spec:'畅行版', img:'asset/畅行版.png',
+        bf:[
+          { n:'景区VIP通行权', v:false, x:'未核销' },
+          { n:'研学课程', v:false, x:'共1次 未使用' }
+        ]
+      },
+      { id:'#02', t:'2026-05-15 10:00', h:'0x9c2d1e8f5a3b...3e4f', spec:'学韵版', img:'asset/学韵版.png',
+        bf:[
+          { n:'景区VIP通行权', v:true, d:'2026-07-01', a:'绍兴兰亭景区', cd:'VIP202607010001' },
+          { n:'研学课程', v:true, d:'2026-07-05', a:'绍兴兰亭书法学院', cd:'YX202607050001' },
+          { n:'文创实物', v:true, d:'2026-07-10', a:'兰亭文创中心', cd:'WC202607100001' }
+        ]
+      },
+      { id:'#03', t:'2026-05-20 14:30', h:'0xd5f8a3c2e7b1...9a6c', spec:'优享版', img:'asset/优享版.png',
+        bf:[
+          { n:'景区VIP通行权', v:true, d:'2026-06-25', a:'绍兴兰亭景区VIP通道', cd:'VIP202606250002' },
+          { n:'研学课程', v:true, d:'2026-06-28', a:'绍兴兰亭书法学院', cd:'YX202606280001' },
+          { n:'文创实物', v:false, x:'共1次 未使用' },
+          { n:'跨城特权', v:false, x:'未核销' }
+        ]
+      }
+    ]
   }
 };
 
@@ -382,75 +442,80 @@ function copyIt(txt, lb){
   navigator.clipboard.writeText(txt).then(function(){ alert(lb+'已复制'); }).catch(function(){ alert('复制失败'); });
 }
 
+function makeQR(used, usedDate){
+  var html = '<div class="qr-card"><div class="qr-img"><img src="asset/二维码.png" alt="二维码">';
+  if(used) html += '<div class="qr-used"><span>已核销</span></div>';
+  html += '</div>';
+  if(usedDate) html += '<div style="font-size:10px;color:var(--ink-subtle);margin-top:6px;text-align:center">'+usedDate+'</div>';
+  html += '</div>';
+  return html;
+}
+
 function onBenefit(idx, bi){
   var bf = data.list[idx].bf[bi];
   var modal = document.getElementById('modalMask');
   var content = document.getElementById('modalContent');
 
-  if(bf.n === '线下品鉴会资格'){
+  if(bf.n === '景区VIP通行权' || bf.n === '跨城特权'){
+    var desc = bf.n === '景区VIP通行权'
+      ? '兰亭景区VIP通行权，包括景点：鹅池碑、御碑亭'
+      : '兰亭雅集跨城特权，持本权益可享受绍兴、杭州、上海三地兰亭文化体验馆优先入场';
     content.innerHTML =
-      '<div class="modal-title">权益核销工作由发行方平台承接</div>'+
-      '<div class="modal-sub">请使用登记手机号登录茅台微信小程序，在【我的资产】板块操作使用对应权益产品。</div>';
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
-    return;
-  }
-
-  if(bf.n === '超值优惠券'){
-    content.innerHTML =
-      '<div class="modal-title">权益核销工作由发行方平台承接</div>'+
-      '<div class="modal-sub">请使用登记手机号登录茅台微信小程序，在【我的资产】板块操作使用对应权益产品。</div>';
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
-    return;
-  }
-
-  if(bf.n !== '实物酒兑换') return;
-
-  if(bf.v){
-    var ship = bf.shipping || {};
-    var logisticsHTML = '';
-    (bf.logistics || []).forEach(function(l, li){
-      var cls = li === 0 ? 'active' : (l.s === 'done' ? 'done' : 'pending');
-      logisticsHTML +=
-        '<div class="logis-item">'+
-          '<div class="logis-line"></div>'+
-          '<div class="logis-dot '+cls+'"></div>'+
-          '<div class="logis-info">'+
-            '<div class="l-tit">'+l.d+'</div>'+
-            '<div class="l-time">'+l.t+'</div>'+
-            '<div class="l-desc">'+l.loc+'</div>'+
+      '<div class="benefit-modal">'+
+        '<div class="modal-hdr">'+
+          '<div class="mh-left">'+
+            '<div class="modal-title">'+bf.n+'</div>'+
+            '<div class="modal-sub">点击下方二维码进行核销</div>'+
           '</div>'+
-        '</div>';
-    });
+          '<span class="benefit-status valid">有效</span>'+
+        '</div>'+
+        '<div class="benefit-desc">'+desc+'</div>'+
+        '<div class="qr-section">'+makeQR(false)+'</div>'+
+        '<div class="qr-expiry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>有效期至：2026-12-31</div>'+
+      '</div>';
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    return;
+  }
 
+  if(bf.n === '研学课程'){
     content.innerHTML =
-      '<div class="modal-title">物流详情</div>'+
-      '<div class="modal-sub">该数字资产已完成实物酒兑换</div>'+
-      '<div class="shipping-info">'+
-        '<div class="si-row"><span class="si-l">收件人</span><span class="si-r">'+(ship.name || '--')+'</span></div>'+
-        '<div class="si-row"><span class="si-l">联系电话</span><span class="si-r">'+(ship.phone || '--')+'</span></div>'+
-        '<div class="si-row"><span class="si-l">收货地址</span><span class="si-r">'+(ship.addr || '--')+'</span></div>'+
-        '<div class="si-row"><span class="si-l">快递公司</span><span class="si-r">'+(ship.exp || '--')+'</span></div>'+
-        '<div class="si-row"><span class="si-l">快递单号</span><span class="si-r" style="color:#D70C1F;cursor:pointer" onclick="event.stopPropagation();copyIt(\''+(ship.expNo||'')+'\',\'快递单号\')">'+(ship.expNo || '--')+'</span></div>'+
-      '</div>'+
-      '<div class="sec-title"><span>物流轨迹</span></div>'+
-      '<div class="logistics">'+logisticsHTML+'</div>';
-  } else {
+      '<div class="benefit-modal">'+
+        '<div class="modal-hdr">'+
+          '<div class="mh-left">'+
+            '<div class="modal-title">研学课程</div>'+
+            '<div class="modal-sub">滑动查看课程二维码</div>'+
+          '</div>'+
+          '<span class="benefit-status partial">部分使用</span>'+
+        '</div>'+
+        '<div class="benefit-desc">漓渚镇兰花/书法研学课程3张</div>'+
+        '<div class="qr-section">'+
+          makeQR(false)+
+          makeQR(true, '2026-06-15 14:30:00')+
+          makeQR(false)+
+        '</div>'+
+        '<div class="qr-expiry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>有效期至：2026-12-31</div>'+
+      '</div>';
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    return;
+  }
+
+  if(bf.n === '文创实物'){
     content.innerHTML =
-      '<div class="modal-title">填写收货地址</div>'+
-      '<div class="modal-sub">核销该数字资产后，将安排实物茅台1935发货</div>'+
+      '<div class="modal-title">文创实物</div>'+
+      '<div class="modal-sub" style="margin-bottom:14px">填写收货信息，核销后寄送兰亭文创实物</div>'+
       '<div class="form-group"><label class="form-label">收件人姓名</label><input class="form-input" id="fName" placeholder="请输入收件人姓名"></div>'+
       '<div class="form-group"><label class="form-label">联系电话</label><input class="form-input" id="fPhone" type="tel" placeholder="请输入手机号码"></div>'+
       '<div class="form-group"><label class="form-label">详细地址</label><textarea class="form-input" id="fAddr" placeholder="省/市/区/街道/门牌号"></textarea></div>'+
-      '<button class="form-submit" id="fSubmit" onclick="submitAddress('+idx+','+bi+')">确认核销并提交</button>';
+      '<button class="form-submit" id="fSubmit" onclick="submitWenChuang('+idx+','+bi+')">确认核销并提交</button>';
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    return;
   }
-
-  modal.classList.add('show');
-  document.body.style.overflow = 'hidden';
 }
 
-function submitAddress(idx, bi){
+function submitWenChuang(idx, bi){
   var name = document.getElementById('fName').value.trim();
   var phone = document.getElementById('fPhone').value.trim();
   var addr = document.getElementById('fAddr').value.trim();
@@ -465,9 +530,9 @@ function submitAddress(idx, bi){
   setTimeout(function(){
     var bf = data.list[idx].bf[bi];
     bf.v = true;
-    bf.d = '2026-06-10';
+    bf.d = '2026-07-15';
     bf.a = addr;
-    bf.cd = 'HX2026061000'+(idx+1);
+    bf.cd = 'WC20260715'+(idx+1);
     delete bf.x;
     bf.shipping = {
       name: name,

@@ -14,8 +14,9 @@
   --font-body:"Inter",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-muted);display:flex;justify-content:center;min-height:100%}
-.page{max-width:430px;width:100%;min-height:100vh;background:var(--page-bg);padding:16px;padding-bottom:80px;position:relative;box-sizing:border-box}
+html{margin:0;width:100%;min-height:100%}
+body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(--ink-muted);display:flex;justify-content:center;min-height:100%}
+.page{max-width:430px;width:100%;min-height:100vh;background:linear-gradient(180deg,#3F8B6D 0%,#a8c9bb 8%,#f0f0f0 20%);padding:16px;padding-bottom:80px;position:relative;box-sizing:border-box}
 @media(max-width:430px){.page{max-width:100%}}
 
 .top-bar{display:flex;align-items:center;justify-content:center;padding:0 0 16px}
@@ -47,6 +48,8 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
 .goods-card{background:var(--bg);border-radius:var(--radius-card);overflow:hidden;cursor:pointer;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:transform .2s;display:flex;flex-direction:column}
 .goods-card:active{transform:scale(.96)}
 .goods-card .img-wrap{width:100%;aspect-ratio:1/1;background-position:center;background-size:cover;position:relative}
+.goods-card .soldout-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:1}
+.goods-card .soldout-overlay span{color:#fff;font-size:16px;font-weight:700;letter-spacing:2px;text-shadow:0 2px 8px rgba(0,0,0,.3)}
 .goods-card .info{padding:12px 12px 14px;flex:1;display:flex;flex-direction:column;gap:6px}
 .goods-card .info h4{font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .goods-card .info .tags{display:flex;gap:4px;flex-wrap:wrap}
@@ -132,9 +135,11 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
 
 <script>
 var assets = [
-  { name:'兰亭碑刻·数字藏品', img:'asset/兰亭碑刻封面图.png', sale:'优先购', saleCls:'t-sale-prior', issuer:'绍兴兰亭产业数资', price:299, sold:128, total:888, date:'2026-05-11', link:'#' },
-  { name:'兰亭春禊·数字藏品', img:'asset/兰亭春禊封面图.png', sale:'全民购', saleCls:'t-sale-all', issuer:'绍兴兰亭产业数资', price:199, sold:256, total:888, date:'2026-05-11', link:'#' },
-  { name:'兰亭雅集·数字藏品', img:'asset/兰亭雅集产品图.png', sale:'抽签购', saleCls:'t-sale-lottery', issuer:'绍兴兰亭产业数资', price:399, sold:67, total:666, date:'2026-05-12', link:'product_maotai1935.html' }
+  { name:'兰亭碑刻', img:'asset/兰亭碑刻封面图.png', sale:'优先购', saleCls:'t-sale-prior', issuer:'绍兴兰亭产业数资', price:299, sold:128, total:888, date:'2026-05-11', link:'#' },
+  { name:'兰亭春禊', img:'asset/兰亭春禊封面图.png', sale:'全民购', saleCls:'t-sale-all', issuer:'绍兴兰亭产业数资', price:199, sold:256, total:888, date:'2026-05-11', link:'#' },
+  { name:'兰亭雅集', img:'asset/兰亭雅集产品图.png', sale:'抽签购', saleCls:'t-sale-lottery', issuer:'绍兴兰亭产业数资', price:399, sold:67, total:666, date:'2026-05-12', link:'product_maotai1935.html' },
+  { name:'曲水流觞', img:'asset/曲水流觞封面图.png', sale:'抽签购', saleCls:'t-sale-lottery', issuer:'古越龙山', price:259, sold:45, total:666, date:'2026-06-01', link:'#' },
+  { name:'兰亭诗韵', img:'asset/兰亭诗韵封面图.png', sale:'优先购', saleCls:'t-sale-prior', issuer:'诸暨珠宝', price:459, sold:888, total:888, date:'2026-06-05', link:'#' }
 ];
 
 var currentDateSort = '';
@@ -152,15 +157,16 @@ function render(){
   if(list.length === 0){ grid.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
   grid.innerHTML = list.map(function(a){
-    var s = a.sold >= a.total ? '<span style="color:#999;font-size:10px;margin-left:4px">已售罄</span>' : '';
     return '<div class="goods-card" onclick="window.location.href=\''+a.link+'\'">'+
-      '<div class="img-wrap" style="background-image:url(\''+a.img+'\')"></div>'+
+      '<div class="img-wrap" style="background-image:url(\''+a.img+'\')">'+
+        (a.sold >= a.total ? '<div class="soldout-overlay"><span>已售罄</span></div>' : '')+
+      '</div>'+
       '<div class="info">'+
         '<h4>'+a.name+'</h4>'+
         '<div class="tags"><span class="'+a.saleCls+'">'+a.sale+'</span></div>'+
-        '<div class="issuer">发行方：'+a.issuer+'</div>'+
+        '<div class="issuer">'+a.issuer+'</div>'+
         '<div class="price">¥'+a.price+'</div>'+
-        '<div class="sold">已售 '+a.sold+'/'+a.total+s+'</div>'+
+        '<div class="sold">已售 '+a.sold+'/'+a.total+'</div>'+
       '</div>'+
     '</div>';
   }).join('');

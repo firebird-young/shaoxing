@@ -790,6 +790,17 @@
       color: #ff4d4f;
       background: #fff2f0;
     }
+
+    /* 权益类型依赖字段 */
+    .bf-cond-field { display: none; }
+    .bf-cond-field.show { display: block; }
+    .benefit-fields .bf-cond-field .form-group { margin-bottom: 0; }
+    .benefit-fields .bf-cond-field .form-group label { font-size: 13px; color: #666; margin-bottom: 6px; }
+    .benefit-fields .bf-cond-field .form-group input,
+    .benefit-fields .bf-cond-field .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 13px; outline: none; transition: border .2s; box-sizing:border-box }
+    .benefit-fields .bf-cond-field .form-group input:focus,
+    .benefit-fields .bf-cond-field .form-group select:focus { border-color: #667eea; }
+    .benefit-fields .bf-full { grid-column: 1 / -1; }
     
     .btn-add {
       display: inline-flex;
@@ -1847,15 +1858,40 @@
                       <div class="benefit-fields">
                         <div>
                           <label>权益名称</label>
-                          <input type="text" class="benefit-name" placeholder="请输入权益名称" required>
+                          <input type="text" class="benefit-name" placeholder="如：景区VIP通行权" required>
                         </div>
                         <div>
-                          <label>核销方式</label>
-                          <select class="benefit-method" required>
-                            <option value="">请选择核销方式</option>
-                            <option value="delivery">实物快递</option>
-                            <option value="verification">商家平台核销</option>
+                          <label>权益类型</label>
+                          <select class="benefit-type" required onchange="onBenefitTypeChange(this)">
+                            <option value="">请选择权益类型</option>
+                            <option value="identity">身份权益（无限次扫码）</option>
+                            <option value="ticket">门票/兑换券（按次核销）</option>
+                            <option value="physical">实物权益（快递发货）</option>
                           </select>
+                        </div>
+                        <div class="bf-desc-field bf-full">
+                          <div class="form-group">
+                            <label>使用说明（显示在权益详情页）</label>
+                            <input type="text" class="benefit-desc" placeholder="如：鹅池碑、御碑亭、曲水流觞">
+                          </div>
+                        </div>
+                        <div class="bf-cond-field bf-total-field">
+                          <div class="form-group">
+                            <label>总次数</label>
+                            <input type="number" class="benefit-total" min="1" value="1" placeholder="可核销总次数">
+                          </div>
+                        </div>
+                        <div>
+                          <div class="form-group">
+                            <label>生效时间</label>
+                            <input type="datetime-local" class="benefit-eff" required>
+                          </div>
+                        </div>
+                        <div>
+                          <div class="form-group">
+                            <label>失效时间</label>
+                            <input type="datetime-local" class="benefit-exp" required>
+                          </div>
                         </div>
                       </div>
                       <span class="benefit-remove" onclick="removeBenefit(this)">×</span>
@@ -1944,15 +1980,40 @@
                 <div class="benefit-fields">
                   <div>
                     <label>权益名称</label>
-                    <input type="text" class="benefit-name" placeholder="请输入权益名称" required>
+                    <input type="text" class="benefit-name" placeholder="如：景区VIP通行权" required>
                   </div>
                   <div>
-                    <label>兑现方式</label>
-                    <select class="benefit-method" required>
-                      <option value="">请选择兑现方式</option>
-                      <option value="delivery">实物快递</option>
-                      <option value="verification">商家平台核销</option>
+                    <label>权益类型</label>
+                    <select class="benefit-type" required onchange="onBenefitTypeChange(this)">
+                      <option value="">请选择权益类型</option>
+                      <option value="identity">身份权益（无限次扫码）</option>
+                      <option value="ticket">门票/兑换券（按次核销）</option>
+                      <option value="physical">实物权益（快递发货）</option>
                     </select>
+                  </div>
+                  <div class="bf-desc-field bf-full">
+                    <div class="form-group">
+                      <label>使用说明（显示在权益详情页）</label>
+                      <input type="text" class="benefit-desc" placeholder="如：鹅池碑、御碑亭、曲水流觞">
+                    </div>
+                  </div>
+                  <div class="bf-cond-field bf-total-field">
+                    <div class="form-group">
+                      <label>总次数</label>
+                      <input type="number" class="benefit-total" min="1" value="1" placeholder="可核销总次数">
+                    </div>
+                  </div>
+                  <div>
+                    <div class="form-group">
+                      <label>生效时间</label>
+                      <input type="datetime-local" class="benefit-eff" required>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="form-group">
+                      <label>失效时间</label>
+                      <input type="datetime-local" class="benefit-exp" required>
+                    </div>
                   </div>
                 </div>
                 <span class="benefit-remove" onclick="removeBenefit(this)">×</span>
@@ -2038,15 +2099,40 @@
               <div class="benefit-fields">
                 <div>
                   <label>权益名称</label>
-                  <input type="text" class="benefit-name" placeholder="请输入权益名称" required>
+                  <input type="text" class="benefit-name" placeholder="如：景区VIP通行权" required>
                 </div>
                 <div>
-                  <label>兑现方式</label>
-                  <select class="benefit-method" required>
-                    <option value="">请选择兑现方式</option>
-                    <option value="delivery">实物快递</option>
-                    <option value="verification">商家平台核销</option>
+                  <label>权益类型</label>
+                  <select class="benefit-type" required onchange="onBenefitTypeChange(this)">
+                    <option value="">请选择权益类型</option>
+                    <option value="identity">身份权益（无限次扫码）</option>
+                    <option value="ticket">门票/兑换券（按次核销）</option>
+                    <option value="physical">实物权益（快递发货）</option>
                   </select>
+                </div>
+                <div class="bf-desc-field bf-full">
+                  <div class="form-group">
+                    <label>使用说明（显示在权益详情页）</label>
+                    <input type="text" class="benefit-desc" placeholder="如：鹅池碑、御碑亭、曲水流觞">
+                  </div>
+                </div>
+                <div class="bf-cond-field bf-total-field">
+                  <div class="form-group">
+                    <label>总次数</label>
+                    <input type="number" class="benefit-total" min="1" value="1" placeholder="可核销总次数">
+                  </div>
+                </div>
+                <div>
+                  <div class="form-group">
+                    <label>生效时间</label>
+                    <input type="datetime-local" class="benefit-eff" required>
+                  </div>
+                </div>
+                <div>
+                  <div class="form-group">
+                    <label>失效时间</label>
+                    <input type="datetime-local" class="benefit-exp" required>
+                  </div>
                 </div>
               </div>
               <span class="benefit-remove" onclick="removeBenefit(this)">×</span>
@@ -2075,6 +2161,14 @@
       }
     }
     
+    // 权益类型切换时显示/隐藏条件字段
+    function onBenefitTypeChange(sel) {
+      var item = sel.closest('.benefit-item');
+      var totalField = item.querySelector('.bf-total-field');
+      var val = sel.value;
+      totalField.classList.toggle('show', val === 'ticket');
+    }
+
     // 添加权益
     function addBenefit(el) {
       const benefitsList = el.previousElementSibling;
@@ -2084,15 +2178,40 @@
         <div class="benefit-fields">
           <div>
             <label>权益名称</label>
-            <input type="text" class="benefit-name" placeholder="请输入权益名称" required>
+            <input type="text" class="benefit-name" placeholder="如：景区VIP通行权" required>
           </div>
           <div>
-            <label>兑现方式</label>
-            <select class="benefit-method" required>
-              <option value="">请选择兑现方式</option>
-              <option value="delivery">实物快递</option>
-              <option value="verification">商家平台核销</option>
+            <label>权益类型</label>
+            <select class="benefit-type" required onchange="onBenefitTypeChange(this)">
+              <option value="">请选择权益类型</option>
+              <option value="identity">身份权益（无限次扫码）</option>
+              <option value="ticket">门票/兑换券（按次核销）</option>
+              <option value="physical">实物权益（快递发货）</option>
             </select>
+          </div>
+          <div class="bf-desc-field bf-full">
+            <div class="form-group">
+              <label>使用说明（显示在权益详情页）</label>
+              <input type="text" class="benefit-desc" placeholder="如：鹅池碑、御碑亭、曲水流觞">
+            </div>
+          </div>
+          <div class="bf-cond-field bf-total-field">
+            <div class="form-group">
+              <label>总次数</label>
+              <input type="number" class="benefit-total" min="1" value="1" placeholder="可核销总次数">
+            </div>
+          </div>
+          <div>
+            <div class="form-group">
+              <label>生效时间</label>
+              <input type="datetime-local" class="benefit-eff" required>
+            </div>
+          </div>
+          <div>
+            <div class="form-group">
+              <label>失效时间</label>
+              <input type="datetime-local" class="benefit-exp" required>
+            </div>
           </div>
         </div>
         <span class="benefit-remove" onclick="removeBenefit(this)">×</span>
@@ -3127,7 +3246,26 @@
     // 表单提交
     document.getElementById('assetForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      alert('保存成功！');
+      // 收集款式 + 权益结构化数据
+      var styles = [];
+      document.querySelectorAll('#stylesList .style-item').forEach(function(item, si){
+        var styleName = item.querySelector('.style-name') ? item.querySelector('.style-name').value : '';
+        var benefits = [];
+        item.querySelectorAll('.benefit-item').forEach(function(bfItem){
+          var name = bfItem.querySelector('.benefit-name').value;
+          var type = bfItem.querySelector('.benefit-type').value;
+          var eff = bfItem.querySelector('.benefit-eff').value;
+          var exp = bfItem.querySelector('.benefit-exp').value;
+          var desc = (bfItem.querySelector('.benefit-desc') || {}).value || '';
+          var total = parseInt((bfItem.querySelector('.benefit-total') || {}).value) || 1;
+          benefits.push({ n:name, type:type, eff:eff, exp:exp, desc:desc, total:total, used:0 });
+        });
+        styles.push({ name:styleName, benefits:benefits });
+      });
+      console.log('=== 资产数据 ===');
+      console.log('产品名称:', document.getElementById('assetName').value);
+      console.log('款式与权益:', JSON.stringify(styles, null, 2));
+      alert('保存成功！权益数据已按前端数据模型结构化存储');
       closeModal();
     });
     // 查看铸造信息

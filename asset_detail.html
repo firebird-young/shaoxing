@@ -48,9 +48,11 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
 .ai-number svg{width:18px;height:18px;color:var(--accent);flex-shrink:0}
 .ai-header-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
 .ai-sum-tag{font-size:11px;padding:5px 14px;border-radius:var(--radius-pill);font-weight:600;white-space:nowrap}
-.st-verified{background:rgba(63,139,109,.1);color:var(--accent)}
+.st-unused{background:var(--page-bg);color:var(--ink-subtle)}
 .st-partial{background:#FFF8EC;color:#f0ad4e}
-.st-unverified{background:var(--page-bg);color:var(--ink-subtle)}
+.st-done{background:rgba(63,139,109,.1);color:var(--accent)}
+.st-expired{background:#FFF0F0;color:#e74c3c}
+.st-pending{background:rgba(52,152,219,.1);color:#3498db}
 .ai-expand{width:24px;height:24px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--page-bg);transition:all .25s}
 .ai-expand.open{background:rgba(63,139,109,.08)}
 .ai-expand svg{width:14px;height:14px;color:var(--ink-subtle);transition:transform .25s}
@@ -71,8 +73,11 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
 .ai-bf-name{font-size:14px;font-weight:600;color:var(--ink);flex:1;min-width:0}
 .ai-bf-extra{font-size:11px;color:var(--ink-subtle);margin-right:8px;flex-shrink:0}
 .ai-bf-tag{font-size:11px;padding:4px 12px;border-radius:var(--radius-pill);font-weight:600;white-space:nowrap}
-.bt-verified{background:rgba(63,139,109,.1);color:var(--accent)}
-.bt-unverified{background:var(--page-bg);color:var(--ink-subtle)}
+.bt-unused{background:var(--page-bg);color:var(--ink-subtle)}
+.bt-partial{background:#FFF8EC;color:#f0ad4e}
+.bt-done{background:rgba(63,139,109,.1);color:var(--accent)}
+.bt-expired{background:#FFF0F0;color:#e74c3c}
+.bt-pending{background:rgba(52,152,219,.1);color:#3498db}
 
 .hint-text{text-align:center;font-size:11px;color:var(--ink-subtle);padding:12px 0 8px}
 
@@ -130,21 +135,53 @@ textarea.form-input{height:80px;padding:12px 14px;resize:none}
 .benefit-modal .modal-hdr .mh-left .modal-title{margin-bottom:0}
 .benefit-modal .modal-hdr .mh-left .modal-sub{margin-bottom:0;margin-top:4px}
 .benefit-status{flex-shrink:0;font-size:12px;font-weight:600;padding:5px 14px;border-radius:var(--radius-pill);white-space:nowrap}
-.benefit-status.valid{background:rgba(63,139,109,.1);color:var(--accent)}
+.benefit-status.unused{background:var(--page-bg);color:var(--ink-subtle)}
 .benefit-status.partial{background:#FFF8EC;color:#f0ad4e}
-.benefit-status.used{background:var(--page-bg);color:var(--ink-muted);border:1px solid var(--border)}
+.benefit-status.done{background:rgba(63,139,109,.1);color:var(--accent)}
+.benefit-status.expired{background:#FFF0F0;color:#e74c3c}
+.benefit-status.pending{background:rgba(52,152,219,.1);color:#3498db}
 
 .benefit-desc{font-size:13px;color:var(--ink-muted);line-height:1.6;background:var(--page-bg);padding:14px 16px;border-radius:12px;margin-bottom:18px}
+.benefit-card{background:var(--page-bg);border-radius:14px;padding:16px;margin-bottom:18px}
 
-.qr-section{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;padding:4px 0 8px;-webkit-overflow-scrolling:touch}
-.qr-section::-webkit-scrollbar{display:none}
-.qr-card{flex-shrink:0;width:170px;background:var(--bg);border-radius:14px;padding:14px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.06);position:relative}
-.qr-card .qr-img{width:140px;height:140px;border-radius:10px;overflow:hidden;position:relative;border:2px solid var(--border);padding:4px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)}
+/* ── 单张二维码轮播 ── */
+.qr-carousel{position:relative;padding:4px 0 8px}
+.qr-carousel .qr-track{display:flex;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.qr-carousel .qr-card{flex-shrink:0;width:100%;background:var(--bg);border-radius:14px;padding:16px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.06);position:relative}
+.qr-card .qr-img{width:180px;height:180px;margin:0 auto;border-radius:10px;overflow:hidden;position:relative;border:2px solid var(--border);padding:4px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)}
 .qr-card .qr-img img{width:100%;height:100%;object-fit:contain;display:block;border-radius:6px}
-.qr-card .qr-used{position:absolute;inset:4px;background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;border-radius:6px;z-index:1}
-.qr-card .qr-used span{background:var(--page-bg);color:var(--ink-subtle);font-size:13px;font-weight:600;padding:5px 16px;border-radius:6px;border:1px solid var(--border)}
+.qr-card .qr-used-overlay{position:absolute;inset:4px;background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;border-radius:6px;z-index:1}
+.qr-card .qr-used-overlay span{background:var(--page-bg);color:var(--ink-subtle);font-size:14px;font-weight:600;padding:6px 20px;border-radius:6px;border:1px solid var(--border)}
+.qr-card .qr-used-time{font-size:11px;color:var(--ink-subtle);margin-top:8px;text-align:center}
+.qr-arrow{width:36px;height:36px;border-radius:50%;border:none;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s;flex-shrink:0}
+.qr-arrow:active{transform:scale(.85)}
+.qr-arrow svg{width:18px;height:18px;display:block}
+.qr-index{font-size:13px;color:var(--ink-subtle);font-weight:500;min-width:40px;text-align:center}
 .qr-expiry{font-size:12px;color:var(--ink-subtle);margin-top:14px;display:flex;align-items:center;gap:6px;padding-top:12px;border-top:1px dashed var(--border)}
 .qr-expiry svg{width:14px;height:14px;flex-shrink:0}
+
+/* ── 功能说明浮窗 ── */
+.f-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(255,255,255,.2);border-radius:50%;border:none;color:#fff;font-size:14px;flex-shrink:0}
+.f-btn:active{background:rgba(255,255,255,.35)}
+.f-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:92%;max-width:430px;max-height:85vh;overflow-y:auto;background:#fff;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.2);z-index:10000;padding:20px;display:none}
+.f-modal.show{display:block}
+.f-modal .fm-title{font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;cursor:grab;padding-bottom:10px;border-bottom:1px solid #eee}
+.f-modal .fm-title:active{cursor:grabbing}
+.f-modal .fm-close{width:28px;height:28px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:#666;border:none;flex-shrink:0}
+.f-modal .fm-close:hover{background:#e8e8e8}
+.f-modal .fm-body{font-size:12px;color:#555;line-height:1.7}
+.f-modal .fm-body h4{font-size:13px;font-weight:700;color:#1a1a2e;margin:16px 0 6px}
+.f-modal .fm-body h4:first-child{margin-top:0}
+.f-modal .fm-body p{margin:0 0 8px}
+.f-modal .fm-body ul{padding-left:16px;margin:0 0 10px}
+.f-modal .fm-body li{margin-bottom:3px}
+.f-modal .fm-body table{width:100%;border-collapse:collapse;margin:6px 0 10px;font-size:11px}
+.f-modal .fm-body th,.f-modal .fm-body td{border:1px solid #e0e0e0;padding:5px 8px;text-align:left}
+.f-modal .fm-body th{background:#f7f7f7;font-weight:600;color:#333}
+.f-modal .fm-body blockquote{background:#f9fdfb;border-left:3px solid var(--accent);margin:8px 0;padding:6px 12px;color:#666;font-size:11px}
+.f-modal .fm-body hr{margin:12px 0;border:none;border-top:1px dashed #ddd}
+.f-modal .fm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9999;display:none}
+.f-modal .fm-overlay.show{display:block}
 </style>
 </head>
 <body>
@@ -156,6 +193,7 @@ textarea.form-input{height:80px;padding:12px 14px;resize:none}
   </div>
   <div class="nav-title">资产详情</div>
   <div class="nav-placeholder"></div>
+  <button class="f-btn" onclick="toggleFuncModal()" title="功能说明">📖</button>
 </div>
 
 <div class="overview-card" id="overviewCard"></div>
@@ -190,164 +228,149 @@ var ICONS = {
   '跨城特权':         { bg:'rgba(255,183,77,.12)', c:'#F08A24', s:'<path d="M3 3h18v18H3z"/><path d="M13 3v18"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/>' }
 };
 
-var STA = { verified:['已核销','bt-verified'], unverified:['未核销','bt-unverified'] };
-var SUM = { verified:{t:'已核销',c:'st-verified'}, partial:{t:'部分核销',c:'st-partial'}, unverified:{t:'未核销',c:'st-unverified'} };
+/* ── 状态标签 ── */
+var B_STA = { pending:['待生效','bt-pending'], unused:['未使用','bt-unused'], partial:['部分使用','bt-partial'], done:['已用完','bt-done'], expired:['已失效','bt-expired'] };
+var P_STA = { unused:{t:'未使用',c:'st-unused'}, partial:{t:'部分使用',c:'st-partial'}, done:{t:'已用完',c:'st-done'}, expired:{t:'已失效',c:'st-expired'} };
+
+function calcBenefitStatus(bf){
+  var now = Date.now();
+  var eff = bf.eff ? new Date(bf.eff).getTime() : 0;
+  var exp = bf.exp ? new Date(bf.exp).getTime() : Infinity;
+  var total = bf.total || 1;
+  var used = bf.used || 0;
+
+  if(used >= total) return 'done';
+  if(now > exp && used < total) return 'expired';
+  if(now < eff) return 'pending';
+  if(used > 0 && used < total) return 'partial';
+  return 'unused';
+}
+
+function calcPackageStatus(bfs){
+  var hasPartial = false, hasDone = false, hasEnding = false, hasExpired = false;
+  bfs.forEach(function(bf){
+    var s = calcBenefitStatus(bf);
+    if(s === 'partial') hasPartial = true;
+    if(s === 'done') hasDone = true;
+    if(s === 'expired') hasExpired = true;
+    if(s === 'pending' || s === 'unused' || s === 'partial') hasEnding = true;
+  });
+
+  if(!hasExpired && hasDone && !hasEnding) return 'done';
+  if(!hasEnding && hasExpired) return 'expired';
+  if(hasEnding && (hasPartial || hasDone)) return 'partial';
+  return 'unused';
+}
 
 var params = new URLSearchParams(window.location.search);
 var prod = params.get('product') || 'lantingyaji';
 
 var DB = {
-  maotai1935: {
-    name:'茅台1935·时光窖藏', img:'茅台1935.png', n:'×3', url:'product_maotai1935.html',
-    list:[
-      { id:'#54', t:'2025-06-15 14:32', h:'0x7a3e8f2b1c9d...1a2b', spec:'凝时', img:'凝时.png',
-        bf:[
-          { n:'实物酒兑换', v:true, d:'2025-09-20 10:15:30', a:'贵阳市茅台大厦一楼体验店', cd:'HX202509200001',
-            logistics:[
-              { s:'done', t:'2025-09-26 10:22:35', d:'包裹已签收，感谢您的兑换', loc:'贵阳市观山湖区' },
-              { s:'done', t:'2025-09-25 08:15:20', d:'包裹正在派送中，快递员：张师傅 138****5678', loc:'贵阳市' },
-              { s:'done', t:'2025-09-24 22:30:45', d:'包裹已到达贵阳分拣中心', loc:'贵阳分拣中心' },
-              { s:'done', t:'2025-09-23 14:00:10', d:'包裹已从仁怀茅台镇发出', loc:'仁怀市茅台镇' },
-              { s:'done', t:'2025-09-20 10:15:30', d:'核销成功，商家正在备货中', loc:'茅台酒厂' }
-            ],
-            shipping:{ name:'张三', phone:'138****5678', addr:'贵州省贵阳市观山湖区茅台大厦1201室', exp:'顺丰速运', expNo:'SF1234567890123' }
-          },
-          { n:'线下品鉴会资格', v:false, x:'共2次 未使用' },
-          { n:'超值优惠券', v:true, d:'2025-07-03 14:30:00', ch:'茅台云商App', cd:'YH202507030012' }
-        ]
-      },
-      { id:'#77', t:'2025-08-22 09:15', h:'0x9c2d1e8f5a3b...3e4f', spec:'守岁', img:'守岁.png',
-        bf:[
-          { n:'实物酒兑换', v:true, d:'2025-10-18 10:15:45', a:'贵阳市茅台大厦一楼体验店', cd:'HX202510180003',
-            logistics:[
-              { s:'done', t:'2025-10-24 16:08', d:'包裹已签收，感谢您的兑换', loc:'成都市锦江区' },
-              { s:'done', t:'2025-10-23 11:30', d:'包裹正在派送中', loc:'成都市' },
-              { s:'done', t:'2025-10-22 19:45', d:'包裹已到达成都分拣中心', loc:'成都分拣中心' },
-              { s:'done', t:'2025-10-20 08:00', d:'包裹已从仁怀茅台镇发出', loc:'仁怀市茅台镇' },
-              { s:'done', t:'2025-10-18 10:15:45', d:'核销成功，商家正在备货中', loc:'茅台酒厂' }
-            ],
-            shipping:{ name:'李四', phone:'139****4321', addr:'四川省成都市锦江区太古里茅台文化体验中心', exp:'顺丰速运', expNo:'SF9876543210987' }
-          },
-          { n:'线下品鉴会资格', v:true, d:'2025-11-08 09:30:00', a:'成都太古里茅台文化体验中心', x:'已核2/2次' },
-          { n:'超值优惠券', v:true, d:'2025-12-15 16:45:20', ch:'茅台云商App', cd:'YH202512150020' }
-        ]
-      },
-      { id:'#102', t:'2026-03-10 11:20', h:'0xd5f8a3c2e7b1...9a6c', spec:'溯年', img:'溯年.png',
-        bf:[
-          { n:'实物酒兑换', v:false, x:'未核销' },
-          { n:'线下品鉴会资格', v:false, x:'共2次 未使用' },
-          { n:'超值优惠券', v:false, x:'未核销' }
-        ]
-      }
-    ]
-  },
-  feitian: {
-    name:'飞天茅台·元宇宙酒票', img:'飞天茅台·元宇宙酒票.png', n:'×1', url:'product_maotai1935.html',
-    list:[
-      { id:'#28', t:'2025-08-22 09:15', h:'0x3b5c9d1e8f2a...7d8e', spec:'典藏版', img:'飞天茅台·元宇宙酒票.png',
-        bf:[
-          { n:'实物酒兑换', v:true, d:'2025-10-12 14:00:20', a:'茅台国际大酒店', cd:'HX202510120001',
-            logistics:[
-              { s:'done', t:'2025-10-18 09:30:55', d:'包裹已签收', loc:'贵阳市' },
-              { s:'done', t:'2025-10-12 14:00:20', d:'核销成功，商家正在备货中', loc:'茅台酒厂' }
-            ],
-            shipping:{ name:'王五', phone:'137****9012', addr:'贵州省贵阳市南明区茅台国际大酒店', exp:'京东物流', expNo:'JD202510120001' }
-          },
-          { n:'线下品鉴会资格', v:false, x:'共2次 未使用' },
-          { n:'超值优惠券', v:true, d:'2025-12-01 11:20:10', ch:'茅台云商App', cd:'YH202512010003' }
-        ]
-      }
-    ]
-  },
-  guojiu: {
-    name:'国酒·数字徽章', img:'国酒·数字徽章.png', n:'×1', url:'product_maotai1935.html',
-    list:[
-      { id:'#08', t:'2025-04-10 15:00', h:'0xae1c3f5b8d2e...9f0a', spec:'标准款', img:'国酒·数字徽章.png',
-        bf:[
-          { n:'超值优惠券', v:true, d:'2025-05-20 10:00:00', ch:'茅台云商App', cd:'YH202505200008' },
-          { n:'线下品鉴会资格', v:false, x:'共1次 未使用' }
-        ]
-      }
-    ]
-  },
-  banana: {
-    name:'巴拿马金奖·复刻', img:'巴拿马金奖·复刻.png', n:'×1', url:'product_maotai1935.html',
-    list:[
-      { id:'#03', t:'2025-03-05 10:00', h:'0x1f8c7d3a5b6e...2d4c', spec:'典藏款', img:'巴拿马金奖·复刻.png',
-        bf:[
-          { n:'实物酒兑换', v:true, d:'2025-06-15 09:00:15', a:'茅台国际大酒店', cd:'HX202506150005',
-            logistics:[
-              { s:'done', t:'2025-06-22 14:00', d:'包裹已签收', loc:'广州市' },
-              { s:'done', t:'2025-06-15 09:00:15', d:'核销成功，商家正在备货中', loc:'茅台酒厂' }
-            ],
-            shipping:{ name:'赵六', phone:'136****3456', addr:'广东省广州市天河区茅台体验中心', exp:'顺丰速运', expNo:'SF5678901234567' }
-          },
-          { n:'线下品鉴会资格', v:true, d:'2026-01-08 10:30:00', a:'广州茅台文化体验中心', x:'已核1/1次' }
-        ]
-      }
-    ]
-  },
-  shengxiao: {
-    name:'茅台生肖兔·典藏', img:'茅台生肖兔·典藏.png', n:'×1', url:'product_maotai1935.html',
-    list:[
-      { id:'#12', t:'2026-01-15 12:00', h:'0xb2e4d8c1a5f7...3e6d', spec:'兔年限定', img:'茅台生肖兔·典藏.png',
-        bf:[
-          { n:'实物酒兑换', v:false, x:'未核销' },
-          { n:'线下品鉴会资格', v:false, x:'共1次 未使用' },
-          { n:'超值优惠券', v:false, x:'未核销' }
-        ]
-      }
-    ]
-  },
-  guichuideng: {
-    name:'鬼吹灯·数字资产', img:'鬼吹灯.png', n:'×1', url:'product_maotai1935.html',
-    list:[
-      { id:'#36', t:'2026-05-10 10:00', h:'0x7c8d9e0f1a...2b3c', spec:'标准款', img:'鬼吹灯.png',
-        bf:[
-          { n:'超值优惠券', v:true, d:'2026-05-18', ch:'鬼吹灯商城', cd:'G001' }
-        ]
-      }
-    ]
-  },
-  santi: {
-    name:'三体·数字资产', img:'三体.png', n:'×1', url:'product_maotai1935.html',
-    list:[
-      { id:'#42', t:'2026-06-01 14:00', h:'0x8e0f1a2b3c...4d5', spec:'标准款', img:'三体.png',
-        bf:[
-          { n:'超值优惠券', v:false, x:'未核销' }
-        ]
-      }
-    ]
-  },
   lantingyaji: {
     name:'兰亭雅集', img:'asset/兰亭雅集封面图.png', n:'×3', url:'product_maotai1935.html',
     list:[
       { id:'#01', t:'2026-05-15 10:00', h:'0x7a3e8f2b1c9d...1a2b', spec:'畅行版', img:'asset/畅行版.png',
         bf:[
-          { n:'景区VIP通行权', v:false, x:'未核销' },
-          { n:'研学课程', v:false, x:'共1次 未使用' }
+          { n:'景区VIP通行权', type:'identity', eff:'2026-05-15', exp:'2026-12-31', total:999, used:0, desc:'鹅池碑、御碑亭' },
+          { n:'研学课程', type:'ticket', eff:'2026-05-15', exp:'2026-12-31', total:3, used:0, desc:'书法研学、拓印体验、非遗手作',
+            slots:[{u:false,t:''},{u:false,t:''},{u:false,t:''}] }
         ]
       },
       { id:'#02', t:'2026-05-15 10:00', h:'0x9c2d1e8f5a3b...3e4f', spec:'学韵版', img:'asset/学韵版.png',
         bf:[
-          { n:'景区VIP通行权', v:true, d:'2026-07-01', a:'绍兴兰亭景区', cd:'VIP202607010001' },
-          { n:'研学课程', v:true, d:'2026-07-05', a:'绍兴兰亭书法学院', cd:'YX202607050001' },
-          { n:'文创实物', v:true, d:'2026-07-10', a:'兰亭文创中心', cd:'WC202607100001' }
+          { n:'景区VIP通行权', type:'identity', eff:'2026-05-01', exp:'2026-12-31', total:999, used:3, desc:'鹅池碑、御碑亭、曲水流觞' },
+          { n:'研学课程', type:'ticket', eff:'2026-05-01', exp:'2026-12-31', total:3, used:1, desc:'书法研学、拓印体验、非遗手作',
+            slots:[{u:true,t:'2026-05-20 09:15:30'},{u:false,t:''},{u:false,t:''}] },
+          { n:'文创实物', type:'physical', eff:'2026-05-01', exp:'2026-12-31', total:1, used:1, desc:'兰亭文创礼盒（含书法折扇、拓片、书签）',
+            ship:{name:'张三',phone:'138****5678',addr:'绍兴市柯桥区兰亭风景区文创中心',exp:'顺丰速运',expNo:'SF1234567890'},
+            logistics:[
+              {s:'active',t:'2026-06-10 10:30:00',d:'包裹已发出，正在派送中',loc:'绍兴分拣中心'},
+              {s:'done',t:'2026-06-09 14:00:00',d:'包裹已从兰亭文创中心发出',loc:'兰亭文创中心'}
+            ] }
         ]
       },
       { id:'#03', t:'2026-05-20 14:30', h:'0xd5f8a3c2e7b1...9a6c', spec:'优享版', img:'asset/优享版.png',
         bf:[
-          { n:'景区VIP通行权', v:true, d:'2026-06-25', a:'绍兴兰亭景区VIP通道', cd:'VIP202606250002' },
-          { n:'研学课程', v:true, d:'2026-06-28', a:'绍兴兰亭书法学院', cd:'YX202606280001' },
-          { n:'文创实物', v:false, x:'共1次 未使用' },
-          { n:'跨城特权', v:false, x:'未核销' }
+          { n:'景区VIP通行权', type:'identity', eff:'2026-05-01', exp:'2026-12-31', total:999, used:5, desc:'鹅池碑、御碑亭、曲水流觞、兰亭江' },
+          { n:'研学课程', type:'ticket', eff:'2026-05-01', exp:'2026-12-31', total:3, used:1, desc:'书法研学、拓印体验、非遗手作',
+            slots:[{u:true,t:'2026-06-20 10:00:00'},{u:false,t:''},{u:false,t:''}] },
+          { n:'文创实物', type:'physical', eff:'2026-05-01', exp:'2026-12-31', total:1, used:0, desc:'兰亭文创礼盒（含书法折扇、拓片、书签）' },
+          { n:'跨城特权', type:'identity', eff:'2026-06-01', exp:'2026-12-31', total:999, used:0, desc:'绍兴、杭州、上海三地优先入场' }
+        ]
+      }
+    ]
+  },
+  /* ── 新增：兰亭春禊 — 展示 已用完/已失效 权益包状态 ── */
+  lantingchunxi: {
+    name:'兰亭春禊', img:'asset/兰亭春禊封面图.png', n:'×2', url:'product_maotai1935.html',
+    list:[
+      { id:'#B01', t:'2026-04-01 10:00', h:'0x3f7a9e2c4d8b...e2f1', spec:'畅行版', img:'asset/畅行版.png',
+        /* 权益包：已用完 — 所有子权益均为 done */
+        bf:[
+          { n:'文创实物', type:'physical', eff:'2026-04-01', exp:'2026-06-30', total:1, used:1, desc:'兰亭文创礼盒（含书法折扇、拓片、书签）',
+            ship:{name:'赵六',phone:'136****9999',addr:'绍兴市柯桥区兰亭风景区游客中心',exp:'顺丰速运',expNo:'SF0987654321'},
+            logistics:[
+              {s:'done',t:'2026-05-20 14:00:00',d:'已签收',loc:'柯桥区兰亭'},
+              {s:'done',t:'2026-05-19 10:00:00',d:'包裹已发出',loc:'兰亭文创中心'}
+            ] },
+          { n:'研学课程', type:'ticket', eff:'2026-04-01', exp:'2026-06-30', total:2, used:2, desc:'书法研学、拓印体验、非遗手作',
+            slots:[{u:true,t:'2026-04-10 09:30:00'},{u:true,t:'2026-04-20 14:00:00'}] }
+        ]
+      },
+      { id:'#B02', t:'2026-04-01 10:00', h:'0x8a2d1f6e3c7b...9f0d', spec:'学韵版', img:'asset/学韵版.png',
+        /* 权益包：已失效 — 子权益含 done + expired，无 ending */
+        bf:[
+          { n:'文创实物', type:'physical', eff:'2026-01-01', exp:'2026-03-31', total:1, used:1, desc:'兰亭文创礼盒（含书法折扇、拓片、书签）',
+            ship:{name:'李四',phone:'139****1234',addr:'绍兴市越城区鲁迅中路88号',exp:'中通快递',expNo:'ZTO9876543210'},
+            logistics:[
+              {s:'done',t:'2026-03-15 10:00:00',d:'已签收',loc:'绍兴越城区'},
+              {s:'done',t:'2026-03-13 14:00:00',d:'包裹派送中',loc:'绍兴分拣中心'},
+              {s:'done',t:'2026-03-12 09:00:00',d:'包裹已发出',loc:'兰亭文创中心'}
+            ] },
+          { n:'跨城特权', type:'identity', eff:'2025-01-01', exp:'2025-12-31', total:10, used:3, desc:'绍兴、杭州、宁波三地优先入场' }
+        ]
+      }
+    ]
+  },
+  /* ── 新增：曲水流觞 — 展示 子权益全部5种状态 ── */
+  qushuishang: {
+    name:'曲水流觞', img:'asset/曲水流觞封面图.png', n:'×3', url:'product_maotai1935.html',
+    list:[
+      { id:'#C01', t:'2026-07-01 10:00', h:'0x4c9e7a1d3f6b...8c2e', spec:'基础版', img:'asset/畅行版.png',
+        /* 子权益：待生效 + 部分使用  → 权益包：部分使用 */
+        bf:[
+          { n:'跨城特权', type:'identity', eff:'2027-01-01', exp:'2027-12-31', total:999, used:0, desc:'绍兴、杭州、上海三地优先入场（2027年启用）' },
+          { n:'景区VIP通行权', type:'identity', eff:'2026-07-01', exp:'2027-12-31', total:10, used:3, desc:'鹅池碑、御碑亭、曲水流觞、兰亭江' }
+        ]
+      },
+      { id:'#C02', t:'2026-07-01 10:00', h:'0xf2b8a3d7e4c1...6a5f', spec:'学韵版', img:'asset/学韵版.png',
+        /* 子权益：待生效 + 未使用 + 已用完  → 权益包：部分使用 */
+        bf:[
+          { n:'景区VIP通行权', type:'identity', eff:'2027-08-01', exp:'2027-12-31', total:999, used:0, desc:'兰亭景区全区域通行权（2027年8月起生效）' },
+          { n:'研学课程', type:'ticket', eff:'2026-07-01', exp:'2027-12-31', total:2, used:0,
+            slots:[{u:false,t:''},{u:false,t:''}] },
+          { n:'文创实物', type:'physical', eff:'2026-01-01', exp:'2026-06-30', total:1, used:1,
+            ship:{name:'王五',phone:'137****5678',addr:'绍兴市柯桥区轻纺城路88号',exp:'韵达快递',expNo:'YD1234567890'},
+            logistics:[
+              {s:'done',t:'2026-06-20 16:00:00',d:'已签收',loc:'柯桥区轻纺城'},
+              {s:'done',t:'2026-06-19 11:00:00',d:'包裹派送中',loc:'绍兴分拣中心'}
+            ] }
+        ]
+      },
+      { id:'#C03', t:'2026-07-01 10:00', h:'0x1a6d9b2c8e4f...7d3a', spec:'优享版', img:'asset/优享版.png',
+        /* 子权益：已失效 × 3  → 权益包：已失效 */
+        bf:[
+          { n:'研学课程', type:'ticket', eff:'2024-01-01', exp:'2025-03-31', total:1, used:0, desc:'书法研学课程（已过期）',
+            slots:[{u:false,t:''}] },
+          { n:'景区VIP通行权', type:'identity', eff:'2024-01-01', exp:'2025-12-31', total:999, used:5, desc:'全景区通票（已过期权益）' },
+          { n:'跨城特权', type:'identity', eff:'2024-01-01', exp:'2025-06-30', total:10, used:2, desc:'绍兴、杭州、上海三地优先入场' }
         ]
       }
     ]
   }
 };
 
-var data = DB[prod] || DB.maotai1935;
+var data = DB[prod] || DB.lantingyaji;
 
 document.getElementById('overviewCard').innerHTML =
   '<div class="ov-img" style="background-image:url(\''+data.img+'\')"></div>'+
@@ -357,29 +380,20 @@ document.getElementById('overviewCard').innerHTML =
   '</div>';
 document.getElementById('btnProduct').onclick = function(){ location.href = data.url; };
 
-function calcSummary(bf){
-  var allV = true, noneV = true;
-  for(var i=0;i<bf.length;i++){
-    if(bf[i].v) noneV = false; else allV = false;
-  }
-  if(allV) return 'verified';
-  if(noneV) return 'unverified';
-  return 'partial';
-}
-
 var listEl = document.getElementById('instanceList');
 data.list.forEach(function(inst, idx){
-  var sum = calcSummary(inst.bf);
-  var sm = SUM[sum];
+  var pStatus = calcPackageStatus(inst.bf);
+  var pm = P_STA[pStatus];
   var cid = 'card_'+idx;
 
   var bfRows = '';
   inst.bf.forEach(function(bf, bi){
-    var ico = ICONS[bf.n] || ICONS['实物酒兑换'];
-    var st = STA[bf.v ? 'verified' : 'unverified'];
+    var s = calcBenefitStatus(bf);
+    var st = B_STA[s] || B_STA.unused;
+    var ico = ICONS[bf.n] || ICONS['景区VIP通行权'];
     var extra = '';
-    if(bf.v){ extra = bf.d || bf.x || ''; }
-    else { extra = bf.x || ''; }
+    if(bf.type === 'ticket') extra = '已用'+bf.used+'/'+bf.total+'次';
+    else if(bf.type === 'identity' && bf.used > 0) extra = '已扫码'+bf.used+'次';
 
     bfRows +=
       '<div class="ai-benefit" onclick="event.stopPropagation();onBenefit('+idx+','+bi+')">'+
@@ -388,7 +402,7 @@ data.list.forEach(function(inst, idx){
         '</div>'+
         '<div class="ai-bf-name">'+bf.n+'</div>'+
         (extra ? '<div class="ai-bf-extra">'+extra+'</div>' : '')+
-        (bf.v ? '<span class="ai-bf-tag '+st[1]+'">'+st[0]+'</span>' : '')+
+        '<span class="ai-bf-tag '+st[1]+'">'+st[0]+'</span>'+
       '</div>';
   });
 
@@ -407,7 +421,7 @@ data.list.forEach(function(inst, idx){
           (inst.spec ? '<div class="ai-spec-name">'+inst.spec+'</div>' : '')+
         '</div></div>'+
         '<div class="ai-header-right">'+
-          '<span class="ai-sum-tag '+sm.c+'">'+sm.t+'</span>'+
+          '<span class="ai-sum-tag '+pm.c+'">'+pm.t+'</span>'+
           '<div class="ai-expand">'+
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>'+
           '</div>'+
@@ -451,64 +465,149 @@ function makeQR(used, usedDate){
   return html;
 }
 
+var qrIdx = {};
+function goQr(trackId, curId, idx, total, slots){
+  qrIdx[trackId] = idx;
+  var card = document.getElementById(trackId);
+  var cur = document.getElementById(curId);
+  if(card && slots && slots[idx]){
+    var s = slots[idx];
+    card.innerHTML =
+      '<div class="qr-img"><img src="asset/二维码.png" alt="二维码">'+
+        (s.u ? '<div class="qr-used-overlay"><span>已使用</span></div>' : '')+
+      '</div>'+
+      (s.t ? '<div class="qr-used-time">核销时间：'+s.t+'</div>' : '');
+  }
+  if(cur) cur.textContent = (idx+1) + '/' + total;
+}
+function goQrPrev(trackId, curId, total){
+  var idx = (qrIdx[trackId] || 0) - 1;
+  if(idx < 0) idx = total - 1;
+  goQr(trackId, curId, idx, total, window['qrSlots_' + trackId]);
+}
+function goQrNext(trackId, curId, total){
+  var idx = (qrIdx[trackId] || 0) + 1;
+  if(idx >= total) idx = 0;
+  goQr(trackId, curId, idx, total, window['qrSlots_' + trackId]);
+}
+
 function onBenefit(idx, bi){
   var bf = data.list[idx].bf[bi];
+  var s = calcBenefitStatus(bf);
+  var st = B_STA[s] || B_STA.unused;
   var modal = document.getElementById('modalMask');
   var content = document.getElementById('modalContent');
 
-  if(bf.n === '景区VIP通行权' || bf.n === '跨城特权'){
-    var desc = bf.n === '景区VIP通行权'
-      ? '兰亭景区VIP通行权，包括景点：鹅池碑、御碑亭'
-      : '兰亭雅集跨城特权，持本权益可享受绍兴、杭州、上海三地兰亭文化体验馆优先入场';
+  if(bf.type === 'identity'){
     content.innerHTML =
       '<div class="benefit-modal">'+
         '<div class="modal-hdr">'+
           '<div class="mh-left">'+
             '<div class="modal-title">'+bf.n+'</div>'+
-            '<div class="modal-sub">点击下方二维码进行核销</div>'+
           '</div>'+
-          '<span class="benefit-status valid">有效</span>'+
+          '<span class="benefit-status '+s+'">'+st[0]+'</span>'+
         '</div>'+
-        '<div class="benefit-desc">'+desc+'</div>'+
-        '<div class="qr-section">'+makeQR(false)+'</div>'+
-        '<div class="qr-expiry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>有效期至：2026-12-31</div>'+
+        '<div class="benefit-card" style="margin-bottom:14px;line-height:1.6;color:var(--ink-muted);font-size:13px">'+bf.desc+'</div>'+
+        '<div style="padding:0 0 8px"><div class="qr-card" style="width:200px;margin:0 auto"><div class="qr-img"><img src="asset/二维码.png" alt="二维码"></div></div></div>'+
+        '<div class="qr-expiry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>有效期：'+bf.eff+' ~ '+bf.exp+'</div>'+
       '</div>';
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
     return;
   }
 
-  if(bf.n === '研学课程'){
+  if(bf.type === 'ticket'){
+    var slots = bf.slots || [{u:false,t:''},{u:false,t:''},{u:false,t:''}];
+    // 已使用排到最后
+    slots.sort(function(a,b){ return (a.u?1:0) - (b.u?1:0); });
+    var totalSlots = slots.length;
+    var usedSlots = slots.filter(function(s){ return s.u; }).length;
+    var trackId = 'qrTrack_' + idx + '_' + bi;
+    var curId = 'qrCur_' + idx + '_' + bi;
+    window['qrSlots_' + trackId] = slots;
+
     content.innerHTML =
       '<div class="benefit-modal">'+
         '<div class="modal-hdr">'+
           '<div class="mh-left">'+
-            '<div class="modal-title">研学课程</div>'+
-            '<div class="modal-sub">滑动查看课程二维码</div>'+
+            '<div class="modal-title">'+bf.n+'</div>'+
+            '<div class="modal-sub">已使用 '+usedSlots+'/'+totalSlots+' 张</div>'+
           '</div>'+
-          '<span class="benefit-status partial">部分使用</span>'+
+          '<span class="benefit-status '+s+'">'+st[0]+'</span>'+
         '</div>'+
-        '<div class="benefit-desc">漓渚镇兰花/书法研学课程3张</div>'+
-        '<div class="qr-section">'+
-          makeQR(false)+
-          makeQR(true, '2026-06-15 14:30:00')+
-          makeQR(false)+
+        '<div class="benefit-card" style="margin-bottom:14px;line-height:1.6;color:var(--ink-muted);font-size:13px">'+(bf.desc||'')+'</div>'+
+        '<div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:10px">'+
+          '<button class="qr-arrow" onclick="goQrPrev(\''+trackId+'\',\''+curId+'\','+totalSlots+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>'+
+          '<span class="qr-index" id="'+curId+'">1/'+totalSlots+'</span>'+
+          '<button class="qr-arrow" onclick="goQrNext(\''+trackId+'\',\''+curId+'\','+totalSlots+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>'+
         '</div>'+
-        '<div class="qr-expiry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>有效期至：2026-12-31</div>'+
+        '<div class="qr-card" id="'+trackId+'" style="width:200px;margin:0 auto 10px"><div class="qr-img"><img src="asset/二维码.png" alt="二维码">'+
+          (slots[0].u ? '<div class="qr-used-overlay"><span>已使用</span></div>' : '')+
+        '</div>'+
+          (slots[0].t ? '<div class="qr-used-time">核销时间：'+slots[0].t+'</div>' : '')+
+        '</div>'+
+        '<div class="qr-expiry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>有效期：'+bf.eff+' ~ '+bf.exp+'</div>'+
       '</div>';
+
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
     return;
   }
 
-  if(bf.n === '文创实物'){
+  if(bf.type === 'physical'){
+    if(s === 'done'){
+      var ship = bf.ship || {};
+      var logs = bf.logistics || [];
+      var logHtml = '';
+      logs.forEach(function(l){
+        logHtml +=
+          '<div class="logis-item">'+
+            '<div class="logis-line"></div>'+
+            '<div class="logis-dot '+(l.s === 'active' ? 'active' : 'done')+'"></div>'+
+            '<div class="logis-info">'+
+              '<div class="l-tit">'+l.d+'</div>'+
+              '<div class="l-time">'+l.t+'</div>'+
+              '<div class="l-desc">'+l.loc+'</div>'+
+            '</div>'+
+          '</div>';
+      });
+      content.innerHTML =
+        '<div class="benefit-modal">'+
+          '<div class="modal-hdr">'+
+            '<div class="mh-left">'+
+              '<div class="modal-title">'+bf.n+'</div>'+
+            '</div>'+
+            '<span class="benefit-status done">已用完</span>'+
+          '</div>'+
+          '<div class="benefit-card" style="margin-bottom:14px;line-height:1.6;color:var(--ink-muted);font-size:13px">'+(bf.desc||'')+'</div>'+
+          '<div class="modal-sub" style="margin-bottom:14px">已领取，物流信息如下</div>'+
+          '<div class="benefit-card">'+
+            '<div class="si-row"><span class="si-l">收件人</span><span class="si-r">'+(ship.name||'--')+'</span></div>'+
+            '<div class="si-row"><span class="si-l">联系电话</span><span class="si-r">'+(ship.phone||'--')+'</span></div>'+
+            '<div class="si-row"><span class="si-l">收货地址</span><span class="si-r">'+(ship.addr||'--')+'</span></div>'+
+            '<div class="si-row" style="border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:8px"><span class="si-l">快递</span><span class="si-r">'+(ship.exp||'--')+' '+(ship.expNo||'')+'</span></div>'+
+            '<div class="logistics">'+logHtml+'</div>'+
+          '</div>'+
+        '</div>';
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+      return;
+    }
     content.innerHTML =
-      '<div class="modal-title">文创实物</div>'+
-      '<div class="modal-sub" style="margin-bottom:14px">填写收货信息，核销后寄送兰亭文创实物</div>'+
-      '<div class="form-group"><label class="form-label">收件人姓名</label><input class="form-input" id="fName" placeholder="请输入收件人姓名"></div>'+
-      '<div class="form-group"><label class="form-label">联系电话</label><input class="form-input" id="fPhone" type="tel" placeholder="请输入手机号码"></div>'+
-      '<div class="form-group"><label class="form-label">详细地址</label><textarea class="form-input" id="fAddr" placeholder="省/市/区/街道/门牌号"></textarea></div>'+
-      '<button class="form-submit" id="fSubmit" onclick="submitWenChuang('+idx+','+bi+')">确认核销并提交</button>';
+      '<div class="benefit-modal">'+
+        '<div class="modal-hdr">'+
+          '<div class="mh-left"><div class="modal-title">'+bf.n+'</div></div>'+
+          '<span class="benefit-status '+s+'">'+st[0]+'</span>'+
+        '</div>'+
+        '<div class="benefit-card" style="margin-bottom:14px;line-height:1.6;color:var(--ink-muted);font-size:13px">'+(bf.desc||'')+'</div>'+
+        '<div class="modal-sub" style="margin-bottom:14px">填写收货信息，核销后寄送兰亭文创实物</div>'+
+        '<div class="benefit-card">'+
+          '<div class="form-group"><label class="form-label">收件人姓名</label><input class="form-input" id="fName" placeholder="请输入收件人姓名"></div>'+
+          '<div class="form-group"><label class="form-label">联系电话</label><input class="form-input" id="fPhone" type="tel" placeholder="请输入手机号码"></div>'+
+          '<div class="form-group"><label class="form-label">详细地址</label><textarea class="form-input" id="fAddr" placeholder="省/市/区/街道/门牌号"></textarea></div>'+
+          '<button class="form-submit" id="fSubmit" onclick="submitWenChuang('+idx+','+bi+')">确认核销并提交</button>'+
+        '</div>'+
+      '</div>';
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
     return;
@@ -529,28 +628,14 @@ function submitWenChuang(idx, bi){
 
   setTimeout(function(){
     var bf = data.list[idx].bf[bi];
-    bf.v = true;
-    bf.d = '2026-07-15';
-    bf.a = addr;
-    bf.cd = 'WC20260715'+(idx+1);
-    delete bf.x;
-    bf.shipping = {
-      name: name,
-      phone: phone.substring(0,3)+'****'+phone.substring(phone.length-4),
-      addr: addr,
-      exp: '顺丰速运',
-      expNo: 'SF'+Date.now().toString().substring(5)
-    };
-    bf.logistics = [
-      { s:'active', t:'2026-06-10 '+new Date().toTimeString().substring(0,8), d:'核销成功，商家正在备货中', loc:'茅台酒厂' }
-    ];
+    bf.used = 1;
 
     var content = document.getElementById('modalContent');
     content.innerHTML =
       '<div class="success-box">'+
         '<div class="s-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>'+
         '<div class="s-tit">核销提交成功</div>'+
-        '<div class="s-desc">商家将在1-3个工作日内安排发货，届时可在此查看物流信息</div>'+
+        '<div class="s-desc">兰亭文创实物将在7个工作日内寄出</div>'+
         '<button class="form-submit" style="margin-top:20px" onclick="closeModal();location.reload()">我知道了</button>'+
       '</div>';
   }, 1200);
@@ -561,7 +646,122 @@ function closeModal(e){
   document.getElementById('modalMask').classList.remove('show');
   document.body.style.overflow = '';
 }
+
+/* ── 功能说明浮窗 ── */
+function toggleFuncModal(){
+  var m = document.getElementById('funcModal');
+  var o = document.getElementById('fmOverlay');
+  m.classList.toggle('show');
+  o.classList.toggle('show');
+  if(m.classList.contains('show') && !m.dataset.dragged){
+    m.style.left = '50%'; m.style.top = '50%'; m.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function(){
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function(){
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e){ modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e){ var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e){ if(!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e){ if(!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag(){ dragging = false; if(titleBar) titleBar.style.cursor = 'grab'; }
+})();
 </script>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="fm-overlay" id="fmOverlay" onclick="toggleFuncModal()"></div>
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div class="fm-body">
+    <h4>一、权益包状态（Package）</h4>
+    <blockquote>权益包状态由子权益状态计算得出</blockquote>
+    <table>
+      <tr><th>状态</th><th>定义</th><th>判定逻辑</th></tr>
+      <tr><td>未使用</td><td>尚未使用任何子权益</td><td>所有子权益均未发生使用行为</td></tr>
+      <tr><td>部分使用</td><td>已发生权益使用行为，但仍存在未结束的子权益</td><td>存在已使用权益，且存在未结束权益</td></tr>
+      <tr><td>已用完</td><td>所有子权益均已使用完成</td><td>所有子权益均为已用完</td></tr>
+      <tr><td>已失效</td><td>权益包内已无可使用权益，且存在失效权益</td><td>不存在未结束权益，且至少存在一个已失效权益</td></tr>
+    </table>
+    <p><strong>子权益分类：</strong>未结束权益 = 待生效、未使用、部分使用 ｜ 已结束权益 = 已用完、已失效</p>
+    <hr>
+    <table>
+      <tr><th>身份权益</th><th>门票权益</th><th>实物权益</th><th>权益包状态</th></tr>
+      <tr><td>未使用</td><td>未使用</td><td>未使用</td><td>未使用</td></tr>
+      <tr><td>待生效</td><td>未使用</td><td>未使用</td><td>未使用</td></tr>
+      <tr><td>部分使用</td><td>未使用</td><td>未使用</td><td>部分使用</td></tr>
+      <tr><td>已用完</td><td>未使用</td><td>未使用</td><td>部分使用</td></tr>
+      <tr><td>已用完</td><td>已用完</td><td>已用完</td><td>已用完</td></tr>
+      <tr><td>已失效</td><td>已失效</td><td>已失效</td><td>已失效</td></tr>
+      <tr><td>已用完</td><td>已失效</td><td>已失效</td><td>已失效</td></tr>
+      <tr><td>部分使用</td><td>已失效</td><td>已失效</td><td>部分使用</td></tr>
+      <tr><td>已用完</td><td>已用完</td><td>已失效</td><td>已失效</td></tr>
+    </table>
+
+    <h4>二、子权益状态（Benefit）</h4>
+    <table>
+      <tr><th>状态</th><th>定义</th><th>判定逻辑</th></tr>
+      <tr><td>待生效</td><td>未达到生效时间</td><td>当前时间 &lt; 生效时间</td></tr>
+      <tr><td>未使用</td><td>已生效且未发生任何使用行为</td><td>当前时间 ≥ 生效时间，未过期，已使用次数=0</td></tr>
+      <tr><td>部分使用</td><td>已发生部分使用，仍可继续使用</td><td>已使用次数&gt;0，且剩余次数&gt;0</td></tr>
+      <tr><td>已用完</td><td>权益已全部消耗完成</td><td>剩余次数=0</td></tr>
+      <tr><td>已失效</td><td>超过有效期且未使用完</td><td>当前时间&gt;失效时间，且状态不满足已用完</td></tr>
+    </table>
+    <hr>
+    <p><strong>状态优先级（高→低）：</strong>已用完 &gt; 已失效 &gt; 待生效 &gt; 部分使用 &gt; 未使用</p>
+
+    <h4>三、权益类型状态示例</h4>
+    <p><strong>身份权益（无限次扫码）</strong></p>
+    <table>
+      <tr><th>场景</th><th>状态</th></tr>
+      <tr><td>未到生效时间</td><td>待生效</td></tr>
+      <tr><td>从未扫码验证</td><td>未使用</td></tr>
+      <tr><td>已发生扫码验证</td><td>部分使用</td></tr>
+      <tr><td>超过有效期</td><td>已失效</td></tr>
+    </table>
+    <p><strong>门票权益 / 兑换券权益</strong></p>
+    <table>
+      <tr><th>总次数</th><th>已使用次数</th><th>是否过期</th><th>状态</th></tr>
+      <tr><td>3</td><td>0</td><td>否</td><td>未使用</td></tr>
+      <tr><td>3</td><td>1</td><td>否</td><td>部分使用</td></tr>
+      <tr><td>3</td><td>2</td><td>否</td><td>部分使用</td></tr>
+      <tr><td>3</td><td>3</td><td>否</td><td>已用完</td></tr>
+      <tr><td>3</td><td>1</td><td>是</td><td>已失效</td></tr>
+      <tr><td>3</td><td>0</td><td>是</td><td>已失效</td></tr>
+      <tr><td>3</td><td>3</td><td>是</td><td>已用完</td></tr>
+    </table>
+    <p><strong>实物权益</strong></p>
+    <table>
+      <tr><th>场景</th><th>状态</th></tr>
+      <tr><td>未到领取开始时间</td><td>待生效</td></tr>
+      <tr><td>可领取但未领取</td><td>未使用</td></tr>
+      <tr><td>已领取</td><td>已用完</td></tr>
+      <tr><td>超过领取截止时间未领取</td><td>已失效</td></tr>
+      <tr><td>已领取后超过领取截止时间</td><td>已用完</td></tr>
+    </table>
+
+    <h4>四、权益包状态计算规则</h4>
+    <p><strong>未使用：</strong>不存在部分使用/已用完状态子权益，至少存在一个待生效或未使用状态子权益</p>
+    <p><strong>部分使用：</strong>存在部分使用或已用完状态子权益，同时存在待生效、未使用或部分使用状态子权益</p>
+    <p><strong>已用完：</strong>所有子权益均为已用完状态</p>
+    <p><strong>已失效：</strong>不存在待生效/未使用/部分使用状态子权益，至少存在一个已失效状态子权益，不满足已用完条件</p>
+
+    <h4>五、最终状态集</h4>
+    <p><strong>权益包状态：</strong>未使用、部分使用、已用完、已失效</p>
+    <p><strong>子权益状态：</strong>待生效、未使用、部分使用、已用完、已失效</p>
+  </div>
+</div>
 
 </body>
 </html>

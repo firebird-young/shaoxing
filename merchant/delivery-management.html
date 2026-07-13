@@ -741,7 +741,7 @@
       <h1>发货管理</h1>
     </div>
     <div class="header-right">
-      <span class="merchant-name">贵州茅台集团</span>
+      <span class="merchant-name">绍兴兰亭产业数资</span>
       <span class="verify-badge">V</span>
       <button class="btn-logout">退出登录</button>
     </div>
@@ -1018,139 +1018,126 @@
     // 发货数据
     const deliveryData = [
       {
-        deliveryNo: 'DH20240115001',
-        orderNo: 'DD202401150001',
-        productName: '飞天茅台 53度 500ml',
-        quantity: 1,
-        userId: 'U20240001',
-        userPhone: '13800188888',
-        receiver: '张三',
-        phone: '13800188888',
-        address: '北京市朝阳区建国路88号SOHO现代城A座1001室',
-        status: 'pending',
-        createTime: '2024-01-15 10:30:00'
-      },
-      {
-        deliveryNo: 'DH20240115002',
-        orderNo: 'DD202401150002',
-        productName: '茅台1935 53度 500ml',
-        quantity: 2,
-        userId: 'U20240002',
-        userPhone: '13900166666',
-        receiver: '李四',
-        phone: '13900166666',
-        address: '上海市浦东新区陆家嘴环路1000号恒生银行大厦20层',
-        status: 'pending',
-        createTime: '2024-01-15 11:20:00'
-      },
-      {
-        deliveryNo: 'DH20240114003',
-        orderNo: 'DD202401140003',
-        productName: '飞天茅台 53度 500ml',
+        deliveryNo: 'DH20260701001',
+        orderNo: 'DD202607010001',
+        productName: '兰亭雅集·文创礼盒',
         quantity: 1,
         userId: 'U20240003',
-        userPhone: '13700155555',
-        receiver: '王五',
-        phone: '13700155555',
-        address: '广州市天河区珠江新城冼村路11号保利威座北塔30楼',
+        userPhone: '13755555555',
+        receiver: '江南游客',
+        phone: '13755555555',
+        address: '绍兴市柯桥区兰亭风景区游客中心',
+        status: 'pending',
+        createTime: '2026-07-01 10:30:00'
+      },
+      {
+        deliveryNo: 'DH20260701002',
+        orderNo: 'DD202607010002',
+        productName: '兰亭雅集·文创礼盒',
+        quantity: 2,
+        userId: 'U20240004',
+        userPhone: '13644444444',
+        receiver: '绍兴老酒客',
+        phone: '13644444444',
+        address: '绍兴市越城区鲁迅中路88号',
+        status: 'pending',
+        createTime: '2026-07-01 11:20:00'
+      },
+      {
+        deliveryNo: 'DH20260628003',
+        orderNo: 'DD202606280003',
+        productName: '兰亭春禊·文创礼盒',
+        quantity: 1,
+        userId: 'U20240005',
+        userPhone: '13533333333',
+        receiver: '文化收藏家',
+        phone: '13533333333',
+        address: '杭州市西湖区文三路478号华星创业大厦15楼',
         status: 'shipped',
         company: '顺丰速运',
         trackingNo: 'SF1234567890',
-        createTime: '2024-01-14 15:45:00',
-        shipTime: '2024-01-14 16:30:00',
+        createTime: '2026-06-28 15:45:00',
+        shipTime: '2026-06-28 16:30:00',
         logistics: [
-          { time: '2024-01-14 16:30:00', text: '快件已揽收', done: true },
-          { time: '2024-01-14 18:45:00', text: '快件已到达广州转运中心', done: true },
-          { time: '2024-01-15 08:30:00', text: '快件已发出，下一站：北京', done: true },
-          { time: '2024-01-15 14:20:00', text: '快件已到达北京集散中心', done: false, current: true }
+          { time: '2026-06-28 16:30:00', text: '快件已揽收', done: true },
+          { time: '2026-06-28 18:45:00', text: '快件已到达绍兴转运中心', done: true },
+          { time: '2026-06-29 08:30:00', text: '快件已发出，下一站：杭州', done: true },
+          { time: '2026-06-29 14:20:00', text: '快件已到达杭州集散中心', done: false, current: true }
         ]
       },
       {
-        deliveryNo: 'DH20240113004',
-        orderNo: 'DD202401130004',
-        productName: '贵州大曲 53度 500ml',
+        deliveryNo: 'DH20260620004',
+        orderNo: 'DD202606200004',
+        productName: '兰亭春禊·文创礼盒',
         quantity: 3,
-        userId: 'U20240004',
-        userPhone: '13600144444',
-        receiver: '赵六',
-        phone: '13600144444',
-        address: '深圳市南山区科技园南区深南大道9999号',
+        userId: 'U20240006',
+        userPhone: '13422222222',
+        receiver: '水乡旅人',
+        phone: '13422222222',
+        address: '绍兴市柯桥区轻纺城路88号',
         status: 'delivered',
-        company: '圆通速递',
-        trackingNo: 'YT9876543210',
-        createTime: '2024-01-13 09:15:00',
-        shipTime: '2024-01-13 10:00:00',
+        company: '韵达快递',
+        trackingNo: 'YD9876543210',
+        createTime: '2026-06-20 09:15:00',
+        shipTime: '2026-06-20 10:00:00',
         logistics: [
-          { time: '2024-01-13 10:00:00', text: '快件已揽收', done: true },
-          { time: '2024-01-13 12:30:00', text: '快件已到达深圳转运中心', done: true },
-          { time: '2024-01-14 09:00:00', text: '快件已送达，签收人：本人', done: true, current: true }
+          { time: '2026-06-20 10:00:00', text: '快件已揽收', done: true },
+          { time: '2026-06-20 12:30:00', text: '快件已到达柯桥分拣中心', done: true },
+          { time: '2026-06-21 09:00:00', text: '快件已送达，签收人：本人', done: true, current: true }
         ]
       },
       {
-        deliveryNo: 'DH20240115005',
-        orderNo: 'DD202401150005',
-        productName: '飞天茅台 53度 500ml',
+        deliveryNo: 'DH20260701005',
+        orderNo: 'DD202607010005',
+        productName: '兰亭雅集·学韵版文创',
         quantity: 1,
-        userId: 'U20240005',
-        userPhone: '13500133333',
-        receiver: '孙七',
-        phone: '13500133333',
-        address: '杭州市西湖区文三路478号华星创业大厦15楼',
+        userId: 'U20240001',
+        userPhone: '13856785678',
+        receiver: '数码藏家',
+        phone: '13856785678',
+        address: '绍兴市柯桥区兰亭风景区文创中心',
         status: 'pending',
-        createTime: '2024-01-15 14:00:00'
+        createTime: '2026-07-01 14:00:00'
       },
       {
-        deliveryNo: 'DH20240115006',
-        orderNo: 'DD202401150006',
-        productName: '茅台王子酒 53度 500ml',
+        deliveryNo: 'DH20260615006',
+        orderNo: 'DD202606150006',
+        productName: '兰亭春禊·文创礼盒',
         quantity: 2,
-        userId: 'U20240006',
-        userPhone: '13400122222',
-        receiver: '周八',
-        phone: '13400122222',
-        address: '成都市锦江区春熙路步行街1号IFS国际金融中心',
-        status: 'pending',
-        createTime: '2024-01-15 15:30:00'
-      },
-      {
-        deliveryNo: 'DH20240114007',
-        orderNo: 'DD202401140007',
-        productName: '飞天茅台 53度 500ml',
-        quantity: 1,
         userId: 'U20240007',
-        userPhone: '13300111111',
-        receiver: '吴九',
-        phone: '13300111111',
-        address: '南京市鼓楼区中山路18号德基广场',
+        userPhone: '13100000000',
+        receiver: '过路游客',
+        phone: '13100000000',
+        address: '绍兴市越城区解放路56号',
         status: 'shipped',
         company: '中通快递',
         trackingNo: 'ZT1122334455',
-        createTime: '2024-01-14 16:00:00',
-        shipTime: '2024-01-14 17:30:00',
+        createTime: '2026-06-15 16:00:00',
+        shipTime: '2026-06-15 17:30:00',
         logistics: [
-          { time: '2024-01-14 17:30:00', text: '快件已揽收', done: true },
-          { time: '2024-01-15 09:30:00', text: '快件已到达南京转运中心', done: false, current: true }
+          { time: '2026-06-15 17:30:00', text: '快件已揽收', done: true },
+          { time: '2026-06-16 09:30:00', text: '快件已到达绍兴转运中心', done: false, current: true }
         ]
       },
       {
-        deliveryNo: 'DH20240112008',
-        orderNo: 'DD202401120008',
-        productName: '飞天茅台 53度 500ml',
+        deliveryNo: 'DH20260610007',
+        orderNo: 'DD202606100007',
+        productName: '曲水流觞·文创礼盒',
         quantity: 1,
         userId: 'U20240008',
-        userPhone: '13200100000',
-        receiver: '郑十',
-        phone: '13200100000',
-        address: '武汉市江汉区解放大道688号武汉国际广场',
+        userPhone: '13377777777',
+        receiver: '文创爱好者',
+        phone: '13377777777',
+        address: '绍兴市柯桥区湖塘街道88号',
         status: 'delivered',
         company: '顺丰速运',
         trackingNo: 'SF5566778899',
-        createTime: '2024-01-12 11:00:00',
-        shipTime: '2024-01-12 12:00:00',
+        createTime: '2026-06-10 11:00:00',
+        shipTime: '2026-06-10 12:00:00',
         logistics: [
-          { time: '2024-01-12 12:00:00', text: '快件已揽收', done: true },
-          { time: '2024-01-12 18:00:00', text: '快件已到达武汉转运中心', done: true },
-          { time: '2024-01-13 10:30:00', text: '快件已送达，签收人：本人', done: true, current: true }
+          { time: '2026-06-10 12:00:00', text: '快件已揽收', done: true },
+          { time: '2026-06-10 18:00:00', text: '快件已到达绍兴转运中心', done: true },
+          { time: '2026-06-11 10:30:00', text: '快件已送达，签收人：本人', done: true, current: true }
         ]
       }
     ];

@@ -116,6 +116,7 @@
     .benefit-unused { background: #f0f5ff; color: #1890ff; }
     .benefit-status { padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500; }
     .benefit-partial { background: #fff7e6; color: #fa8c16; }
+    .benefit-cancelled { background: #fff2f3; color: #D70C1F; }
     .btn-group { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #f0f0f0; }
     .btn-cancel { padding: 8px 20px; background: #f5f5f5; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
 
@@ -171,7 +172,7 @@
       <div class="search-fields">
         <div class="search-field"><label>订单号</label><input type="text" id="orderNoInput" placeholder="请输入订单号"></div>
         <div class="search-field"><label>数字资产名称</label><input type="text" id="productNameInput" placeholder="请输入商品名称"></div>
-        <div class="search-field"><label>发行方</label><select id="issuerInput" style="height:36px;padding:0 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;width:150px"><option value="">全部</option><option value="贵州茅台集团">贵州茅台集团</option><option value="海底捞">海底捞</option><option value="王者荣耀">王者荣耀</option><option value="三体">三体</option><option value="鬼吹灯">鬼吹灯</option></select></div>
+        <div class="search-field"><label>发行方</label><select id="issuerInput" style="height:36px;padding:0 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;width:150px"><option value="">全部</option><option value="绍兴兰亭产业数资">绍兴兰亭产业数资</option><option value="古越龙山">古越龙山</option></select></div>
         <div class="search-field"><label>款式</label><input type="text" id="specInput" placeholder="请输入款式"></div>
         <div class="search-field"><label>买家账号</label><input type="text" id="buyerAccountInput" placeholder="请输入买家账号"></div>
         <div class="search-field"><label>买家ID</label><input type="text" id="buyerIdInput" placeholder="请输入买家ID"></div>
@@ -208,44 +209,68 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- 权益详情浮窗 -->
+<div class="modal-overlay" id="benefitModal" style="z-index:2000">
+  <div class="modal-box" style="max-width:500px">
+    <div class="modal-header">
+      <div class="modal-title">权益详情</div>
+      <div class="modal-close" onclick="document.getElementById('benefitModal').classList.remove('show')">✕</div>
+    </div>
+    <div class="modal-body" id="benefitBody"></div>
+  </div>
+</div>
+
 <script>
+/* ── 权益状态判定 ── */
+var B_STA = { pending:['待生效','benefit-unused'], unused:['未使用','benefit-unused'], partial:['部分使用','benefit-partial'], done:['已用完','benefit-used'], expired:['已失效','benefit-cancelled'] };
+var P_STA_MAP = { unused:'未使用', partial:'部分使用', done:'已用完', expired:'已失效' };
+function calcBenefitStatus(bf){
+  var now = Date.now();
+  var eff = bf.eff ? new Date(bf.eff).getTime() : 0;
+  var exp = bf.exp ? new Date(bf.exp).getTime() : Infinity;
+  var total = bf.total || 1;
+  var used = bf.used || 0;
+  if(used >= total) return 'done';
+  if(now > exp && used < total) return 'expired';
+  if(now < eff) return 'pending';
+  if(used > 0 && used < total) return 'partial';
+  return 'unused';
+}
+function calcPackageStatus(bfs){
+  var hP=false,hD=false,hE=false,hX=false;
+  bfs.forEach(function(b){var s=calcBenefitStatus(b);if(s==='partial')hP=true;if(s==='done')hD=true;if(s==='expired')hX=true;if(s==='pending'||s==='unused'||s==='partial')hE=true;});
+  if(!hX&&hD&&!hE)return'done';if(!hE&&hX)return'expired';if(hE&&(hP||hD))return'partial';return'unused';
+}
+
+/* ── 订单数据（多发行方） ── */
 var orders = [
-  { id: 'O20240601001', product:'1935·时光窖藏', spec:'凝时', img:'🎯', price:599, status:'pending', buyerId:'U20240001', buyerNick:'茅台收藏家', buyerAccount:'138****8888', date:'2026-06-01 10:30:25', issuer:'贵州茅台集团', quantity:1, payTime:'-', payMethod:'支付宝', benefitStatus:'-',
-    benefits:[{name:'限量编号证书', status:'unused'},{name:'VIP专属通道', status:'unused'}] },
-  { id: 'O20240601002', product:'飞天茅台·元宇宙酒票', spec:'标准款', img:'🍷', price:299, status:'completed', buyerId:'U20240002', buyerNick:'数字玩家', buyerAccount:'139****6666', date:'2026-05-28 14:15:10', issuer:'贵州茅台集团', quantity:2, payTime:'2026-05-28 14:16:05', payMethod:'微信支付', benefitStatus:'部分核销',
-    benefits:[{name:'线下品鉴会入场资格', status:'unused'},{name:'专属客服服务', status:'used'}] },
-  { id: 'O20240601003', product:'1935·时光窖藏', spec:'守岁', img:'🎯', price:699, status:'pending', buyerId:'U20240003', buyerNick:'元宇宙探索者', buyerAccount:'137****5555', date:'2026-06-02 09:00:33', issuer:'贵州茅台集团', quantity:1, payTime:'-', payMethod:'汇付', benefitStatus:'-',
-    benefits:[{name:'限量编号证书', status:'unused'}] },
-  { id: 'O20240601004', product:'海底捞·黑海会员', spec:'黑海会员卡', img:'🍲', price:199, status:'completed', buyerId:'U20240004', buyerNick:'白酒爱好者', buyerAccount:'136****4444', date:'2026-05-20 16:30:47', issuer:'海底捞', quantity:1, payTime:'2026-05-20 16:31:20', payMethod:'支付宝', benefitStatus:'全部已核销',
-    benefits:[{name:'黑海会员权益', status:'used'},{name:'优先订座', status:'used'}] },
-  { id: 'O20240601005', product:'王者荣耀·传说皮肤', spec:'皮肤A-李白', img:'🎮', price:888, status:'completed', buyerId:'U20240005', buyerNick:'收藏达人', buyerAccount:'135****3333', date:'2026-05-15 11:00:22', issuer:'王者荣耀', quantity:1, payTime:'2026-05-15 11:01:05', payMethod:'微信支付', benefitStatus:'全部未核销',
-    benefits:[{name:'限定皮肤体验', status:'unused'},{name:'游戏内称号', status:'unused'}] },
-  { id: 'O20240601006', product:'巴拿马金奖·复刻', spec:'典藏款', img:'🏆', price:1999, status:'pending', buyerId:'U20240006', buyerNick:'海贼迷', buyerAccount:'134****2222', date:'2026-06-03 08:45:15', issuer:'贵州茅台集团', quantity:1, payTime:'-', payMethod:'汇付', benefitStatus:'-',
-    benefits:[{name:'金奖复刻证书', status:'unused'},{name:'VIP品鉴会', status:'unused'}] },
-  { id: 'O20240601007', product:'王者荣耀·传说皮肤', spec:'皮肤B-貂蝉', img:'🎮', price:888, status:'completed', buyerId:'U20240007', buyerNick:'电竞选手', buyerAccount:'133****1111', date:'2026-05-10 20:00:10', issuer:'王者荣耀', quantity:1, payTime:'2026-05-10 20:01:30', payMethod:'支付宝', benefitStatus:'部分核销',
-    benefits:[{name:'限定皮肤体验', status:'used'},{name:'游戏内称号', status:'unused'}] },
-  { id: 'O20240601008', product:'三体·数字资产', spec:'标准款', img:'🌌', price:399, status:'pending', buyerId:'U20240008', buyerNick:'潮流先锋', buyerAccount:'132****0000', date:'2026-06-02 15:00:42', issuer:'三体', quantity:1, payTime:'-', payMethod:'微信支付', benefitStatus:'-',
-    benefits:[{name:'三体文明数字凭证', status:'unused'}] },
-  { id: 'O20240601009', product:'海底捞·黑海会员', spec:'黑海会员卡', img:'🍲', price:199, status:'completed', buyerId:'U20240002', buyerNick:'数字玩家', buyerAccount:'139****6666', date:'2026-05-05 12:00:55', issuer:'海底捞', quantity:1, payTime:'2026-05-05 12:01:18', payMethod:'微信支付', benefitStatus:'全部已核销',
-    benefits:[{name:'黑海会员权益', status:'used'}] },
-  { id: 'O20240601010', product:'鬼吹灯·数字资产', spec:'标准款', img:'🔦', price:499, status:'completed', buyerId:'U20240001', buyerNick:'茅台收藏家', buyerAccount:'138****8888', date:'2026-06-01 18:30:10', issuer:'鬼吹灯', quantity:1, payTime:'2026-06-01 18:31:05', payMethod:'支付宝', benefitStatus:'部分核销',
-    benefits:[{name:'摸金校尉勋章', status:'used'},{name:'场景解锁权', status:'unused'}] },
-  { id: 'O20240601011', product:'茅台会员积分', spec:'积分包', img:'💎', price:99, status:'cancelled', buyerId:'U20240006', buyerNick:'海贼迷', buyerAccount:'134****2222', date:'2026-06-05 11:20:00', issuer:'贵州茅台集团', quantity:1, payTime:'-', payMethod:'-', benefitStatus:'-',
-    benefits:[] }
+  { id:'O20240601001', product:'兰亭雅集', spec:'畅行版', price:1299, status:'pending', buyerId:'U20240001', buyerNick:'数码藏家', buyerAccount:'13888888888', date:'2026-07-01 10:30:25', issuer:'绍兴兰亭产业数资', quantity:1, payTime:'-', payMethod:'中金支付',
+    bf:[{n:'景区VIP通行权',type:'identity',eff:'2026-05-15',exp:'2026-12-31',total:999,used:0,desc:'鹅池碑、御碑亭'},{n:'研学课程',type:'ticket',eff:'2026-05-15',exp:'2026-12-31',total:3,used:0,desc:'书法研学、拓印体验、非遗手作',slots:[{u:false,t:''},{u:false,t:''},{u:false,t:''}]}] },
+  { id:'O20240601002', product:'兰亭雅集', spec:'学韵版', price:1599, status:'completed', buyerId:'U20240002', buyerNick:'兰亭书法迷', buyerAccount:'13966666666', date:'2026-07-02 09:15:10', issuer:'绍兴兰亭产业数资', quantity:2, payTime:'2026-07-02 09:16:05', payMethod:'汇付支付',
+    items:[
+      {number:'#LYJ-0002', bf:[{n:'景区VIP通行权',type:'identity',eff:'2026-05-01',exp:'2026-12-31',total:999,used:3,desc:'鹅池碑、御碑亭、曲水流觞',usedTimes:['2026-05-10 09:30','2026-05-18 14:20','2026-06-01 10:05']},{n:'研学课程',type:'ticket',eff:'2026-05-01',exp:'2026-12-31',total:3,used:1,desc:'书法研学、拓印体验、非遗手作',slots:[{u:true,t:'2026-05-20 09:15:30'},{u:false,t:''},{u:false,t:''}]},{n:'文创实物',type:'physical',eff:'2026-05-01',exp:'2026-12-31',total:1,used:1,desc:'兰亭文创礼盒',ship:{name:'张三',phone:'13856785678',addr:'绍兴市柯桥区兰亭风景区文创中心',exp:'顺丰速运',expNo:'SF1234567890'}}]},
+      {number:'#LYJ-0004', bf:[{n:'景区VIP通行权',type:'identity',eff:'2026-05-01',exp:'2026-12-31',total:999,used:1,desc:'鹅池碑、御碑亭、曲水流觞',usedTimes:['2026-06-15 10:30']},{n:'研学课程',type:'ticket',eff:'2026-05-01',exp:'2026-12-31',total:3,used:0,desc:'书法研学、拓印体验、非遗手作',slots:[{u:false,t:''},{u:false,t:''},{u:false,t:''}]},{n:'文创实物',type:'physical',eff:'2026-05-01',exp:'2026-12-31',total:1,used:0,desc:'兰亭文创礼盒'}]}
+    ] },
+  { id:'O20240601003', product:'兰亭雅集', spec:'优享版', price:2599, status:'completed', buyerId:'U20240003', buyerNick:'江南游客', buyerAccount:'13755555555', date:'2026-06-28 10:20:33', issuer:'绍兴兰亭产业数资', quantity:1, payTime:'2026-06-28 10:22:18', payMethod:'中金支付',
+    productNumber:'#LYJ-0003',
+    bf:[{n:'景区VIP通行权',type:'identity',eff:'2026-05-01',exp:'2026-12-31',total:999,used:5,desc:'鹅池碑、御碑亭、曲水流觞、兰亭江',usedTimes:['2026-05-12 08:10','2026-05-25 11:30','2026-06-08 15:00','2026-06-15 09:45','2026-06-22 13:20']},{n:'研学课程',type:'ticket',eff:'2026-05-01',exp:'2026-12-31',total:3,used:1,desc:'书法研学、拓印体验、非遗手作',slots:[{u:true,t:'2026-06-20 10:00:00'},{u:false,t:''},{u:false,t:''}]},{n:'文创实物',type:'physical',eff:'2026-05-01',exp:'2026-12-31',total:1,used:0,desc:'兰亭文创礼盒'},{n:'跨城特权',type:'identity',eff:'2026-06-01',exp:'2026-12-31',total:999,used:0,desc:'绍兴、杭州、上海三地优先入场'}] },
+  { id:'O20240601004', product:'兰亭春禊', spec:'畅行版', price:1999, status:'completed', buyerId:'U20240004', buyerNick:'绍兴老酒客', buyerAccount:'13644444444', date:'2026-06-25 11:35:47', issuer:'绍兴兰亭产业数资', quantity:1, payTime:'2026-06-25 11:36:20', payMethod:'汇付支付',
+    productNumber:'#LTCX-0001',
+    bf:[{n:'文创实物',type:'physical',eff:'2026-04-01',exp:'2026-06-30',total:1,used:1,desc:'兰亭文创礼盒（含书法折扇、拓片、书签）',ship:{name:'赵六',phone:'13699999999',addr:'绍兴市柯桥区兰亭风景区游客中心',exp:'顺丰速运',expNo:'SF0987654321'},logistics:[{s:'done',t:'2026-05-20 14:00:00',d:'已签收',loc:'柯桥区兰亭'}]},{n:'研学课程',type:'ticket',eff:'2026-04-01',exp:'2026-06-30',total:2,used:2,desc:'书法研学、拓印体验、非遗手作',slots:[{u:true,t:'2026-04-10 09:30:00'},{u:true,t:'2026-04-20 14:00:00'}]}] },
+  { id:'O20240601005', product:'曲水流觞', spec:'基础版', price:899, status:'completed', buyerId:'U20240005', buyerNick:'水乡旅人', buyerAccount:'13422222222', date:'2026-06-15 10:05:15', issuer:'古越龙山', quantity:1, payTime:'2026-06-15 10:06:30', payMethod:'中金支付',
+    productNumber:'#QSS-0001',
+    bf:[{n:'跨城特权',type:'identity',eff:'2027-01-01',exp:'2027-12-31',total:999,used:0,desc:'绍兴、杭州、上海三地优先入场（2027年启用）'},{n:'景区VIP通行权',type:'identity',eff:'2026-07-01',exp:'2027-12-31',total:10,used:3,desc:'鹅池碑、御碑亭、曲水流觞、兰亭江',usedTimes:['2026-07-05 10:15','2026-07-10 14:30','2026-07-12 09:00']}] },
+  { id:'O20240601006', product:'曲水流觞', spec:'优享版', price:1599, status:'cancelled', buyerId:'U20240006', buyerNick:'过路游客', buyerAccount:'13100000000', date:'2026-06-10 16:20:45', issuer:'古越龙山', quantity:1, payTime:'-', payMethod:'-', bf:[] }
 ];
 
 var currentFilter = 'all';
 
 function calcStats(list) {
-  var pending = 0, completed = 0, today = 0, total = list.length, revenue = 0;
-  list.forEach(function(o) {
-    if (o.status === 'pending') pending++;
-    else completed++;
-    revenue += o.price * (o.quantity || 1);
-  });
+  var pending = 0, completed = 0, total = list.length, revenue = 0;
+  list.forEach(function(o) { if(o.status==='pending')pending++; else if(o.status==='completed')completed++; revenue += o.price*(o.quantity||1); });
   document.getElementById('statPending').textContent = pending;
   document.getElementById('statCompleted').textContent = completed;
-  document.getElementById('statToday').textContent = today || total;
+  document.getElementById('statToday').textContent = total;
   document.getElementById('statRevenue').textContent = '¥' + revenue.toLocaleString();
   document.getElementById('statTotal').textContent = total;
 }
@@ -259,123 +284,198 @@ function filterByStatus(status, el) {
 
 function searchOrders() { renderOrders(); }
 function resetSearch() {
-  document.getElementById('orderNoInput').value = '';
-  document.getElementById('productNameInput').value = '';
-  document.getElementById('issuerInput').value = '';
-  document.getElementById('specInput').value = '';
-  document.getElementById('buyerAccountInput').value = '';
-  document.getElementById('buyerIdInput').value = '';
-  document.getElementById('startDateInput').value = '';
-  document.getElementById('endDateInput').value = '';
+  ['orderNoInput','productNameInput','issuerInput','specInput','buyerAccountInput','buyerIdInput','startDateInput','endDateInput'].forEach(function(id){ document.getElementById(id).value=''; });
   renderOrders();
 }
 
 function renderOrders() {
-  var kwOrder = (document.getElementById('orderNoInput').value || '').toLowerCase();
-  var kwProduct = (document.getElementById('productNameInput').value || '').toLowerCase();
-  var kwIssuer = (document.getElementById('issuerInput').value || '').toLowerCase();
-  var kwSpec = (document.getElementById('specInput').value || '').toLowerCase();
-  var kwAccount = (document.getElementById('buyerAccountInput').value || '').toLowerCase();
-  var kwBuyer = (document.getElementById('buyerIdInput').value || '').toLowerCase();
-  var startDate = document.getElementById('startDateInput').value;
-  var endDate = document.getElementById('endDateInput').value;
-
-  var list = orders.filter(function(o) {
-    if (currentFilter !== 'all' && o.status !== currentFilter) return false;
-    if (kwOrder && o.id.toLowerCase().indexOf(kwOrder) === -1) return false;
-    if (kwProduct && o.product.toLowerCase().indexOf(kwProduct) === -1) return false;
-    if (kwIssuer && o.issuer.toLowerCase().indexOf(kwIssuer) === -1) return false;
-    if (kwSpec && o.spec.toLowerCase().indexOf(kwSpec) === -1) return false;
-    if (kwAccount && o.buyerAccount.toLowerCase().indexOf(kwAccount) === -1) return false;
-    if (kwBuyer && o.buyerId.toLowerCase().indexOf(kwBuyer) === -1) return false;
-    if (startDate && o.date.substring(0,10) < startDate) return false;
-    if (endDate && o.date.substring(0,10) > endDate) return false;
+  var kwOrder=(document.getElementById('orderNoInput').value||'').toLowerCase();
+  var kwProduct=(document.getElementById('productNameInput').value||'').toLowerCase();
+  var kwIssuer=(document.getElementById('issuerInput').value||'').toLowerCase();
+  var kwSpec=(document.getElementById('specInput').value||'').toLowerCase();
+  var kwAccount=(document.getElementById('buyerAccountInput').value||'').toLowerCase();
+  var kwBuyer=(document.getElementById('buyerIdInput').value||'').toLowerCase();
+  var sd=document.getElementById('startDateInput').value;
+  var ed=document.getElementById('endDateInput').value;
+  var list=orders.filter(function(o){
+    if(currentFilter!=='all'&&o.status!==currentFilter)return false;
+    if(kwOrder&&o.id.toLowerCase().indexOf(kwOrder)===-1)return false;
+    if(kwProduct&&o.product.toLowerCase().indexOf(kwProduct)===-1)return false;
+    if(kwIssuer&&o.issuer.toLowerCase().indexOf(kwIssuer)===-1)return false;
+    if(kwSpec&&o.spec.toLowerCase().indexOf(kwSpec)===-1)return false;
+    if(kwAccount&&o.buyerAccount.toLowerCase().indexOf(kwAccount)===-1)return false;
+    if(kwBuyer&&o.buyerId.toLowerCase().indexOf(kwBuyer)===-1)return false;
+    if(sd&&o.date.substring(0,10)<sd)return false;
+    if(ed&&o.date.substring(0,10)>ed)return false;
     return true;
   });
-
   calcStats(list);
+  var c=document.getElementById('orderList'),e=document.getElementById('emptyState');
+  if(list.length===0){c.innerHTML='';e.style.display='block';return;}
+  e.style.display='none';
+  c.innerHTML=list.map(function(o){
+    var pStatus=o.bf&&o.bf.length?calcPackageStatus(o.bf):'-';
+    var pm=P_STA_MAP[pStatus]||'-';
+    return '<div class="order-item" onclick="viewOrder(\''+o.id+'\')">'+
+      '<div class="order-left">'+
+        '<div class="order-header"><span><label>订单号：</label>'+o.id+'</span><span class="order-date">'+o.date+'</span></div>'+
+        '<div class="buyer-info"><span><label>买家账号：</label>'+o.buyerAccount+'</span><span><label>买家ID：</label>'+o.buyerId+'</span></div>'+
+        '<div class="order-product">'+
+          '<img src="../asset/'+(o.product==='兰亭雅集'?(o.spec==='畅行版'?'畅行版.png':'学韵版.png'):o.spec==='畅行版'?'畅行版.png':o.spec==='优享版'?'优享版.png':'畅行版.png')+'" style="width:48px;height:48px;border-radius:8px;object-fit:cover;background:#f5f7fa" onerror="this.style.display=\'none\'">'+
+          '<div class="product-info">'+
+            '<div class="product-name">'+o.product+'</div>'+
+            '<div class="product-spec">款式：'+o.spec+' | 数量：'+(o.quantity||1)+'</div>'+
+            '<div class="product-issuer">发行方：'+o.issuer+'</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="order-right">'+
+        '<div class="order-price">¥'+(o.price*(o.quantity||1)).toLocaleString()+'</div>'+
+        '<div class="order-status '+(o.status==='pending'?'status-pending':o.status==='completed'?'status-completed':'status-cancelled')+'">'+(o.status==='pending'?'待付款':o.status==='completed'?'已完成':'已取消')+'</div>'+
 
-  var container = document.getElementById('orderList');
-  var empty = document.getElementById('emptyState');
-  if (list.length === 0) { container.innerHTML = ''; empty.style.display = 'block'; return; }
-  empty.style.display = 'none';
-
-  container.innerHTML = list.map(function(o) {
-    return '<div class="order-item" onclick="viewOrder(\'' + o.id + '\')">' +
-      '<div class="order-left">' +
-        '<div class="order-header"><span><label>订单号：</label>' + o.id + '</span><span class="order-date">' + o.date + '</span></div>' +
-        '<div class="buyer-info"><span><label>买家账号：</label>' + o.buyerAccount + '</span><span><label>买家ID：</label>' + o.buyerId + '</span></div>' +
-        '<div class="order-product">' +
-          '<div class="product-image">' + o.img + '</div>' +
-          '<div class="product-info">' +
-            '<div class="product-name">' + o.product + '</div>' +
-            '<div class="product-spec">款式：' + o.spec + ' | 数量：' + (o.quantity||1) + '</div>' +
-            '<div class="product-issuer">发行方：' + o.issuer + '</div>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="order-right">' +
-        '<div class="order-price">¥' + (o.price * (o.quantity||1)).toLocaleString() + '</div>' +
-        '<div class="order-status ' + (o.status==='pending'?'status-pending':o.status==='completed'?'status-completed':'status-cancelled') + '">' + (o.status==='pending'?'待付款':o.status==='completed'?'已完成':'已取消') + '</div>' +
-        '<button class="action-btn action-btn-primary" onclick="event.stopPropagation();viewOrder(\'' + o.id + '\')">查看详情</button>' +
-      '</div>' +
+        '<button class="action-btn action-btn-primary" onclick="event.stopPropagation();viewOrder(\''+o.id+'\')">查看详情</button>'+
+      '</div>'+
     '</div>';
   }).join('');
 }
 
 function viewOrder(id) {
-  var o = orders.find(function(o) { return o.id === id; });
+  var o = orders.find(function(x) { return x.id === id; });
   if (!o) return;
-  var st = o.status === 'pending' ? '待付款' : o.status === 'completed' ? '已完成' : '已取消';
-  var stCls = o.status === 'pending' ? 'status-pending' : o.status === 'completed' ? 'status-completed' : 'status-cancelled';
+  var st=o.status==='pending'?'待付款':o.status==='completed'?'已完成':'已取消';
+  var sc=o.status==='pending'?'status-pending':o.status==='completed'?'status-completed':'status-cancelled';
+  var h='';
+  h+='<div class="detail-section"><div class="detail-title">订单信息</div>';
+  h+='<div class="detail-row"><span class="detail-label">订单编号</span><span class="detail-value">'+o.id+'</span></div>';
+  h+='<div class="detail-row"><span class="detail-label">下单时间</span><span class="detail-value">'+o.date+'</span></div>';
+  h+='<div class="detail-row"><span class="detail-label">支付时间</span><span class="detail-value">'+(o.payTime||'-')+'</span></div>';
+  h+='<div class="detail-row"><span class="detail-label">订单状态</span><span class="detail-value"><span class="order-status '+sc+'">'+st+'</span></span></div>';
+  h+='</div>';
 
-  var h = '';
-  h += '<div class="detail-section"><div class="detail-title">订单信息</div>';
-  h += '<div class="detail-row"><span class="detail-label">订单编号</span><span class="detail-value">' + o.id + '</span></div>';
-  h += '<div class="detail-row"><span class="detail-label">下单时间</span><span class="detail-value">' + o.date + '</span></div>';
-  h += '<div class="detail-row"><span class="detail-label">支付时间</span><span class="detail-value">' + (o.payTime||'-') + '</span></div>';
-      h += '<div class="detail-row"><span class="detail-label">订单状态</span><span class="detail-value"><span class="order-status ' + stCls + '">' + st + '</span></span></div>';
-  h += '</div>';
+  h+='<div class="detail-section"><div class="detail-title">买家信息</div>';
+  h+='<div class="detail-row"><span class="detail-label">买家昵称</span><span class="detail-value">'+o.buyerNick+'</span></div>';
+  h+='<div class="detail-row"><span class="detail-label">买家账号</span><span class="detail-value">'+o.buyerAccount+'</span></div>';
+  h+='<div class="detail-row"><span class="detail-label">买家ID</span><span class="detail-value">'+o.buyerId+'</span></div>';
+  h+='<div class="detail-row"><span class="detail-label">支付方式</span><span class="detail-value">'+o.payMethod+'</span></div>';
+  h+='</div>';
 
-  h += '<div class="detail-section"><div class="detail-title">买家信息</div>';
-  h += '<div class="detail-row"><span class="detail-label">买家昵称</span><span class="detail-value">' + o.buyerNick + '</span></div>';
-  h += '<div class="detail-row"><span class="detail-label">买家账号</span><span class="detail-value">' + o.buyerAccount + '</span></div>';
-  h += '<div class="detail-row"><span class="detail-label">买家ID</span><span class="detail-value">' + o.buyerId + '</span></div>';
-  h += '<div class="detail-row"><span class="detail-label">支付方式</span><span class="detail-value">' + o.payMethod + '</span></div>';
-  h += '</div>';
+  var imgFile = o.product==='兰亭雅集'?(o.spec==='畅行版'?'畅行版.png':'学韵版.png'):o.spec==='畅行版'?'畅行版.png':o.spec==='优享版'?'优享版.png':'畅行版.png';
+  h+='<div class="detail-section"><div class="detail-title">商品信息</div>';
+  h+='<div style="display:flex;gap:12px;align-items:flex-start">';
+  h+='<img src="../asset/'+imgFile+'" style="width:80px;height:80px;border-radius:8px;object-fit:cover;background:#f5f7fa">';
+  h+='<div style="flex:1"><div style="font-size:15px;font-weight:600;color:#333;margin-bottom:4px">'+o.product+'</div>';
+  h+='<div style="font-size:12px;color:#666">款式：'+o.spec+' | 数量：'+(o.quantity||1)+'</div>';
+  h+='<div style="font-size:12px;color:#D70C1F;font-weight:500;margin-top:4px">发行方：'+o.issuer+'</div>';
+  h+='<div style="margin-top:6px;font-size:16px;font-weight:600;color:#D70C1F">¥'+(o.price*(o.quantity||1)).toLocaleString()+'</div></div></div></div>';
 
-  h += '<div class="detail-section"><div class="detail-row" style="align-items:flex-start"><div class="detail-product-image">' + o.img + '</div>';
-  h += '<div class="detail-product-info"><div class="detail-product-name">' + o.product + '</div>';
-  h += '<div class="detail-product-spec">款式：' + o.spec + ' | 数量：' + (o.quantity||1) + '</div>';
-  h += '<div style="margin-top:8px;font-size:16px;font-weight:600;color:#ff4d4f">¥' + (o.price * (o.quantity||1)).toLocaleString() + '</div></div></div></div>';
-
-  h += '<div class="detail-section"><div class="detail-title">权益详情</div><div class="benefits-detail"><div class="benefits-detail-title">包含权益</div>';
-  if (o.benefits && o.benefits.length > 0) {
-    o.benefits.forEach(function(b) {
-      h += '<div class="benefit-detail-item"><span class="benefit-detail-name">' + b.name + '</span></div>';
+  // 权益模板展示
+  var tplBf = o.bf || (o.items&&o.items[0]?o.items[0].bf:[]);
+  if(tplBf&&tplBf.length){
+    h+='<div class="detail-section"><div class="detail-title">权益内容（该商品包含以下权益）</div>';
+    h+='<div style="background:#f5f7fa;border-radius:10px;padding:10px">';
+    tplBf.forEach(function(b){
+      h+='<div style="display:flex;align-items:center;padding:6px 0;border-bottom:1px solid #eee;font-size:13px">';
+      h+='<span style="color:#333;flex:1">'+b.n+'</span>';
+      h+='<span style="color:#999;font-size:11px">'+(b.desc||'')+'</span></div>';
     });
-  } else {
-    h += '<div style="font-size:12px;color:#999;padding:12px 0">暂无权益信息</div>';
+    h+='</div></div>';
   }
-  h += '</div></div>';
+  // 产品列表
+  if(o.status!=='pending'&&o.status!=='cancelled'){
+    var items = o.items || (o.productNumber ? [{number:o.productNumber, bf:o.bf||[]}] : (o.bf ? [{number:'#LYJ-****', bf:o.bf}] : []));
+    if(items.length>0){
+      h+='<div class="detail-section"><div class="detail-title">产品编号</div>';
+      items.forEach(function(item, ii){
+        h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#fafafa;border-radius:6px;margin-bottom:4px">';
+        h+='<span style="font-size:13px;font-weight:600;color:#D70C1F;font-family:monospace">'+item.number+'</span>';
+        h+='<span class="tag tag-sold" style="font-size:10px;padding:1px 6px">已售出</span>';
+        h+='<span style="flex:1"></span>';
+        h+='<button class="action-btn" style="font-size:11px;padding:3px 10px" onclick="event.stopPropagation();showItemBenefit(\''+o.id+'\','+ii+')">查看权益</button>';
+        h+='</div>';
+      });
+      h+='</div>';
+    }
+  }
 
-  h += '<div class="detail-section"><div class="detail-title">发行方信息</div>';
-  h += '<div class="detail-row"><span class="detail-label">发行方</span><span class="detail-value" style="color:#D70C1F;font-weight:600">' + o.issuer + '</span></div>';
-  h += '</div>';
-
-  h += '<div class="btn-group"><button class="btn-cancel" onclick="closeDetailModal()">关闭</button></div>';
-
+  h+='<div class="btn-group"><button class="btn-cancel" onclick="closeDetailModal()">关闭</button></div>';
   document.getElementById('detailContent').innerHTML = h;
   document.getElementById('detailModal').classList.add('show');
 }
 
-function closeDetailModal() { document.getElementById('detailModal').classList.remove('show'); }
-function navigateTo(url) { window.location.href = url; }
-function showToast(msg) {
-  var t = document.createElement('div'); t.className = 'toast success'; t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(function() { t.remove(); }, 2000);
+function showItemBenefit(orderId, itemIdx){
+  var o=orders.find(function(x){return x.id===orderId;});
+  if(!o)return;
+  var items=o.items||(o.productNumber?[{number:o.productNumber,bf:o.bf||[]}]:o.bf?[{number:'#LYJ-****',bf:o.bf}]:[]);
+  var item=items[itemIdx];
+  if(!item)return;
+  var pStatus=calcPackageStatus(item.bf||[]);
+  var pm=P_STA_MAP[pStatus]||'-';
+  var b=document.getElementById('benefitBody');
+  var h='<div style="padding:4px 0">';
+  h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #eee">';
+  h+='<span style="font-size:14px;font-weight:600;color:#333">产品编号：</span>';
+  h+='<span style="font-size:14px;font-weight:700;color:#D70C1F;font-family:monospace">'+item.number+'</span>';
+  h+='<span style="flex:1"></span>';
+  h+='<span style="font-size:11px;font-weight:500;padding:3px 10px;border-radius:4px;background:'+({unused:'#f0f5ff',partial:'#fff7e6',done:'#f6ffed',expired:'#fff2f3'}[pStatus]||'#f5f5f5')+';color:'+({unused:'#1890ff',partial:'#fa8c16',done:'#52c41a',expired:'#D70C1F'}[pStatus]||'#999')+'">权益包：'+pm+'</span>';
+  h+='</div>';
+  (item.bf||[]).forEach(function(bb){
+    var s=calcBenefitStatus(bb);
+    var sa=B_STA[s]||B_STA.unused;
+    var extra='',det='';
+    if(bb.type==='ticket'){extra='已用'+bb.used+'/'+bb.total+'次';
+      if(bb.slots){var us=bb.slots.filter(function(sl){return sl.u&&sl.t;});
+        if(us.length>0){det+='<div style="margin-top:6px;padding-top:6px;border-top:1px dashed #ddd"><div style="font-size:11px;font-weight:500;color:#666;margin-bottom:4px">使用时间</div>';
+          us.forEach(function(sl){det+='<div style="font-size:11px;color:#888;padding:2px 4px 2px 14px">• '+sl.t+'</div>';});
+          det+='</div>';}}
+    }else if(bb.type==='identity'&&bb.used>0){
+      var isId = bb.usedTimes && bb.usedTimes.length > 0;
+      extra = isId ? '<span style="cursor:pointer;text-decoration:underline dashed;text-underline-offset:2px" onclick="event.stopPropagation();showIdTimes(\''+bb.n+'\','+bb.used+',\''+encodeURIComponent(JSON.stringify(bb.usedTimes))+'\')">已使用'+bb.used+'次</span>' : '已使用'+bb.used+'次';
+    }
+    else if(bb.type==='physical'&&bb.used>0&&bb.ship){det+='<div style="margin-top:6px;padding-top:6px;border-top:1px dashed #ddd"><div style="font-size:11px;font-weight:500;color:#666;margin-bottom:2px">发货信息</div>';
+      det+='<div style="font-size:11px;color:#888;padding:2px 0">📦 '+bb.ship.expNo+' ('+bb.ship.exp+')</div>';
+      det+='<div style="font-size:11px;color:#888;padding:2px 0">👤 '+bb.ship.name+' '+bb.ship.phone+'</div>';
+      det+='<div style="font-size:11px;color:#888;padding:2px 0">📍 '+bb.ship.addr+'</div></div>';}
+    h+='<div style="padding:12px 14px;margin-bottom:10px;border-radius:8px;background:#fff;border:1px solid #eee">';
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
+    h+='<span style="font-size:13px;font-weight:600;color:#333;flex:1">'+bb.n+'</span>';
+    if(extra)h+='<span style="font-size:11px;color:#999">'+extra+'</span>';
+    h+='<span style="font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;background:'+({pending:'rgba(52,152,219,.1)',unused:'#f0f5ff',partial:'#fff7e6',done:'#f6ffed',expired:'#fff2f3'}[s]||'#f5f5f5')+';color:'+({pending:'#3498db',unused:'#1890ff',partial:'#fa8c16',done:'#52c41a',expired:'#D70C1F'}[s]||'#999')+'">'+sa[0]+'</span>';
+    h+='</div>';
+    h+='<div style="font-size:11px;color:#3F8B6D;font-weight:500;margin-bottom:6px;padding:4px 0">📅 有效期 '+bb.eff+' ~ '+bb.exp+'</div>';
+    if(bb.desc)h+='<div style="font-size:11px;color:#888;margin-bottom:6px;padding:4px 8px;background:#f5f7fa;border-radius:4px">'+bb.desc+'</div>';
+    h+=det;
+    h+='</div>';
+  });
+  h+='</div>';
+  b.innerHTML=h;
+  document.getElementById('benefitModal').classList.add('show');
 }
+
+function showIdTimes(name, count, encoded){
+  var times = [];
+  try { if(encoded) times = JSON.parse(decodeURIComponent(encoded)); } catch(e){}
+  var b=document.getElementById('benefitBody');
+  var h='<div style="padding:4px 0">';
+  h+='<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #f0f0f0">';
+  h+='<span style="font-size:26px;font-weight:700;color:#D70C1F">'+count+'</span>';
+  h+='<span style="font-size:13px;color:#666">次使用记录</span></div>';
+  if(times.length>0){
+    times.forEach(function(t,i){
+      var n=(i+1).toString().padStart(2,'0');
+      h+='<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;margin-bottom:3px;background:'+(i%2===0?'#f9f9f9':'#fff')+';border-radius:6px">';
+      h+='<span style="font-size:10px;color:#bbb;font-family:monospace;min-width:18px">#'+n+'</span>';
+      h+='<span style="font-size:12px;color:#555">'+t+'</span></div>';
+    });
+  } else {
+    h+='<div style="padding:12px;background:#f5f7fa;border-radius:8px;font-size:12px;color:#888;text-align:center">暂无详细使用时间记录</div>';
+  }
+  h+='</div>';
+  b.innerHTML=h;
+  document.getElementById('benefitModal').classList.add('show');
+}
+function closeDetailModal(){document.getElementById('detailModal').classList.remove('show');}
+function navigateTo(url){window.location.href=url;}
+function showToast(msg){var t=document.createElement('div');t.className='toast success';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},2000);}
 
 calcStats(orders);
 renderOrders();

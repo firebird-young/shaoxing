@@ -239,7 +239,7 @@
     /* 资产列表 */
     .asset-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(6, 1fr);
       gap: 20px;
     }
     
@@ -262,16 +262,18 @@
     }
     
     .asset-cover {
-      height: 180px;
+      width: 100%;
+      aspect-ratio: 1 / 1;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 48px;
+      object-fit: cover;
     }
     
     .asset-info {
-      padding: 16px;
+      padding: 10px;
     }
     
     .asset-header.search-bar {
@@ -1464,7 +1466,7 @@
       <h1>数字资产管理</h1>
     </div>
     <div class="header-right">
-      <span class="merchant-name">贵州茅台集团</span>
+      <span class="merchant-name">绍兴兰亭产业数资</span>
       <span class="verify-badge">
         <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" width="12" height="12">
           <polyline points="20 6 9 17 4 12"/>
@@ -1552,22 +1554,20 @@
     
     <!-- 资产列表 -->
     <div class="asset-list" id="assetList">
-      <!-- 草稿状态 -->
       <div class="asset-card" data-status="draft" onclick="viewAsset('1')">
-        <div class="asset-cover">🍷</div>
+        <div class="asset-cover" style="background-image:url(../asset/兰亭雅集封面图.png);background-size:cover;font-size:0;background-position:center"></div>
         <div class="asset-info">
           <div class="asset-header">
-            <div class="asset-name">飞天茅台数字藏品</div>
+            <div class="asset-name">兰亭雅集</div>
             <span class="status-tag status-draft">草稿</span>
           </div>
           <div class="asset-meta">
-            <span>发行：1000</span>
+            <span>发行：3000</span>
             <span>3款</span>
           </div>
           <div class="asset-tags">
-            <span class="tag">白酒</span>
-            <span class="tag">酱香型</span>
-            <span class="tag">高端</span>
+            <span class="tag">书法</span>
+            <span class="tag">文旅</span>
           </div>
           <div class="asset-actions">
             <button class="action-btn action-btn-secondary" onclick="event.stopPropagation(); editAsset('1')">编辑</button>
@@ -1577,20 +1577,19 @@
         </div>
       </div>
       
-      <!-- 待审核状态 -->
       <div class="asset-card" data-status="pending" onclick="viewAsset('2')">
-        <div class="asset-cover">🏺</div>
+        <div class="asset-cover" style="background-image:url(../asset/兰亭春禊封面图.png);background-size:cover;font-size:0;background-position:center"></div>
         <div class="asset-info">
           <div class="asset-header">
-            <div class="asset-name">茅台年份酒数字凭证</div>
+            <div class="asset-name">兰亭春禊</div>
             <span class="status-tag status-pending">待审核</span>
           </div>
           <div class="asset-meta">
-            <span>发行：500</span>
+            <span>发行：2000</span>
             <span>2款</span>
           </div>
           <div class="asset-tags">
-            <span class="tag">年份酒</span>
+            <span class="tag">文旅</span>
             <span class="tag">收藏</span>
           </div>
           <div class="asset-actions">
@@ -1599,22 +1598,20 @@
         </div>
       </div>
       
-      <!-- 已驳回状态 -->
       <div class="asset-card" data-status="rejected" onclick="viewAsset('3')">
-        <div class="asset-cover">📦</div>
+        <div class="asset-cover" style="background-image:url(../asset/曲水流觞封面图.png);background-size:cover;font-size:0;background-position:center"></div>
         <div class="asset-info">
           <div class="asset-header">
-            <div class="asset-name">茅台纪念版礼盒</div>
+            <div class="asset-name">曲水流觞</div>
             <span class="status-tag status-rejected">已驳回</span>
           </div>
           <div class="asset-meta">
-            <span>发行：200</span>
-            <span>1款</span>
+            <span>发行：1500</span>
+            <span>3款</span>
           </div>
           <div class="asset-tags">
-            <span class="tag">礼盒</span>
+            <span class="tag">文旅</span>
             <span class="tag">限量</span>
-            <span class="tag">纪念</span>
           </div>
           <div class="asset-actions">
             <button class="action-btn action-btn-secondary" onclick="event.stopPropagation(); editAsset('3')">编辑</button>
@@ -1624,40 +1621,38 @@
         </div>
       </div>
       
-      <!-- 已通过状态 -->
       <div class="asset-card" data-status="approved" onclick="viewAsset('4')">
-        <div class="asset-cover">�</div>
+        <div class="asset-cover" style="background-image:url(../asset/兰亭碑刻封面图.png);background-size:cover;font-size:0;background-position:center"></div>
         <div class="asset-info">
           <div class="asset-header">
-            <div class="asset-name">茅台数字艺术藏品</div>
+            <div class="asset-name">兰亭碑刻</div>
             <span class="status-tag status-approved">已通过</span>
+          </div>
+          <div class="asset-meta">
+            <span>发行：1000</span>
+            <span>1款</span>
+          </div>
+          <div class="asset-tags">
+            <span class="tag">书法</span>
+            <span class="tag">碑刻</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="asset-card" data-status="casting" onclick="viewAsset('5')">
+        <div class="asset-cover" style="background-image:url(../asset/兰亭诗韵封面图.png);background-size:cover;font-size:0;background-position:center"></div>
+        <div class="asset-info">
+          <div class="asset-header">
+            <div class="asset-name">兰亭诗韵</div>
+            <span class="status-tag status-casting">铸造中</span>
           </div>
           <div class="asset-meta">
             <span>发行：800</span>
             <span>2款</span>
           </div>
           <div class="asset-tags">
-            <span class="tag">艺术</span>
-            <span class="tag">创新</span>
-          </div>
-        </div>
-      </div>
-      
-      <!-- 铸造中状态 -->
-      <div class="asset-card" data-status="casting" onclick="viewAsset('5')">
-        <div class="asset-cover">🔧</div>
-        <div class="asset-info">
-          <div class="asset-header">
-            <div class="asset-name">茅台VIP尊享卡</div>
-            <span class="status-tag status-casting">铸造中</span>
-          </div>
-          <div class="asset-meta">
-            <span>发行：500</span>
-            <span>1款</span>
-          </div>
-          <div class="asset-tags">
-            <span class="tag">VIP</span>
-            <span class="tag">权益</span>
+            <span class="tag">诗歌</span>
+            <span class="tag">文旅</span>
           </div>
           <div class="asset-actions">
             <span class="no-action">铸造中...</span>
@@ -1665,44 +1660,20 @@
         </div>
       </div>
       
-      <!-- 待上线状态 - 新品 -->
-      <div class="asset-card" data-status="publish-pending" onclick="viewAsset('8')">
-        <div class="asset-cover">🎨</div>
-        <div class="asset-info">
-          <div class="asset-header">
-            <div class="asset-name">艺术大师·臻品系列</div>
-            <span class="status-tag status-publish-pending">待上线</span>
-          </div>
-          <div class="asset-meta">
-            <span>发行：3000</span>
-            <span>8款</span>
-          </div>
-          <div class="asset-tags">
-            <span class="tag">艺术</span>
-            <span class="tag">限量</span>
-          </div>
-          <div class="asset-actions">
-            <button class="action-btn action-btn-primary" id="publishBtn8" onclick="event.stopPropagation(); setPublishMode('8')">设置发行模式</button>
-            <button class="action-btn action-btn-secondary" onclick="event.stopPropagation(); viewCastingInfo('cast8')">查看铸造信息</button>
-          </div>
-        </div>
-      </div>
-      
-      <!-- 已上线状态 -->
       <div class="asset-card" data-status="published" onclick="viewAsset('6')">
-        <div class="asset-cover">⛓️</div>
+        <div class="asset-cover" style="background-image:url(../asset/越窑青瓷封面图.png);background-size:cover;font-size:0;background-position:center"></div>
         <div class="asset-info">
           <div class="asset-header">
-            <div class="asset-name">1935·时光窖藏</div>
+            <div class="asset-name">越窑青瓷</div>
             <span class="status-tag status-published">已上线</span>
           </div>
           <div class="asset-meta">
-            <span>发行：5000</span>
-            <span>5款</span>
+            <span>发行：3000</span>
+            <span>3款</span>
           </div>
           <div class="asset-tags">
-            <span class="tag">白酒</span>
-            <span class="tag">收藏</span>
+            <span class="tag">青瓷</span>
+            <span class="tag">非遗</span>
           </div>
           <div class="asset-actions">
             <button class="action-btn action-btn-secondary" id="publishBtn6" onclick="event.stopPropagation(); setPublishMode('6')">查看发行情况</button>
@@ -1711,21 +1682,20 @@
         </div>
       </div>
       
-      <!-- 已上线状态 -->
       <div class="asset-card" data-status="ended" onclick="viewAsset('7')">
-        <div class="asset-cover">🎯</div>
+        <div class="asset-cover" style="background-image:url(../asset/平水日铸茶封面图.png);background-size:cover;font-size:0;background-position:center"></div>
         <div class="asset-info">
           <div class="asset-header">
-            <div class="asset-name">茅台会员积分</div>
+            <div class="asset-name">平水日铸茶</div>
             <span class="status-tag status-ended">已结束</span>
           </div>
           <div class="asset-meta">
-            <span>发行：10000</span>
-            <span>1款</span>
+            <span>发行：2000</span>
+            <span>2款</span>
           </div>
           <div class="asset-tags">
-            <span class="tag">会员</span>
-            <span class="tag">积分</span>
+            <span class="tag">茶叶</span>
+            <span class="tag">特产</span>
           </div>
           <div class="asset-actions">
             <button class="action-btn action-btn-secondary" id="publishBtn7" onclick="event.stopPropagation(); setPublishMode('7')">查看发行情况</button>
@@ -2031,7 +2001,7 @@
       document.getElementById('modalTitle').textContent = '编辑数字资产';
       document.getElementById('assetForm').reset();
       document.getElementById('assetQuantity').value = 1;
-      document.getElementById('assetName').value = '飞天茅台数字藏品';
+      document.getElementById('assetName').value = '兰亭雅集';
       document.getElementById('assetModal').classList.add('show');
     }
     

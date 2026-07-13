@@ -47,10 +47,11 @@
     .btn-disabled { background: #f5f5f5; color: #ccc; cursor: not-allowed; }
 
     /* ── 资产列表 ── */
-    .asset-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+    .asset-list { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
     .asset-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor: pointer; transition: all 0.2s; }
     .asset-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-    .asset-cover { height: 180px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 48px; }
+    .asset-cover { width: 100%; aspect-ratio: 1 / 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 48px; object-fit: cover; }
+    .asset-info { padding: 10px; }
     .asset-info { padding: 16px; }
     .asset-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .asset-name { font-size: 16px; font-weight: 600; }
@@ -91,6 +92,7 @@
     .detail-value { color: #333; font-size: 14px; font-weight: 500; }
     .detail-value.readonly { color: #666; font-weight: normal; }
     .detail-image { max-width: 200px; max-height: 200px; border-radius: 8px; margin-top: 8px; }
+    .benefit-cancelled { background: #fff2f3; color: #D70C1F; }
     .detail-images { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
     .style-item-detail { background: #fafafa; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
     .style-item-detail:last-child { margin-bottom: 0; }
@@ -178,163 +180,94 @@
 
     <!-- 资产列表 -->
     <div class="asset-list" id="assetList">
-      <!-- 待审核状态 -->
       <div class="asset-card" data-status="pending" onclick="viewAssetDetail('1')">
-        <div class="asset-cover" style="background-image: url('../茅台1935.png'); background-size: cover; background-position: center;"></div>
+        <div class="asset-cover" style="background-image:url(../asset/兰亭雅集封面图.png);background-size:cover;background-position:center"></div>
         <div class="asset-info">
           <div class="asset-header">
-            <div class="asset-name">1935·时光窖藏</div>
+            <div class="asset-name">兰亭雅集</div>
             <span class="status-tag status-pending">待审核</span>
           </div>
-          <div class="asset-merchant">商家：贵州茅台集团</div>
-          <div class="asset-meta">
-            <span>发行：5款</span>
-            <span>共5000</span>
-          </div>
-          <div class="asset-tags">
-            <span class="asset-tag">白酒</span>
-            <span class="asset-tag">收藏</span>
-            <span class="asset-tag">限量</span>
-          </div>
-          <div class="asset-actions">
-            <button class="btn btn-primary" onclick="event.stopPropagation(); openAuditModal('1')">审核</button>
-          </div>
+          <div class="asset-merchant">商家：绍兴兰亭产业数资</div>
+          <div class="asset-meta"><span>3款</span><span>共3000</span></div>
+          <div class="asset-tags"><span class="asset-tag">书法</span><span class="asset-tag">文旅</span></div>
+          <div class="asset-actions"><button class="btn btn-primary" onclick="event.stopPropagation(); openAuditModal('1')">审核</button></div>
         </div>
       </div>
-
-      <!-- 已驳回状态 -->
       <div class="asset-card" data-status="rejected">
-        <div class="asset-cover">📦</div>
+        <div class="asset-cover" style="background-image:url(../asset/兰亭春禊封面图.png);background-size:cover;background-position:center"></div>
         <div class="asset-info">
           <div class="asset-header">
-            <div class="asset-name">茅台纪念版礼盒</div>
+            <div class="asset-name">兰亭春禊</div>
             <span class="status-tag status-rejected">已驳回</span>
           </div>
-          <div class="asset-merchant">商家：贵州茅台集团</div>
-          <div class="asset-meta">
-            <span>发行：200</span>
-            <span>1款</span>
-          </div>
-          <div class="asset-tags">
-            <span class="asset-tag">礼盒</span>
-            <span class="asset-tag">收藏</span>
-          </div>
+          <div class="asset-merchant">商家：绍兴兰亭产业数资</div>
+          <div class="asset-meta"><span>2款</span><span>共2000</span></div>
+          <div class="asset-tags"><span class="asset-tag">文旅</span><span class="asset-tag">收藏</span></div>
         </div>
       </div>
-
-      <!-- 已通过状态 -->
       <div class="asset-card" data-status="approved">
-        <div class="asset-cover">🌟</div>
+        <div class="asset-cover" style="background-image:url(../asset/曲水流觞封面图.png);background-size:cover;background-position:center"></div>
         <div class="asset-info">
           <div class="asset-header">
-            <div class="asset-name">茅台数字艺术藏品</div>
+            <div class="asset-name">曲水流觞</div>
             <span class="status-tag status-approved">已通过</span>
           </div>
-          <div class="asset-merchant">商家：贵州茅台集团</div>
-          <div class="asset-meta">
-            <span>发行：800</span>
-            <span>2款</span>
-          </div>
-          <div class="asset-tags">
-            <span class="asset-tag">艺术</span>
-            <span class="asset-tag">数字藏品</span>
-          </div>
-          <div class="asset-actions">
-            <button class="btn btn-success" onclick="startCasting('3')">开始铸造</button>
-          </div>
+          <div class="asset-merchant">商家：古越龙山</div>
+          <div class="asset-meta"><span>3款</span><span>共1500</span></div>
+          <div class="asset-tags"><span class="asset-tag">文旅</span><span class="asset-tag">限量</span></div>
+          <div class="asset-actions"><button class="btn btn-success" onclick="startCasting('3')">开始铸造</button></div>
         </div>
       </div>
-
-      <!-- 铸造中状态 -->
       <div class="asset-card" data-status="casting">
-        <div class="asset-cover">🔧</div>
+        <div class="asset-cover" style="background-image:url(../asset/兰亭碑刻封面图.png);background-size:cover;background-position:center"></div>
         <div class="asset-info">
           <div class="asset-header">
-            <div class="asset-name">茅台VIP尊享卡</div>
+            <div class="asset-name">兰亭碑刻</div>
             <span class="status-tag status-casting">铸造中</span>
           </div>
-          <div class="asset-merchant">商家：贵州茅台集团</div>
-          <div class="asset-meta">
-            <span>发行：500</span>
-            <span>1款</span>
-          </div>
-          <div class="asset-tags">
-            <span class="asset-tag">VIP</span>
-            <span class="asset-tag">权益</span>
-          </div>
-          <div class="asset-actions">
-            <span class="no-action">铸造中...</span>
-          </div>
+          <div class="asset-merchant">商家：绍兴兰亭产业数资</div>
+          <div class="asset-meta"><span>1款</span><span>共1000</span></div>
+          <div class="asset-tags"><span class="asset-tag">书法</span><span class="asset-tag">碑刻</span></div>
+          <div class="asset-actions"><span class="no-action">铸造中...</span></div>
         </div>
       </div>
-
-      <!-- 待上线状态 -->
       <div class="asset-card" data-status="publish-pending">
-        <div class="asset-cover">🚀</div>
+        <div class="asset-cover" style="background-image:url(../asset/兰亭诗韵封面图.png);background-size:cover;background-position:center"></div>
         <div class="asset-info">
           <div class="asset-header">
-            <div class="asset-name">茅台品鉴会门票</div>
+            <div class="asset-name">兰亭诗韵</div>
             <span class="status-tag status-publish-pending">待上线</span>
           </div>
-          <div class="asset-merchant">商家：贵州茅台集团</div>
-          <div class="asset-meta">
-            <span>发行：300</span>
-            <span>1款</span>
-          </div>
-          <div class="asset-tags">
-            <span class="asset-tag">门票</span>
-            <span class="asset-tag">品鉴会</span>
-          </div>
-          <div class="asset-actions">
-            <span class="no-action">等待商家操作</span>
-          </div>
+          <div class="asset-merchant">商家：绍兴兰亭产业数资</div>
+          <div class="asset-meta"><span>2款</span><span>共800</span></div>
+          <div class="asset-tags"><span class="asset-tag">诗歌</span><span class="asset-tag">文旅</span></div>
+          <div class="asset-actions"><span class="no-action">等待商家操作</span></div>
         </div>
       </div>
-
-      <!-- 已结束状态 -->
-      <div class="asset-card" data-status="ended">
-        <div class="asset-cover">🎯</div>
-        <div class="asset-info">
-          <div class="asset-header">
-            <div class="asset-name">茅台会员积分</div>
-            <span class="status-tag status-ended">已结束</span>
-          </div>
-          <div class="asset-merchant">商家：贵州茅台集团</div>
-          <div class="asset-meta">
-            <span>发行：10000</span>
-            <span>1款</span>
-          </div>
-          <div class="asset-tags">
-            <span class="asset-tag">积分</span>
-            <span class="asset-tag">会员</span>
-          </div>
-          <div class="asset-actions">
-            <button class="btn btn-info" onclick="event.stopPropagation(); viewData('6')">查看数据</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 已上线状态 - 海底捞 -->
       <div class="asset-card" data-status="published">
-        <div class="asset-cover">🍲</div>
+        <div class="asset-cover" style="background-image:url(../asset/越窑青瓷封面图.png);background-size:cover;background-position:center"></div>
         <div class="asset-info">
           <div class="asset-header">
-            <div class="asset-name">海底捞·黑海会员</div>
+            <div class="asset-name">越窑青瓷</div>
             <span class="status-tag status-published">已上线</span>
           </div>
-          <div class="asset-merchant">商家：海底捞</div>
-          <div class="asset-meta">
-            <span>发行：20000</span>
-            <span>1款</span>
+          <div class="asset-merchant">商家：越窑文化</div>
+          <div class="asset-meta"><span>3款</span><span>共3000</span></div>
+          <div class="asset-tags"><span class="asset-tag">青瓷</span><span class="asset-tag">非遗</span></div>
+          <div class="asset-actions"><button class="btn btn-info" onclick="event.stopPropagation(); viewData('8')">查看数据</button></div>
+        </div>
+      </div>
+      <div class="asset-card" data-status="ended">
+        <div class="asset-cover" style="background-image:url(../asset/平水日铸茶封面图.png);background-size:cover;background-position:center"></div>
+        <div class="asset-info">
+          <div class="asset-header">
+            <div class="asset-name">平水日铸茶</div>
+            <span class="status-tag status-ended">已结束</span>
           </div>
-          <div class="asset-tags">
-            <span class="asset-tag">餐饮</span>
-            <span class="asset-tag">会员</span>
-            <span class="asset-tag">权益</span>
-          </div>
-          <div class="asset-actions">
-            <button class="btn btn-info" onclick="event.stopPropagation(); viewData('8')">查看数据</button>
-          </div>
+          <div class="asset-merchant">商家：平水茶业</div>
+          <div class="asset-meta"><span>2款</span><span>共2000</span></div>
+          <div class="asset-tags"><span class="asset-tag">茶叶</span><span class="asset-tag">特产</span></div>
+          <div class="asset-actions"><button class="btn btn-info" onclick="event.stopPropagation(); viewData('6')">查看数据</button></div>
         </div>
       </div>
     </div>
@@ -361,81 +294,15 @@
 
 <!-- 审核弹窗 -->
 <div class="modal-overlay" id="auditModal">
-  <div class="modal-box">
+  <div class="modal-box" style="max-width:800px">
     <div class="modal-header">
       <div class="modal-title">审核数字资产</div>
       <div class="modal-close" onclick="closeAuditModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </div>
     </div>
-    <div class="modal-body">
-      <input type="hidden" id="auditAssetId">
-      
-      <!-- 资产基本信息 -->
-      <div class="detail-section">
-        <div class="detail-title">资产信息</div>
-        <div class="detail-row">
-          <span class="detail-label">资产名称</span>
-          <span class="detail-value" id="auditAssetName">飞天茅台数字藏品</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">商家名称</span>
-          <span class="detail-value" id="auditMerchantName">贵州茅台集团</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">发行总数量</span>
-          <span class="detail-value" id="auditQuantity">1000</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">详细说明</span>
-          <span class="detail-value readonly" id="auditDescription">飞天茅台是贵州茅台集团的核心产品，具有独特的酱香风格...</span>
-        </div>
-      </div>
-
-      <!-- 产品价值评估报告 -->
-      <div class="detail-section">
-        <div class="detail-title">产品价值评估报告</div>
-        <div class="detail-row">
-          <span class="detail-label">报告内容</span>
-          <span class="detail-value readonly" id="auditReport">本数字藏品具有较高的收藏价值和市场潜力...</span>
-        </div>
-      </div>
-
-      <!-- 款式信息 -->
-      <div class="detail-section">
-        <div class="detail-title">款式信息</div>
-        <div id="auditStyles">
-          <div class="style-item-detail">
-            <div class="style-header-detail">
-              <span class="style-name-detail">款式 1：经典款</span>
-            </div>
-            <div class="detail-row" style="padding: 6px 0;">
-              <span class="detail-label">数量</span>
-              <span class="detail-value">500</span>
-            </div>
-            <div class="detail-row" style="padding: 6px 0;">
-              <span class="detail-label">权益说明</span>
-            </div>
-            <div class="benefit-item-detail">
-              <span class="detail-label">权益名称：</span>
-              <span class="detail-value">实物兑换</span>
-              <span style="margin-left: 20px;" class="detail-label">兑现方式：</span>
-              <span class="detail-value">实物快递</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 审核意见 -->
-      <div class="detail-section">
-        <div class="detail-title">审核意见</div>
-        <textarea class="audit-comment" id="auditComment" placeholder="请输入审核意见（驳回时必填）"></textarea>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-default" onclick="closeAuditModal()">取消</button>
-      <button class="btn btn-default" onclick="rejectAsset()">驳回</button>
-      <button class="btn btn-primary" onclick="approveAsset()">通过</button>
+    <div class="modal-body" id="auditContent">
+      <!-- 由 JS 填充详情 + 审核操作区 -->
     </div>
   </div>
 </div>
@@ -461,23 +328,32 @@
 const assets = {
   '1': {
     id: '1',
-    name: '1935·时光窖藏',
-    merchant: '贵州茅台集团',
-    quantity: 5000,
-    description: '茅台经典系列数字资产，1935时光窖藏系列，传承经典酿造工艺，具有独特的酱香风格。',
-    report: 'maotai_1935_report.pdf',
-    modelFile: 'maotai_1935_3d.glb',
-    cover: '茅台1935.png',
-    images: [
-      '1935详情.png'
-    ],
+    name: '兰亭雅集',
+    merchant: '绍兴兰亭产业数资',
+    quantity: 3000,
+    tags: ['书法','文旅'],
+    description: '兰亭雅集数字资产，融合书法艺术与数字科技，包含景区通行、研学体验等多项权益。',
+    report: 'lanting_report.pdf',
+    modelFile: 'lanting_3d.glb',
+    cover: '兰亭雅集封面图.png',
+    images: ['../asset/兰亭雅集产品图.png'],
     status: 'pending',
     styles: [
-      { name: '凝时', quantity: 1000, image: '凝时.png', price: 599, benefits: [{ name: '实物酒兑换', method: '实物快递' }, { name: '超值优惠券', method: '商家平台核销' }] },
-      { name: '守岁', quantity: 1000, image: '守岁.png', price: 699, benefits: [{ name: '实物酒兑换', method: '实物快递' }, { name: '线下品鉴会资格', method: '商家平台核销' }] },
-      { name: '溯年', quantity: 1000, image: '溯年.png', price: 899, benefits: [{ name: '实物酒兑换', method: '实物快递' }, { name: '超值优惠券', method: '商家平台核销' }, { name: '线下品鉴会资格', method: '商家平台核销' }] },
-      { name: '沉光', quantity: 1000, image: '沉光.png', price: 599, benefits: [{ name: '实物酒兑换', method: '实物快递' }] },
-      { name: '驻痕', quantity: 1000, image: '驻痕.png', price: 799, benefits: [{ name: '实物酒兑换', method: '实物快递' }, { name: '超值优惠券', method: '商家平台核销' }], soldOut: true }
+      { name: '畅行版', quantity: 1000, image: '畅行版.png', price: 1299, benefits: [
+        { n:'景区VIP通行权',type:'identity',total:999,eff:'2026-05-15',exp:'2026-12-31',desc:'鹅池碑、御碑亭' },
+        { n:'研学课程',type:'ticket',total:3,eff:'2026-05-15',exp:'2026-12-31',desc:'书法研学、拓印体验、非遗手作' }
+      ]},
+      { name: '学韵版', quantity: 1000, image: '学韵版.png', price: 1599, benefits: [
+        { n:'景区VIP通行权',type:'identity',total:999,eff:'2026-05-01',exp:'2026-12-31',desc:'鹅池碑、御碑亭、曲水流觞'},
+        { n:'研学课程',type:'ticket',total:3,eff:'2026-05-01',exp:'2026-12-31',desc:'书法研学、拓印体验、非遗手作'},
+        { n:'文创实物',type:'physical',total:1,eff:'2026-05-01',exp:'2026-12-31',desc:'兰亭文创礼盒（含书法折扇、拓片、书签）'}
+      ]},
+      { name: '优享版', quantity: 1000, image: '优享版.png', price: 2599, benefits: [
+        { n:'景区VIP通行权',type:'identity',total:999,eff:'2026-05-01',exp:'2026-12-31',desc:'鹅池碑、御碑亭、曲水流觞、兰亭江'},
+        { n:'研学课程',type:'ticket',total:3,eff:'2026-05-01',exp:'2026-12-31',desc:'书法研学、拓印体验、非遗手作'},
+        { n:'文创实物',type:'physical',total:1,eff:'2026-05-01',exp:'2026-12-31',desc:'兰亭文创礼盒（含书法折扇、拓片、书签）'},
+        { n:'跨城特权',type:'identity',total:999,eff:'2026-06-01',exp:'2026-12-31',desc:'绍兴、杭州、上海三地优先入场'}
+      ]}
     ]
   },
   '2': {
@@ -606,129 +482,25 @@ function filterByStatus(status, tabElement) {
   });
 }
 
+/* ── 权益状态判定 ── */
+var B_STA = { pending:['待生效','benefit-unused'], unused:['未使用','benefit-unused'], partial:['部分使用','benefit-partial'], done:['已用完','benefit-used'], expired:['已失效','benefit-cancelled'] };
+function calcBenefitStatus(bf){
+  var now = Date.now();
+  var eff = bf.eff ? new Date(bf.eff).getTime() : 0;
+  var exp = bf.exp ? new Date(bf.exp).getTime() : Infinity;
+  var total = bf.total || 1;
+  var used = bf.used || 0;
+  if(used >= total) return 'done';
+  if(now > exp && used < total) return 'expired';
+  if(now < eff) return 'pending';
+  if(used > 0 && used < total) return 'partial';
+  return 'unused';
+}
 // 查看资产详情
 function viewAssetDetail(id) {
   const asset = assets[id];
   if (!asset) return;
-  
-  let stylesHtml = '';
-  asset.styles.forEach((style, index) => {
-    let benefitsHtml = `
-      <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">
-        <thead>
-          <tr style="background: #f5f5f7;">
-            <th style="padding: 6px 10px; text-align: left; font-size: 12px; color: #666; border: 1px solid #e8e8e8;">权益名称</th>
-            <th style="padding: 6px 10px; text-align: left; font-size: 12px; color: #666; border: 1px solid #e8e8e8;">核销方式</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
-    style.benefits.forEach((benefit) => {
-      benefitsHtml += `
-        <tr>
-          <td style="padding: 6px 10px; font-size: 13px; color: #333; border: 1px solid #e8e8e8;">${benefit.name}</td>
-          <td style="padding: 6px 10px; font-size: 13px; color: #333; border: 1px solid #e8e8e8;">${benefit.method === 'delivery' ? '实物快递' : '商家平台核销'}</td>
-        </tr>
-      `;
-    });
-    benefitsHtml += '</tbody></table>';
-    
-    stylesHtml += `
-      <div class="style-item-detail">
-        <div class="style-header-detail">
-          <span class="style-name-detail">款式 ${index + 1}：${style.name}</span>
-        </div>
-        <div style="display: flex; gap: 16px; margin-bottom: 12px;">
-          <img src="${style.image}" alt="${style.name}" class="style-image" onclick="previewImage('${style.image}')" style="cursor: pointer;">
-          <div style="flex: 1;">
-            <div class="detail-row" style="padding: 6px 0;">
-              <span class="detail-label">数量</span>
-              <span class="detail-value">${style.quantity}</span>
-            </div>
-          </div>
-        </div>
-        <div style="margin-top: 8px;">
-          <span class="detail-label" style="display: block; margin-bottom: 8px;">权益说明：</span>
-          ${benefitsHtml}
-        </div>
-      </div>
-    `;
-  });
-  
-  let imagesHtml = '';
-  if (asset.images && asset.images.length > 0) {
-    imagesHtml = `
-      <div class="detail-section">
-        <div class="detail-title">产品详情</div>
-        <div class="detail-images">
-          ${asset.images.map((img, index) => `
-            <img src="${img}" alt="产品图片${index + 1}" style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px; cursor: pointer;" onclick="previewImage('${img}')">
-          `).join('')}
-        </div>
-        <div style="font-size: 12px; color: #999; margin-top: 8px;">点击图片可放大查看</div>
-      </div>
-    `;
-  }
-  
-  const content = `
-    <div class="detail-section">
-      <div class="detail-title">资产信息</div>
-      <div class="detail-row">
-        <span class="detail-label">产品名称</span>
-        <span class="detail-value">${asset.name}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">封面</span>
-        <div>
-          <img src="${asset.cover || asset.images[0]}" alt="封面" style="width: 150px; height: 180px; object-fit: cover; border-radius: 8px; cursor: pointer;" onclick="previewImage('${asset.cover || asset.images[0]}')">
-          <div style="font-size: 12px; color: #999; margin-top: 4px;">1935详情.png</div>
-        </div>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">商家名称</span>
-        <span class="detail-value">${asset.merchant}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">发行总数量</span>
-        <span class="detail-value">${asset.quantity}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">详细说明</span>
-        <span class="detail-value readonly">${asset.description}</span>
-      </div>
-    </div>
-
-    <div class="detail-section">
-      <div class="detail-title">产品价值评估报告</div>
-      <div class="detail-row">
-        <span class="detail-label">报告文件</span>
-        <a href="#" class="download-link" onclick="event.preventDefault(); showToast('正在下载报告', 'success')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          查看 ${asset.report}
-        </a>
-      </div>
-    </div>
-
-    <div class="detail-section">
-      <div class="detail-title">3D模型文件</div>
-      <div class="detail-row">
-        <span class="detail-label">模型文件</span>
-        <a href="#" class="download-link" onclick="event.preventDefault(); showToast('正在下载3D模型', 'success')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          下载 ${asset.modelFile}
-        </a>
-      </div>
-    </div>
-
-    ${imagesHtml}
-
-    <div class="detail-section">
-      <div class="detail-title">款式信息</div>
-      ${stylesHtml}
-    </div>
-  `;
-  
-  document.getElementById('detailContent').innerHTML = content;
+  document.getElementById('detailContent').innerHTML = buildDetailContent(asset);
   document.getElementById('detailModal').classList.add('show');
 }
 
@@ -760,47 +532,80 @@ function closeDetailModal() {
 function openAuditModal(id) {
   const asset = assets[id];
   if (!asset) return;
+  document.getElementById('auditComment2') && (document.getElementById('auditComment2').value = '');
+
+  var auditContent = buildDetailContent(asset);
   
-  document.getElementById('auditAssetId').value = id;
-  document.getElementById('auditAssetName').textContent = asset.name;
-  document.getElementById('auditMerchantName').textContent = asset.merchant;
-  document.getElementById('auditQuantity').textContent = asset.quantity;
-  document.getElementById('auditDescription').textContent = asset.description;
-  document.getElementById('auditReport').textContent = asset.report;
-  
-  let stylesHtml = '';
-  asset.styles.forEach((style, index) => {
-    let benefitsHtml = '';
-    style.benefits.forEach(benefit => {
-      benefitsHtml += `
-        <div class="benefit-item-detail">
-          <span class="detail-label">权益名称：</span>
-          <span class="detail-value">${benefit.name}</span>
-          <span style="margin-left: 20px;" class="detail-label">兑现方式：</span>
-          <span class="detail-value">${benefit.method === 'delivery' ? '实物快递' : '商家平台核销'}</span>
-        </div>
-      `;
-    });
-    stylesHtml += `
-      <div class="style-item-detail">
-        <div class="style-header-detail">
-          <span class="style-name-detail">款式 ${index + 1}：${style.name}</span>
-        </div>
-        <div class="detail-row" style="padding: 6px 0;">
-          <span class="detail-label">数量</span>
-          <span class="detail-value">${style.quantity}</span>
-        </div>
-        <div class="detail-row" style="padding: 6px 0;">
-          <span class="detail-label">权益说明</span>
-        </div>
-        ${benefitsHtml}
+  // 追加审核操作区
+  auditContent += `
+    <div style="margin-top:24px;padding-top:20px;border-top:2px solid #D70C1F">
+      <div class="detail-title" style="margin-bottom:12px">审核意见</div>
+      <textarea class="audit-comment" id="auditComment2" placeholder="请输入审核意见（驳回时必填）"></textarea>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px">
+        <button class="btn btn-default" onclick="closeAuditModal()">取消</button>
+        <button class="btn btn-default" style="background:#fff2f0;color:#ff4d4f;border:1px solid #ffccc7" onclick="rejectAsset(\''+id+'\')">驳回</button>
+        <button class="btn btn-primary" onclick="approveAsset(\''+id+'\')">通过</button>
       </div>
-    `;
+    </div>
+  `;
+  
+  document.getElementById('auditContent').innerHTML = auditContent;
+  document.getElementById('auditModal').classList.add('show');
+}
+
+// 提取详情构建函数，供 viewAssetDetail 和 openAuditModal 共用
+function buildDetailContent(asset){
+  var typeMap = { identity:'身份权益（无限次扫码）', ticket:'门票/兑换券（按次核销）', physical:'实物权益（快递发货）' };
+  var stylesHtml = '';
+  asset.styles.forEach(function(style, index){
+    var benHtml = '';
+    (style.benefits||[]).forEach(function(b){
+      benHtml += '<div style="padding:10px 12px;margin-bottom:6px;border-radius:8px;background:#fff;border:1px solid #eee">';
+      benHtml += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">';
+      benHtml += '<span style="font-size:13px;font-weight:600;color:#333;flex:1">'+b.n+'</span>';
+      benHtml += '<span style="font-size:10px;color:#888;background:#f0f0f0;padding:2px 8px;border-radius:4px">'+(typeMap[b.type]||b.type)+'</span>';
+      benHtml += '</div>';
+      benHtml += '<div style="font-size:11px;color:#3F8B6D;font-weight:500;margin-bottom:4px">📅 有效期 '+b.eff+' ~ '+b.exp+'</div>';
+      if(b.desc) benHtml += '<div style="font-size:11px;color:#888;margin-bottom:2px;padding:3px 8px;background:#f5f7fa;border-radius:4px">'+b.desc+'</div>';
+      benHtml += '<div style="font-size:11px;color:#999">总次数：'+(b.total>=999?'不限':(b.total||'--'))+'次</div>';
+      benHtml += '</div>';
+    });
+    stylesHtml += '<div style="background:#f5f7fa;border-radius:10px;padding:14px;margin-bottom:12px">';
+    stylesHtml += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">';
+    stylesHtml += '<img src="../asset/'+style.image+'" style="width:56px;height:56px;border-radius:8px;object-fit:cover;border:1px solid #eee" onerror="this.style.display=\'none\'">';
+    stylesHtml += '<div style="flex:1"><div style="font-size:14px;font-weight:600;color:#333">款式 '+(index+1)+'：'+style.name+'</div>';
+    stylesHtml += '<div style="font-size:11px;color:#999">数量：'+style.quantity+' ｜ 价格：¥'+(style.price||'--')+'</div></div></div>';
+    stylesHtml += '<div style="font-size:12px;font-weight:500;color:#666;margin-bottom:6px">权益配置（'+(style.benefits.length)+'项）：</div>'+benHtml+'</div>';
   });
   
-  document.getElementById('auditStyles').innerHTML = stylesHtml;
-  document.getElementById('auditComment').value = '';
-  document.getElementById('auditModal').classList.add('show');
+  var tagsHtml = (asset.tags||[]).map(function(t){return '<span style="display:inline-block;padding:2px 8px;background:#f0f5ff;color:#1890ff;border-radius:4px;font-size:11px;margin:0 4px 4px 0">'+t+'</span>';}).join('');
+  var imgsHtml = (asset.images||[]).map(function(src){return '<img src="'+src+'" style="width:120px;height:120px;border-radius:8px;object-fit:cover;border:1px solid #eee;cursor:pointer" onclick="previewImage(\''+src+'\')">';}).join('');
+  
+  return '<div style="display:flex;gap:16px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid #eee">'+
+    '<img src="../asset/'+asset.cover+'" style="width:80px;height:80px;border-radius:10px;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,.08)" onerror="this.style.display=\'none\'">'+
+    '<div style="flex:1"><div style="font-size:17px;font-weight:700;color:#1a1a2e;margin-bottom:6px">'+asset.name+'</div>'+
+    '<div style="font-size:12px;color:#D70C1F;font-weight:600;margin-bottom:4px">发行方：'+asset.merchant+'</div>'+
+    '<div style="font-size:12px;color:#888;margin-bottom:6px">发行总量：'+asset.quantity+' | '+asset.styles.length+'款</div>'+
+    (tagsHtml?'<div>'+tagsHtml+'</div>':'')+'</div></div>'+
+    '<div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #eee">'+
+    '<div class="detail-title" style="margin-bottom:12px">产品详情</div>'+
+    '<div style="display:flex;gap:12px;flex-wrap:wrap">'+imgsHtml+'</div>'+
+    '<div style="font-size:11px;color:#bbb;margin-top:6px">点击图片可放大查看</div></div>'+
+    '<div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #eee">'+
+    '<div class="detail-title" style="margin-bottom:12px">产品价值评估报告</div>'+
+    '<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#f5f7fa;border-radius:8px">'+
+    '<span style="font-size:18px">📄</span><span style="flex:1;font-size:13px;color:#555">'+(asset.report||'未上传')+'</span>'+
+    '<a href="#" style="font-size:12px;color:#1890ff;text-decoration:none;font-weight:500" onclick="event.preventDefault();alert(\'下载评估报告\')">下载</a></div></div>'+
+    '<div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #eee">'+
+    '<div class="detail-title" style="margin-bottom:12px">3D模型文件</div>'+
+    '<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#f5f7fa;border-radius:8px">'+
+    '<span style="font-size:18px">🗿</span><span style="flex:1;font-size:13px;color:#555">'+(asset.modelFile||'未上传')+'</span>'+
+    '<a href="#" style="font-size:12px;color:#1890ff;text-decoration:none;font-weight:500" onclick="event.preventDefault();alert(\'下载3D模型\')">下载</a></div></div>'+
+    '<div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #eee">'+
+    '<div class="detail-title" style="margin-bottom:12px">产品描述</div>'+
+    '<div style="font-size:13px;color:#666;line-height:1.8;padding:12px 16px;background:#f5f7fa;border-radius:8px">'+asset.description+'</div></div>'+
+    '<div style="margin-bottom:0"><div class="detail-title" style="margin-bottom:12px">款式及权益（'+asset.styles.length+'款）</div>'+
+    stylesHtml+'</div>';
 }
 
 // 关闭审核弹窗
@@ -809,8 +614,9 @@ function closeAuditModal() {
 }
 
 // 审核通过
-function approveAsset() {
-  const id = document.getElementById('auditAssetId').value;
+function approveAsset(id) {
+  if(!id) id = '1';
+  if(!assets[id]) return;
   assets[id].status = 'approved';
   
   // 更新卡片状态
@@ -827,14 +633,14 @@ function approveAsset() {
 }
 
 // 驳回
-function rejectAsset() {
-  const comment = document.getElementById('auditComment').value.trim();
+function rejectAsset(id) {
+  if(!id) id = '1';
+  const comment = (document.getElementById('auditComment2')||{}).value.trim();
   if (!comment) {
     showToast('请输入驳回理由', 'error');
     return;
   }
-  
-  const id = document.getElementById('auditAssetId').value;
+  if(!assets[id]) return;
   assets[id].status = 'rejected';
   
   // 更新卡片状态

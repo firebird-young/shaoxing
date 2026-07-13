@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>商家登录 - 核销客户端</title>
+<style>
+:root{--accent:#3F8B6D;--accent-contrast:#fff;--bg:#fff;--ink:#222;--ink-muted:#555;--ink-subtle:#888;--border:#e0e0e0;--page-bg:#F0F2F5;--radius-sm:7px;--radius-card:12px;--radius-pill:9999px;--font-display:"Helvetica Neue",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;--font-body:"Inter",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;width:100%;background:var(--page-bg);font-family:var(--font-body);color:var(--ink-muted);display:flex;justify-content:center;min-height:100vh}
+.page{max-width:430px;width:100%;min-height:100vh;background:linear-gradient(180deg,#3F8B6D 0%,#a8c9bb 25%,#f0f2f5 50%);padding:40px 24px;position:relative;box-sizing:border-box}
+@media(max-width:430px){.page{max-width:100%}}
+
+/* ── 顶部品牌区 ── */
+.brand{text-align:center;padding:32px 0 40px}
+.brand-logo{width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,.2);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;border:1px solid rgba(255,255,255,.25)}
+.brand-logo svg{width:32px;height:32px;color:#fff;display:block}
+.brand h1{font-size:22px;font-weight:700;color:#fff;margin-bottom:4px;letter-spacing:1px}
+.brand p{font-size:13px;color:rgba(255,255,255,.75)}
+
+/* ── 登录卡片 ── */
+.login-card{background:var(--bg);border-radius:16px;padding:32px 24px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:13px;color:var(--ink-muted);margin-bottom:6px;font-weight:500}
+.form-input{width:100%;height:46px;padding:0 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;color:var(--ink);outline:none;transition:border .25s;background:#fafafa}
+.form-input:focus{border-color:var(--accent);background:#fff}
+.form-input::placeholder{color:#ccc}
+.submit-btn{width:100%;height:48px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px;transition:opacity .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.submit-btn:active{opacity:.85}
+.submit-btn svg{width:18px;height:18px;display:block}
+
+/* ── 提示信息 ── */
+.form-error{display:none;background:#fff0ef;border:1px solid #ffc9c4;border-radius:10px;padding:10px 14px;font-size:13px;color:#d13b3b;margin-top:12px;text-align:center;line-height:1.5}
+.form-success{display:none;background:#edfcf2;border:1px solid #b7ebc2;border-radius:10px;padding:10px 14px;font-size:13px;color:#0d9e6e;margin-top:12px;text-align:center;line-height:1.5}
+
+/* ── 协议 ── */
+.agreement{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:12px;color:var(--ink-subtle);justify-content:center}
+.agreement input[type=checkbox]{width:14px;height:14px;accent-color:var(--accent);cursor:pointer}
+.agreement a{color:var(--accent);text-decoration:none;font-weight:500}
+
+/* ── Toast ── */
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.78);color:#fff;font-size:14px;padding:14px 28px;border-radius:8px;z-index:200;pointer-events:none;opacity:0;transition:opacity .3s}
+.toast.show{opacity:1}
+
+/* ── 拖动校验码 ── */
+.captcha-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9998;display:none;align-items:center;justify-content:center}
+.captcha-overlay.show{display:flex}
+.captcha-box{background:#fff;border-radius:16px;width:320px;padding:28px 24px 24px;box-shadow:0 8px 40px rgba(0,0,0,.18);text-align:center}
+.captcha-box .cb-title{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.captcha-box .cb-sub{font-size:12px;color:var(--ink-subtle);margin-bottom:20px}
+.captcha-box .cb-img{width:100%;height:120px;border-radius:10px;background:linear-gradient(135deg,#3F8B6D,#2a5e4a);margin-bottom:16px;display:flex;align-items:center;justify-content:center;font-size:36px;color:rgba(255,255,255,.25);overflow:hidden}
+.captcha-box .cb-slider-track{width:100%;height:42px;background:#f0f2f5;border-radius:21px;position:relative;overflow:hidden;user-select:none}
+.captcha-box .cb-slider-progress{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,#3F8B6D,#5caF8a);border-radius:21px;width:0;transition:none}
+.captcha-box .cb-slider-btn{position:absolute;left:2px;top:2px;width:38px;height:38px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.18);cursor:grab;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--accent);z-index:2;transition:none}
+.captcha-box .cb-slider-btn:active{cursor:grabbing}
+.captcha-box .cb-hint{font-size:12px;color:var(--ink-subtle);margin-top:10px;display:flex;align-items:center;justify-content:center;gap:4px}
+.captcha-box .cb-success{color:#0d9e6e;font-weight:600}
+.captcha-box .cb-fail{color:#d13b3b;font-weight:600}
+
+/* ── 底部链接 ── */
+.footer-links{text-align:center;margin-top:24px}
+.footer-links a{font-size:12px;color:rgba(255,255,255,.6);text-decoration:none;margin:0 12px}
+.footer-links a:hover{color:rgba(255,255,255,.9)}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- 品牌 -->
+  <div class="brand">
+    <div class="brand-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <h1>商家核销系统</h1>
+    <p>绍兴数资</p>
+  </div>
+
+  <!-- 登录卡片 -->
+  <div class="login-card">
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label class="form-label">商家简称</label>
+        <input class="form-input" id="loginName" placeholder="请输入商家简称" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">账号</label>
+        <input class="form-input" id="loginAccount" placeholder="请输入账号" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">密码</label>
+        <input class="form-input" id="loginPassword" type="password" placeholder="请输入密码" required>
+      </div>
+      <div class="agreement">
+        <input type="checkbox" id="agreeCheck" checked>
+        <label for="agreeCheck">已阅读并同意 <a href="#">《服务协议》</a> 和 <a href="#">《隐私政策》</a></label>
+      </div>
+      <button class="submit-btn" type="submit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        登录
+      </button>
+      <div class="form-error" id="loginError"></div>
+    </form>
+  </div>
+
+  <!-- 底部 -->
+  <div class="footer-links">
+    <a href="../merchant/register.html">商家入驻注册 ›</a>
+    <a href="#" onclick="showToast('请联系管理员重置密码')">忘记密码？</a>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ====== 拖动校验码弹窗 ====== -->
+<div class="captcha-overlay" id="captchaOverlay">
+  <div class="captcha-box">
+    <div class="cb-title">安全验证</div>
+    <div class="cb-sub">请拖动滑块完成校验</div>
+    <div class="cb-img" id="cbImg">🛡️</div>
+    <div class="cb-slider-track" id="cbTrack">
+      <div class="cb-slider-progress" id="cbProgress"></div>
+      <div class="cb-slider-btn" id="cbBtn">→</div>
+    </div>
+    <div class="cb-hint" id="cbHint">拖动滑块到最右侧完成验证</div>
+  </div>
+</div>
+
+<script>
+var captchaVerified = false;
+var pendingAction = null;
+
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t=setTimeout(function(){t.classList.remove('show')},2000);
+}
+
+function showFormError(id,msg){
+  var e=document.getElementById(id);
+  if(e){e.textContent=msg;e.style.display='block';}
+}
+function hideFormError(id){
+  var e=document.getElementById(id);
+  if(e)e.style.display='none';
+}
+
+// ── 拖动校验码 ──
+function resetSlider(){
+  captchaVerified=false;
+  var pr=document.getElementById('cbProgress');
+  var btn=document.getElementById('cbBtn');
+  var h=document.getElementById('cbHint');
+  if(pr)pr.style.width='0';
+  if(btn){btn.style.left='2px';btn.innerHTML='→';btn.style.color='#3F8B6D';btn.style.background='#fff';}
+  if(h){h.textContent='拖动滑块到最右侧完成验证';h.className='cb-hint';}
+}
+function showCaptcha(){
+  resetSlider();
+  document.getElementById('captchaOverlay').classList.add('show');
+}
+function closeCaptcha(){
+  document.getElementById('captchaOverlay').classList.remove('show');
+  pendingAction=null;
+}
+
+(function(){
+  var track,bBtn,bProgress,startX=0,btnLeft=0,dragging=false;
+  var btnW=38;
+  function init(){
+    track=document.getElementById('cbTrack');
+    bBtn=document.getElementById('cbBtn');
+    bProgress=document.getElementById('cbProgress');
+    if(!track||!bBtn||!bProgress)return;
+    bBtn.addEventListener('mousedown',function(e){
+      if(captchaVerified)return;
+      dragging=true;startX=e.clientX;
+      btnLeft=parseFloat(bBtn.style.left)||0;
+      e.preventDefault();
+    });
+    bBtn.addEventListener('touchstart',function(e){
+      if(captchaVerified)return;
+      dragging=true;startX=e.touches[0].clientX;
+      btnLeft=parseFloat(bBtn.style.left)||0;
+    },{passive:true});
+    document.addEventListener('mousemove',function(e){if(!dragging)return;moveSlider(e.clientX);});
+    document.addEventListener('touchmove',function(e){if(!dragging)return;moveSlider(e.touches[0].clientX);},{passive:true});
+    document.addEventListener('mouseup',function(){endDrag()});
+    document.addEventListener('touchend',function(){endDrag()});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+  function moveSlider(cx){
+    var tw=track.offsetWidth;
+    var dx=cx-startX;
+    var nl=Math.max(2,Math.min(tw-btnW-2,btnLeft+dx));
+    var pct=((nl-2)/(tw-btnW-4))*100;
+    bBtn.style.left=nl+'px';
+    bProgress.style.width=pct+'%';
+  }
+  function endDrag(){
+    if(!dragging)return;
+    dragging=false;
+    var tw=track.offsetWidth;
+    var nl=parseFloat(bBtn.style.left)||2;
+    if(nl>=tw-btnW-10){
+      captchaVerified=true;
+      bBtn.style.left=(tw-btnW-2)+'px';
+      bProgress.style.width='100%';
+      bBtn.innerHTML='✓';
+      bBtn.style.color='#fff';
+      bBtn.style.background='#0d9e6e';
+      document.getElementById('cbHint').textContent='✓ 验证通过';
+      document.getElementById('cbHint').className='cb-hint cb-success';
+      setTimeout(function(){closeCaptcha();doLogin();},400);
+    }else{
+      bBtn.textContent='✕';
+      bBtn.style.color='#d13b3b';
+      bBtn.style.background='#fff';
+      document.getElementById('cbHint').textContent='❌ 验证失败，请重试';
+      document.getElementById('cbHint').className='cb-hint cb-fail';
+      setTimeout(function(){resetSlider()},700);
+    }
+  }
+})();
+
+// ── 登录 ──
+function handleLogin(e){
+  e.preventDefault();
+  hideFormError('loginError');
+  var name=document.getElementById('loginName').value.trim();
+  var account=document.getElementById('loginAccount').value.trim();
+  var pwd=document.getElementById('loginPassword').value;
+  if(!name||!account||!pwd){showFormError('loginError','⚠️ 请填写所有字段');return}
+  if(!document.getElementById('agreeCheck').checked){showFormError('loginError','⚠️ 请阅读并同意服务协议');return}
+  window._loginData={name:name,account:account,pwd:pwd};
+  showCaptcha();
+}
+
+function doLogin(){
+  var d=window._loginData;
+  var users=JSON.parse(localStorage.getItem('merchants')||'[]');
+  var u=users.find(function(u){return u.name===d.name&&u.account===d.account&&u.password===d.pwd});
+  if(!u){showFormError('loginError','❌ 商家简称、账号或密码错误');return}
+  localStorage.setItem('merchantLogin',JSON.stringify({name:u.name,account:u.account,certStatus:u.certStatus||'unauth',logo:u.logo||'',tag:u.tag||''}));
+  location.href='scan.html';
+}
+</script>
+</body>
+</html>

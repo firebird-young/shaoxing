@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>扫码核销 - 商家客户端</title>
+<style>
+:root{--accent:#3F8B6D;--accent-contrast:#fff;--bg:#fff;--ink:#222;--ink-muted:#555;--ink-subtle:#888;--border:#e0e0e0;--page-bg:#F0F0F0;--radius-sm:7px;--radius-card:7px;--radius-pill:9999px;--font-display:"Helvetica Neue",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;--font-body:"Inter",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(--ink-muted);display:flex;justify-content:center;min-height:100%}
+.page{max-width:430px;width:100%;min-height:100vh;background:linear-gradient(180deg,#3F8B6D 0%,#a8c9bb 8%,#f0f0f0 20%);padding:16px;padding-bottom:80px;position:relative;box-sizing:border-box}
+@media(max-width:430px){.page{max-width:100%}}
+
+/* ── 顶部 ── */
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:0 0 16px}
+.top-bar-left{display:flex;align-items:center;gap:10px}
+.merchant-logo{width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.4)}
+.merchant-name{font-size:14px;font-weight:600;color:#fff}
+.merchant-status{font-size:10px;color:rgba(255,255,255,.7);display:flex;align-items:center;gap:3px}
+.merchant-status .dot{width:6px;height:6px;border-radius:50%;background:#52c41a;display:inline-block}
+.top-bar-right{display:flex;gap:12px}
+.top-bar-right .icon-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;color:#fff}
+.top-bar-right .icon-btn svg{width:18px;height:18px;display:block}
+.top-bar-right .icon-btn:active{background:rgba(255,255,255,.35)}
+
+/* ── 扫码区 ── */
+.scan-area{background:var(--bg);border-radius:var(--radius-card);padding:24px 20px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.04);margin-bottom:12px}
+.scan-btn{width:80px;height:80px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 4px 16px rgba(63,139,109,.3);transition:transform .15s}
+.scan-btn:active{transform:scale(.9)}
+.scan-btn svg{width:36px;height:36px;color:#fff;display:block}
+.scan-title{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.scan-desc{font-size:12px;color:var(--ink-subtle)}
+.scan-tip{font-size:11px;color:var(--ink-subtle);margin-top:10px;padding:8px 12px;background:var(--page-bg);border-radius:6px;display:flex;align-items:center;gap:6px;justify-content:center}
+
+/* ── 今日统计 ── */
+.stats-row{display:flex;gap:8px;margin-bottom:12px}
+.stat-card{flex:1;background:var(--bg);border-radius:var(--radius-card);padding:14px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.04)}
+.stat-num{font-size:22px;font-weight:700;color:var(--accent);margin-bottom:2px}
+.stat-label{font-size:11px;color:var(--ink-subtle)}
+
+/* ── 最近核销 ── */
+.section-title{display:flex;align-items:center;justify-content:space-between;padding:10px 0 8px}
+.section-title span{font-size:14px;font-weight:600;color:var(--ink)}
+.section-title a{font-size:11px;color:var(--accent);text-decoration:none;cursor:pointer}
+.history-item{background:var(--bg);border-radius:var(--radius-card);padding:12px 14px;margin-bottom:6px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 6px rgba(0,0,0,.04);cursor:pointer}
+.history-item:active{background:var(--page-bg)}
+.hi-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hi-icon svg{width:18px;height:18px;display:block}
+.hi-info{flex:1;min-width:0}
+.hi-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.hi-time{font-size:10px;color:var(--ink-subtle)}
+.hi-tag{font-size:11px;font-weight:500;padding:3px 10px;border-radius:var(--radius-pill);flex-shrink:0}
+.hi-tag.success{background:rgba(63,139,109,.1);color:var(--accent)}
+.hi-tag.pending{background:rgba(52,152,219,.1);color:#3498db}
+
+/* ── 空状态 ── */
+.empty-state{text-align:center;padding:32px 0 16px}
+.empty-state .empty-icon{width:48px;height:48px;margin:0 auto 8px;opacity:.3}
+.empty-state .empty-icon svg{width:100%;height:100%;color:var(--ink-subtle)}
+.empty-state .empty-text{font-size:12px;color:var(--ink-subtle)}
+
+/* ── 底部导航 ── */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:64px;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:space-between;padding:0 16px;padding-bottom:env(safe-area-inset-bottom,4px);z-index:100;box-sizing:border-box}
+.bnav .ni{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border:none;background:none;padding:4px 10px;font-size:10px;color:var(--ink-subtle);transition:color .2s}
+.bnav .ni .ico{width:22px;height:22px;transition:transform .15s}
+.bnav .ni .ico svg{display:block;width:100%;height:100%}
+.bnav .ni:active .ico{transform:scale(.8)}
+.bnav .ni.on{color:var(--accent)}
+.bnav .ni span:last-child{font-size:10px;display:block}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- 顶部 -->
+<div class="top-bar">
+  <div class="top-bar-left">
+    <img class="merchant-logo" src="../asset/绍兴兰亭logo.png" alt="logo" onerror="this.style.display='none'">
+    <div>
+      <div class="merchant-name">绍兴兰亭产业数资</div>
+    </div>
+  </div>
+  <div class="top-bar-right">
+    <button class="icon-btn" onclick="location.href='login.html'" title="切换账号">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- 扫码区 -->
+<div class="scan-area">
+  <button class="scan-btn" onclick="simulateScan()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+  </button>
+  <div class="scan-title">扫码核销</div>
+  <div class="scan-desc">扫描用户出示的二维码核销权益</div>
+  <div class="scan-tip">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    点击上方按钮或点击下方模拟扫码
+  </div>
+</div>
+
+<!-- 今日统计 -->
+<div class="stats-row">
+  <div class="stat-card"><div class="stat-num">23</div><div class="stat-label">今日核销</div></div>
+  <div class="stat-card"><div class="stat-num">12</div><div class="stat-label">身份权益</div></div>
+  <div class="stat-card"><div class="stat-num">8</div><div class="stat-label">门票核销</div></div>
+
+</div>
+
+<!-- 最近核销 -->
+<div class="section-title">
+  <span>最近核销</span>
+  <a onclick="location.href='history.html'">查看全部 ›</a>
+</div>
+
+<div id="historyList">
+  <div class="history-item" onclick="simulateScan()">
+    <div class="hi-icon" style="background:rgba(63,139,109,.1);color:var(--accent)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+    </div>
+    <div class="hi-info">
+      <div class="hi-name">景区VIP通行权</div>
+      <div class="hi-time">10分钟前 · 用户 138****5678</div>
+    </div>
+    <span class="hi-tag success">已核销</span>
+  </div>
+  <div class="history-item" onclick="simulateScan()">
+    <div class="hi-icon" style="background:rgba(206,147,216,.12);color:#8A5CFF">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+    </div>
+    <div class="hi-info">
+      <div class="hi-name">研学课程 · 第2次</div>
+      <div class="hi-time">35分钟前 · 用户 139****1234</div>
+    </div>
+    <span class="hi-tag success">已核销</span>
+  </div>
+
+</div>
+
+<div class="empty-state" id="emptyState" style="display:none">
+  <div class="empty-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+  </div>
+  <div class="empty-text">暂无核销记录</div>
+</div>
+
+</div>
+
+<!-- 底部导航 -->
+<div class="bnav">
+  <button class="ni on">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+    <span>首页</span>
+  </button>
+  <button class="ni" onclick="location.href='history.html'">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+    <span>记录</span>
+  </button>
+  <button class="ni" onclick="location.href='profile.html'">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+    <span>我的</span>
+  </button>
+</div>
+
+<script>
+function simulateScan(){
+  // 模拟扫码后直接跳转到扫码成功页，展示核销内容
+  var data = {
+    user: 'U20240001',
+    name: '兰亭泼墨人',
+    type: 'identity',
+    label: '身份权益',
+    assetName: '兰亭雅集',
+    assetSpec: '优享版',
+    assetNo: '#0001',
+    title: '景区VIP通行权',
+    desc: '鹅池碑、御碑亭、曲水流觞、兰亭江',
+    time: '2026-07-13 17:26',
+    code: '28294756'
+  };
+  var param = encodeURIComponent(JSON.stringify(data));
+  location.href = 'success.html?data=' + param;
+}
+</script>
+</body>
+</html>

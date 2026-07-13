@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>核销确认 - 商家客户端</title>
+<style>
+:root{--accent:#3F8B6D;--accent-contrast:#fff;--bg:#fff;--ink:#222;--ink-muted:#555;--ink-subtle:#888;--border:#e0e0e0;--page-bg:#F0F0F0;--radius-sm:7px;--radius-card:7px;--radius-pill:9999px;--font-display:"Helvetica Neue",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;--font-body:"Inter",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(--ink-muted);display:flex;justify-content:center;min-height:100%}
+.page{max-width:430px;width:100%;min-height:100vh;background:linear-gradient(180deg,#3F8B6D 0%,#a8c9bb 8%,#f0f0f0 20%);padding:16px;padding-bottom:80px;position:relative;box-sizing:border-box}
+@media(max-width:430px){.page{max-width:100%}}
+
+/* ── 顶部 ── */
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:0 0 16px}
+.nav-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(255,255,255,.2);border-radius:50%}
+.nav-back svg{width:20px;height:20px;display:block;color:#fff}
+.nav-title{flex:1;text-align:center;font-size:16px;font-weight:700;color:#fff}
+.nav-placeholder{width:32px}
+
+/* ── 用户信息卡 ── */
+.user-card{background:var(--bg);border-radius:var(--radius-card);padding:16px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 6px rgba(0,0,0,.04);margin-bottom:12px}
+.user-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.user-meta{font-size:11px;color:var(--ink-subtle)}
+.user-meta svg{width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:2px}
+
+/* ── 资产卡片 ── */
+.asset-card{background:var(--bg);border-radius:var(--radius-card);overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.04);margin-bottom:12px}
+.asset-header{display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid var(--page-bg)}
+.asset-thumb{width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0}
+.asset-info{flex:1;min-width:0}
+.asset-name{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.asset-spec{font-size:11px;color:var(--ink-subtle)}
+.asset-tag{font-size:11px;padding:3px 10px;border-radius:var(--radius-pill);background:rgba(63,139,109,.1);color:var(--accent);font-weight:500;flex-shrink:0}
+
+/* ── 权益列表 ── */
+.benefits-list{padding:8px 14px}
+.benefit-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--page-bg);cursor:pointer;transition:background .15s}
+.benefit-item:last-child{border-bottom:none}
+.benefit-item:active{background:var(--page-bg);margin:0 -14px;padding:10px 14px}
+.bf-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bf-icon svg{width:16px;height:16px;display:block}
+.bf-name{font-size:13px;font-weight:500;color:var(--ink);flex:1;min-width:0}
+.bf-extra{font-size:11px;color:var(--ink-subtle);margin-right:6px}
+.bf-status{font-size:11px;font-weight:500;padding:3px 10px;border-radius:var(--radius-pill);flex-shrink:0}
+.bf-status.usable{background:rgba(63,139,109,.1);color:var(--accent)}
+.bf-status.used{background:var(--page-bg);color:var(--ink-subtle)}
+.bf-status.pending{background:rgba(52,152,219,.1);color:#3498db}
+.bf-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.bf-check.on{border-color:var(--accent);background:var(--accent)}
+.bf-check.on svg{display:block}
+.bf-check svg{width:12px;height:12px;color:#fff;display:none}
+
+/* ── 操作栏 ── */
+.action-bar{display:flex;gap:10px;padding:8px 0}
+.btn-outline{flex:1;height:46px;border:1px solid var(--border);border-radius:12px;background:var(--bg);color:var(--ink-muted);font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-outline:active{background:var(--page-bg)}
+.btn-primary{flex:1;height:46px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-primary:active{opacity:.9}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary svg,.btn-outline svg{width:16px;height:16px;display:block}
+
+/* ── 选择提示 ── */
+.select-hint{text-align:center;font-size:11px;color:var(--ink-subtle);padding:8px 0}
+
+/* ── 底部导航 ── */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:64px;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:space-between;padding:0 16px;padding-bottom:env(safe-area-inset-bottom,4px);z-index:100;box-sizing:border-box}
+.bnav .ni{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border:none;background:none;padding:4px 10px;font-size:10px;color:var(--ink-subtle);transition:color .2s}
+.bnav .ni .ico{width:22px;height:22px;transition:transform .15s}
+.bnav .ni .ico svg{display:block;width:100%;height:100%}
+.bnav .ni:active .ico{transform:scale(.8)}
+.bnav .ni.on{color:var(--accent)}
+.bnav .ni span:last-child{font-size:10px;display:block}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- 顶部 -->
+<div class="top-bar">
+  <div class="nav-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </div>
+  <div class="nav-title">核销确认</div>
+  <div class="nav-placeholder"></div>
+</div>
+
+<!-- 用户信息 -->
+<div class="user-card">
+  <img class="user-avatar" src="../asset/logo.png" alt="" onerror="this.style.display='none'">
+  <div class="user-info">
+    <div class="user-name" id="userName">兰亭泼墨人</div>
+    <div class="user-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg> 用户ID: <span id="userId">U20240001</span> · 持有1份</div>
+  </div>
+</div>
+
+<!-- 资产卡片 -->
+<div class="asset-card">
+  <div class="asset-header">
+    <img class="asset-thumb" src="../asset/兰亭雅集封面图.png" alt="" onerror="this.style.display='none'">
+    <div class="asset-info">
+      <div class="asset-name">兰亭雅集 · 优享版</div>
+      <div class="asset-spec">产品编号：#0001</div>
+    </div>
+    <span class="asset-tag">部分使用</span>
+  </div>
+  <div class="benefits-list" id="benefitsList">
+    <!-- 由 JS 渲染 -->
+  </div>
+</div>
+
+<!-- 选择提示 -->
+<div class="select-hint" id="selectHint">请选择要核销的权益项</div>
+
+<!-- 操作栏 -->
+<div class="action-bar">
+  <button class="btn-outline" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    取消
+  </button>
+  <button class="btn-primary" id="btnConfirm" disabled onclick="confirmWriteOff()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    确认核销
+  </button>
+</div>
+
+</div>
+
+<script>
+// ── 权益状态判定 ──
+var B_STA = { pending:['待生效','pending'], unused:['未使用','usable'], partial:['部分使用','usable'], done:['已用完','used'], expired:['已失效','used'] };
+
+// ── 模拟数据 ──
+var params = new URLSearchParams(window.location.search);
+var userId = params.get('user') || 'U20240001';
+
+var users = {
+  'U20240001': { name:'兰亭泼墨人', asset:'兰亭雅集', spec:'优享版', number:'#0001', packageStatus:'partial',
+    bf:[
+      { n:'景区VIP通行权', type:'identity', total:999, used:5, eff:'2026-05-01', exp:'2026-12-31', desc:'鹅池碑、御碑亭、曲水流觞、兰亭江' },
+      { n:'研学课程', type:'ticket', total:3, used:1, eff:'2026-05-01', exp:'2026-12-31', desc:'书法研学、拓印体验、非遗手作' },
+      { n:'文创实物', type:'physical', total:1, used:0, eff:'2026-05-01', exp:'2026-12-31', desc:'兰亭文创礼盒（含书法折扇、拓片、书签）' },
+      { n:'跨城特权', type:'identity', total:999, used:0, eff:'2026-06-01', exp:'2026-12-31', desc:'绍兴、杭州、上海三地优先入场' }
+    ]},
+  'U20240003': { name:'江南游客', asset:'兰亭雅集', spec:'畅行版', number:'#0002', packageStatus:'unused',
+    bf:[
+      { n:'景区VIP通行权', type:'identity', total:999, used:0, eff:'2026-05-15', exp:'2026-12-31', desc:'鹅池碑、御碑亭' },
+      { n:'研学课程', type:'ticket', total:3, used:0, eff:'2026-05-15', exp:'2026-12-31', desc:'书法研学、拓印体验、非遗手作' }
+    ]},
+  'U20240005': { name:'文化收藏家', asset:'兰亭春禊', spec:'学韵版', number:'#0003', packageStatus:'expired',
+    bf:[
+      { n:'文创实物', type:'physical', total:1, used:1, eff:'2026-01-01', exp:'2026-03-31', desc:'兰亭文创礼盒（含书法折扇、拓片、书签）' },
+      { n:'跨城特权', type:'identity', total:10, used:3, eff:'2025-01-01', exp:'2025-12-31', desc:'绍兴、杭州、宁波三地优先入场' }
+    ]}
+};
+
+var user = users[userId] || users['U20240001'];
+var selected = {};
+
+function renderBenefits(){
+  document.getElementById('userName').textContent = user.name;
+  document.getElementById('userId').textContent = userId;
+
+  var iconMap = {
+    '景区VIP通行权': { bg:'rgba(63,139,109,.1)', c:'#3F8B6D', s:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>' },
+    '研学课程': { bg:'rgba(206,147,216,.12)', c:'#8A5CFF', s:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/>' },
+    '文创实物': { bg:'rgba(79,195,247,.12)', c:'#398BFF', s:'<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>' },
+    '跨城特权': { bg:'rgba(255,183,77,.12)', c:'#F08A24', s:'<path d="M3 3h18v18H3z"/><path d="M13 3v18"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/>' }
+  };
+
+  var list = document.getElementById('benefitsList');
+  list.innerHTML = '';
+  user.bf.forEach(function(bf, idx){
+    var status = calcBenefitStatus(bf);
+    var st = B_STA[status] || B_STA.unused;
+    var ico = iconMap[bf.n] || iconMap['景区VIP通行权'];
+    var extra = '';
+    if(bf.type === 'ticket') extra = '已用'+bf.used+'/'+bf.total+'次';
+    else if(bf.type === 'identity' && bf.used > 0) extra = '已使用'+bf.used+'次';
+    else if(bf.type === 'physical') extra = bf.used > 0 ? '已领取' : '未领取';
+
+    var canSelect = (status === 'unused' || status === 'partial');
+    var isSelected = selected[idx] || false;
+
+    var item = document.createElement('div');
+    item.className = 'benefit-item';
+    item.onclick = function(){ toggleSelect(idx); };
+    item.innerHTML =
+      '<div class="bf-icon" style="background:'+ico.bg+'">'+
+        '<svg viewBox="0 0 24 24" fill="none" stroke="'+ico.c+'" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+ico.s+'</svg>'+
+      '</div>'+
+      '<div class="bf-name">'+bf.n+'</div>'+
+      (extra ? '<div class="bf-extra">'+extra+'</div>' : '')+
+      '<span class="bf-status '+st[1]+'">'+st[0]+'</span>'+
+      (canSelect ? '<div class="bf-check'+(isSelected?' on':'')+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>' : '');
+    list.appendChild(item);
+  });
+}
+
+function calcBenefitStatus(bf){
+  var now = Date.now();
+  var eff = bf.eff ? new Date(bf.eff).getTime() : 0;
+  var exp = bf.exp ? new Date(bf.exp).getTime() : Infinity;
+  var total = bf.total || 1;
+  var used = bf.used || 0;
+  if(used >= total) return 'done';
+  if(now > exp && used < total) return 'expired';
+  if(now < eff) return 'pending';
+  if(used > 0 && used < total) return 'partial';
+  return 'unused';
+}
+
+function toggleSelect(idx){
+  var bf = user.bf[idx];
+  var status = calcBenefitStatus(bf);
+  if(status !== 'unused' && status !== 'partial') return;
+  if(selected[idx]){ delete selected[idx]; } else { selected[idx] = true; }
+  renderBenefits();
+  updateConfirmBtn();
+}
+
+function updateConfirmBtn(){
+  var btn = document.getElementById('btnConfirm');
+  var count = Object.keys(selected).length;
+  btn.disabled = count === 0;
+  btn.textContent = count > 0 ? '确认核销（'+count+'项）' : '确认核销';
+}
+
+function confirmWriteOff(){
+  var names = [];
+  Object.keys(selected).forEach(function(idx){
+    names.push(user.bf[idx].n);
+  });
+  var param = encodeURIComponent(JSON.stringify({ user:userId, benefits:names }));
+  location.href = 'success.html?data=' + param;
+}
+
+renderBenefits();
+updateConfirmBtn();
+</script>
+</body>
+</html>

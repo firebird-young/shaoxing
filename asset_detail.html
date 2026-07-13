@@ -163,7 +163,7 @@ textarea.form-input{height:80px;padding:12px 14px;resize:none}
 /* ── 功能说明浮窗 ── */
 .f-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(255,255,255,.2);border-radius:50%;border:none;color:#fff;font-size:14px;flex-shrink:0}
 .f-btn:active{background:rgba(255,255,255,.35)}
-.f-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:92%;max-width:430px;max-height:85vh;overflow-y:auto;background:#fff;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.2);z-index:10000;padding:20px;display:none}
+.f-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:92%;max-width:500px;max-height:85vh;overflow-y:auto;background:#fff;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.2);z-index:10000;padding:20px;display:none}
 .f-modal.show{display:block}
 .f-modal .fm-title{font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;cursor:grab;padding-bottom:10px;border-bottom:1px solid #eee}
 .f-modal .fm-title:active{cursor:grabbing}
@@ -185,6 +185,8 @@ textarea.form-input{height:80px;padding:12px 14px;resize:none}
 </style>
 </head>
 <body>
+<div style="position:relative;width:100%;max-width:430px;margin:0 auto">
+  <button class="f-btn" onclick="toggleFuncModal()" title="功能说明" style="position:fixed;top:12px;left:50%;margin-left:226px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(63,139,109,.15);border-radius:50%;border:none;color:#3F8B6D;font-size:16px;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,.1)">📖</button>
 <div class="page">
 
 <div class="top-bar">
@@ -193,7 +195,6 @@ textarea.form-input{height:80px;padding:12px 14px;resize:none}
   </div>
   <div class="nav-title">资产详情</div>
   <div class="nav-placeholder"></div>
-  <button class="f-btn" onclick="toggleFuncModal()" title="功能说明">📖</button>
 </div>
 
 <div class="overview-card" id="overviewCard"></div>
@@ -282,7 +283,7 @@ var DB = {
           { n:'研学课程', type:'ticket', eff:'2026-05-01', exp:'2026-12-31', total:3, used:1, desc:'书法研学、拓印体验、非遗手作',
             slots:[{u:true,t:'2026-05-20 09:15:30'},{u:false,t:''},{u:false,t:''}] },
           { n:'文创实物', type:'physical', eff:'2026-05-01', exp:'2026-12-31', total:1, used:1, desc:'兰亭文创礼盒（含书法折扇、拓片、书签）',
-            ship:{name:'张三',phone:'138****5678',addr:'绍兴市柯桥区兰亭风景区文创中心',exp:'顺丰速运',expNo:'SF1234567890'},
+            ship:{name:'张三',phone:'13856785678',addr:'绍兴市柯桥区兰亭风景区文创中心',exp:'顺丰速运',expNo:'SF1234567890'},
             logistics:[
               {s:'active',t:'2026-06-10 10:30:00',d:'包裹已发出，正在派送中',loc:'绍兴分拣中心'},
               {s:'done',t:'2026-06-09 14:00:00',d:'包裹已从兰亭文创中心发出',loc:'兰亭文创中心'}
@@ -350,7 +351,7 @@ var DB = {
           { n:'研学课程', type:'ticket', eff:'2026-07-01', exp:'2027-12-31', total:2, used:0,
             slots:[{u:false,t:''},{u:false,t:''}] },
           { n:'文创实物', type:'physical', eff:'2026-01-01', exp:'2026-06-30', total:1, used:1,
-            ship:{name:'王五',phone:'137****5678',addr:'绍兴市柯桥区轻纺城路88号',exp:'韵达快递',expNo:'YD1234567890'},
+            ship:{name:'王五',phone:'13756785678',addr:'绍兴市柯桥区轻纺城路88号',exp:'韵达快递',expNo:'YD1234567890'},
             logistics:[
               {s:'done',t:'2026-06-20 16:00:00',d:'已签收',loc:'柯桥区轻纺城'},
               {s:'done',t:'2026-06-19 11:00:00',d:'包裹派送中',loc:'绍兴分拣中心'}
@@ -393,7 +394,7 @@ data.list.forEach(function(inst, idx){
     var ico = ICONS[bf.n] || ICONS['景区VIP通行权'];
     var extra = '';
     if(bf.type === 'ticket') extra = '已用'+bf.used+'/'+bf.total+'次';
-    else if(bf.type === 'identity' && bf.used > 0) extra = '已扫码'+bf.used+'次';
+    else if(bf.type === 'identity' && bf.used > 0) extra = '已使用'+bf.used+'次';
 
     bfRows +=
       '<div class="ai-benefit" onclick="event.stopPropagation();onBenefit('+idx+','+bi+')">'+

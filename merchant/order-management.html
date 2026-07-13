@@ -327,11 +327,7 @@
       width: 60px;
       height: 60px;
       border-radius: 8px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
+      object-fit: cover;
       flex-shrink: 0;
     }
     
@@ -412,6 +408,11 @@
     .benefit-used {
       background: #f6ffed;
       color: #52c41a;
+    }
+    
+    .benefit-cancelled {
+      background: #fff2f3;
+      color: #D70C1F;
     }
     
     .order-actions {
@@ -563,15 +564,7 @@
     }
     
     .detail-product-image {
-      width: 100px;
-      height: 100px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 40px;
-      flex-shrink: 0;
+      display: none;
     }
     
     .detail-product-info {
@@ -865,22 +858,22 @@
 
     <!-- 订单列表 -->
     <div class="order-list" id="orderList">
-      <!-- 待付款订单 -->
+      <!-- 待付款 -->
       <div class="order-item" data-status="pending" onclick="viewOrder('O202401150001')">
         <div class="order-left">
           <div class="order-header">
-            <span><label>买家账号：</label>138****8888</span>
-            <span class="order-date">2024-01-15 14:30:25</span>
+            <span class="order-id">O202401150001</span>
+            <span class="order-date">2026-07-01 14:30:25</span>
           </div>
           <div class="buyer-info">
-            <span><label>买家账号：</label>13800188888</span>
+            <span><label>买家账号：</label>13888888888</span>
             <span><label>买家ID：</label>U20240001</span>
           </div>
           <div class="order-product">
-            <div class="product-image">🍷</div>
+            <img src="../asset/畅行版.png" class="product-image" style="background:none">
             <div class="product-info">
-              <div class="product-name">飞天茅台数字藏品</div>
-              <div class="product-spec">款式：经典款 | 数量：1</div>
+              <div class="product-name">兰亭雅集</div>
+              <div class="product-spec">款式：畅行版 | 数量：1</div>
             </div>
           </div>
         </div>
@@ -896,23 +889,23 @@
       <div class="order-item" data-status="pending" onclick="viewOrder('O202401150002')">
         <div class="order-left">
           <div class="order-header">
-            <span><label>买家账号：</label>139****6666</span>
-            <span class="order-date">2024-01-15 15:45:10</span>
+            <span class="order-id">O202401150002</span>
+            <span class="order-date">2026-07-02 09:15:10</span>
           </div>
           <div class="buyer-info">
-            <span><label>买家账号：</label>13900166666</span>
+            <span><label>买家账号：</label>13966666666</span>
             <span><label>买家ID：</label>U20240002</span>
           </div>
           <div class="order-product">
-            <div class="product-image">🏺</div>
+            <img src="../asset/学韵版.png" class="product-image" style="background:none">
             <div class="product-info">
-              <div class="product-name">茅台年份酒数字凭证</div>
-              <div class="product-spec">款式：1983年份 | 数量：2</div>
+              <div class="product-name">兰亭雅集</div>
+              <div class="product-spec">款式：学韵版 | 数量：2</div>
             </div>
           </div>
         </div>
         <div class="order-right">
-          <div class="order-price">¥5,998.00</div>
+          <div class="order-price">¥3,198.00</div>
           <div class="order-status status-pending">待付款</div>
           <div class="order-actions">
             <button class="action-btn action-btn-primary" onclick="event.stopPropagation(); viewOrder('O202401150002')">查看详情</button>
@@ -920,22 +913,22 @@
         </div>
       </div>
       
-      <!-- 已完成订单 -->
+      <!-- 已完成 -->
       <div class="order-item" data-status="completed" onclick="viewOrder('O202401140001')">
         <div class="order-left">
           <div class="order-header">
-            <span><label>买家账号：</label>137****5555</span>
-            <span class="order-date">2024-01-14 09:20:33</span>
+            <span class="order-id">O202401140001</span>
+            <span class="order-date">2026-06-28 10:20:33</span>
           </div>
           <div class="buyer-info">
-            <span><label>买家账号：</label>13700155555</span>
+            <span><label>买家账号：</label>13755555555</span>
             <span><label>买家ID：</label>U20240003</span>
           </div>
           <div class="order-product">
-            <div class="product-image">🎨</div>
+            <img src="../asset/优享版.png" class="product-image" style="background:none">
             <div class="product-info">
-              <div class="product-name">艺术大师·臻品系列</div>
-              <div class="product-spec">款式：山水意境 | 数量：1</div>
+              <div class="product-name">兰亭雅集</div>
+              <div class="product-spec">款式：优享版 | 数量：1</div>
             </div>
           </div>
         </div>
@@ -951,23 +944,23 @@
       <div class="order-item" data-status="completed" onclick="viewOrder('O202401130001')">
         <div class="order-left">
           <div class="order-header">
-            <span><label>买家账号：</label>136****4444</span>
-            <span class="order-date">2024-01-13 11:35:47</span>
+            <span class="order-id">O202401130001</span>
+            <span class="order-date">2026-06-25 11:35:47</span>
           </div>
           <div class="buyer-info">
-            <span><label>买家账号：</label>13600144444</span>
+            <span><label>买家账号：</label>13644444444</span>
             <span><label>买家ID：</label>U20240004</span>
           </div>
           <div class="order-product">
-            <div class="product-image">⛓️</div>
+            <img src="../asset/畅行版.png" class="product-image" style="background:none">
             <div class="product-info">
-              <div class="product-name">1935·时光窖藏</div>
-              <div class="product-spec">款式：珍藏版 | 数量：1</div>
+              <div class="product-name">兰亭春禊</div>
+              <div class="product-spec">款式：畅行版 | 数量：2</div>
             </div>
           </div>
         </div>
         <div class="order-right">
-          <div class="order-price">¥3,999.00</div>
+          <div class="order-price">¥3,998.00</div>
           <div class="order-status status-completed">已完成</div>
           <div class="order-actions">
             <button class="action-btn" onclick="event.stopPropagation(); viewOrder('O202401130001')">查看详情</button>
@@ -978,23 +971,23 @@
       <div class="order-item" data-status="completed" onclick="viewOrder('O202401120001')">
         <div class="order-left">
           <div class="order-header">
-            <span><label>买家账号：</label>135****3333</span>
-            <span class="order-date">2024-01-12 16:10:22</span>
+            <span class="order-id">O202401120001</span>
+            <span class="order-date">2026-06-20 16:10:22</span>
           </div>
           <div class="buyer-info">
-            <span><label>买家账号：</label>13500133333</span>
+            <span><label>买家账号：</label>13533333333</span>
             <span><label>买家ID：</label>U20240005</span>
           </div>
           <div class="order-product">
-            <div class="product-image">🎯</div>
+            <img src="../asset/学韵版.png" class="product-image" style="background:none">
             <div class="product-info">
-              <div class="product-name">茅台会员积分</div>
-              <div class="product-spec">款式：基础积分 | 数量：1</div>
+              <div class="product-name">兰亭春禊</div>
+              <div class="product-spec">款式：学韵版 | 数量：1</div>
             </div>
           </div>
         </div>
         <div class="order-right">
-          <div class="order-price">¥100.00</div>
+          <div class="order-price">¥1,899.00</div>
           <div class="order-status status-completed">已完成</div>
           <div class="order-actions">
             <button class="action-btn" onclick="event.stopPropagation(); viewOrder('O202401120001')">查看详情</button>
@@ -1005,51 +998,51 @@
       <div class="order-item" data-status="completed" onclick="viewOrder('O202401110001')">
         <div class="order-left">
           <div class="order-header">
-            <span><label>买家账号：</label>134****2222</span>
-            <span class="order-date">2024-01-11 10:05:15</span>
+            <span class="order-id">O202401110001</span>
+            <span class="order-date">2026-06-15 10:05:15</span>
           </div>
           <div class="buyer-info">
-            <span><label>买家账号：</label>13400122222</span>
+            <span><label>买家账号：</label>13422222222</span>
             <span><label>买家ID：</label>U20240006</span>
           </div>
           <div class="order-product">
-            <div class="product-image">🍷</div>
+            <img src="../asset/畅行版.png" class="product-image" style="background:none">
             <div class="product-info">
-              <div class="product-name">飞天茅台数字藏品</div>
-              <div class="product-spec">款式：纪念款 | 数量：3</div>
+              <div class="product-name">曲水流觞</div>
+              <div class="product-spec">款式：基础版 | 数量：3</div>
             </div>
           </div>
         </div>
         <div class="order-right">
-          <div class="order-price">¥3,897.00</div>
+          <div class="order-price">¥2,697.00</div>
           <div class="order-status status-completed">已完成</div>
           <div class="order-actions">
             <button class="action-btn" onclick="event.stopPropagation(); viewOrder('O202401110001')">查看详情</button>
           </div>
         </div>
       </div>
-
-      <!-- 已取消订单 -->
+      
+      <!-- 已取消 -->
       <div class="order-item" data-status="cancelled" onclick="viewOrder('O202401100001')">
         <div class="order-left">
           <div class="order-header">
-            <span><label>买家账号：</label>131****0000</span>
-            <span class="order-date">2024-01-10 16:20:45</span>
+            <span class="order-id">O202401100001</span>
+            <span class="order-date">2026-06-10 16:20:45</span>
           </div>
           <div class="buyer-info">
-            <span><label>买家账号：</label>13100100000</span>
+            <span><label>买家账号：</label>13100000000</span>
             <span><label>买家ID：</label>U20240007</span>
           </div>
           <div class="order-product">
-            <div class="product-image">💎</div>
+            <img src="../asset/优享版.png" class="product-image" style="background:none">
             <div class="product-info">
-              <div class="product-name">茅台会员积分</div>
-              <div class="product-spec">款式：积分包 | 数量：1</div>
+              <div class="product-name">曲水流觞</div>
+              <div class="product-spec">款式：优享版 | 数量：1</div>
             </div>
           </div>
         </div>
         <div class="order-right">
-          <div class="order-price">¥99.00</div>
+          <div class="order-price">¥1,599.00</div>
           <div class="order-status status-cancelled">已取消</div>
           <div class="order-actions">
             <button class="action-btn" onclick="event.stopPropagation(); viewOrder('O202401100001')">查看详情</button>
@@ -1073,6 +1066,17 @@
     </div>
   </div>
   
+  <!-- 权益详情浮窗 -->
+  <div class="modal-overlay" id="benefitDetailModal" style="z-index:2000">
+    <div class="modal-box" style="max-width:500px">
+      <div class="modal-header">
+        <div class="modal-title">权益详情</div>
+        <div class="modal-close" onclick="document.getElementById('benefitDetailModal').classList.remove('show')">✕</div>
+      </div>
+      <div class="modal-body" id="benefitDetailBody"></div>
+    </div>
+  </div>
+
   <script>
     // 侧边栏菜单切换
         // 搜索订单
@@ -1138,36 +1142,147 @@
       });
     }
     
+    /* ── 权益状态判定（与 asset_detail.html 一致） ── */
+    var B_STA = { pending:['待生效','benefit-unused'], unused:['未使用','benefit-unused'], partial:['部分使用','benefit-partial'], done:['已用完','benefit-used'], expired:['已失效','benefit-cancelled'] };
+    function calcBenefitStatus(bf){
+      var now = Date.now();
+      var eff = bf.eff ? new Date(bf.eff).getTime() : 0;
+      var exp = bf.exp ? new Date(bf.exp).getTime() : Infinity;
+      var total = bf.total || 1;
+      var used = bf.used || 0;
+      if(used >= total) return 'done';
+      if(now > exp && used < total) return 'expired';
+      if(now < eff) return 'pending';
+      if(used > 0 && used < total) return 'partial';
+      return 'unused';
+    }
+    function calcPackageStatus(bfs){
+      var hasPartial = false, hasDone = false, hasEnding = false, hasExpired = false;
+      bfs.forEach(function(bf){
+        var s = calcBenefitStatus(bf);
+        if(s === 'partial') hasPartial = true;
+        if(s === 'done') hasDone = true;
+        if(s === 'expired') hasExpired = true;
+        if(s === 'pending' || s === 'unused' || s === 'partial') hasEnding = true;
+      });
+      if(!hasExpired && hasDone && !hasEnding) return 'done';
+      if(!hasEnding && hasExpired) return 'expired';
+      if(hasEnding && (hasPartial || hasDone)) return 'partial';
+      return 'unused';
+    }
+
     // 查看订单详情
     var orderDataMap = {
-      'O202401150001': { id:'O202401150001', orderTime:'2024-01-15 14:30:25', payTime:'-', status:'pending', benefitStatus:'-',
-        buyerNick:'茅台收藏家', buyerAccount:'138****8888', buyerId:'U20240001', payMethod:'支付宝',
-        productIcon:'🍷', productName:'飞天茅台数字藏品', productSpec:'款式：经典款 | 数量：1', price:'¥1,299.00',
-        benefits:[{name:'线下品鉴会入场资格', status:'unused'},{name:'专属客服服务', status:'unused'}] },
-      'O202401150002': { id:'O202401150002', orderTime:'2024-01-15 15:45:10', payTime:'-', status:'pending', benefitStatus:'-',
-        buyerNick:'酒中仙', buyerAccount:'139****6666', buyerId:'U20240002', payMethod:'微信支付',
-        productIcon:'🏺', productName:'茅台年份酒数字凭证', productSpec:'款式：1983年份 | 数量：2', price:'¥5,998.00',
-        benefits:[{name:'年份酒专属权益', status:'unused'}] },
-      'O202401140001': { id:'O202401140001', orderTime:'2024-01-14 09:20:33', payTime:'2024-01-14 09:22:18', status:'completed', benefitStatus:'部分核销',
-        buyerNick:'茅台收藏家', buyerAccount:'137****5555', buyerId:'U20240003', payMethod:'汇付',
-        productIcon:'🎨', productName:'艺术大师·臻品系列', productSpec:'款式：山水意境 | 数量：1', price:'¥2,599.00',
-        benefits:[{name:'线下品鉴会入场资格', status:'unused'},{name:'专属客服服务', status:'unused'},{name:'优先购买权', status:'used'}] },
-      'O202401130001': { id:'O202401130001', orderTime:'2024-01-13 11:35:47', payTime:'2024-01-13 11:36:20', status:'completed', benefitStatus:'部分核销',
-        buyerNick:'老酒客', buyerAccount:'136****4444', buyerId:'U20240004', payMethod:'支付宝',
-        productIcon:'⛓️', productName:'1935·时光窖藏', productSpec:'款式：珍藏版 | 数量：1', price:'¥3,999.00',
-        benefits:[{name:'限量编号证书', status:'unused'},{name:'VIP专属通道', status:'used'}] },
-      'O202401120001': { id:'O202401120001', orderTime:'2024-01-12 16:10:22', payTime:'2024-01-12 16:11:05', status:'completed', benefitStatus:'全部未核销',
-        buyerNick:'酱香爱好者', buyerAccount:'135****3333', buyerId:'U20240005', payMethod:'微信支付',
-        productIcon:'💎', productName:'茅台会员积分', productSpec:'款式：积分包 | 数量：1', price:'¥99.00',
-        benefits:[{name:'积分兑换权益', status:'unused'}] },
-      'O202401110001': { id:'O202401110001', orderTime:'2024-01-11 10:05:15', payTime:'2024-01-11 10:06:30', status:'completed', benefitStatus:'全部已核销',
-        buyerNick:'酒文化达人', buyerAccount:'134****2222', buyerId:'U20240006', payMethod:'汇付',
-        productIcon:'🏅', productName:'国酒·数字徽章', productSpec:'款式：典藏版 | 数量：1', price:'¥1,888.00',
-        benefits:[{name:'数字徽章展示权', status:'used'},{name:'会员专属折扣', status:'used'}] },
-      'O202401100001': { id:'O202401100001', orderTime:'2024-01-10 16:20:45', payTime:'-', status:'cancelled', benefitStatus:'-',
-        buyerNick:'过路游客', buyerAccount:'131****0000', buyerId:'U20240007', payMethod:'-',
-        productIcon:'💎', productName:'茅台会员积分', productSpec:'款式：积分包 | 数量：1', price:'¥99.00',
-        benefits:[] }
+      'O202401150001': { id:'O202401150001', orderTime:'2026-07-01 14:30:25', payTime:'-', status:'pending',
+        buyerNick:'数码藏家', buyerAccount:'13888888888', buyerId:'U20240001', payMethod:'中金支付',
+        productImg:'../asset/畅行版.png', productName:'兰亭雅集', productSpec:'畅行版', productNumber:'#LYJ-0001', quantity:1, price:'¥1,299.00',
+        bf:[
+          { n:'景区VIP通行权', type:'identity', eff:'2026-05-15', exp:'2026-12-31', total:999, used:0, desc:'鹅池碑、御碑亭' },
+          { n:'研学课程', type:'ticket', eff:'2026-05-15', exp:'2026-12-31', total:3, used:0, desc:'书法研学、拓印体验、非遗手作',
+            slots:[{u:false,t:''},{u:false,t:''},{u:false,t:''}] }
+        ] },
+      'O202401150002': { id:'O202401150002', orderTime:'2026-07-02 09:15:10', payTime:'-', status:'pending',
+        buyerNick:'兰亭书法迷', buyerAccount:'13966666666', buyerId:'U20240002', payMethod:'汇付支付',
+        productImg:'../asset/学韵版.png', productName:'兰亭雅集', productSpec:'学韵版', quantity:2, price:'¥3,198.00',
+        items:[
+          { number:'#LYJ-0002', bf:[
+            { n:'景区VIP通行权', type:'identity', eff:'2026-05-01', exp:'2026-12-31', total:999, used:3, desc:'鹅池碑、御碑亭、曲水流觞' },
+            { n:'研学课程', type:'ticket', eff:'2026-05-01', exp:'2026-12-31', total:3, used:1, desc:'书法研学、拓印体验、非遗手作',
+              slots:[{u:true,t:'2026-05-20 09:15:30'},{u:false,t:''},{u:false,t:''}] },
+            { n:'文创实物', type:'physical', eff:'2026-05-01', exp:'2026-12-31', total:1, used:1, desc:'兰亭文创礼盒（含书法折扇、拓片、书签）',
+              ship:{name:'张三',phone:'13856785678',addr:'绍兴市柯桥区兰亭风景区文创中心',exp:'顺丰速运',expNo:'SF1234567890'},
+              logistics:[{s:'active',t:'2026-06-10 10:30:00',d:'包裹已发出，正在派送中',loc:'绍兴分拣中心'},{s:'done',t:'2026-06-09 14:00:00',d:'包裹已从兰亭文创中心发出',loc:'兰亭文创中心'}] }
+          ] },
+          { number:'#LYJ-0004', bf:[
+            { n:'景区VIP通行权', type:'identity', eff:'2026-05-01', exp:'2026-12-31', total:999, used:1, desc:'鹅池碑、御碑亭、曲水流觞' },
+            { n:'研学课程', type:'ticket', eff:'2026-05-01', exp:'2026-12-31', total:3, used:0, desc:'书法研学、拓印体验、非遗手作',
+              slots:[{u:false,t:''},{u:false,t:''},{u:false,t:''}] },
+            { n:'文创实物', type:'physical', eff:'2026-05-01', exp:'2026-12-31', total:1, used:0, desc:'兰亭文创礼盒（含书法折扇、拓片、书签）' }
+          ] }
+        ] },
+      'O202401140001': { id:'O202401140001', orderTime:'2026-06-28 10:20:33', payTime:'2026-06-28 10:22:18', status:'completed',
+        buyerNick:'江南游客', buyerAccount:'13755555555', buyerId:'U20240003', payMethod:'中金支付',
+        productImg:'../asset/优享版.png', productName:'兰亭雅集', productSpec:'优享版', productNumber:'#LYJ-0003', quantity:1, price:'¥2,599.00',
+        bf:[
+          { n:'景区VIP通行权', type:'identity', eff:'2026-05-01', exp:'2026-12-31', total:999, used:5, desc:'鹅池碑、御碑亭、曲水流觞、兰亭江' },
+          { n:'研学课程', type:'ticket', eff:'2026-05-01', exp:'2026-12-31', total:3, used:1, desc:'书法研学、拓印体验、非遗手作',
+            slots:[{u:true,t:'2026-06-20 10:00:00'},{u:false,t:''},{u:false,t:''}] },
+          { n:'文创实物', type:'physical', eff:'2026-05-01', exp:'2026-12-31', total:1, used:0, desc:'兰亭文创礼盒（含书法折扇、拓片、书签）' },
+          { n:'跨城特权', type:'identity', eff:'2026-06-01', exp:'2026-12-31', total:999, used:0, desc:'绍兴、杭州、上海三地优先入场' }
+        ] },
+      'O202401130001': { id:'O202401130001', orderTime:'2026-06-25 11:35:47', payTime:'2026-06-25 11:36:20', status:'completed',
+        buyerNick:'绍兴老酒客', buyerAccount:'13644444444', buyerId:'U20240004', payMethod:'支付宝',
+        productImg:'../asset/畅行版.png', productName:'兰亭春禊', productSpec:'畅行版', quantity:2, price:'¥3,998.00',
+        items:[
+          { number:'#LTCX-0001', bf:[
+            { n:'文创实物', type:'physical', eff:'2026-04-01', exp:'2026-06-30', total:1, used:1, desc:'兰亭文创礼盒（含书法折扇、拓片、书签）',
+              ship:{name:'赵六',phone:'13699999999',addr:'绍兴市柯桥区兰亭风景区游客中心',exp:'顺丰速运',expNo:'SF0987654321'},
+              logistics:[{s:'done',t:'2026-05-20 14:00:00',d:'已签收',loc:'柯桥区兰亭'},{s:'done',t:'2026-05-19 10:00:00',d:'包裹已发出',loc:'兰亭文创中心'}] },
+            { n:'研学课程', type:'ticket', eff:'2026-04-01', exp:'2026-06-30', total:2, used:2, desc:'书法研学、拓印体验、非遗手作',
+              slots:[{u:true,t:'2026-04-10 09:30:00'},{u:true,t:'2026-04-20 14:00:00'}] }
+          ] },
+          { number:'#LTCX-0003', bf:[
+            { n:'文创实物', type:'physical', eff:'2026-04-01', exp:'2026-06-30', total:1, used:0, desc:'兰亭文创礼盒（含书法折扇、拓片、书签）' },
+            { n:'研学课程', type:'ticket', eff:'2026-04-01', exp:'2026-06-30', total:2, used:0, desc:'书法研学、拓印体验、非遗手作',
+              slots:[{u:false,t:''},{u:false,t:''}] }
+          ] }
+        ] },
+      'O202401120001': { id:'O202401120001', orderTime:'2026-06-20 16:10:22', payTime:'2026-06-20 16:11:05', status:'completed',
+        buyerNick:'文化收藏家', buyerAccount:'13533333333', buyerId:'U20240005', payMethod:'中金支付',
+        productImg:'../asset/学韵版.png', productName:'兰亭春禊', productSpec:'学韵版', productNumber:'#LTCX-0002', quantity:1, price:'¥1,899.00',
+        bf:[
+          { n:'文创实物', type:'physical', eff:'2026-01-01', exp:'2026-03-31', total:1, used:1, desc:'兰亭文创礼盒（含书法折扇、拓片、书签）',
+            ship:{name:'李四',phone:'13912341234',addr:'绍兴市越城区鲁迅中路88号',exp:'中通快递',expNo:'ZTO9876543210'},
+            logistics:[{s:'done',t:'2026-03-15 10:00:00',d:'已签收',loc:'绍兴越城区'},{s:'done',t:'2026-03-13 14:00:00',d:'包裹派送中',loc:'绍兴分拣中心'},{s:'done',t:'2026-03-12 09:00:00',d:'包裹已发出',loc:'兰亭文创中心'}] },
+          { n:'跨城特权', type:'identity', eff:'2025-01-01', exp:'2025-12-31', total:10, used:3, desc:'绍兴、杭州、宁波三地优先入场' }
+        ] },
+      'O202401110001': { id:'O202401110001', orderTime:'2026-06-15 10:05:15', payTime:'2026-06-15 10:06:30', status:'completed',
+        buyerNick:'水乡旅人', buyerAccount:'13422222222', buyerId:'U20240006', payMethod:'汇付支付',
+        productImg:'../asset/畅行版.png', productName:'曲水流觞', productSpec:'基础版', quantity:3, price:'¥2,697.00',
+        items:[
+          { number:'#QSS-0001', bf:[
+            { n:'跨城特权', type:'identity', eff:'2027-01-01', exp:'2027-12-31', total:999, used:0, desc:'绍兴、杭州、上海三地优先入场（2027年启用）' },
+            { n:'景区VIP通行权', type:'identity', eff:'2026-07-01', exp:'2027-12-31', total:10, used:3, desc:'鹅池碑、御碑亭、曲水流觞、兰亭江' }
+          ] },
+          { number:'#QSS-0004', bf:[
+            { n:'跨城特权', type:'identity', eff:'2027-01-01', exp:'2027-12-31', total:999, used:0, desc:'绍兴、杭州、上海三地优先入场（2027年启用）' },
+            { n:'景区VIP通行权', type:'identity', eff:'2026-07-01', exp:'2027-12-31', total:10, used:1, desc:'鹅池碑、御碑亭、曲水流觞、兰亭江' }
+          ] },
+          { number:'#QSS-0005', bf:[
+            { n:'跨城特权', type:'identity', eff:'2027-01-01', exp:'2027-12-31', total:999, used:0, desc:'绍兴、杭州、上海三地优先入场（2027年启用）' },
+            { n:'景区VIP通行权', type:'identity', eff:'2026-07-01', exp:'2027-12-31', total:10, used:0, desc:'鹅池碑、御碑亭、曲水流觞、兰亭江' }
+          ] }
+        ] },
+      'O202401100001': { id:'O202401100001', orderTime:'2026-06-10 16:20:45', payTime:'-', status:'cancelled',
+        buyerNick:'过路游客', buyerAccount:'13100000000', buyerId:'U20240007', payMethod:'-',
+        productImg:'../asset/优享版.png', productName:'曲水流觞', productSpec:'优享版', productNumber:'#QSS-0003', quantity:1, price:'¥1,599.00',
+        bf:[] },
+      'O202401050001': { id:'O202401050001', orderTime:'2026-07-05 16:00:00', payTime:'2026-07-05 16:02:30', status:'completed',
+        buyerNick:'文创爱好者', buyerAccount:'13377777777', buyerId:'U20240008', payMethod:'支付宝',
+        productImg:'../asset/优享版.png', productName:'曲水流觞', productSpec:'优享版', productNumber:'#QSS-0003', quantity:3, price:'¥4,797.00',
+        bf:[
+          { n:'研学课程', type:'ticket', eff:'2024-01-01', exp:'2025-03-31', total:1, used:0, desc:'书法研学课程（已过期）',
+            slots:[{u:false,t:''}] },
+          { n:'景区VIP通行权', type:'identity', eff:'2024-01-01', exp:'2025-12-31', total:999, used:5, desc:'全景区通票（已过期权益）' },
+          { n:'跨城特权', type:'identity', eff:'2024-01-01', exp:'2025-06-30', total:10, used:2, desc:'绍兴、杭州、上海三地优先入场' }
+        ] },
+      'O202401050002': { id:'O202401050002', orderTime:'2026-07-06 10:30:00', payTime:'2026-07-06 10:31:15', status:'completed',
+        buyerNick:'批量采购商', buyerAccount:'13266666666', buyerId:'U20240009', payMethod:'汇付支付',
+        productImg:'../asset/畅行版.png', productName:'兰亭雅集', productSpec:'畅行版', productNumber:'#LYJ-0001', quantity:5, price:'¥6,495.00',
+        bf:[
+          { n:'景区VIP通行权', type:'identity', eff:'2026-05-15', exp:'2026-12-31', total:999, used:0, desc:'鹅池碑、御碑亭' },
+          { n:'研学课程', type:'ticket', eff:'2026-05-15', exp:'2026-12-31', total:3, used:0, desc:'书法研学、拓印体验、非遗手作',
+            slots:[{u:false,t:''},{u:false,t:''},{u:false,t:''}] }
+        ] },
+      'O202401050003': { id:'O202401050003', orderTime:'2026-07-07 14:00:00', payTime:'-', status:'pending',
+        buyerNick:'新用户', buyerAccount:'13011111111', buyerId:'U20240010', payMethod:'汇付',
+        productImg:'../asset/学韵版.png', productName:'兰亭春禊', productSpec:'学韵版', productNumber:'#LTCX-0002', quantity:2, price:'¥3,798.00',
+        bf:[
+          { n:'文创实物', type:'physical', eff:'2026-01-01', exp:'2026-03-31', total:1, used:1, desc:'兰亭文创礼盒（含书法折扇、拓片、书签）',
+            ship:{name:'李四',phone:'13912341234',addr:'绍兴市越城区鲁迅中路88号',exp:'中通快递',expNo:'ZTO9876543210'},
+            logistics:[{s:'done',t:'2026-03-15 10:00:00',d:'已签收',loc:'绍兴越城区'},{s:'done',t:'2026-03-13 14:00:00',d:'包裹派送中',loc:'绍兴分拣中心'},{s:'done',t:'2026-03-12 09:00:00',d:'包裹已发出',loc:'兰亭文创中心'}] },
+          { n:'跨城特权', type:'identity', eff:'2025-01-01', exp:'2025-12-31', total:10, used:3, desc:'绍兴、杭州、宁波三地优先入场' }
+        ] }
     };
     
     function viewOrder(orderId) {
@@ -1195,26 +1310,123 @@
       h += '<div class="detail-section">';
       h += '<div class="detail-title">商品信息</div>';
       h += '<div class="detail-product">';
-      h += '<div class="detail-product-image">'+data.productIcon+'</div>';
+      h += '<img src="'+data.productImg+'" style="width:100px;height:100px;border-radius:8px;object-fit:cover;flex-shrink:0">';
       h += '<div class="detail-product-info"><div class="detail-product-name">'+data.productName+'</div>';
-      h += '<div class="detail-product-spec">'+data.productSpec+'</div>';
+      h += '<div class="detail-product-spec">款式：'+data.productSpec+' | 数量：'+(data.quantity||1)+'</div>';
       h += '<div style="margin-top:8px;font-size:16px;font-weight:600;color:#ff4d4f">'+data.price+'</div></div>';
-      h += '</div></div>';
+      h += '</div>';
+      // 列出各产品编号
+      if(data.status !== 'pending' && data.status !== 'cancelled'){
+        var items = data.items || (data.productNumber ? [{number:data.productNumber, bf:data.bf||[]}] : []);
+        if(items.length > 0){
+          h += '<div style="margin-top:10px;padding-top:10px;border-top:1px solid #f0f0f0">';
+          h += '<div style="font-size:13px;font-weight:500;color:#666;margin-bottom:6px">本订单包含以下产品：</div>';
+          items.forEach(function(item, ii){
+            h += '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#fafafa;border-radius:6px;margin-bottom:4px">';
+            h += '<span style="font-size:13px;font-weight:600;color:#3F8B6D;font-family:monospace">'+item.number+'</span>';
+            h += '<span class="tag tag-sold" style="font-size:10px;padding:1px 6px">已售出</span>';
+            h += '<span style="flex:1"></span>';
+            h += '<button class="action-btn" style="font-size:11px;padding:3px 10px" onclick="event.stopPropagation();showItemBenefit(\''+orderId+'\','+ii+')">查看权益</button>';
+            h += '</div>';
+          });
+          h += '</div>';
+        }
+      }
+      h += '</div>';
       
-      h += '<div class="detail-section">';
-      h += '<div class="detail-title">权益详情</div>';
-      h += '<div class="benefits-detail">';
-      h += '<div class="benefits-detail-title">包含权益</div>';
-      data.benefits.forEach(function(b) {
-        h += '<div class="benefit-detail-item"><span class="benefit-detail-name">'+b.name+'</span></div>';
-      });
-      h += '</div></div>';
+      // 权益模板展示
+      var tplBf = data.bf || (items.length>0 ? items[0].bf : []);
+      if(tplBf && tplBf.length){
+        h += '<div class="detail-section">';
+        h += '<div class="detail-title">权益内容（该商品包含以下权益）</div>';
+        h += '<div style="background:#f5f7fa;border-radius:10px;padding:10px">';
+        tplBf.forEach(function(b) {
+          h += '<div style="display:flex;align-items:center;padding:6px 0;border-bottom:1px solid #eee">';
+          h += '<span style="font-size:13px;color:#333;flex:1">'+b.n+'</span>';
+          h += '<span style="font-size:11px;color:#999">'+(b.desc||'')+'</span>';
+          h += '</div>';
+        });
+        h += '</div></div>';
+      }
       
       h += '<div class="btn-group"><button class="btn-cancel" onclick="closeModal()">关闭</button></div>';
       
       document.getElementById('modalBody').innerHTML = h;
       document.getElementById('orderModal').classList.add('show');
     }
+
+    /* ── 查看单个产品的权益详情 ── */
+    function showItemBenefit(orderId, itemIdx){
+      var data = orderDataMap[orderId];
+      if(!data) return;
+      var items = data.items || (data.productNumber ? [{number:data.productNumber, bf:data.bf||[]}] : []);
+      var item = items[itemIdx];
+      if(!item) return;
+      var pStatus = calcPackageStatus(item.bf||[]);
+      var pm = P_STA_MAP[pStatus] || '-';
+      var body = document.getElementById('benefitDetailBody');
+      var h = '<div style="padding:4px 0">';
+      h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #eee">';
+      h += '<span style="font-size:14px;font-weight:600;color:#333">产品编号：</span>';
+      h += '<span style="font-size:14px;font-weight:700;color:#3F8B6D;font-family:monospace">'+item.number+'</span>';
+      h += '<span style="flex:1"></span>';
+      h += '<span style="font-size:11px;font-weight:500;padding:3px 10px;border-radius:4px;background:'+({
+        unused:'#f0f5ff', partial:'#fff7e6', done:'#f6ffed', expired:'#fff2f3'
+      }[pStatus]||'#f5f5f5')+';color:'+({
+        unused:'#1890ff', partial:'#fa8c16', done:'#52c41a', expired:'#D70C1F'
+      }[pStatus]||'#999')+'">权益包：'+pm+'</span>';
+      h += '</div>';
+      (item.bf||[]).forEach(function(b){
+        var s = calcBenefitStatus(b);
+        var stArr = B_STA[s] || B_STA.unused;
+        var extra = '';
+        var detailHtml = '';
+        if(b.type === 'ticket') {
+          extra = '已用'+b.used+'/'+b.total+'次';
+          if(b.slots){
+            var usedSlots = b.slots.filter(function(sl){ return sl.u && sl.t; });
+            if(usedSlots.length > 0){
+              detailHtml += '<div style="margin-top:6px;padding-top:6px;border-top:1px dashed #ddd">';
+              detailHtml += '<div style="font-size:11px;font-weight:500;color:#666;margin-bottom:4px">使用时间</div>';
+              usedSlots.forEach(function(sl){
+                detailHtml += '<div style="font-size:11px;color:#888;padding:2px 4px 2px 14px;position:relative">• <span style="color:#666">'+sl.t+'</span></div>';
+              });
+              detailHtml += '</div>';
+            }
+          }
+        }
+        else if(b.type === 'identity' && b.used > 0) extra = '已使用'+b.used+'次';
+        else if(b.type === 'physical') {
+          if(b.used > 0 && b.ship){
+            detailHtml += '<div style="margin-top:6px;padding-top:6px;border-top:1px dashed #ddd">';
+            detailHtml += '<div style="font-size:11px;font-weight:500;color:#666;margin-bottom:2px">发货信息</div>';
+            detailHtml += '<div style="font-size:11px;color:#888;padding:2px 0">快递单号：'+(b.ship.expNo||'--')+' ('+(b.ship.exp||'')+')</div>';
+            detailHtml += '<div style="font-size:11px;color:#888;padding:2px 0">收件人：'+b.ship.name+' '+b.ship.phone+'</div>';
+            detailHtml += '<div style="font-size:11px;color:#888;padding:2px 0">收货地址：'+b.ship.addr+'</div>';
+            detailHtml += '</div>';
+          }
+        }
+        h += '<div style="padding:12px 14px;margin-bottom:10px;border-radius:8px;background:#fff;border:1px solid #eee">';
+        h += '<div style="width:100%;display:flex;align-items:center;gap:8px;margin-bottom:6px">';
+        h += '<span style="font-size:13px;font-weight:600;color:#333;flex:1">'+b.n+'</span>';
+        if(extra) h += '<span style="font-size:11px;color:#999">'+extra+'</span>';
+        h += '<span style="font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;background:'+({
+          pending:'rgba(52,152,219,.1)', unused:'#f0f5ff', partial:'#fff7e6', done:'#f6ffed', expired:'#fff2f3'
+        }[s]||'#f5f5f5')+';color:'+({
+          pending:'#3498db', unused:'#1890ff', partial:'#fa8c16', done:'#52c41a', expired:'#D70C1F'
+        }[s]||'#999')+'">'+stArr[0]+'</span>';
+        h += '</div>';
+        h += '<div style="width:100%;font-size:11px;color:#3F8B6D;font-weight:500;margin-bottom:6px;padding:4px 0">📅 有效期 '+b.eff+' ~ '+b.exp+'</div>';
+        if(b.desc) h += '<div style="width:100%;font-size:11px;color:#888;margin-bottom:6px;padding:4px 8px;background:#f5f7fa;border-radius:4px">'+b.desc+'</div>';
+        h += detailHtml;
+        h += '</div>';
+      });
+      h += '</div>';
+      body.innerHTML = h;
+      document.getElementById('benefitDetailModal').classList.add('show');
+    }
+
+    var P_STA_MAP = { unused:'未使用', partial:'部分使用', done:'已用完', expired:'已失效' };
     
     // 关闭弹窗
     function closeModal() {

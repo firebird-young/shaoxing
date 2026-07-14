@@ -23,32 +23,66 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
 .global-dir-btn:hover{background:rgba(0,0,0,.6);color:#fff}
 .global-dir-btn svg{width:16px;height:16px;display:block}
 
-/* ── 欢迎卡片 ── */
-.welcome-card{background:var(--bg);border-radius:var(--radius-card);padding:16px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.04);display:flex;align-items:center;gap:14px}
-.welcome-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);flex-shrink:0}
-.welcome-info{flex:1;min-width:0}
-.welcome-greeting{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:2px}
-.welcome-greeting span{color:var(--accent)}
-.welcome-meta{font-size:11px;color:var(--ink-subtle);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.welcome-meta .dot{width:3px;height:3px;border-radius:50%;background:var(--ink-subtle);display:inline-block}
+/* ── 用户卡片 ── */
+.user-card{background:var(--bg);border-radius:var(--radius-card);padding:14px 16px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.04);display:flex;align-items:center;gap:12px}
+.user-avatar-wrap{position:relative;width:42px;height:42px;flex-shrink:0}
+.user-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);display:block}
+.user-avatar-status{position:absolute;bottom:-1px;right:-1px;width:14px;height:14px;border-radius:50%;background:#52c41a;border:2px solid var(--bg);display:flex;align-items:center;justify-content:center}
+.user-avatar-status svg{width:7px;height:7px;color:#fff;display:block}
+.user-info{flex:1;min-width:0}
+.user-greeting{font-size:13px;color:var(--ink-muted);margin-bottom:1px}
+.user-greeting strong{font-size:15px;font-weight:700;color:var(--ink)}
+.user-meta{font-size:11px;color:var(--ink-subtle);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.user-meta .divider{width:3px;height:3px;border-radius:50%;background:var(--ink-subtle);display:inline-block;opacity:.4}
+.user-tag{font-size:10px;padding:2px 10px;border-radius:var(--radius-pill);font-weight:500;flex-shrink:0;background:rgba(63,139,109,.1);color:var(--accent);border:1px solid rgba(63,139,109,.15)}
+
+
 
 /* ── 扫码区 ── */
-.scan-area{background:var(--bg);border-radius:var(--radius-card);padding:20px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.04);margin-bottom:12px}
-.scan-btn{width:72px;height:72px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;box-shadow:0 4px 16px rgba(63,139,109,.3);transition:transform .15s}
-.scan-btn:active{transform:scale(.9)}
+.scan-area{background:var(--bg);border-radius:var(--radius-card);padding:20px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.04);margin-bottom:12px;position:relative;overflow:hidden}
+.scan-area::before{content:'';position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(63,139,109,.06) 0%,transparent 70%)}
+.scan-btn-wrap{position:relative;width:80px;height:80px;margin:0 auto 10px}
+.scan-btn{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#3F8B6D,#2d6b53);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(63,139,109,.35);transition:transform .15s,box-shadow .15s;position:absolute;top:4px;left:4px}
+.scan-btn:active{transform:scale(.88);box-shadow:0 2px 10px rgba(63,139,109,.25)}
 .scan-btn svg{width:32px;height:32px;color:#fff;display:block}
-.scan-title{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:2px}
-.scan-desc{font-size:12px;color:var(--ink-subtle)}
-.scan-tip{font-size:11px;color:var(--ink-subtle);margin-top:8px;padding:6px 12px;background:var(--page-bg);border-radius:6px;display:flex;align-items:center;gap:6px;justify-content:center}
-.scan-fail-link{font-size:11px;color:var(--ink-subtle);margin-top:6px;display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding:4px;transition:color .2s;border:none;background:none;width:100%}
+.scan-ring{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(63,139,109,.12);animation:scanRing 2.5s ease-in-out infinite}
+.scan-ring:nth-child(2){animation-delay:.8s}
+.scan-ring:nth-child(3){animation-delay:1.6s}
+@keyframes scanRing{0%{transform:scale(.85);opacity:1}100%{transform:scale(1.35);opacity:0}}
+.scan-title{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:2px;letter-spacing:.5px}
+.scan-desc{font-size:12px;color:var(--ink-subtle);margin-bottom:4px}
+.scan-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 12px;border-radius:var(--radius-pill);font-size:10px;font-weight:500;background:rgba(63,139,109,.08);color:var(--accent);margin-bottom:6px}
+.scan-badge svg{width:10px;height:10px;display:block}
+.scan-tip{font-size:11px;color:var(--ink-subtle);padding:6px 12px;background:var(--page-bg);border-radius:6px;display:flex;align-items:center;gap:6px;justify-content:center}
+.scan-fail-link{font-size:10px;color:var(--ink-subtle);margin-top:6px;display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding:4px;transition:color .2s;border:none;background:none;width:100%}
 .scan-fail-link:hover{color:#e74c3c}
-.scan-fail-link svg{width:12px;height:12px;display:block}
+.scan-fail-link svg{width:11px;height:11px;display:block}
 
 /* ── 今日统计 ── */
-.stats-row{display:flex;gap:8px;margin-bottom:0}
-.stat-card{flex:1;background:var(--bg);border-radius:var(--radius-card);padding:12px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.04)}
-.stat-num{font-size:20px;font-weight:700;color:var(--accent);margin-bottom:1px}
-.stat-label{font-size:11px;color:var(--ink-subtle)}
+.stats-row{display:flex;gap:8px;margin-bottom:10px}
+.stat-card{flex:1;background:var(--bg);border-radius:var(--radius-card);padding:10px 8px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.04);position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stat-card:nth-child(1)::after{background:linear-gradient(90deg,#3F8B6D,#5caF8a)}
+.stat-card:nth-child(2)::after{background:linear-gradient(90deg,#667eea,#8A5CFF)}
+.stat-card:nth-child(3)::after{background:linear-gradient(90deg,#f5a623,#f08a24)}
+.stat-num{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:1px}
+.stat-label{font-size:10px;color:var(--ink-subtle)}
+
+/* ── 最近核销 ── */
+.recent-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.recent-title span{font-size:13px;font-weight:600;color:var(--ink)}
+.recent-title a{font-size:10px;color:var(--accent);text-decoration:none;cursor:pointer}
+.recent-list{display:flex;flex-direction:column;gap:6px}
+.recent-item{background:var(--bg);border-radius:var(--radius-card);padding:10px 12px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.03);cursor:pointer;transition:background .12s}
+.recent-item:active{background:var(--page-bg)}
+.ri-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ri-dot.green{background:var(--accent)}
+.ri-dot.purple{background:#8A5CFF}
+.ri-info{flex:1;min-width:0}
+.ri-name{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:1px}
+.ri-meta{font-size:10px;color:var(--ink-subtle);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.ri-meta .dot{width:2px;height:2px;border-radius:50%;background:var(--ink-subtle);display:inline-block}
+.ri-tag{font-size:10px;font-weight:500;padding:2px 8px;border-radius:var(--radius-pill);flex-shrink:0;background:rgba(63,139,109,.08);color:var(--accent)}
 
 
 
@@ -133,27 +167,46 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
   <div class="top-bar-right"></div>
 </div>
 
-<!-- 欢迎卡片（当前登录账号信息） -->
-<div class="welcome-card">
-  <img class="welcome-avatar" id="welcomeAvatar" src="../asset/绍兴兰亭logo.png" alt="" onerror="this.style.display='none'">
-  <div class="welcome-info">
-    <div class="welcome-greeting" id="greetingText" onclick="goLogin()" style="cursor:pointer">欢迎回来，<span id="operatorName">-</span></div>
-    <div class="welcome-meta">
-      <span id="loginTime">今天 08:30</span>
+<!-- 用户卡片 -->
+<div class="user-card">
+  <div class="user-avatar-wrap">
+    <img class="user-avatar" id="welcomeAvatar" src="../asset/绍兴兰亭logo.png" alt="" onerror="this.style.display='none'">
+    <div class="user-avatar-status">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
   </div>
+  <div class="user-info">
+    <div class="user-greeting" id="greetingText" onclick="goLogin()" style="cursor:pointer">
+      <strong id="operatorName">-</strong>，欢迎回来
+    </div>
+    <div class="user-meta">
+      <span id="loginTime">今天 08:30</span>
+      <span class="divider"></span>
+      <span style="color:var(--accent);font-weight:500">在线</span>
+    </div>
+  </div>
+  <span class="user-tag">已登录</span>
 </div>
 
 <!-- 扫码区 -->
 <div class="scan-area">
-  <button class="scan-btn" onclick="simulateScan()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
-  </button>
+  <div class="scan-btn-wrap">
+    <div class="scan-ring"></div>
+    <div class="scan-ring"></div>
+    <div class="scan-ring"></div>
+    <button class="scan-btn" onclick="simulateScan()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+    </button>
+  </div>
   <div class="scan-title">扫码核销</div>
   <div class="scan-desc">扫描用户出示的二维码核销权益</div>
+  <div class="scan-badge">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    支持身份权益 · 次数权益
+  </div>
   <div class="scan-tip">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-    点击上方扫码按钮模拟核销
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    点击上方按钮模拟核销
   </div>
   <button class="scan-fail-link" onclick="simulateFail()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
@@ -166,6 +219,54 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
   <div class="stat-card"><div class="stat-num">23</div><div class="stat-label">今日核销</div></div>
   <div class="stat-card"><div class="stat-num">12</div><div class="stat-label">身份权益</div></div>
   <div class="stat-card"><div class="stat-num">8</div><div class="stat-label">门票核销</div></div>
+</div>
+
+<!-- 最近核销 -->
+<div class="recent-title">
+  <span>最近核销</span>
+  <a onclick="location.href='history.html'">查看全部 ›</a>
+</div>
+<div class="recent-list">
+  <div class="recent-item" onclick="simulateScan()">
+    <span class="ri-dot green"></span>
+    <div class="ri-info">
+      <div class="ri-name">景区VIP通行权</div>
+      <div class="ri-meta">10分钟前 <span class="dot"></span> 138****5678</div>
+    </div>
+    <span class="ri-tag">已核销</span>
+  </div>
+  <div class="recent-item" onclick="simulateScan()">
+    <span class="ri-dot purple"></span>
+    <div class="ri-info">
+      <div class="ri-name">研学课程 · 第2次</div>
+      <div class="ri-meta">35分钟前 <span class="dot"></span> 139****1234</div>
+    </div>
+    <span class="ri-tag">已核销</span>
+  </div>
+  <div class="recent-item" onclick="simulateScan()">
+    <span class="ri-dot green"></span>
+    <div class="ri-info">
+      <div class="ri-name">跨城特权</div>
+      <div class="ri-meta">1小时前 <span class="dot"></span> 137****9012</div>
+    </div>
+    <span class="ri-tag">已核销</span>
+  </div>
+  <div class="recent-item" onclick="simulateScan()">
+    <span class="ri-dot purple"></span>
+    <div class="ri-info">
+      <div class="ri-name">研学课程 · 第1次</div>
+      <div class="ri-meta">2小时前 <span class="dot"></span> 139****1234</div>
+    </div>
+    <span class="ri-tag">已核销</span>
+  </div>
+  <div class="recent-item" onclick="simulateScan()">
+    <span class="ri-dot green"></span>
+    <div class="ri-info">
+      <div class="ri-name">景区VIP通行权</div>
+      <div class="ri-meta">3小时前 <span class="dot"></span> 135****4321</div>
+    </div>
+    <span class="ri-tag">已核销</span>
+  </div>
 </div>
 
 </div>

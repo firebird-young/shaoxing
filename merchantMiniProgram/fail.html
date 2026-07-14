@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>核销失败 - 商家客户端</title>
+<style>
+:root{--accent:#3F8B6D;--accent-contrast:#fff;--bg:#fff;--ink:#222;--ink-muted:#555;--ink-subtle:#888;--border:#e0e0e0;--page-bg:#F0F0F0;--radius-sm:7px;--radius-card:7px;--radius-pill:9999px;--font-display:"Helvetica Neue",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;--font-body:"Inter",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(--ink-muted);display:flex;justify-content:center;min-height:100%}
+.page{max-width:430px;width:100%;min-height:100vh;background:linear-gradient(180deg,#e74c3c 0%,#f5a6a6 12%,#f0f0f0 28%);padding:16px;padding-bottom:80px;position:relative;box-sizing:border-box}
+@media(max-width:430px){.page{max-width:100%}}
+
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:0 0 16px}
+.nav-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(255,255,255,.2);border-radius:50%}
+.nav-back svg{width:20px;height:20px;display:block;color:#fff}
+.nav-title{flex:1;text-align:center;font-size:16px;font-weight:700;color:#fff}
+.nav-placeholder{width:32px}
+
+.fail-banner{text-align:center;padding:40px 0 24px}
+.fail-icon{width:72px;height:72px;border-radius:50%;background:rgba(231,76,60,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;animation:shake .5s ease-in-out}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.fail-icon svg{width:36px;height:36px;color:#e74c3c;display:block}
+.fail-title{font-size:18px;font-weight:700;color:#e74c3c;margin-bottom:4px}
+.fail-sub{font-size:12px;color:var(--ink-subtle)}
+
+.info-card{background:var(--bg);border-radius:var(--radius-card);overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.04);margin-bottom:12px}
+.info-row{display:flex;align-items:flex-start;padding:14px;border-bottom:1px solid var(--page-bg);gap:12px}
+.info-row:last-child{border-bottom:none}
+.info-label{font-size:12px;color:var(--ink-subtle);width:64px;flex-shrink:0;padding-top:1px}
+.info-value{font-size:13px;color:var(--ink);flex:1;min-width:0;word-break:break-all;line-height:1.5}
+.info-value .error-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 12px;border-radius:var(--radius-pill);font-size:12px;font-weight:600;background:rgba(231,76,60,.1);color:#e74c3c}
+
+.action-bar{display:flex;gap:10px;padding:8px 0}
+.btn-primary{flex:1;height:46px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-primary:active{opacity:.9}
+.btn-outline{flex:1;height:46px;border:1px solid var(--border);border-radius:12px;background:var(--bg);color:var(--ink-muted);font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-outline:active{background:var(--page-bg)}
+.btn-primary svg,.btn-outline svg{width:16px;height:16px;display:block}
+
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:64px;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:space-between;padding:0 16px;padding-bottom:env(safe-area-inset-bottom,4px);z-index:100;box-sizing:border-box}
+.bnav .ni{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border:none;background:none;padding:4px 10px;font-size:10px;color:var(--ink-subtle);transition:color .2s}
+.bnav .ni .ico{width:22px;height:22px;transition:transform .15s}
+.bnav .ni .ico svg{display:block;width:100%;height:100%}
+.bnav .ni:active .ico{transform:scale(.8)}
+.bnav .ni.on{color:var(--accent)}
+.bnav .ni span:last-child{font-size:10px;display:block}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="top-bar">
+  <div class="nav-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </div>
+  <div class="nav-title">核销结果</div>
+  <div class="nav-placeholder"></div>
+</div>
+
+<div class="fail-banner">
+  <div class="fail-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+  </div>
+  <div class="fail-title">核销失败</div>
+  <div class="fail-sub" id="failReason">-</div>
+</div>
+
+<div class="info-card">
+  <div class="info-row">
+    <div class="info-label">失败原因</div>
+    <div class="info-value"><span class="error-tag" id="errorTag">-</span></div>
+  </div>
+  <div class="info-row">
+    <div class="info-label">详细说明</div>
+    <div class="info-value" id="errorDesc">-</div>
+  </div>
+  <div class="info-row">
+    <div class="info-label">建议操作</div>
+    <div class="info-value" id="errorSuggestion">-</div>
+  </div>
+</div>
+
+<div class="action-bar">
+  <button class="btn-outline" onclick="location.href='scan.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+    重新扫码
+  </button>
+  <button class="btn-primary" onclick="location.href='scan.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    返回首页
+  </button>
+</div>
+
+</div>
+
+<div class="bnav">
+  <button class="ni on" onclick="location.href='scan.html'">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+    <span>首页</span>
+  </button>
+  <button class="ni" onclick="location.href='history.html'">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+    <span>记录</span>
+  </button>
+  <button class="ni" onclick="location.href='profile.html'">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+    <span>我的</span>
+  </button>
+</div>
+
+<script>
+var params = new URLSearchParams(window.location.search);
+var raw = params.get('data');
+var data = raw ? JSON.parse(decodeURIComponent(raw)) : null;
+
+var suggestions = {
+  '二维码已过期':'请用户重新打开数字资产页面生成新的核销二维码',
+  '二维码无效':'请确认二维码来源，仅支持绍兴数资平台生成的核销码',
+  '权益已被核销':'该权益已被使用，如有疑问请联系客服',
+  '权益已失效':'该权益已超过有效期，无法核销使用',
+  '用户身份不匹配':'请确认用户持有的资产属于当前商家发行的产品',
+  '网络连接失败':'请检查设备网络连接，稍后重试'
+};
+
+if(data){
+  document.getElementById('failReason').textContent = data.title || '未知错误';
+  document.getElementById('errorTag').textContent = data.title || '未知错误';
+  document.getElementById('errorDesc').textContent = data.desc || '';
+  document.getElementById('errorSuggestion').textContent = suggestions[data.title] || '请重试或联系客服';
+}
+</script>
+</body>
+</html>

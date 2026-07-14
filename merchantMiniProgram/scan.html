@@ -12,52 +12,45 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
 @media(max-width:430px){.page{max-width:100%}}
 
 /* ── 顶部 ── */
-.top-bar{display:flex;align-items:center;justify-content:space-between;padding:0 0 16px}
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:0 0 12px}
 .top-bar-left{display:flex;align-items:center;gap:10px}
 .merchant-logo{width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.4)}
 .merchant-name{font-size:14px;font-weight:600;color:#fff}
-.merchant-status{font-size:10px;color:rgba(255,255,255,.7);display:flex;align-items:center;gap:3px}
-.merchant-status .dot{width:6px;height:6px;border-radius:50%;background:#52c41a;display:inline-block}
 .top-bar-right{display:flex;gap:12px}
-.top-bar-right .icon-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;color:#fff}
-.top-bar-right .icon-btn svg{width:18px;height:18px;display:block}
-.top-bar-right .icon-btn:active{background:rgba(255,255,255,.35)}
+
+/* ── 全局目录按钮 ── */
+.global-dir-btn{position:fixed;top:12px;right:12px;z-index:9999;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.75);transition:all .2s}
+.global-dir-btn:hover{background:rgba(0,0,0,.6);color:#fff}
+.global-dir-btn svg{width:16px;height:16px;display:block}
+
+/* ── 欢迎卡片 ── */
+.welcome-card{background:var(--bg);border-radius:var(--radius-card);padding:16px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.04);display:flex;align-items:center;gap:14px}
+.welcome-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);flex-shrink:0}
+.welcome-info{flex:1;min-width:0}
+.welcome-greeting{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.welcome-greeting span{color:var(--accent)}
+.welcome-meta{font-size:11px;color:var(--ink-subtle);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.welcome-meta .dot{width:3px;height:3px;border-radius:50%;background:var(--ink-subtle);display:inline-block}
 
 /* ── 扫码区 ── */
-.scan-area{background:var(--bg);border-radius:var(--radius-card);padding:24px 20px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.04);margin-bottom:12px}
-.scan-btn{width:80px;height:80px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 4px 16px rgba(63,139,109,.3);transition:transform .15s}
+.scan-area{background:var(--bg);border-radius:var(--radius-card);padding:20px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.04);margin-bottom:12px}
+.scan-btn{width:72px;height:72px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;box-shadow:0 4px 16px rgba(63,139,109,.3);transition:transform .15s}
 .scan-btn:active{transform:scale(.9)}
-.scan-btn svg{width:36px;height:36px;color:#fff;display:block}
-.scan-title{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.scan-btn svg{width:32px;height:32px;color:#fff;display:block}
+.scan-title{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:2px}
 .scan-desc{font-size:12px;color:var(--ink-subtle)}
-.scan-tip{font-size:11px;color:var(--ink-subtle);margin-top:10px;padding:8px 12px;background:var(--page-bg);border-radius:6px;display:flex;align-items:center;gap:6px;justify-content:center}
+.scan-tip{font-size:11px;color:var(--ink-subtle);margin-top:8px;padding:6px 12px;background:var(--page-bg);border-radius:6px;display:flex;align-items:center;gap:6px;justify-content:center}
+.scan-fail-link{font-size:11px;color:var(--ink-subtle);margin-top:6px;display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding:4px;transition:color .2s;border:none;background:none;width:100%}
+.scan-fail-link:hover{color:#e74c3c}
+.scan-fail-link svg{width:12px;height:12px;display:block}
 
 /* ── 今日统计 ── */
-.stats-row{display:flex;gap:8px;margin-bottom:12px}
-.stat-card{flex:1;background:var(--bg);border-radius:var(--radius-card);padding:14px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.04)}
-.stat-num{font-size:22px;font-weight:700;color:var(--accent);margin-bottom:2px}
+.stats-row{display:flex;gap:8px;margin-bottom:0}
+.stat-card{flex:1;background:var(--bg);border-radius:var(--radius-card);padding:12px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.04)}
+.stat-num{font-size:20px;font-weight:700;color:var(--accent);margin-bottom:1px}
 .stat-label{font-size:11px;color:var(--ink-subtle)}
 
-/* ── 最近核销 ── */
-.section-title{display:flex;align-items:center;justify-content:space-between;padding:10px 0 8px}
-.section-title span{font-size:14px;font-weight:600;color:var(--ink)}
-.section-title a{font-size:11px;color:var(--accent);text-decoration:none;cursor:pointer}
-.history-item{background:var(--bg);border-radius:var(--radius-card);padding:12px 14px;margin-bottom:6px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 6px rgba(0,0,0,.04);cursor:pointer}
-.history-item:active{background:var(--page-bg)}
-.hi-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.hi-icon svg{width:18px;height:18px;display:block}
-.hi-info{flex:1;min-width:0}
-.hi-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
-.hi-time{font-size:10px;color:var(--ink-subtle)}
-.hi-tag{font-size:11px;font-weight:500;padding:3px 10px;border-radius:var(--radius-pill);flex-shrink:0}
-.hi-tag.success{background:rgba(63,139,109,.1);color:var(--accent)}
-.hi-tag.pending{background:rgba(52,152,219,.1);color:#3498db}
 
-/* ── 空状态 ── */
-.empty-state{text-align:center;padding:32px 0 16px}
-.empty-state .empty-icon{width:48px;height:48px;margin:0 auto 8px;opacity:.3}
-.empty-state .empty-icon svg{width:100%;height:100%;color:var(--ink-subtle)}
-.empty-state .empty-text{font-size:12px;color:var(--ink-subtle)}
 
 /* ── 底部导航 ── */
 .bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:64px;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:space-between;padding:0 16px;padding-bottom:env(safe-area-inset-bottom,4px);z-index:100;box-sizing:border-box}
@@ -67,6 +60,63 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
 .bnav .ni:active .ico{transform:scale(.8)}
 .bnav .ni.on{color:var(--accent)}
 .bnav .ni span:last-child{font-size:10px;display:block}
+
+/* ── 浮层通用 ── */
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;align-items:center;justify-content:center;padding:24px;animation:fadeIn .2s}
+.modal-mask.show{display:flex}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-box{background:var(--bg);border-radius:16px;width:100%;max-width:380px;padding:32px 24px 20px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.18);animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ── 成功浮层 ── */
+.modal-icon{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.modal-icon svg{width:30px;height:30px;display:block}
+.modal-icon.success{background:rgba(63,139,109,.12)}
+.modal-icon.success svg{color:var(--accent);animation:pulse 1s ease-in-out}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
+.modal-icon.fail{background:rgba(231,76,60,.12)}
+.modal-icon.fail svg{color:#e74c3c;animation:shake .5s ease-in-out}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:2px}
+.modal-title.success{color:var(--accent)}
+.modal-title.fail{color:#e74c3c}
+.modal-sub{font-size:12px;color:var(--ink-subtle);margin-bottom:16px}
+
+/* ── 浮层信息行 ── */
+.modal-info{background:var(--page-bg);border-radius:10px;padding:12px 14px;margin-bottom:16px;text-align:left}
+.modal-info .mi-row{display:flex;padding:5px 0;font-size:12px;border-bottom:1px solid rgba(0,0,0,.04)}
+.modal-info .mi-row:last-child{border-bottom:none}
+.modal-info .mi-label{color:var(--ink-subtle);width:60px;flex-shrink:0}
+.modal-info .mi-value{color:var(--ink);flex:1;min-width:0;word-break:break-all}
+.modal-info .mi-tag{display:inline-flex;padding:2px 10px;border-radius:var(--radius-pill);font-size:11px;font-weight:600}
+.modal-info .mi-tag.identity{background:rgba(63,139,109,.1);color:var(--accent)}
+.modal-info .mi-tag.ticket{background:rgba(206,147,216,.12);color:#8A5CFF}
+
+/* ── 浮层按钮 ── */
+.modal-btn{width:100%;height:44px;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px}
+.modal-btn:active{opacity:.85}
+.modal-btn.primary{background:var(--accent);color:#fff}
+.modal-btn.danger{background:#e74c3c;color:#fff}
+.modal-btn.outline{background:transparent;color:var(--ink-muted);border:1px solid var(--border);font-weight:500}
+.modal-btn.outline:active{background:var(--page-bg)}
+.modal-btn svg{width:16px;height:16px;display:block}
+
+/* ── 失败场景下拉 ── */
+.fail-dropdown{width:100%;margin-bottom:12px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.fail-dropdown-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;font-size:12px;color:var(--ink-muted);background:var(--page-bg);transition:background .15s;border:none;width:100%;text-align:left}
+.fail-dropdown-header:active{background:#e5e5e5}
+.fail-dropdown-header .arrow{width:14px;height:14px;transition:transform .25s;color:var(--ink-subtle);display:block}
+.fail-dropdown-header .arrow.open{transform:rotate(180deg)}
+.fail-dropdown-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.fail-dropdown-body.open{max-height:500px}
+.fail-scenario-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background .12s;border-top:1px solid var(--page-bg)}
+.fail-scenario-item:active{background:var(--page-bg)}
+.fail-scenario-item .fs-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;background:#ddd}
+.fail-scenario-item .fs-dot.on{background:#e74c3c}
+.fail-scenario-item .fs-name{flex:1;font-size:12px;color:var(--ink-muted)}
+.fail-scenario-item .fs-name.on{color:var(--ink);font-weight:600}
+.fail-scenario-item .fs-check{width:16px;height:16px;flex-shrink:0;color:var(--accent);display:none}
+.fail-scenario-item .fs-check.show{display:block}
 </style>
 </head>
 <body>
@@ -80,10 +130,17 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
       <div class="merchant-name">绍兴兰亭产业数资</div>
     </div>
   </div>
-  <div class="top-bar-right">
-    <button class="icon-btn" onclick="location.href='login.html'" title="切换账号">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-    </button>
+  <div class="top-bar-right"></div>
+</div>
+
+<!-- 欢迎卡片（当前登录账号信息） -->
+<div class="welcome-card">
+  <img class="welcome-avatar" id="welcomeAvatar" src="../asset/绍兴兰亭logo.png" alt="" onerror="this.style.display='none'">
+  <div class="welcome-info">
+    <div class="welcome-greeting" id="greetingText" onclick="goLogin()" style="cursor:pointer">欢迎回来，<span id="operatorName">-</span></div>
+    <div class="welcome-meta">
+      <span id="loginTime">今天 08:30</span>
+    </div>
   </div>
 </div>
 
@@ -96,8 +153,12 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
   <div class="scan-desc">扫描用户出示的二维码核销权益</div>
   <div class="scan-tip">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-    点击上方按钮或点击下方模拟扫码
+    点击上方扫码按钮模拟核销
   </div>
+  <button class="scan-fail-link" onclick="simulateFail()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+    模拟扫码失败场景
+  </button>
 </div>
 
 <!-- 今日统计 -->
@@ -105,47 +166,14 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
   <div class="stat-card"><div class="stat-num">23</div><div class="stat-label">今日核销</div></div>
   <div class="stat-card"><div class="stat-num">12</div><div class="stat-label">身份权益</div></div>
   <div class="stat-card"><div class="stat-num">8</div><div class="stat-label">门票核销</div></div>
-
-</div>
-
-<!-- 最近核销 -->
-<div class="section-title">
-  <span>最近核销</span>
-  <a onclick="location.href='history.html'">查看全部 ›</a>
-</div>
-
-<div id="historyList">
-  <div class="history-item" onclick="simulateScan()">
-    <div class="hi-icon" style="background:rgba(63,139,109,.1);color:var(--accent)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-    </div>
-    <div class="hi-info">
-      <div class="hi-name">景区VIP通行权</div>
-      <div class="hi-time">10分钟前 · 用户 138****5678</div>
-    </div>
-    <span class="hi-tag success">已核销</span>
-  </div>
-  <div class="history-item" onclick="simulateScan()">
-    <div class="hi-icon" style="background:rgba(206,147,216,.12);color:#8A5CFF">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-    </div>
-    <div class="hi-info">
-      <div class="hi-name">研学课程 · 第2次</div>
-      <div class="hi-time">35分钟前 · 用户 139****1234</div>
-    </div>
-    <span class="hi-tag success">已核销</span>
-  </div>
-
-</div>
-
-<div class="empty-state" id="emptyState" style="display:none">
-  <div class="empty-icon">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
-  </div>
-  <div class="empty-text">暂无核销记录</div>
 </div>
 
 </div>
+
+<!-- 全局目录按钮（页面右上角，手机框外面） -->
+<button class="global-dir-btn" onclick="location.href='../index.html'" title="返回目录">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+</button>
 
 <!-- 底部导航 -->
 <div class="bnav">
@@ -163,9 +191,73 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
   </button>
 </div>
 
+<!-- ====== 核销成功浮层 ====== -->
+<div class="modal-mask" id="successModal">
+  <div class="modal-box">
+    <div class="modal-icon success">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    </div>
+    <div class="modal-title success">核销成功</div>
+    <div class="modal-sub">权益已成功核销</div>
+    <div class="modal-info" id="successInfo"></div>
+    <button class="modal-btn primary" onclick="closeSuccess()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      我知道了
+    </button>
+    <button class="modal-btn outline" onclick="closeSuccess();location.href='history.html'">查看核销记录</button>
+  </div>
+</div>
+
+<!-- ====== 核销失败浮层 ====== -->
+<div class="modal-mask" id="failModal">
+  <div class="modal-box">
+    <div class="modal-icon fail">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+    </div>
+    <div class="modal-title fail" id="failTitle">核销失败</div>
+    <div class="modal-sub" id="failReason">-</div>
+    <!-- 场景下拉 -->
+    <div class="fail-dropdown">
+      <button class="fail-dropdown-header" id="failDropdownBtn" onclick="toggleFailDropdown()">
+        <span>所有失败场景</span>
+        <svg class="arrow" id="failDropdownArrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="fail-dropdown-body" id="failDropdownBody"></div>
+    </div>
+    <button class="modal-btn danger" onclick="closeFail()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      关闭
+    </button>
+  </div>
+</div>
+
 <script>
+// ── 写死登录账号 ──
+var DEMO_MERCHANT = { name:'绍兴兰亭', account:'admin', password:'888888' };
+
+// ── 加载登录账号信息 ──
+(function(){
+  var login = JSON.parse(localStorage.getItem('merchantLogin') || '{}');
+  if(!login.account){
+    document.getElementById('greetingText').textContent = '未登录，点击登录';
+    document.getElementById('loginTime').textContent = '';
+    return;
+  }
+  document.getElementById('operatorName').textContent = login.account;
+  // 同步头像
+  var savedAvatar = localStorage.getItem('merchantAvatar');
+  if(savedAvatar) document.getElementById('welcomeAvatar').src = savedAvatar;
+  var now = new Date();
+  var h = now.getHours().toString().padStart(2,'0');
+  var mi = now.getMinutes().toString().padStart(2,'0');
+  document.getElementById('loginTime').textContent = '今天 '+h+':'+mi;
+})();
+
+function goLogin(){
+  location.href = 'login.html';
+}
+
 function simulateScan(){
-  // 模拟扫码后直接跳转到扫码成功页，展示核销内容
   var data = {
     user: 'U20240001',
     name: '兰亭泼墨人',
@@ -177,10 +269,102 @@ function simulateScan(){
     title: '景区VIP通行权',
     desc: '鹅池碑、御碑亭、曲水流觞、兰亭江',
     time: '2026-07-13 17:26',
-    code: '28294756'
+    code: '28294756',
+    operator: 'admin'
   };
-  var param = encodeURIComponent(JSON.stringify(data));
-  location.href = 'success.html?data=' + param;
+  showSuccess(data);
+}
+
+function showSuccess(d){
+  var typeMap = { identity:['身份权益','identity'], ticket:['次数权益','ticket'] };
+  var tp = typeMap[d.type] || typeMap.identity;
+  var h = '';
+  h += '<div class="mi-row"><span class="mi-label">用户</span><span class="mi-value">'+d.name+' ('+d.user+')</span></div>';
+  h += '<div class="mi-row"><span class="mi-label">数字资产</span><span class="mi-value">'+d.assetName+(d.assetSpec?' · '+d.assetSpec:'')+' <span style="font-family:monospace;color:#999">'+d.assetNo+'</span></span></div>';
+  h += '<div class="mi-row"><span class="mi-label">权益</span><span class="mi-value">'+d.title+'</span></div>';
+  h += '<div class="mi-row"><span class="mi-label">类型</span><span class="mi-value"><span class="mi-tag '+tp[1]+'">'+tp[0]+'</span></span></div>';
+  h += '<div class="mi-row"><span class="mi-label">核销编号</span><span class="mi-value" style="font-family:monospace;font-size:11px;color:#999">'+d.code+'</span></div>';
+  h += '<div class="mi-row"><span class="mi-label">操作员</span><span class="mi-value">'+(d.operator||'-')+'</span></div>';
+  document.getElementById('successInfo').innerHTML = h;
+  document.getElementById('successModal').classList.add('show');
+}
+function closeSuccess(){document.getElementById('successModal').classList.remove('show');}
+
+// ── 扫码失败场景 ──
+var failScenarios = [
+  { title:'二维码已过期', desc:'该二维码已超过有效期，请用户刷新后重新出示' },
+  { title:'二维码无效', desc:'无法识别该二维码，请确认是绍兴数资平台的核销码' },
+  { title:'权益已被核销', desc:'该权益已完成核销，不可重复使用' },
+  { title:'权益已失效', desc:'该权益已超过有效期，无法核销' },
+  { title:'用户身份不匹配', desc:'该二维码与当前商家无关联，无权核销' },
+  { title:'网络连接失败', desc:'无法连接到服务器，请检查网络后重试' }
+];
+var failSuggestions = {
+  '二维码已过期':'请用户重新打开数字资产页面生成新的核销二维码',
+  '二维码无效':'请确认二维码来源，仅支持绍兴数资平台生成的核销码',
+  '权益已被核销':'该权益已被使用，如有疑问请联系客服',
+  '权益已失效':'该权益已超过有效期，无法核销使用',
+  '用户身份不匹配':'请确认用户持有的资产属于当前商家发行的产品',
+  '网络连接失败':'请检查设备网络连接，稍后重试'
+};
+
+function simulateFail(){
+  var idx = Math.floor(Math.random() * failScenarios.length);
+  showFail(idx);
+}
+
+var failCurrentIdx = 0;
+
+function showFail(idx){
+  failCurrentIdx = idx;
+  var sc = failScenarios[idx];
+  document.getElementById('failTitle').textContent = sc.title;
+  document.getElementById('failReason').textContent = sc.desc;
+  renderFailDropdown(idx);
+  document.getElementById('failModal').classList.add('show');
+  document.getElementById('failDropdownBody').classList.remove('open');
+  document.getElementById('failDropdownArrow').classList.remove('open');
+}
+
+function renderFailDropdown(activeIdx){
+  var body = document.getElementById('failDropdownBody');
+  var h = '';
+  failScenarios.forEach(function(sc, i){
+    var isOn = i === activeIdx;
+    h +=
+      '<div class="fail-scenario-item" onclick="switchFailScenario('+i+')">'+
+        '<span class="fs-dot'+(isOn?' on':'')+'"></span>'+
+        '<span class="fs-name'+(isOn?' on':'')+'">'+sc.title+'</span>'+
+        '<svg class="fs-check'+(isOn?' show':'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'+
+      '</div>';
+  });
+  body.innerHTML = h;
+}
+
+function switchFailScenario(idx){
+  failCurrentIdx = idx;
+  var sc = failScenarios[idx];
+  document.getElementById('failTitle').textContent = sc.title;
+  document.getElementById('failReason').textContent = sc.desc;
+  renderFailDropdown(idx);
+  closeFailDropdown();
+}
+
+function toggleFailDropdown(){
+  var body = document.getElementById('failDropdownBody');
+  var arrow = document.getElementById('failDropdownArrow');
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+function closeFailDropdown(){
+  document.getElementById('failDropdownBody').classList.remove('open');
+  document.getElementById('failDropdownArrow').classList.remove('open');
+}
+
+function closeFail(){
+  closeFailDropdown();
+  document.getElementById('failModal').classList.remove('show');
 }
 </script>
 </body>

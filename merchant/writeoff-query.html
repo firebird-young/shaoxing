@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核销查询 - 商家中心</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:#f5f7fa;color:#333}
+
+    .header{background:#fff;padding:16px 24px;box-shadow:0 2px 4px rgba(0,0,0,.05);display:flex;justify-content:space-between;align-items:center}
+    .header-left h1{font-size:18px;font-weight:600}
+    .header-right{display:flex;align-items:center;gap:16px}
+    .merchant-name{font-weight:500;color:#667eea}
+    .btn-logout{padding:8px 16px;background:#f5f5f5;border:none;border-radius:6px;cursor:pointer;font-size:13px;color:#666}
+    .btn-logout:hover{background:#e8ecf0}
+
+    .sidebar{position:fixed;left:0;top:60px;bottom:0;width:200px;background:#2c3e50;padding:20px 0;z-index:10}
+    .sidebar-menu{list-style:none;padding:0;margin:0}
+    .menu-title{display:flex;align-items:center;gap:10px;padding:12px 20px;color:#b8c7ce;font-size:14px;text-decoration:none;transition:all .2s;cursor:pointer}
+    .menu-title svg{width:18px;height:18px;flex-shrink:0}
+    a.menu-title:hover{background:rgba(255,255,255,.1);color:#fff}
+    .menu-title.active{background:rgba(102,126,234,.3);color:#fff}
+    .submenu{list-style:none;padding:0;margin:0}
+    .submenu-item{display:block;padding:10px 20px 10px 50px;color:#8a9aa8;font-size:13px;text-decoration:none;transition:all .2s}
+    .submenu-item:hover{background:rgba(255,255,255,.1);color:#fff}
+    .submenu-item.active{background:rgba(102,126,234,.3);color:#fff}
+
+    .content{margin-left:200px;padding:24px}
+    .content-title{font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+    .content-title svg{width:20px;height:20px}
+
+    .card{background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+
+    /* 搜索栏 */
+    .search-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+    .search-input{padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;outline:none;min-width:140px;flex:1;max-width:200px}
+    .search-input:focus{border-color:#667eea}
+    .search-select{padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;outline:none;background:#fff;min-width:100px}
+    .search-btn{padding:8px 20px;border:none;border-radius:6px;background:#667eea;color:#fff;font-size:13px;cursor:pointer}
+    .search-btn:hover{background:#5a6fd6}
+    .search-btn.secondary{background:#f0f0f0;color:#666}
+    .search-btn.secondary:hover{background:#e0e0e0}
+
+    /* 统计概览 */
+    .stats-row{display:flex;gap:12px;margin-bottom:16px}
+    .stat-card{flex:1;background:#f8f9fb;border-radius:8px;padding:14px 16px;text-align:center}
+    .stat-num{font-size:24px;font-weight:700;color:#667eea;margin-bottom:4px}
+    .stat-label{font-size:12px;color:#999}
+
+    /* 表格 */
+    .table-wrap{overflow-x:auto;border-radius:8px;border:1px solid #eee}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{padding:12px 14px;text-align:left;border-bottom:1px solid #f0f0f0;font-size:13px}
+    th{background:#f7f8fa;font-weight:600;color:#555;white-space:nowrap;font-size:12px;letter-spacing:.3px}
+    th:first-child{border-radius:8px 0 0 0}
+    th:last-child{border-radius:0 8px 0 0}
+    tr:last-child td{border-bottom:none}
+    tbody tr{transition:background .12s}
+    tbody tr:hover{background:#f5f7ff}
+    tbody tr:nth-child(even){background:#fafbfc}
+    tbody tr:nth-child(even):hover{background:#f5f7ff}
+    .cell-user{font-weight:600;color:#1a1a2e}
+    .cell-user-sub{font-size:11px;color:#999;margin-top:2px;display:flex;align-items:center;gap:6px}
+    .cell-user-sub .phone-icon{width:12px;height:12px;opacity:.5}
+    .cell-asset{font-weight:500;color:#333}
+    .cell-asset-sub{font-size:11px;color:#999;font-family:monospace;margin-top:2px}
+    .cell-benefit{font-weight:500;color:#333}
+    .cell-time{font-size:12px;color:#888;white-space:nowrap}
+    .cell-id{font-family:monospace;font-size:11px;color:#999;letter-spacing:.2px}
+    .tag{padding:3px 12px;border-radius:12px;font-size:11px;font-weight:600;display:inline-block;letter-spacing:.3px}
+    .tag-identity{background:rgba(102,126,234,.1);color:#667eea}
+    .tag-ticket{background:rgba(206,147,216,.12);color:#8A5CFF}
+    .tag-physical{background:rgba(79,195,247,.12);color:#398BFF}
+    .detail-btn{padding:5px 14px;border:none;border-radius:6px;background:#667eea;color:#fff;font-size:12px;cursor:pointer;transition:opacity .15s;white-space:nowrap}
+    .detail-btn:hover{opacity:.85}
+    .detail-btn:active{opacity:.7}
+
+    .empty-state{text-align:center;padding:48px 0;color:#999;font-size:13px}
+    .empty-state svg{width:48px;height:48px;color:#ddd;margin-bottom:12px}
+
+    /* 分页 */
+    .pagination{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:16px}
+    .page-btn{padding:6px 14px;border:1px solid #ddd;border-radius:6px;background:#fff;font-size:12px;color:#666;cursor:pointer}
+    .page-btn:hover{background:#f5f5f5}
+    .page-btn.active{background:#667eea;color:#fff;border-color:#667eea}
+    .page-btn:disabled{opacity:.4;cursor:not-allowed}
+    .page-info{font-size:12px;color:#999}
+
+    /* 详情弹窗 */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+    .modal-overlay.show{display:flex}
+    .modal-box{background:#fff;border-radius:16px;width:100%;max-width:520px;max-height:80vh;overflow-y:auto}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #f0f0f0}
+    .modal-title{font-size:16px;font-weight:600}
+    .modal-close{width:28px;height:28px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:#666;border:none}
+    .modal-close:hover{background:#e8e8e8}
+    .modal-body{padding:20px}
+    .detail-row{display:flex;padding:7px 0;font-size:13px;border-bottom:1px solid #f5f5f5}
+    .detail-label{width:80px;color:#999;flex-shrink:0}
+    .detail-value{flex:1;color:#333;word-break:break-all}
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left"><h1>商家中心</h1></div>
+  <div class="header-right">
+    <span class="merchant-name" id="merchantName">-</span>
+    <button class="btn-logout" onclick="doLogout()">退出登录</button>
+  </div>
+</div>
+
+<div class="sidebar">
+  <div class="sidebar-menu">
+    <div class="menu-item">
+      <a class="menu-title" href="dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>首页</span>
+      </a>
+    </div>
+    <div class="menu-item">
+      <div class="menu-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span>数字资产</span>
+      </div>
+      <ul class="submenu">
+        <li><a href="asset-management.html" class="submenu-item">数字资产管理</a></li>
+        <li><a href="digital-asset-detail.html" class="submenu-item">数字资产详情</a></li>
+      </ul>
+    </div>
+    <div class="menu-item">
+      <div class="menu-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span>订单管理</span>
+      </div>
+      <ul class="submenu">
+        <li><a href="order-management.html" class="submenu-item">订单管理</a></li>
+        <li><a href="delivery-management.html" class="submenu-item">发货管理</a></li>
+      </ul>
+    </div>
+    <div class="menu-item">
+      <div class="menu-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span>核销管理</span>
+      </div>
+      <ul class="submenu">
+        <li><a href="writeoff-query.html" class="submenu-item active">核销查询</a></li>
+      </ul>
+    </div>
+    <div class="menu-item">
+      <div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg><span>营销管理</span></div>
+      <ul class="submenu">
+        <li><a href="marketing.html" class="submenu-item">空间管理</a></li>
+        <li><a href="task-management.html" class="submenu-item">任务管理</a></li>
+      </ul>
+    </div>
+    <div class="menu-item">
+      <div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>内容管理</span></div>
+      <ul class="submenu">
+        <li><a href="story-admin.html" class="submenu-item">文化故事管理</a></li>
+      </ul>
+    </div>
+    <div class="menu-item">
+      <div class="menu-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg><span>系统管理</span></div>
+      <ul class="submenu">
+        <li><a href="operator-management.html" class="submenu-item">操作员管理</a></li>
+        <li><a href="role-management.html" class="submenu-item">角色管理</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="content-title">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    核销查询
+  </div>
+
+  <div class="card">
+    <!-- 搜索栏 -->
+    <div class="search-bar">
+      <input class="search-input" id="sUserId" placeholder="用户ID" onkeydown="if(event.key==='Enter') applyFilter()">
+      <input class="search-input" id="sBenefitName" placeholder="权益名称" onkeydown="if(event.key==='Enter') applyFilter()">
+      <input class="search-input" id="sAssetName" placeholder="资产名称" onkeydown="if(event.key==='Enter') applyFilter()">
+      <input class="search-input" id="sPhone" placeholder="用户手机号" onkeydown="if(event.key==='Enter') applyFilter()">
+      <input class="search-input" id="sAssetNo" placeholder="资产编号" style="max-width:110px" onkeydown="if(event.key==='Enter') applyFilter()">
+      <select class="search-select" id="sType">
+        <option value="all">全部类型</option>
+        <option value="identity">身份权益</option>
+        <option value="ticket">次数权益</option>
+      </select>
+      <input class="search-input" id="sDateStart" type="date" style="max-width:140px" onchange="applyFilter()">
+      <span style="color:#bbb;font-size:13px">至</span>
+      <input class="search-input" id="sDateEnd" type="date" style="max-width:140px" onchange="applyFilter()">
+      <button class="search-btn" onclick="applyFilter()">🔍 查询</button>
+      <button class="search-btn secondary" onclick="resetFilter()">重置</button>
+    </div>
+
+    <!-- 统计 -->
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num" id="totalCount">0</div><div class="stat-label">查询结果</div></div>
+      <div class="stat-card"><div class="stat-num" id="identityCount">0</div><div class="stat-label">身份权益</div></div>
+      <div class="stat-card"><div class="stat-num" id="ticketCount">0</div><div class="stat-label">次数权益</div></div>
+    </div>
+
+    <!-- 表格 -->
+    <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:36px">#</th>
+          <th>核销编号</th>
+          <th>用户信息</th>
+          <th>数字资产</th>
+          <th>权益名称</th>
+          <th>权益类型</th>
+          <th>操作员</th>
+          <th>核销时间</th>
+          <th style="width:70px">操作</th>
+        </tr>
+      </thead>
+      <tbody id="listBody"></tbody>
+    </table>
+    </div>
+
+    <div class="empty-state" id="emptyState" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+      <div>暂无核销记录</div>
+    </div>
+
+    <!-- 分页 -->
+    <div class="pagination" id="pagination"></div>
+  </div>
+</div>
+
+<!-- 详情弹窗 -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">核销详情</div>
+      <button class="modal-close" onclick="document.getElementById('detailModal').classList.remove('show')">✕</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
+<script>
+// ── 模拟核销数据 ──
+var allRecords = [
+  { id:'WO20260713001', user:'U20240001', userName:'兰亭泼墨人', phone:'13856785678', type:'identity', label:'身份权益', assetName:'兰亭雅集', assetSpec:'优享版', assetNo:'#0001', title:'景区VIP通行权', desc:'鹅池碑、御碑亭、曲水流觞、兰亭江', time:'2026-07-13 17:26', operator:'admin' },
+  { id:'WO20260713002', user:'U20240003', userName:'江南游客', phone:'13912341234', type:'ticket', label:'次数权益', assetName:'兰亭雅集', assetSpec:'畅行版', assetNo:'#0002', title:'研学课程 · 第1次', desc:'书法研学体验', time:'2026-07-13 16:52', operator:'admin' },
+  { id:'WO20260713003', user:'U20240005', userName:'文化收藏家', phone:'13790129012', type:'identity', label:'身份权益', assetName:'兰亭春禊', assetSpec:'学韵版', assetNo:'#0003', title:'跨城特权', desc:'绍兴、杭州、上海三地优先入场', time:'2026-07-13 15:30', operator:'admin' },
+  { id:'WO20260712001', user:'U20240001', userName:'兰亭泼墨人', phone:'13856785678', type:'ticket', label:'次数权益', assetName:'兰亭雅集', assetSpec:'优享版', assetNo:'#0001', title:'研学课程 · 第2次', desc:'拓印体验', time:'2026-07-12 14:10', operator:'张三' },
+  { id:'WO20260712002', user:'U20240002', userName:'墨韵书生', phone:'13543214321', type:'identity', label:'身份权益', assetName:'兰亭碑刻', assetSpec:'珍藏版', assetNo:'#0004', title:'景区VIP通行权', desc:'鹅池碑、御碑亭', time:'2026-07-12 11:05', operator:'张三' },
+  { id:'WO20260711001', user:'U20240001', userName:'兰亭泼墨人', phone:'13856785678', type:'ticket', label:'次数权益', assetName:'兰亭雅集', assetSpec:'优享版', assetNo:'#0001', title:'研学课程 · 第3次', desc:'非遗手作体验', time:'2026-07-11 09:30', operator:'李四' },
+  { id:'WO20260710001', user:'U20240004', userName:'越地旅人', phone:'13687658765', type:'identity', label:'身份权益', assetName:'兰亭春禊', assetSpec:'畅行版', assetNo:'#0005', title:'景区VIP通行权', desc:'曲水流觞、兰亭江', time:'2026-07-10 16:20', operator:'李四' },
+  { id:'WO20260709001', user:'U20240003', userName:'江南游客', phone:'13912341234', type:'ticket', label:'次数权益', assetName:'兰亭雅集', assetSpec:'畅行版', assetNo:'#0002', title:'研学课程 · 第2次', desc:'书法研学体验', time:'2026-07-09 13:45', operator:'admin' },
+  { id:'WO20260708001', user:'U20240006', userName:'书法爱好者', phone:'15867896789', type:'identity', label:'身份权益', assetName:'兰亭诗韵', assetSpec:'基础版', assetNo:'#0006', title:'跨城特权', desc:'绍兴、杭州优先入场', time:'2026-07-08 10:00', operator:'张三' },
+  { id:'WO20260705001', user:'U20240005', userName:'文化收藏家', phone:'13790129012', type:'ticket', label:'次数权益', assetName:'兰亭春禊', assetSpec:'学韵版', assetNo:'#0003', title:'研学课程 · 第1次', desc:'书法研学体验', time:'2026-07-05 14:30', operator:'李四' }
+];
+
+var pageSize = 8;
+var currentPage = 1;
+var filteredList = [];
+
+// ── 时间判断 ──
+function isInRange(d, start, end){
+  var t = new Date(d).getTime();
+  if(start && t < new Date(start).getTime()) return false;
+  if(end && t > new Date(end).getTime() + 86400000) return false;
+  return true;
+}
+
+// ── 筛选 ──
+function applyFilter(){
+  currentPage = 1;
+  var userId = document.getElementById('sUserId').value.trim().toLowerCase();
+  var benefitName = document.getElementById('sBenefitName').value.trim().toLowerCase();
+  var assetName = document.getElementById('sAssetName').value.trim().toLowerCase();
+  var phone = document.getElementById('sPhone').value.trim().toLowerCase();
+  var assetNo = document.getElementById('sAssetNo').value.trim().toLowerCase();
+  var type = document.getElementById('sType').value;
+  var dateStart = document.getElementById('sDateStart').value;
+  var dateEnd = document.getElementById('sDateEnd').value;
+
+  filteredList = allRecords.filter(function(r){
+    if(type !== 'all' && r.type !== type) return false;
+    if((dateStart || dateEnd) && !isInRange(r.time, dateStart, dateEnd)) return false;
+    if(userId && r.user.toLowerCase().indexOf(userId)===-1) return false;
+    if(benefitName && r.title.toLowerCase().indexOf(benefitName)===-1) return false;
+    if(assetName && r.assetName.toLowerCase().indexOf(assetName)===-1) return false;
+    if(phone && r.phone.indexOf(phone)===-1) return false;
+    if(assetNo && r.assetNo.toLowerCase().indexOf(assetNo)===-1) return false;
+    return true;
+  });
+  renderList();
+}
+
+function resetFilter(){
+  document.getElementById('sUserId').value = '';
+  document.getElementById('sBenefitName').value = '';
+  document.getElementById('sAssetName').value = '';
+  document.getElementById('sPhone').value = '';
+  document.getElementById('sAssetNo').value = '';
+  document.getElementById('sType').value = 'all';
+  document.getElementById('sDateStart').value = '';
+  document.getElementById('sDateEnd').value = '';
+  applyFilter();
+}
+
+// ── 渲染 ──
+function renderList(){
+  var total = filteredList.length;
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('identityCount').textContent = filteredList.filter(function(r){return r.type==='identity'}).length;
+  document.getElementById('ticketCount').textContent = filteredList.filter(function(r){return r.type==='ticket'}).length;
+
+  var totalPages = Math.ceil(total / pageSize) || 1;
+  var start = (currentPage - 1) * pageSize;
+  var paged = filteredList.slice(start, start + pageSize);
+  var body = document.getElementById('listBody');
+  var empty = document.getElementById('emptyState');
+
+  if(paged.length === 0){
+    body.innerHTML = '';
+    empty.style.display = 'block';
+    renderPagination(0);
+    return;
+  }
+  empty.style.display = 'none';
+
+  body.innerHTML = paged.map(function(r, i){
+    var idx = start + i + 1;
+    var tagCls = r.type === 'identity' ? 'tag-identity' : 'tag-ticket';
+    var phoneIcon = '<svg class="phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+    return '<tr>'+
+      '<td style="color:#bbb;font-family:monospace;font-size:12px;text-align:center">'+idx+'</td>'+
+      '<td class="cell-id">'+r.id+'</td>'+
+      '<td><div class="cell-user">'+r.userName+'</div><div class="cell-user-sub">'+r.user+' <span style="color:#ddd">|</span> '+phoneIcon+' '+r.phone+'</div></td>'+
+      '<td><div class="cell-asset">'+r.assetName+(r.assetSpec?' · '+r.assetSpec:'')+'</div><div class="cell-asset-sub">'+r.assetNo+'</div></td>'+
+      '<td class="cell-benefit">'+r.title+'</td>'+
+      '<td><span class="tag '+tagCls+'">'+r.label+'</span></td>'+
+      '<td class="cell-issuer">'+(r.operator||'-')+'</td>'+
+      '<td class="cell-time">'+formatTime(r.time)+'</td>'+
+      '<td><button class="detail-btn" onclick="showDetail(\''+r.id+'\')">详情</button></td>'+
+      '</tr>';
+  }).join('');
+  renderPagination(totalPages);
+}
+
+function renderPagination(totalPages){
+  var el = document.getElementById('pagination');
+  if(totalPages <= 1){ el.innerHTML = ''; return; }
+  var h = '';
+  h += '<button class="page-btn" onclick="goPage('+(currentPage-1)+')"'+(currentPage<=1?' disabled':'')+'>‹ 上一页</button>';
+  for(var i=1; i<=totalPages; i++){
+    h += '<button class="page-btn'+(i===currentPage?' active':'')+'" onclick="goPage('+i+')">'+i+'</button>';
+  }
+  h += '<button class="page-btn" onclick="goPage('+(currentPage+1)+')"'+(currentPage>=totalPages?' disabled':'')+'>下一页 ›</button>';
+  h += '<span class="page-info">第 '+currentPage+'/'+totalPages+' 页</span>';
+  el.innerHTML = h;
+}
+
+function goPage(p){
+  var total = filteredList.length;
+  var totalPages = Math.ceil(total / pageSize) || 1;
+  if(p < 1 || p > totalPages) return;
+  currentPage = p;
+  renderList();
+}
+
+function formatTime(t){
+  var d = new Date(t);
+  var m = (d.getMonth()+1).toString().padStart(2,'0');
+  var day = d.getDate().toString().padStart(2,'0');
+  var h = d.getHours().toString().padStart(2,'0');
+  var mi = d.getMinutes().toString().padStart(2,'0');
+  return d.getFullYear()+'-'+m+'-'+day+' '+h+':'+mi;
+}
+
+// ── 详情弹窗 ──
+function showDetail(id){
+  var r = allRecords.find(function(x){return x.id===id});
+  if(!r) return;
+  var h = '';
+  h += '<div class="detail-row"><span class="detail-label">核销编号</span><span class="detail-value" style="font-family:monospace;color:#888">'+r.id+'</span></div>';
+  h += '<div class="detail-row"><span class="detail-label">用户信息</span><span class="detail-value"><strong>'+r.userName+'</strong> ('+r.user+') '+r.phone+'</span></div>';
+  h += '<div class="detail-row"><span class="detail-label">数字资产</span><span class="detail-value">'+r.assetName+(r.assetSpec?' · '+r.assetSpec:'')+' <span style="font-family:monospace;color:#999">'+r.assetNo+'</span></span></div>';
+  h += '<div class="detail-row"><span class="detail-label">权益名称</span><span class="detail-value">'+r.title+'</span></div>';
+  h += '<div class="detail-row"><span class="detail-label">权益类型</span><span class="detail-value"><span class="tag '+(r.type==='identity'?'tag-identity':'tag-ticket')+'">'+r.label+'</span></span></div>';
+  h += '<div class="detail-row"><span class="detail-label">权益说明</span><span class="detail-value" style="color:#888">'+r.desc+'</span></div>';
+  h += '<div class="detail-row"><span class="detail-label">操作员</span><span class="detail-value">'+(r.operator||'-')+'</span></div>';
+  h += '<div class="detail-row"><span class="detail-label">核销时间</span><span class="detail-value">'+r.time+'</span></div>';
+  document.getElementById('detailBody').innerHTML = h;
+  document.getElementById('detailModal').classList.add('show');
+}
+
+// ── 退出 ──
+function doLogout(){
+  localStorage.removeItem('merchantLogin');
+  location.href = 'register.html';
+}
+
+// ── 初始化 ──
+(function(){
+  var login = JSON.parse(localStorage.getItem('merchantLogin') || '{}');
+  document.getElementById('merchantName').textContent = login.name || '未登录';
+})();
+applyFilter();
+</script>
+</body>
+</html>

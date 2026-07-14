@@ -13,8 +13,11 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
 
 /* ── 顶部头像区 ── */
 .profile-header{text-align:center;padding:40px 16px 32px}
-.profile-avatar-wrap{position:relative;width:72px;height:72px;margin:0 auto 14px}
+.profile-avatar-wrap{position:relative;width:72px;height:72px;margin:0 auto 14px;cursor:pointer}
 .profile-avatar{width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.4);display:block}
+.profile-avatar-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
+.profile-avatar-wrap:active .profile-avatar-overlay{opacity:1}
+.profile-avatar-overlay svg{width:22px;height:22px;color:#fff;display:block}
 .profile-name{font-size:18px;font-weight:700;color:#fff;margin-bottom:2px}
 .profile-account{font-size:12px;color:rgba(255,255,255,.65);display:flex;align-items:center;justify-content:center;gap:4px}
 .profile-account svg{width:12px;height:12px;display:block}
@@ -69,8 +72,12 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
 
 <!-- 顶部个人信息 -->
 <div class="profile-header">
-  <div class="profile-avatar-wrap">
-    <img class="profile-avatar" src="../asset/绍兴兰亭logo.png" alt="" onerror="this.style.display='none'">
+  <div class="profile-avatar-wrap" onclick="document.getElementById('avatarInput').click()">
+    <img class="profile-avatar" id="avatarImg" src="../asset/绍兴兰亭logo.png" alt="" onerror="this.style.display='none'">
+    <div class="profile-avatar-overlay">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+    </div>
+    <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="changeAvatar(event)">
   </div>
   <div class="profile-name" id="merchantName">-</div>
   <div class="profile-account">
@@ -160,8 +167,24 @@ function loadMerchantInfo(){
   var login = JSON.parse(localStorage.getItem('merchantLogin') || '{}');
   document.getElementById('merchantName').textContent = login.name || '未登录';
   document.getElementById('merchantAccount').textContent = login.account || '-';
+  // 加载保存的头像
+  var saved = localStorage.getItem('merchantAvatar');
+  if(saved) document.getElementById('avatarImg').src = saved;
 }
 loadMerchantInfo();
+
+// ── 头像更换 ──
+function changeAvatar(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    var dataUrl = ev.target.result;
+    document.getElementById('avatarImg').src = dataUrl;
+    localStorage.setItem('merchantAvatar', dataUrl);
+  };
+  reader.readAsDataURL(file);
+}
 
 // ── 退出 ──
 function showLogoutModal(){

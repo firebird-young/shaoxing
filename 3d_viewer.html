@@ -125,7 +125,7 @@ xhr.onload = function(){
       var model = gltf.scene;
       var box = new THREE.Box3().setFromObject(model);
       var size = box.getBoundingSphere(new THREE.Sphere()).radius;
-      var s = 2.2 / size;
+      var s = 1.0 / size;
       model.scale.set(s, s, s);
       var center = new THREE.Vector3();
       box.getCenter(center);

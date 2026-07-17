@@ -57,10 +57,10 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
 .t-sale-all{color:#2980b9;background:#E8F4FD}
 .t-sale-prior{color:#f0ad4e;background:#FFF8EC}
 .t-sale-lottery{color:#6c5ce7;background:#F3F0FF}
-.goods-card .info .issuer{font-size:10px;color:var(--ink-subtle);display:inline-block;padding:2px 8px;margin-top:-2px;background:var(--page-bg);border-radius:4px;align-self:flex-start}
 .goods-card .info .price{color:var(--accent);font-size:20px;font-weight:700}
 .goods-card .info .price small{font-size:11px;font-weight:400;color:var(--ink-subtle)}
 .goods-card .info .sold{color:var(--ink-subtle);font-size:10px}
+.goods-card .info .issuer{color:var(--ink-subtle);font-size:10px;display:inline-block;padding:2px 8px;background:#f5f5f5;border-radius:4px;align-self:flex-start;margin-top:auto}
 
 .empty-state{text-align:center;padding:60px 0;color:var(--ink-subtle);font-size:14px;display:none}
 
@@ -115,10 +115,6 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
     <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
     <span>首页</span>
   </button>
-  <button class="ni" onclick="window.location.href='my_assets.html'">
-    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 16 7 12 15 8 7 12 2"/><line x1="12" y1="15" x2="12" y2="22"/><line x1="8" y1="19" x2="16" y2="19"/></svg></span>
-    <span>资产</span>
-  </button>
   <button class="ni on">
     <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><line x1="6" y1="16" x2="6" y2="20"/><line x1="10" y1="12" x2="10" y2="20"/><line x1="14" y1="8" x2="14" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/></svg></span>
     <span>市场</span>
@@ -160,9 +156,9 @@ function render(){
       '<div class="info">'+
         '<h4>'+a.name+'</h4>'+
         '<div class="tags"><span class="'+a.saleCls+'">'+a.sale+'</span></div>'+
-        '<div class="issuer">'+a.issuer+'</div>'+
         '<div class="price">¥'+a.price+'</div>'+
         '<div class="sold">已售 '+a.sold+'/'+a.total+'</div>'+
+        '<div class="issuer">'+a.issuer+'</div>'+
       '</div>'+
     '</div>';
   }).join('');

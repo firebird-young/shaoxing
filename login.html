@@ -5,53 +5,63 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>登录</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: #e8e9ee; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; justify-content: center; }
-.page { max-width: 430px; min-width: 320px; min-height: 100vh; background: #f5f6fa; padding: 40px 28px; width: 100%; display: flex; flex-direction: column; justify-content: center; }
+:root{--accent:#3F8B6D;--accent-contrast:#fff;--bg:#fff;--ink:#222;--ink-muted:#555;--ink-subtle:#888;--border:#e0e0e0;--page-bg:#F0F0F0;--radius-sm:7px;--radius-card:7px;--radius-pill:9999px;--font-display:"Helvetica Neue",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;--font-body:"Inter",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(--ink-muted);display:flex;justify-content:center;min-height:100%}
+.page{max-width:430px;width:100%;min-height:100vh;background:linear-gradient(180deg,#3F8B6D 0%,#a8c9bb 25%,#f0f2f5 50%);padding:180px 28px 40px;position:relative;box-sizing:border-box;display:flex;flex-direction:column}
+@media(max-width:430px){.page{max-width:100%}}
 
-.logo-area { text-align: center; margin-bottom: 40px; }
-.logo-area .logo-icon { width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, #D70C1F, #F12B3D); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 30px; box-shadow: 0 8px 24px rgba(215,12,31,.25); }
-.logo-area h1 { font-size: 22px; font-weight: 700; color: #1a1a2e; }
-.logo-area p { font-size: 12px; color: #999; margin-top: 4px; }
+.login-back{position:absolute;top:16px;left:16px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(255,255,255,.2);border-radius:50%;z-index:10}
+.login-back svg{width:20px;height:20px;color:#fff;display:block}
+.logo-area{text-align:center;margin-bottom:24px}
+.logo-icon{width:200px;height:60px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center}
+.logo-icon img{width:100%;height:100%;object-fit:contain;display:block}
+.logo-icon img{width:100%;height:100%;object-fit:cover;display:block}
+.logo-area h1{font-size:20px;font-weight:700;color:#fff;margin-bottom:2px;letter-spacing:1px}
+.logo-area p{font-size:11px;color:rgba(255,255,255,.65)}
 
-.card { background: #fff; border-radius: 20px; padding: 28px 24px; box-shadow: 0 4px 24px rgba(0,0,0,.04); }
+.card{background:var(--bg);border-radius:20px;padding:28px 24px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
 
-.phone-row { display: flex; align-items: center; gap: 10px; border-bottom: 1.5px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 18px; transition: border-color .3s; }
-.phone-row:focus-within { border-color: #D70C1F; }
-.phone-prefix { font-size: 15px; font-weight: 600; color: #1a1a2e; flex-shrink: 0; }
-.phone-row input { flex: 1; border: none; outline: none; font-size: 16px; color: #333; letter-spacing: 1px; background: transparent; }
-.phone-row input::placeholder { color: #ccc; font-size: 14px; letter-spacing: 0; }
+.phone-row{display:flex;align-items:center;gap:10px;border-bottom:1.5px solid var(--border);padding-bottom:10px;margin-bottom:18px;transition:border-color .3s}
+.phone-row:focus-within{border-color:var(--accent)}
+.phone-prefix{font-size:15px;font-weight:600;color:var(--ink);flex-shrink:0}
+.phone-row input{flex:1;border:none;outline:none;font-size:16px;color:var(--ink);letter-spacing:1px;background:transparent}
+.phone-row input::placeholder{color:#ccc;font-size:14px;letter-spacing:0}
 
-.sms-row { display: flex; align-items: center; gap: 10px; border-bottom: 1.5px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 24px; transition: border-color .3s; }
-.sms-row:focus-within { border-color: #D70C1F; }
-.sms-row input { flex: 1; border: none; outline: none; font-size: 16px; color: #333; letter-spacing: 4px; background: transparent; }
-.sms-row input::placeholder { color: #ccc; font-size: 14px; letter-spacing: 0; }
-.sms-btn { height: 34px; padding: 0 16px; border: 1.5px solid #D70C1F; border-radius: 17px; background: #fff; color: #D70C1F; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0; transition: all .2s; }
-.sms-btn:active { background: #FFF2F3; }
-.sms-btn.counting { color: #ccc; border-color: #ddd; pointer-events: none; }
+.sms-row{display:flex;align-items:center;gap:10px;border-bottom:1.5px solid var(--border);padding-bottom:10px;margin-bottom:24px;transition:border-color .3s}
+.sms-row:focus-within{border-color:var(--accent)}
+.sms-row input{flex:1;border:none;outline:none;font-size:16px;color:var(--ink);letter-spacing:4px;background:transparent}
+.sms-row input::placeholder{color:#ccc;font-size:14px;letter-spacing:0}
+.sms-btn{height:34px;padding:0 16px;border:1.5px solid var(--accent);border-radius:17px;background:var(--bg);color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;transition:all .15s}
+.sms-btn:active{background:rgba(63,139,109,.06)}
+.sms-btn.counting{color:#ccc;border-color:#ddd;pointer-events:none}
 
-.btn-login { width: 100%; height: 50px; border: none; border-radius: 25px; background: linear-gradient(135deg, #D70C1F, #F12B3D); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; letter-spacing: 2px; box-shadow: 0 4px 16px rgba(215,12,31,.25); transition: all .2s; }
-.btn-login:active { opacity: .9; transform: scale(.98); }
-.btn-login:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; transform: none; }
+.btn-login{width:100%;height:50px;border:none;border-radius:25px;background:var(--accent);color:#fff;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:2px;box-shadow:0 4px 16px rgba(63,139,109,.3);transition:all .15s}
+.btn-login:active{opacity:.9;transform:scale(.98)}
+.btn-login:disabled{background:#ccc;box-shadow:none;cursor:not-allowed;transform:none}
 
-.agree-row { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 16px 0 0; font-size: 11px; color: #999; }
-.agree-row a { color: #D70C1F; text-decoration: none; }
-.checkbox { width: 14px; height: 14px; border: 1.5px solid #ddd; border-radius: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.checkbox.checked { background: #D70C1F; border-color: #D70C1F; }
-.checkbox svg { width: 10px; height: 10px; color: #fff; display: none; }
-.checkbox.checked svg { display: block; }
+.agree-row{display:flex;align-items:center;justify-content:center;gap:6px;margin:16px 0 0;font-size:11px;color:var(--ink-subtle)}
+.agree-row a{color:var(--accent);text-decoration:none}
+.checkbox{width:14px;height:14px;border:1.5px solid var(--border);border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.checkbox.checked{background:var(--accent);border-color:var(--accent)}
+.checkbox svg{width:10px;height:10px;color:#fff;display:none}
+.checkbox.checked svg{display:block}
 
-.toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(0,0,0,.78); color: #fff; font-size: 14px; padding: 12px 24px; border-radius: 8px; z-index: 200; opacity: 0; pointer-events: none; transition: opacity .25s; }
-.toast.show { opacity: 1; }
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.78);color:#fff;font-size:14px;padding:12px 24px;border-radius:8px;z-index:200;opacity:0;pointer-events:none;transition:opacity .25s}
+.toast.show{opacity:1}
 </style>
 </head>
 <body>
 <div class="page">
 
+<div class="login-back" onclick="location.href='user-index.html'">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+</div>
 <div class="logo-area">
-  <div class="logo-icon">🏛</div>
-  <h1>数字资产平台</h1>
-  <p>深圳文化产权交易所</p>
+  <div class="logo-icon">
+    <img src="asset/logo.png" alt="logo">
+  </div>
+
 </div>
 
 <div class="card">
@@ -139,6 +149,5 @@ function showToast(msg){
 
 toggleAgree();
 </script>
-
 </body>
 </html>

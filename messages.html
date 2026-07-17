@@ -5,89 +5,95 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>消息中心</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: #e8e9ee; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; justify-content: center; }
-.wrapper { display: flex; gap: 40px; align-items: flex-start; justify-content: center; padding: 40px 20px; }
-.page { flex-shrink: 0; }
-.page { max-width: 430px; min-width: 320px; min-height: 100vh; background: #f5f6fa; padding: 0 16px 20px; width: 100%; }
+:root{--accent:#3F8B6D;--accent-contrast:#fff;--bg:#fff;--ink:#222;--ink-muted:#555;--ink-subtle:#888;--border:#e0e0e0;--page-bg:#F0F0F0;--radius-sm:7px;--radius-card:7px;--radius-pill:9999px;--font-display:"Helvetica Neue",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;--font-body:"Inter",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(--ink-muted);display:flex;justify-content:center;min-height:100%}
+.page{max-width:430px;width:100%;min-height:100vh;background:linear-gradient(180deg,#3F8B6D 0%,#a8c9bb 8%,#f0f0f0 20%);padding:0 16px 80px;position:relative;box-sizing:border-box}
+@media(max-width:430px){.page{max-width:100%}}
 
-.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; }
-.nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.nav-back svg { width: 20px; height: 20px; color: #333; display: block; }
-.nav-title { font-size: 17px; font-weight: 700; color: #1a1a2e; }
-.read-all { font-size: 12px; color: #D70C1F; font-weight: 600; cursor: pointer; padding: 4px 8px; border-radius: 4px; }
-.read-all:active { opacity: .7; }
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.nav-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(255,255,255,.2);border-radius:50%}
+.nav-back svg{width:20px;height:20px;color:#fff;display:block}
+.nav-title{font-size:16px;font-weight:700;color:#fff}
+.read-all{font-size:12px;color:rgba(255,255,255,.7);font-weight:500;cursor:pointer;padding:4px 8px;border-radius:4px}
+.read-all:active{color:#fff}
 
-.tabs { display: flex; background: #fff; border-radius: 12px; padding: 4px; margin: 8px 0 16px; box-shadow: 0 1px 4px rgba(0,0,0,.03); }
-.tab { flex: 1; text-align: center; padding: 9px 0; font-size: 13px; color: #999; cursor: pointer; border-radius: 10px; font-weight: 500; transition: all .25s; }
-.tab.on { background: #D70C1F; color: #fff; font-weight: 600; }
-.tab .badge { display: inline-block; min-width: 16px; height: 16px; padding: 0 5px; border-radius: 8px; font-size: 10px; line-height: 16px; margin-left: 4px; }
-.tab.on .badge { background: rgba(255,255,255,.3); color: #fff; }
-.tab .badge { background: #f0f0f0; color: #999; }
+.tabs{display:flex;background:var(--bg);border-radius:12px;padding:4px;margin:4px 0 12px;box-shadow:0 1px 4px rgba(0,0,0,.03)}
+.tab{flex:1;text-align:center;padding:9px 0;font-size:12px;color:var(--ink-subtle);cursor:pointer;border-radius:10px;font-weight:500;transition:all .2s}
+.tab.on{background:var(--accent);color:#fff;font-weight:600}
+.tab .badge{display:inline-block;min-width:16px;height:16px;padding:0 5px;border-radius:8px;font-size:10px;line-height:16px;margin-left:4px;background:var(--page-bg);color:var(--ink-subtle)}
+.tab.on .badge{background:rgba(255,255,255,.25);color:#fff}
 
-/* ── 列表 ── */
-.msg-list { display: flex; flex-direction: column; gap: 8px; }
-.msg-card { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.02); cursor: pointer; transition: .15s; display: flex; align-items: center; gap: 12px; }
-.msg-card:active { background: #fafafa; }
-.msg-card-left { flex: 1; min-width: 0; }
-.msg-type { font-size: 10px; padding: 2px 8px; border-radius: 10px; display: inline-block; font-weight: 600; margin-bottom: 6px; }
-.type-platform { background: #E8F5E9; color: #2e7d32; }
-.type-activity { background: #FFF3E0; color: #e65100; }
-.msg-title { font-size: 14px; font-weight: 600; color: #1a1a2e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.msg-time { font-size: 10px; color: #bbb; margin-top: 4px; }
-.msg-dot { width: 8px; height: 8px; border-radius: 50%; background: #D70C1F; flex-shrink: 0; }
-.msg-arrow { color: #ccc; flex-shrink: 0; }
-.msg-arrow svg { width: 14px; height: 14px; display: block; }
+.msg-list{display:flex;flex-direction:column;gap:8px}
+.msg-card{background:var(--bg);border-radius:var(--radius-card);padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.02);cursor:pointer;transition:background .12s;display:flex;align-items:center;gap:10px}
+.msg-card:active{background:var(--page-bg)}
+.msg-card-left{flex:1;min-width:0}
+.msg-type{font-size:10px;padding:2px 8px;border-radius:10px;display:inline-block;font-weight:600;margin-bottom:4px}
+.type-platform{background:rgba(63,139,109,.1);color:var(--accent)}
+.type-activity{background:rgba(245,166,35,.1);color:#f5a623}
+.msg-title{font-size:13px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.msg-title.read{color:var(--ink-subtle);font-weight:400}
+.msg-time{font-size:10px;color:#bbb;margin-top:3px}
+.msg-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.msg-arrow{color:#ccc;flex-shrink:0}
+.msg-arrow svg{width:14px;height:14px;display:block}
 
-/* ── 详情页 ── */
-.detail-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; }
-.detail-bar .nav-title { flex: 1; text-align: center; }
-.detail-card { background: #fff; border-radius: 16px; padding: 20px 18px; box-shadow: 0 1px 6px rgba(0,0,0,.03); }
-.detail-type { margin-bottom: 12px; }
-.detail-title { font-size: 18px; font-weight: 700; color: #1a1a2e; margin-bottom: 10px; line-height: 1.4; }
-.detail-time { font-size: 11px; color: #bbb; margin-bottom: 20px; }
-.detail-body { font-size: 14px; color: #555; line-height: 1.8; }
-.detail-footer { margin-top: 30px; padding-top: 16px; border-top: 1px solid #f0f0f0; font-size: 11px; color: #ccc; text-align: center; }
+.detail-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.detail-bar .nav-title{flex:1;text-align:center}
+.detail-card{background:var(--bg);border-radius:var(--radius-card);padding:20px 18px;box-shadow:0 1px 6px rgba(0,0,0,.03)}
+.detail-type{margin-bottom:10px}
+.detail-title{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:8px;line-height:1.4}
+.detail-time{font-size:11px;color:#bbb;margin-bottom:16px}
+.detail-body{font-size:13px;color:var(--ink-muted);line-height:1.8}
+.detail-footer{margin-top:24px;padding-top:14px;border-top:1px solid var(--page-bg);font-size:11px;color:#ccc;text-align:center}
 
-.empty { text-align: center; padding: 60px 0; color: #ccc; font-size: 13px; }
+.empty{text-align:center;padding:60px 0;color:#ccc;font-size:13px}
 
-/* ── 功能说明面板 ── */
-.desc-panel { width: 640px; background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,.08); position: sticky; top: 20px; font-size: 13px; color: #555; line-height: 1.7; flex-shrink: 0; }
-.desc-panel h3 { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 12px; }
-.desc-panel h4 { font-size: 14px; font-weight: 600; color: #333; margin: 16px 0 8px; }
-.desc-panel ul { padding-left: 18px; }
-.desc-panel li { margin-bottom: 6px; }
-.desc-panel strong { color: #333; }
-.desc-panel .tag-demo { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 8px; font-weight: 600; }
-.desc-panel .tag-platform { background: #E8F5E9; color: #2e7d32; }
-.desc-panel .tag-activity { background: #FFF3E0; color: #e65100; }
-@media (max-width: 860px) { .wrapper { flex-direction: column; align-items: center; } .desc-panel { width: 100%; max-width: 430px; } }
+/* ── 功能说明按钮（与 asset_detail 一致） ── */
+.f-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(63,139,109,.15);border-radius:50%;border:none;color:#3F8B6D;font-size:16px;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,.1);position:fixed;top:12px;left:50%;margin-left:226px}
+.f-btn:active{background:rgba(63,139,109,.25)}
+
+/* ── 功能说明浮窗 ── */
+.f-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:92%;max-width:500px;max-height:85vh;overflow-y:auto;background:#fff;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.2);z-index:10000;padding:20px;display:none}
+.f-modal.show{display:block}
+.f-modal .fm-title{font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;cursor:grab;padding-bottom:10px;border-bottom:1px solid #eee}
+.f-modal .fm-title:active{cursor:grabbing}
+.f-modal .fm-close{width:28px;height:28px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:#666;border:none;flex-shrink:0}
+.f-modal .fm-close:hover{background:#e8e8e8}
+.f-modal .fm-body{font-size:12px;color:#555;line-height:1.7}
+.f-modal .fm-body h4{font-size:13px;font-weight:700;color:#1a1a2e;margin:16px 0 6px}
+.f-modal .fm-body h4:first-child{margin-top:0}
+.f-modal .fm-body p{margin:0 0 8px}
+.f-modal .fm-body ul{padding-left:16px;margin:0 0 10px}
+.f-modal .fm-body li{margin-bottom:3px}
+.f-modal .fm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9999;display:none}
+.f-modal .fm-overlay.show{display:block}
 </style>
 </head>
 <body>
-<div class="wrapper">
 <div class="page" id="mainPage">
 
-<!-- ═══ 列表视图 ═══ -->
 <div id="listView">
   <div class="top-bar">
     <div class="nav-back" onclick="history.back()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
     </div>
     <div class="nav-title">消息中心</div>
-    <div class="read-all" onclick="markAllRead()">全部已读</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="read-all" onclick="markAllRead()">全部已读</div>
+
+    </div>
   </div>
 
   <div class="tabs">
-    <div class="tab on" id="tabAll" onclick="switchTab('all')">全部消息<span class="badge" id="badgeAll">7</span></div>
-    <div class="tab" id="tabPlatform" onclick="switchTab('platform')">平台消息<span class="badge" id="badgePlatform">3</span></div>
-    <div class="tab" id="tabActivity" onclick="switchTab('activity')">活动消息<span class="badge" id="badgeActivity">4</span></div>
+    <div class="tab on" id="tabAll" onclick="switchTab('all')">全部消息<span class="badge" id="badgeAll">0</span></div>
+    <div class="tab" id="tabPlatform" onclick="switchTab('platform')">平台消息<span class="badge" id="badgePlatform">0</span></div>
+    <div class="tab" id="tabActivity" onclick="switchTab('activity')">活动消息<span class="badge" id="badgeActivity">0</span></div>
   </div>
 
   <div class="msg-list" id="msgList"></div>
 </div>
 
-<!-- ═══ 详情视图 ═══ -->
 <div id="detailView" style="display:none">
   <div class="detail-bar">
     <div class="nav-back" onclick="goBackList()">
@@ -101,44 +107,22 @@ body { margin: 0; background: #e8e9ee; font-family: -apple-system, 'PingFang SC'
 
 </div>
 
-<!-- 功能说明面板 -->
-<div class="desc-panel" id="descPanel">
-  <h3>📖 功能说明</h3>
-
-  <h4>一、消息列表</h4>
-  <ul>
-    <li>顶部展示"消息中心"标题，左侧返回按钮，点击后返回首页，右侧"全部已读"一键标记全部消息为已读状态</li>
-    <li>消息按类别分三个 Tab 切换：<strong>全部消息</strong>、<span class="tag-demo tag-platform">平台消息</span>、<span class="tag-demo tag-activity">活动消息</span>，每个 Tab 显示未读数量徽章</li>
-    <li>每条消息展示：类型标签、标题、发布时间</li>
-    <li>未读消息左侧显示红色圆点标记，已读消息标题变灰</li>
-    <li>列表按时间倒序排列</li>
-    <li>数据来源后台"消息管理"发布的消息</li>
-  </ul>
-
-  <h4>二、消息详情</h4>
-  <ul>
-    <li>点击列表项进入详情页，顶部展示返回按钮和"消息详情"标题</li>
-    <li>详情卡片展示：消息类型标签、消息标题、发布时间、消息正文（支持多段落和图片）</li>
-    <li>进入详情后自动标记为已读</li>
-  </ul>
-</div>
-</div>
+<!-- 全局功能说明按钮（手机框外面） -->
+<button class="f-btn" onclick="toggleFuncModal()" title="功能说明">📖</button>
 
 <script>
 var messages = [
-  { type:'platform', title:'系统版本更新通知', body:'数字资产平台 V3.2.0 版本已正式上线。\n\n本次更新主要内容：\n1. 新增资产转赠功能，支持持有资产一键转赠给其他用户\n2. 优化资产详情页展示，增加规格缩略图与核销状态可视化\n3. 消息中心全新改版，支持分类筛选与全部已读\n4. 修复若干已知 Bug，提升系统稳定性\n\n请及时更新至最新版本，享受更流畅的数字资产交易体验。', time:'2026-06-10 10:00', read:false },
-  { type:'platform', title:'支付通道维护公告', body:'尊敬的用户：\n\n因汇付天下支付通道进行系统升级，平台将于 2026年6月12日 凌晨2:00 至 4:00 期间暂停所有支付及交易服务。\n\n请您提前做好资金安排，避免在维护期间发起交易。升级完成后将自动恢复。\n\n如有疑问，请联系客服。\n\n深圳文化产权交易所\n2026年6月9日', time:'2026-06-09 14:30', read:false },
-  { type:'platform', title:'钱包安全升级提示', body:'为保障您的数字资产安全，平台建议您完成以下安全设置：\n\n1. 开启二次身份验证（2FA）\n2. 定期更新支付密码，建议每90天更换一次\n3. 绑定安全手机号与邮箱\n4. 开启登录异常提醒\n\n请前往【我的-设置-账号安全】进行相关配置。', time:'2026-06-08 09:00', read:true },
-  { type:'activity', title:'三体数字资产重磅上新', body:'刘慈欣科幻巨著《三体》正版授权数字资产即将登陆！\n\n【发售时间】2026年6月12日 10:00\n【发行数量】限量666份\n【发行方】三体\n【销售类型】优先购\n【售价】¥699\n\n三体文明系列数字资产，以"黑暗森林法则""降维打击""面壁者计划"等经典概念为设计灵感，融合宇宙科幻美学，是科幻迷与数字资产爱好者的不二之选。', time:'2026-06-11 08:00', read:false },
-  { type:'activity', title:'茅台1935兑换通道开启', body:'茅台1935·时光窖藏实物酒兑换通道现已开启！\n\n持有【茅台1935·时光窖藏】系列数字资产的用户，若该资产未核销「实物酒兑换」权益，可前往【我的资产】页面点击对应资产进行操作。\n\n兑换流程：\n1. 进入「我的资产」\n2. 选择茅台1935·时光窖藏系列\n3. 展开权益列表，点击「实物酒兑换」\n4. 填写收货地址，提交核销\n\n实物茅台1935将在1-3个工作日内安排发货。', time:'2026-06-10 16:00', read:false },
-  { type:'activity', title:'鬼吹灯·摸金系列预告', body:'鬼吹灯正版授权数字资产即将登陆平台！\n\n摸金校尉系列典藏款数字资产，以经典盗墓探险IP为创作蓝本，融合"寻龙诀""雮尘珠""精绝古城"等元素，打造沉浸式数字收藏体验。\n\n敬请期待发售信息，关注平台公告获取第一手资讯。', time:'2026-06-09 12:00', read:true },
-  { type:'activity', title:'平台周年庆活动预告', body:'庆祝深圳文化产权交易所数字资产平台上线一周年！\n\n【活动时间】2026年6月15日-6月21日\n\n周年庆期间将推出以下系列活动：\n1. 限时优惠券大放送，满减优惠享不停\n2. 幸运大转盘抽奖，100%中奖\n3. 新用户注册即送数字徽章\n4. 转赠免手续费（活动期间）\n5. 老用户专属空投福利\n\n多重好礼，敬请期待！', time:'2026-06-07 10:00', read:true }
+  { type:'platform', title:'系统版本更新通知', body:'数字资产平台 V3.2.0 版本已正式上线。\n\n本次更新主要内容：\n1. 新增资产转赠功能\n2. 优化资产详情页展示\n3. 消息中心全新改版\n4. 修复若干已知 Bug\n\n请及时更新至最新版本。', time:'2026-07-15 10:00', read:false },
+  { type:'platform', title:'兰亭雅集优先购资格通知', body:'恭喜您获得【兰亭雅集·优享版】优先购资格！\n\n【发售时间】2026年7月18日 10:00\n【发售价格】¥399\n【限量】666份\n\n请在发售时间内前往市场页面购买，逾期资格将自动失效。', time:'2026-07-14 14:30', read:false },
+  { type:'platform', title:'支付通道维护公告', body:'因支付通道进行系统升级，平台将于 2026年7月16日 凌晨2:00 至 4:00 期间暂停支付服务。\n\n请您提前做好资金安排。', time:'2026-07-13 09:00', read:true },
+  { type:'activity', title:'兰亭碑刻优先购活动', body:'【兰亭碑刻】限量888份优先购即将开启！\n\n发售时间：2026年7月20日 10:00\n发行方：绍兴兰亭产业数资\n售价：¥299\n\n绍兴兰亭文化数字资产系列，以千年书法圣地为主题，融合传统美学与现代数字技术，打造独一无二的数字收藏体验。', time:'2026-07-16 08:00', read:false },
+  { type:'activity', title:'曲水流觞首发预告', body:'古越龙山携手绍兴数资平台，重磅推出【曲水流觞】数字资产！\n\n【发售信息】\n时间：2026年7月22日 10:00\n价格：¥259\n限量：666份\n\n以兰亭雅集"曲水流觞"典故为设计灵感，融合黄酒文化元素，极具收藏价值。', time:'2026-07-15 16:00', read:false },
+  { type:'activity', title:'兰亭春禊限时优惠', body:'【兰亭春禊】限时优惠活动进行中！\n\n活动期间购买兰亭春禊数字资产，可享受以下福利：\n1. 满2件享9折优惠\n2. 赠送兰亭主题数字徽章\n3. 参与抽奖有机会获得实物文创礼品\n\n活动时间：2026年7月17日-7月24日', time:'2026-07-14 12:00', read:true },
+  { type:'activity', title:'平台周年庆活动预告', body:'庆祝平台上线一周年！\n\n【活动时间】2026年7月25日-7月31日\n\n周年庆期间将推出：\n1. 限时优惠券大放送\n2. 幸运大转盘抽奖\n3. 新用户注册即送数字徽章\n4. 老用户专属空投福利\n\n敬请期待！', time:'2026-07-12 10:00', read:true }
 ];
 
 var currentTab = 'all';
-var detailId = null;
 
-// ═══ 列表 ═══
 function switchTab(tab){
   currentTab = tab;
   document.getElementById('tabAll').className = 'tab' + (tab==='all'?' on':'');
@@ -150,20 +134,17 @@ function switchTab(tab){
 function renderList(){
   var list = currentTab==='all' ? messages.slice() : messages.filter(function(m){ return m.type === currentTab; });
   list.sort(function(a,b){ return b.time.localeCompare(a.time); });
-
   if(!list.length){
     document.getElementById('msgList').innerHTML = '<div class="empty">暂无消息</div>';
     return;
   }
-
   var h = '';
-  list.forEach(function(m, i){
+  list.forEach(function(m){
     var idx = messages.indexOf(m);
-    // 当前tab内的索引映射到全局索引
     h += '<div class="msg-card" onclick="openDetail('+idx+')">';
     h += '<div class="msg-card-left">';
     h += '<span class="msg-type '+(m.type==='platform'?'type-platform':'type-activity')+'">'+(m.type==='platform'?'平台消息':'活动消息')+'</span>';
-    h += '<div class="msg-title" style="'+(m.read?'color:#999;font-weight:400':'')+'">'+m.title+'</div>';
+    h += '<div class="msg-title'+(m.read?' read':'')+'">'+m.title+'</div>';
     h += '<div class="msg-time">'+m.time+'</div>';
     h += '</div>';
     if(!m.read) h += '<div class="msg-dot"></div>';
@@ -173,21 +154,17 @@ function renderList(){
   document.getElementById('msgList').innerHTML = h;
 }
 
-// ═══ 详情 ═══
 function openDetail(idx){
   var m = messages[idx];
   m.read = true;
-  detailId = idx;
-
   var h = '<div class="detail-card">';
   h += '<span class="msg-type '+(m.type==='platform'?'type-platform':'type-activity')+' detail-type">'+(m.type==='platform'?'平台消息':'活动消息')+'</span>';
   h += '<div class="detail-title">'+m.title+'</div>';
   h += '<div class="detail-time">'+m.time+'</div>';
   h += '<div class="detail-body">'+m.body.replace(/\n/g,'<br>')+'</div>';
-  h += '<div class="detail-footer">—— 深圳文化产权交易所 · 数字资产平台 ——</div>';
+  h += '<div class="detail-footer">—— 绍兴数资平台 ——</div>';
   h += '</div>';
   document.getElementById('detailContent').innerHTML = h;
-
   document.getElementById('listView').style.display = 'none';
   document.getElementById('detailView').style.display = 'block';
   updateBadges();
@@ -200,7 +177,6 @@ function goBackList(){
   updateBadges();
 }
 
-// ═══ 全部已读 ═══
 function markAllRead(){
   var list = messages.filter(function(m){ return m.type === currentTab && !m.read; });
   list.forEach(function(m){ m.read = true; });
@@ -219,7 +195,62 @@ function updateBadges(){
 
 renderList();
 updateBadges();
+
+// ── 功能说明浮窗 ──
+function toggleFuncModal(){
+  var m = document.getElementById('funcModal');
+  var o = document.getElementById('fmOverlay');
+  m.classList.toggle('show');
+  o.classList.toggle('show');
+  if(m.classList.contains('show') && !m.dataset.dragged){
+    m.style.left = '50%'; m.style.top = '50%'; m.style.transform = 'translate(-50%,-50%)';
+  }
+}
+(function(){
+  var modal, titleBar, offX, offY, dragging = false;
+  document.addEventListener('DOMContentLoaded', function(){
+    modal = document.getElementById('funcModal');
+    titleBar = modal.querySelector('.fm-title');
+    titleBar.addEventListener('mousedown', startDrag);
+    titleBar.addEventListener('touchstart', startDragTouch, {passive:true});
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', onDragTouch, {passive:true});
+    document.addEventListener('touchend', endDrag);
+  });
+  function startDrag(e){ modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = e.clientX - rect.left; offY = e.clientY - rect.top; dragging = true; titleBar.style.cursor = 'grabbing'; }
+  function startDragTouch(e){ var t = e.touches[0]; modal.dataset.dragged = '1'; modal.style.transform = ''; var rect = modal.getBoundingClientRect(); offX = t.clientX - rect.left; offY = t.clientY - rect.top; dragging = true; }
+  function onDrag(e){ if(!dragging) return; modal.style.left = (e.clientX - offX) + 'px'; modal.style.top = (e.clientY - offY) + 'px'; }
+  function onDragTouch(e){ if(!dragging) return; var t = e.touches[0]; modal.style.left = (t.clientX - offX) + 'px'; modal.style.top = (t.clientY - offY) + 'px'; }
+  function endDrag(){ dragging = false; if(titleBar) titleBar.style.cursor = 'grab'; }
+})();
 </script>
+
+<!-- ====== 功能说明浮窗 ====== -->
+<div class="fm-overlay" id="fmOverlay" onclick="toggleFuncModal()"></div>
+<div class="f-modal" id="funcModal">
+  <div class="fm-title">
+    <span>📖 功能说明</span>
+    <button class="fm-close" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div class="fm-body">
+    <h4>一、消息列表</h4>
+    <ul>
+      <li>顶部展示"消息中心"标题，左侧返回按钮，右侧"全部已读"一键标记全部消息为已读状态，📖 按钮可查看本功能说明</li>
+      <li>消息按类别分三个 Tab 切换：<strong>全部消息</strong>、<strong>平台消息</strong>、<strong>活动消息</strong>，每个 Tab 显示未读数量徽章</li>
+      <li>每条消息展示：类型标签、标题、发布时间</li>
+      <li>未读消息左侧显示绿色圆点标记，已读消息标题变灰</li>
+      <li>列表按时间倒序排列</li>
+      <li>数据来源后台"消息管理"发布的消息</li>
+    </ul>
+    <h4>二、消息详情</h4>
+    <ul>
+      <li>点击列表项进入详情页，顶部展示返回按钮和"消息详情"标题</li>
+      <li>详情卡片展示：消息类型标签、消息标题、发布时间、消息正文</li>
+      <li>进入详情后自动标记为已读</li>
+    </ul>
+  </div>
+</div>
 
 </body>
 </html>

@@ -5,116 +5,88 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>实名认证</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; flex-direction: column; align-items: center; }
-.page { max-width: 430px; min-height: 100vh; background: #f6f7fb; position: relative; width: 100%; }
-.reset-btn { margin: 10px 0 6px; height: 32px; padding: 0 20px; border: 1px dashed rgba(255,255,255,0.3); border-radius: 16px; background: transparent; color: rgba(255,255,255,0.4); font-size: 11px; cursor: pointer; transition: all 0.2s; }
-.reset-btn:hover { border-color: rgba(255,255,255,0.6); color: rgba(255,255,255,0.8); }
+:root{--accent:#3F8B6D;--accent-contrast:#fff;--bg:#fff;--ink:#222;--ink-muted:#555;--ink-subtle:#888;--border:#e0e0e0;--page-bg:#F0F0F0;--radius-sm:7px;--radius-card:7px;--radius-pill:9999px;--font-display:"Helvetica Neue",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;--font-body:"Inter",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(--ink-muted);display:flex;justify-content:center;min-height:100%}
+.page{max-width:430px;width:100%;min-height:100vh;background:linear-gradient(180deg,#3F8B6D 0%,#a8c9bb 8%,#f0f0f0 20%);padding:0;padding-bottom:80px;position:relative;box-sizing:border-box}
+@media(max-width:430px){.page{max-width:100%}}
 
-/* ── 顶部导航 ── */
-.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #fff; border-bottom: 1px solid #f0f0f0; }
-.nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.nav-back svg { width: 20px; height: 20px; color: #333; display: block; }
-.nav-title { flex: 1; text-align: center; font-size: 16px; font-weight: 600; color: #1a1a2e; }
-.nav-placeholder { width: 32px; }
+/* ── 顶部 ── */
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+.nav-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(255,255,255,.2);border-radius:50%}
+.nav-back svg{width:20px;height:20px;display:block;color:#fff}
+.nav-title{flex:1;text-align:center;font-size:16px;font-weight:700;color:#fff}
+.nav-placeholder{width:32px}
 
-/* ── 表单区域 ── */
-.form-section { padding: 16px; }
-
-/* ── 表单标题 ── */
-.form-title { font-size: 14px; font-weight: 600; color: #1a1a2e; margin-bottom: 12px; }
-
-/* ── 表单项 ── */
-.form-item { background: #fff; border-radius: 12px; padding: 0 16px; height: 48px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
-.form-item:active { background: #fafafa; }
-.fi-label { font-size: 14px; color: #999; }
-.fi-value { font-size: 14px; color: #333; flex: 1; text-align: right; margin-left: 16px; }
-.fi-arrow svg { width: 16px; height: 16px; color: #ccc; }
-
-/* ── 输入框样式 ── */
-.fi-input { flex: 1; text-align: right; margin-left: 16px; border: none; outline: none; font-size: 14px; color: #333; background: transparent; }
-.fi-input::placeholder { color: #bbb; }
+/* ── 表单 ── */
+.form-section{padding:16px}
+.form-title{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:10px}
+.form-item{background:var(--bg);border-radius:12px;padding:0 14px;height:48px;display:flex;align-items:center;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.fi-label{font-size:13px;color:var(--ink-subtle);white-space:nowrap;flex-shrink:0}
+.fi-input{flex:1;border:none;outline:none;font-size:14px;color:var(--ink);background:transparent;text-align:right;margin-left:12px}
+.fi-input::placeholder{color:#bbb}
 
 /* ── 温馨提示 ── */
-.tip-box { background: #fffef5; border-radius: 12px; padding: 14px 16px; margin-top: 12px; margin-bottom: 16px; }
-.tip-icon { width: 20px; height: 20px; border-radius: 50%; background: #ffb300; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; float: left; margin-right: 10px; }
-.tip-text { font-size: 12px; color: #666; line-height: 1.6; }
+.tip-box{background:rgba(63,139,109,.06);border-radius:12px;padding:14px 16px;margin-top:4px;margin-bottom:16px;border:1px solid rgba(63,139,109,.1)}
+.tip-icon{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;float:left;margin-right:10px}
+.tip-text{font-size:12px;color:var(--ink-muted);line-height:1.7}
 
-/* ── 同意勾选 ── */
-.agree-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
-.agree-checkbox { width: 18px; height: 18px; border: 2px solid #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.agree-checkbox.checked { background: #D70C1F; border-color: #D70C1F; }
-.agree-checkbox svg { width: 12px; height: 12px; color: #fff; display: none; }
-.agree-checkbox.checked svg { display: block; }
-.agree-text { font-size: 12px; color: #666; }
-.agree-text a { color: #D70C1F; text-decoration: none; }
+/* ── 勾选 ── */
+.agree-row{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.agree-checkbox{width:18px;height:18px;border:2px solid var(--border);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.agree-checkbox.checked{background:var(--accent);border-color:var(--accent)}
+.agree-checkbox svg{width:12px;height:12px;color:#fff;display:none}
+.agree-checkbox.checked svg{display:block}
+.agree-text{font-size:12px;color:var(--ink-muted)}
+.agree-text a{color:var(--accent);text-decoration:none}
 
-/* ── 提交按钮 ── */
-.submit-btn { width: 100%; height: 48px; border-radius: 24px; background: #D70C1F; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
-.submit-btn:active { opacity: 0.85; }
-.submit-btn:disabled { background: #ccc; cursor: not-allowed; }
+/* ── 提交 ── */
+.submit-btn{width:100%;height:48px;border-radius:var(--radius-pill);background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.submit-btn:active{opacity:.85}
+.submit-btn:disabled{background:#ccc;cursor:not-allowed}
 
-/* ── 已认证状态 ── */
-.auth-success { display: none; padding: 40px 16px; text-align: center; }
-.auth-success.show { display: block; }
-.success-icon { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #07c160, #06ad56); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
-.success-icon svg { width: 40px; height: 40px; color: #fff; }
-.success-title { font-size: 18px; font-weight: 600; color: #1a1a2e; margin-bottom: 8px; }
-.success-desc { font-size: 14px; color: #999; margin-bottom: 24px; }
+/* ── 已认证 ── */
+.auth-success{display:none;padding:40px 16px;text-align:center}
+.auth-success.show{display:block}
+.success-icon{width:72px;height:72px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.success-icon svg{width:36px;height:36px;color:#fff}
+.success-title{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.success-desc{font-size:13px;color:var(--ink-subtle);margin-bottom:20px}
+.info-card{background:var(--bg);border-radius:var(--radius-card);padding:16px;margin-bottom:16px;box-shadow:0 1px 6px rgba(0,0,0,.04);text-align:left}
+.info-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--page-bg);font-size:13px}
+.info-row:last-child{border-bottom:none}
+.info-label{color:var(--ink-subtle)}
+.info-value{font-weight:600;color:var(--ink)}
+.confirm-btn{width:100%;height:48px;border-radius:var(--radius-pill);background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.confirm-btn:active{opacity:.85}
 
-/* ── 已认证信息卡片 ── */
-.info-card { background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
-.info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f5f5f7; }
-.info-row:last-child { border-bottom: none; }
-.info-label { font-size: 14px; color: #999; }
-.info-value { font-size: 14px; font-weight: 500; color: #1a1a2e; }
-
-/* ── 确定按钮 ── */
-.confirm-btn { width: 100%; height: 48px; border-radius: 24px; background: #D70C1F; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
-.confirm-btn:active { opacity: 0.85; }
-
-/* ── 自动跳转提示 ── */
-.redirect-tip { font-size: 12px; color: #999; margin-top: 16px; }
-
-/* ── 验证码弹窗 ── */
-.captcha-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 999; padding: 20px; }
-.captcha-overlay.show { display: flex; }
-.captcha-box { background: #fff; border-radius: 20px; padding: 24px; width: 100%; max-width: 340px; }
-.captcha-title { font-size: 16px; font-weight: 600; color: #1a1a2e; text-align: center; margin-bottom: 20px; }
-.captcha-close { position: absolute; top: 16px; right: 16px; width: 28px; height: 28px; border-radius: 50%; background: #f5f5f7; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.captcha-close svg { width: 14px; height: 14px; color: #666; }
-
-/* ── 滑块容器 ── */
-.slider-container { position: relative; height: 120px; background: #f5f5f7; border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
-.slider-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #999; }
-
-/* ── 滑块轨道 ── */
-.slider-track { position: absolute; bottom: 16px; left: 16px; right: 16px; height: 40px; background: #fff; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-
-/* ── 滑块缺口 ── */
-.slider-gap { position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; background: #f5f5f7; border-radius: 12px; border: 2px dashed #ddd; }
-
-/* ── 滑块按钮 ── */
-.slider-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; cursor: grab; transition: box-shadow 0.2s; }
-.slider-btn:active { cursor: grabbing; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-.slider-btn svg { width: 20px; height: 20px; color: #666; }
-
-/* ── 验证提示 ── */
-.captcha-tip { text-align: center; font-size: 12px; color: #999; }
-.captcha-tip.success { color: #07c160; }
-.captcha-tip.error { color: #D70C1F; }
-
-/* ── 加载状态 ── */
-.loading-text { font-size: 14px; color: #666; text-align: center; }
+/* ── 滑块验证 ── */
+.captcha-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999;padding:20px}
+.captcha-overlay.show{display:flex}
+.captcha-box{background:var(--bg);border-radius:16px;padding:24px;width:100%;max-width:340px;position:relative;text-align:center}
+.captcha-close{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;background:var(--page-bg);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none}
+.captcha-close svg{width:14px;height:14px;color:var(--ink-subtle)}
+.captcha-title{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:16px}
+.slider-container{position:relative;height:120px;background:var(--page-bg);border-radius:12px;overflow:hidden;margin-bottom:12px}
+.slider-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-subtle)}
+.slider-track{position:absolute;bottom:16px;left:16px;right:16px;height:40px;background:var(--bg);border-radius:20px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.slider-gap{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;background:var(--page-bg);border-radius:12px;border:2px dashed var(--border)}
+.slider-btn{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;background:var(--accent);border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;cursor:grab;transition:box-shadow .15s;left:0}
+.slider-btn:active{cursor:grabbing;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.slider-btn svg{width:20px;height:20px;color:#fff}
+.captcha-tip{text-align:center;font-size:12px;color:var(--ink-subtle)}
+.captcha-tip.success{color:var(--accent)}
+.captcha-tip.error{color:#e74c3c}
+.reset-btn{margin:10px 0 6px 10px;height:32px;padding:0 20px;border:1px dashed rgba(0,0,0,.2);border-radius:16px;background:transparent;color:rgba(0,0,0,.3);font-size:11px;cursor:pointer;transition:all .15s}
+.reset-btn:hover{border-color:rgba(0,0,0,.4);color:rgba(0,0,0,.5)}
 </style>
 </head>
 <body>
 <button class="reset-btn" onclick="resetAll()">清空开通</button>
 <div class="page">
 
-<!-- 顶部导航 -->
 <div class="top-bar">
-  <div class="nav-back" onclick="goBack()">
+  <div class="nav-back" onclick="location.href='my.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
   </div>
   <div class="nav-title">实名认证</div>
@@ -123,77 +95,58 @@ body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC'
 
 <!-- 未认证表单 -->
 <div class="form-section" id="authForm">
-  <div class="form-title">请输入真实姓名</div>
+  <div class="form-title">真实姓名</div>
   <div class="form-item">
-    <span class="fi-label">请输入姓名</span>
-    <input type="text" class="fi-input" id="realName" placeholder="请输入姓名">
-    <div class="fi-arrow">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
+    <span class="fi-label">姓名</span>
+    <input class="fi-input" id="realName" placeholder="请输入姓名">
   </div>
-
-  <div class="form-title">请输入身份证号</div>
+  <div class="form-title">身份证号</div>
   <div class="form-item">
-    <span class="fi-label">请输入身份证号</span>
-    <input type="text" class="fi-input" id="idCard" placeholder="请输入身份证号">
-    <div class="fi-arrow">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
+    <span class="fi-label">身份证号</span>
+    <input class="fi-input" id="idCard" placeholder="请输入18位身份证号">
   </div>
-
   <div class="tip-box">
     <div class="tip-icon">!</div>
-    <div class="tip-text">根据国家相关法规，为保障交易安全，所有用户均需完成实名认证。本平台仅向已实名认证的成年用户提供服务。认证完成后，您的钱包账户将与实名信息永久绑定，请您务必填写真实信息。</div>
+    <div class="tip-text">根据国家相关法规，为保障交易安全，所有用户均需完成实名认证。认证完成后将与账户永久绑定，请填写真实信息。</div>
   </div>
-
   <div class="agree-row">
     <div class="agree-checkbox" id="agreeCheckbox" onclick="toggleAgree()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
-    <span class="agree-text">同意并授权将填写的信息用于账号的实名认证</span>
+    <span class="agree-text">同意并授权用于实名认证</span>
   </div>
-
   <button class="submit-btn" id="submitBtn" onclick="showCaptcha()">同意授权并认证</button>
 </div>
 
-<!-- 已认证状态 -->
+<!-- 已认证 -->
 <div class="auth-success" id="authSuccess">
   <div class="success-icon">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
   </div>
   <div class="success-title">已实名认证</div>
-  <div class="success-desc">实名认证成功</div>
-  
+  <div class="success-desc">认证信息如下</div>
   <div class="info-card">
-    <div class="info-row">
-      <span class="info-label">姓名</span>
-      <span class="info-value" id="showName">张无忌</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label">身份证号</span>
-      <span class="info-value" id="showIdCard">51160***********25</span>
-    </div>
+    <div class="info-row"><span class="info-label">姓名</span><span class="info-value" id="showName">-</span></div>
+    <div class="info-row"><span class="info-label">身份证号</span><span class="info-value" id="showIdCard">-</span></div>
   </div>
-
   <button class="confirm-btn" onclick="goBack()">确定</button>
-  <div class="redirect-tip" id="redirectTip">3s后页面自动跳转</div>
 </div>
 
 </div>
 
-<!-- 验证码弹窗 -->
+<!-- 滑块验证弹窗 -->
 <div class="captcha-overlay" id="captchaOverlay">
   <div class="captcha-box">
-    <div class="captcha-close" onclick="closeCaptcha()">
+    <button class="captcha-close" onclick="closeCaptcha()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </div>
-    <div class="captcha-title">请完成滑块验证</div>
+    </button>
+    <div class="captcha-title">安全验证</div>
     <div class="slider-container" id="sliderContainer">
       <div class="slider-bg">拖动滑块完成验证</div>
       <div class="slider-track">
         <div class="slider-gap" id="sliderGap"></div>
         <div class="slider-btn" id="sliderBtn" onmousedown="startDrag(event)" ontouchstart="startDrag(event)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 5 12 19"/><polyline points="5 12 19 12"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 5 12 19"/><polyline points="5 12 19 12"/></svg>
         </div>
       </div>
     </div>
@@ -202,194 +155,97 @@ body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC'
 </div>
 
 <script>
-// 检查认证状态
-document.addEventListener('DOMContentLoaded', function() {
-  const isAuthenticated = localStorage.getItem('authenticated') === 'true';
-  const savedName = localStorage.getItem('realName');
-  const savedIdCard = localStorage.getItem('idCard');
-  
-    if (isAuthenticated) {
-    document.getElementById('authForm').style.display = 'none';
+document.addEventListener('DOMContentLoaded',function(){
+  if(localStorage.getItem('authenticated')==='true'){
+    document.getElementById('authForm').style.display='none';
     document.getElementById('authSuccess').classList.add('show');
-    document.getElementById('redirectTip').style.display = 'none';
-    
-    if (savedName) {
-      document.getElementById('showName').textContent = savedName;
-    }
-    if (savedIdCard) {
-      document.getElementById('showIdCard').textContent = maskIdCard(savedIdCard);
-    }
+    var n=localStorage.getItem('realName');
+    var c=localStorage.getItem('idCard');
+    if(n) document.getElementById('showName').textContent=n;
+    if(c) document.getElementById('showIdCard').textContent=maskIdCard(c);
   }
 });
-
-function resetAll() {
+function goBack(){ location.href='my.html'; }
+function resetAll(){
   localStorage.removeItem('authenticated');
   localStorage.removeItem('realName');
   localStorage.removeItem('idCard');
   alert('已清空认证状态，页面将刷新');
   window.location.reload();
 }
-
-function goBack() {
-  window.location.href = 'my.html';
-}
-
-function toggleAgree() {
-  const checkbox = document.getElementById('agreeCheckbox');
-  checkbox.classList.toggle('checked');
-}
-
-function showCaptcha() {
-  const name = document.getElementById('realName').value.trim();
-  const idCard = document.getElementById('idCard').value.trim();
-  const agree = document.getElementById('agreeCheckbox').classList.contains('checked');
-  
-  if (!name) {
-    alert('请输入姓名');
-    return;
-  }
-  
-  if (!idCard) {
-    alert('请输入身份证号');
-    return;
-  }
-  
-  if (idCard.length !== 18) {
-    alert('请输入正确的身份证号码');
-    return;
-  }
-  
-  if (!agree) {
-    alert('请同意授权协议');
-    return;
-  }
-  
-  // 保存输入信息
-  localStorage.setItem('realName', name);
-  localStorage.setItem('idCard', idCard);
-  
-  // 显示验证码弹窗
+function toggleAgree(){ document.getElementById('agreeCheckbox').classList.toggle('checked'); }
+function showCaptcha(){
+  var n=document.getElementById('realName').value.trim();
+  var c=document.getElementById('idCard').value.trim();
+  var a=document.getElementById('agreeCheckbox').classList.contains('checked');
+  if(!n){alert('请输入姓名');return;}
+  if(!c||c.length!==18){alert('请输入正确的18位身份证号');return;}
+  if(!a){alert('请同意授权协议');return;}
+  localStorage.setItem('realName',n);
+  localStorage.setItem('idCard',c);
   document.getElementById('captchaOverlay').classList.add('show');
   initSlider();
 }
-
-function closeCaptcha() {
+function closeCaptcha(){
   document.getElementById('captchaOverlay').classList.remove('show');
-  document.getElementById('captchaTip').textContent = '请拖动滑块完成验证';
-  document.getElementById('captchaTip').className = 'captcha-tip';
+  document.getElementById('captchaTip').textContent='请拖动滑块完成验证';
+  document.getElementById('captchaTip').className='captcha-tip';
 }
-
-// 滑块验证相关变量
-let sliderBtn, sliderGap, sliderTrack, isDragging = false;
-let startX = 0, gapLeft = 0;
-
-function initSlider() {
-  sliderBtn = document.getElementById('sliderBtn');
-  sliderGap = document.getElementById('sliderGap');
-  sliderTrack = document.querySelector('.slider-track');
-  
-  // 随机设置缺口位置（距离左边30%-70%）
-  const trackWidth = sliderTrack.offsetWidth;
-  const gapWidth = sliderGap.offsetWidth;
-  const minLeft = trackWidth * 0.3;
-  const maxLeft = trackWidth * 0.7 - gapWidth;
-  gapLeft = minLeft + Math.random() * (maxLeft - minLeft);
-  
-  sliderGap.style.left = gapLeft + 'px';
-  sliderBtn.style.left = '0px';
+var sliderBtn,sliderGap,sliderTrack,isDragging=false,startX=0,gapLeft=0;
+function initSlider(){
+  sliderBtn=document.getElementById('sliderBtn');
+  sliderGap=document.getElementById('sliderGap');
+  sliderTrack=document.querySelector('.slider-track');
+  var tw=sliderTrack.offsetWidth,gw=sliderGap.offsetWidth;
+  gapLeft=tw*0.3+Math.random()*(tw*0.4);
+  sliderGap.style.left=gapLeft+'px';
+  sliderBtn.style.left='0px';
 }
-
-function startDrag(e) {
-  isDragging = true;
-  startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-  
-  document.addEventListener('mousemove', onDrag);
-  document.addEventListener('mouseup', stopDrag);
-  document.addEventListener('touchmove', onDrag);
-  document.addEventListener('touchend', stopDrag);
+function startDrag(e){
+  isDragging=true;
+  startX=e.type.includes('touch')?e.touches[0].clientX:e.clientX;
+  document.addEventListener('mousemove',onDrag);
+  document.addEventListener('mouseup',stopDrag);
+  document.addEventListener('touchmove',onDrag);
+  document.addEventListener('touchend',stopDrag);
 }
-
-function onDrag(e) {
-  if (!isDragging) return;
-  
-  const trackWidth = sliderTrack.offsetWidth;
-  const gapWidth = sliderGap.offsetWidth;
-  const btnWidth = sliderBtn.offsetWidth;
-  
-  const currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-  let offset = currentX - startX;
-  
-  // 限制范围
-  offset = Math.max(0, Math.min(offset, trackWidth - btnWidth));
-  
-  sliderBtn.style.left = offset + 'px';
+function onDrag(e){
+  if(!isDragging)return;
+  var tw=sliderTrack.offsetWidth,bw=sliderBtn.offsetWidth;
+  var cx=e.type.includes('touch')?e.touches[0].clientX:e.clientX;
+  sliderBtn.style.left=Math.max(0,Math.min(cx-startX,tw-bw))+'px';
 }
-
-function stopDrag() {
-  if (!isDragging) return;
-  isDragging = false;
-  
-  document.removeEventListener('mousemove', onDrag);
-  document.removeEventListener('mouseup', stopDrag);
-  document.removeEventListener('touchmove', onDrag);
-  document.removeEventListener('touchend', stopDrag);
-  
-  const btnLeft = parseFloat(sliderBtn.style.left);
-  const tolerance = 15;
-  
-  // 检查是否对齐
-  if (Math.abs(btnLeft - gapLeft) < tolerance) {
-    // 验证成功
-    document.getElementById('captchaTip').textContent = '验证成功！';
-    document.getElementById('captchaTip').className = 'captcha-tip success';
-    
-    setTimeout(() => {
-      closeCaptcha();
-      completeAuth();
-    }, 800);
-  } else {
-    // 验证失败，重置
-    document.getElementById('captchaTip').textContent = '验证失败，请重试';
-    document.getElementById('captchaTip').className = 'captcha-tip error';
-    
-    sliderBtn.style.transition = 'left 0.3s ease';
-    sliderBtn.style.left = '0px';
-    
-    setTimeout(() => {
-      sliderBtn.style.transition = '';
-      document.getElementById('captchaTip').textContent = '请拖动滑块完成验证';
-      document.getElementById('captchaTip').className = 'captcha-tip';
-    }, 500);
+function stopDrag(){
+  if(!isDragging)return;
+  isDragging=false;
+  document.removeEventListener('mousemove',onDrag);
+  document.removeEventListener('mouseup',stopDrag);
+  document.removeEventListener('touchmove',onDrag);
+  document.removeEventListener('touchend',stopDrag);
+  var bl=parseFloat(sliderBtn.style.left);
+  if(Math.abs(bl-gapLeft)<15){
+    document.getElementById('captchaTip').textContent='验证成功！';
+    document.getElementById('captchaTip').className='captcha-tip success';
+    setTimeout(function(){closeCaptcha();completeAuth();},600);
+  }else{
+    document.getElementById('captchaTip').textContent='验证失败，请重试';
+    document.getElementById('captchaTip').className='captcha-tip error';
+    sliderBtn.style.transition='left .3s ease';
+    sliderBtn.style.left='0px';
+    setTimeout(function(){sliderBtn.style.transition='';document.getElementById('captchaTip').textContent='请拖动滑块完成验证';document.getElementById('captchaTip').className='captcha-tip';},500);
   }
 }
-
-function completeAuth() {
-  // 标记已认证
-  localStorage.setItem('authenticated', 'true');
-  
-  // 显示成功页面
-  document.getElementById('authForm').style.display = 'none';
+function completeAuth(){
+  localStorage.setItem('authenticated','true');
+  document.getElementById('authForm').style.display='none';
   document.getElementById('authSuccess').classList.add('show');
-  
-  // 更新姓名和身份证号显示
-  const savedName = localStorage.getItem('realName');
-  const savedIdCard = localStorage.getItem('idCard');
-  
-  if (savedName) {
-    document.getElementById('showName').textContent = savedName;
-  }
-  if (savedIdCard) {
-    document.getElementById('showIdCard').textContent = maskIdCard(savedIdCard);
-  }
-  
-  document.getElementById('redirectTip').style.display = 'none';
+  var n=localStorage.getItem('realName');
+  var c=localStorage.getItem('idCard');
+  if(n) document.getElementById('showName').textContent=n;
+  if(c) document.getElementById('showIdCard').textContent=maskIdCard(c);
 }
-
-function maskIdCard(idCard) {
-  if (idCard.length === 18) {
-    return idCard.substring(0, 6) + '***********' + idCard.substring(17);
-  }
-  return idCard;
+function maskIdCard(c){
+  return c.length===18 ? c.substring(0,6)+'***********'+c.substring(17) : c;
 }
 </script>
 </body>

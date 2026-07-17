@@ -5,29 +5,38 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>我的收藏</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: #e8e9ee; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; justify-content: center; }
-.page { max-width: 430px; min-width: 320px; min-height: 100vh; background: #f5f6fa; padding: 0 16px 20px; width: 100%; }
+:root{--accent:#3F8B6D;--accent-contrast:#fff;--bg:#fff;--ink:#222;--ink-muted:#555;--ink-subtle:#888;--border:#e0e0e0;--page-bg:#F0F0F0;--radius-sm:7px;--radius-card:7px;--radius-pill:9999px;--font-display:"Helvetica Neue",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;--font-body:"Inter",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-muted);display:flex;justify-content:center;min-height:100%}
+.page{max-width:430px;width:100%;min-height:100vh;background:linear-gradient(180deg,#3F8B6D 0%,#a8c9bb 8%,#f0f0f0 20%);padding:16px;padding-bottom:80px;position:relative;box-sizing:border-box}
+@media(max-width:430px){.page{max-width:100%}}
 
-.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; }
-.nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.nav-back svg { width: 20px; height: 20px; color: #333; display: block; }
-.nav-title { font-size: 17px; font-weight: 700; color: #1a1a2e; }
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:0 0 16px}
+.nav-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(255,255,255,.2);border-radius:50%}
+.nav-back svg{width:20px;height:20px;display:block;color:#fff}
+.nav-title{flex:1;text-align:center;font-size:16px;font-weight:700;color:#fff}
+.nav-placeholder{width:32px}
 
-.list { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
-.card { background: #fff; border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 6px rgba(0,0,0,.03); cursor: pointer; transition: .15s; }
-.card:active { transform: scale(.98); }
-.card-img { width: 56px; height: 68px; border-radius: 10px; background-position: center; background-size: cover; flex-shrink: 0; background-color: #f5f5f7; }
-.card-info { flex: 1; min-width: 0; }
-.card-name { font-size: 14px; font-weight: 600; color: #1a1a2e; margin-bottom: 4px; }
-.card-issuer { font-size: 10px; color: #999; background: #f5f5f7; padding: 2px 8px; border-radius: 4px; display: inline-block; }
-.card-price { font-size: 16px; font-weight: 700; color: #D70C1F; flex-shrink: 0; }
-.card-arrow svg { width: 14px; height: 14px; color: #ccc; display: block; }
+/* ── 收藏列表（2列网格，同 user-index 商品卡片） ── */
+.goods-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}
+.goods-card{background:var(--bg);border-radius:var(--radius-card);overflow:hidden;cursor:pointer;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:transform .2s,box-shadow .2s;display:flex;flex-direction:column}
+.goods-card:active{transform:scale(.96);box-shadow:0 4px 14px rgba(0,0,0,.1)}
+.goods-img{width:100%;aspect-ratio:1/1;background-position:center;background-size:cover;position:relative}
+.goods-card h4{font-size:13px;font-weight:600;padding:10px 12px 0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+.goods-card .price-row{display:flex;align-items:baseline;padding:4px 12px 0;gap:8px;justify-content:space-between}
+.goods-card .price{color:var(--accent);font-size:20px;font-weight:700}
+.goods-card .price small{font-size:11px;font-weight:400;color:var(--ink-subtle)}
+.goods-card .issuer{color:var(--ink-subtle);font-size:10px;display:inline-block;padding:2px 8px;margin:6px 0 10px 12px;background:#f5f5f5;border-radius:4px;align-self:flex-start}
+.goods-card .fav-btn{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.85);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;transition:transform .15s}
+.goods-card .fav-btn:active{transform:scale(.8)}
+.goods-card .fav-btn svg{width:14px;height:14px;display:block}
 
-.empty { text-align: center; padding: 80px 0; }
-.empty-icon { font-size: 48px; margin-bottom: 12px; }
-.empty-text { font-size: 13px; color: #ccc; }
-.empty-link { display: inline-block; margin-top: 14px; padding: 10px 28px; border-radius: 20px; background: #D70C1F; color: #fff; font-size: 13px; font-weight: 600; text-decoration: none; }
+/* ── 空状态 ── */
+.empty{text-align:center;padding-top:30vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.empty svg{width:48px;height:48px;color:#ddd;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto}
+.empty-text{font-size:13px;color:var(--ink-subtle);margin-bottom:16px}
+.empty-link{display:inline-block;padding:10px 28px;border-radius:var(--radius-pill);background:var(--accent);color:#fff;font-size:13px;font-weight:600;text-decoration:none;cursor:pointer}
+.empty-link:active{opacity:.9}
 </style>
 </head>
 <body>
@@ -38,51 +47,66 @@ body { margin: 0; background: #e8e9ee; font-family: -apple-system, 'PingFang SC'
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
   </div>
   <div class="nav-title">我的收藏</div>
-  <div style="width:32px"></div>
+  <div class="nav-placeholder"></div>
 </div>
 
-<div class="list" id="favList"></div>
+<div class="goods-grid" id="favGrid" style="margin-top:0"></div>
+<div id="emptyContainer"></div>
 
 </div>
 
 <script>
 var assets = {
-  maotai1935: { name:'茅台1935·时光窖藏', issuer:'贵州茅台', img:'茅台1935.png', price:'¥599', url:'product_maotai1935.html' },
-  feitian:     { name:'飞天茅台·元宇宙酒票', issuer:'贵州茅台', img:'飞天茅台·元宇宙酒票.png', price:'¥299', url:'product_maotai1935.html' },
-  guojiu:      { name:'国酒·数字徽章', issuer:'贵州茅台', img:'国酒·数字徽章.png', price:'¥99', url:'product_maotai1935.html' },
-  banana:      { name:'巴拿马金奖·复刻', issuer:'贵州茅台', img:'巴拿马金奖·复刻.png', price:'¥1999', url:'product_maotai1935.html' },
-  shengxiao:   { name:'茅台生肖兔·典藏', issuer:'贵州茅台', img:'茅台生肖兔·典藏.png', price:'¥2999', url:'product_maotai1935.html' },
-  guichuideng: { name:'鬼吹灯·数字资产', issuer:'鬼吹灯', img:'鬼吹灯.png', price:'¥499', url:'product_maotai1935.html' },
-  santi:       { name:'三体·数字资产', issuer:'三体', img:'三体.png', price:'¥699', url:'product_maotai1935.html' },
-  wuzhangye:   { name:'五粮液·数字珍藏', issuer:'五粮液', img:'五粮液·数字珍藏.png', price:'¥599', url:'product_maotai1935.html' },
-  wangzhe:     { name:'王者荣耀·传说皮肤', issuer:'王者荣耀', img:'王者荣耀·传说皮肤.png', price:'¥999', url:'product_maotai1935.html' },
-  dishengcao:  { name:'杜甫草堂·文旅数字藏品', issuer:'杜甫草堂', img:'杜甫草堂·文旅数字藏品.png', price:'¥99', url:'product_maotai1935.html' },
-  haidilao:    { name:'海底捞·黑海会员数字卡', issuer:'海底捞', img:'海底捞·黑海会员数字卡.png', price:'¥199', url:'product_maotai1935.html' }
+  lantingbeike:  { name:'兰亭碑刻', issuer:'绍兴兰亭产业数资', img:'asset/兰亭碑刻封面图.png', price:299, url:'asset_detail.html?product=lantingbeike' },
+  lantingchunxi: { name:'兰亭春禊', issuer:'绍兴兰亭产业数资', img:'asset/兰亭春禊封面图.png', price:199, url:'asset_detail.html?product=lantingchunxi' },
+  lantingyaji:   { name:'兰亭雅集', issuer:'绍兴兰亭产业数资', img:'asset/兰亭雅集封面图.png', price:399, url:'asset_detail.html?product=lantingyaji' },
+  qushuishang:   { name:'曲水流觞', issuer:'古越龙山', img:'asset/曲水流觞封面图.png', price:259, url:'asset_detail.html?product=qushuishang' },
+  lantingshiyun: { name:'兰亭诗韵', issuer:'诸暨珠宝', img:'asset/兰亭诗韵封面图.png', price:459, url:'asset_detail.html?product=lantingshiyun' }
 };
 
 function render(){
   var list = JSON.parse(localStorage.getItem('favorites')||'[]');
+  var grid = document.getElementById('favGrid');
+  var empty = document.getElementById('emptyContainer');
   if(!list.length){
-    document.getElementById('favList').innerHTML =
-      '<div class="empty"><div class="empty-icon">♡</div><div class="empty-text">还没有收藏任何资产</div><a class="empty-link" href="user-index.html">去逛逛</a></div>';
+    grid.style.display = 'none';
+    empty.innerHTML =
+      '<div class="empty">'+
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'+
+        '<div class="empty-text">还没有收藏任何资产</div>'+
+        '<a class="empty-link" href="asset_market.html">去逛逛</a>'+
+      '</div>';
     return;
   }
   var h = '';
   list.forEach(function(pid){
-    var a = assets[pid] || { name:pid, issuer:'--', img:'', price:'--', url:'#' };
+    var a = assets[pid] || { name:pid, issuer:'--', img:'', price:0, url:'#' };
     h +=
-      '<div class="card" onclick="window.location.href=\''+a.url+'\'">'+
-        '<div class="card-img" style="background-image:url(\''+a.img+'\')"></div>'+
-        '<div class="card-info"><div class="card-name">'+a.name+'</div><span class="card-issuer">'+a.issuer+'</span></div>'+
-        '<div class="card-price">'+a.price+'</div>'+
-        '<div class="card-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>'+
+      '<div class="goods-card" onclick="window.location.href=\''+a.url+'\'">'+
+        '<div class="goods-img" style="background-image:url(\''+a.img+'\')">'+
+          '<button class="fav-btn" onclick="event.stopPropagation();removeFav(\''+pid+'\')">'+
+            '<svg viewBox="0 0 24 24" fill="#e74c3c" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'+
+          '</button>'+
+        '</div>'+
+        '<h4>'+a.name+'</h4>'+
+        '<div class="price-row"><div class="price">¥'+a.price+'</div></div>'+
+        '<div class="issuer">'+a.issuer+'</div>'+
       '</div>';
   });
-  document.getElementById('favList').innerHTML = h;
+  grid.style.display = 'grid';
+  grid.innerHTML = h;
+  document.getElementById('emptyContainer').innerHTML = '';
+}
+
+function removeFav(pid){
+  var list = JSON.parse(localStorage.getItem('favorites')||'[]');
+  var idx = list.indexOf(pid);
+  if(idx > -1) list.splice(idx, 1);
+  localStorage.setItem('favorites', JSON.stringify(list));
+  render();
 }
 
 render();
 </script>
-
 </body>
 </html>

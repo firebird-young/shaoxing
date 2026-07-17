@@ -52,7 +52,7 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
 .section-title a{font-size:12px;color:var(--ink-subtle);cursor:pointer;padding:4px 0;transition:color .2s}
 .section-title a:active{color:var(--accent)}
 
-/* ── 数字资产市场（2列网格） ── */
+/* ── 当下热卖（2列网格） ── */
 .goods-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .goods-card{background:var(--bg);border-radius:var(--radius-card);overflow:hidden;cursor:pointer;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:transform .2s,box-shadow .2s;display:flex;flex-direction:column}
 .goods-card:active{transform:scale(.96);box-shadow:0 4px 14px rgba(0,0,0,.1)}
@@ -125,7 +125,7 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
 
   <!-- 顶部 -->
   <header class="header">
-    <div></div>
+    <div style="display:flex;align-items:center;gap:6px"><img src="asset/logo.png" style="height:37px;width:auto" alt="logo"></div>
     <div class="header-icons">
 
       <span class="hi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><line x1="15" y1="15" x2="21" y2="21"/></svg></span>
@@ -169,10 +169,10 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
     <div class="calendar-wrap" id="calendarPreview"></div>
   </section>
 
-  <!-- 数字资产市场 -->
+  <!-- 当下热卖 -->
   <section class="section">
     <div class="section-title">
-      <span>数字资产市场</span>
+      <span>当下热卖</span>
       <a onclick="window.location.href='asset_market.html'">查看全部</a>
     </div>
     <div class="goods-grid">
@@ -208,10 +208,7 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
     <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
     <span>首页</span>
   </button>
-  <button class="ni" onclick="window.location.href='my_assets.html'">
-    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 16 7 12 15 8 7 12 2"/><line x1="12" y1="15" x2="12" y2="22"/><line x1="8" y1="19" x2="16" y2="19"/></svg></span>
-    <span>资产</span>
-  </button>
+
   <button class="ni" onclick="window.location.href='asset_market.html'">
     <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><line x1="6" y1="16" x2="6" y2="20"/><line x1="10" y1="12" x2="10" y2="20"/><line x1="14" y1="8" x2="14" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/></svg></span>
     <span>市场</span>

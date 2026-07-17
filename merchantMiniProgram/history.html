@@ -69,6 +69,20 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
 .load-more button{background:none;border:none;font-size:12px;color:var(--ink-subtle);cursor:pointer;padding:8px 20px}
 .load-more button:active{opacity:.6}
 
+/* ── 详情弹窗 ── */
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;align-items:center;justify-content:center;padding:24px}
+.modal-mask.show{display:flex}
+.modal-box{background:var(--bg);border-radius:16px;width:100%;max-width:360px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.18)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--page-bg)}
+.modal-title{font-size:15px;font-weight:700;color:var(--ink)}
+.modal-close{width:26px;height:26px;border-radius:50%;background:var(--page-bg);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--ink-subtle)}
+.modal-close:active{background:#e0e0e0}
+.modal-body{padding:16px 20px 20px}
+.detail-row{display:flex;padding:6px 0;font-size:12px;border-bottom:1px solid #f5f5f5}
+.detail-row:last-child{border-bottom:none}
+.detail-label{width:64px;color:var(--ink-subtle);flex-shrink:0}
+.detail-value{flex:1;color:var(--ink);word-break:break-all}
+
 /* ── 底部导航 ── */
 .bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:64px;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:space-between;padding:0 16px;padding-bottom:env(safe-area-inset-bottom,4px);z-index:100;box-sizing:border-box}
 .bnav .ni{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border:none;background:none;padding:4px 10px;font-size:10px;color:var(--ink-subtle);transition:color .2s}
@@ -84,9 +98,6 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
 
 <!-- 顶部 -->
 <div class="top-bar">
-  <div class="nav-back" onclick="location.href='scan.html'">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-  </div>
   <div class="nav-title">核销记录</div>
   <div class="nav-placeholder"></div>
 </div>
@@ -134,6 +145,17 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
 </div>
 
 <!-- 底部导航 -->
+<!-- 详情弹窗 -->
+<div class="modal-mask" id="detailModal" onclick="closeDetail(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">核销详情</div>
+      <button class="modal-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
 <div class="bnav">
   <button class="ni" onclick="location.href='scan.html'">
     <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
@@ -284,22 +306,22 @@ function formatTime(t){
 function viewDetail(id){
   var r = allRecords.find(function(item){return item.id===id});
   if(!r) return;
-  var data = {
-    user: r.user,
-    name: r.userName,
-    type: r.type,
-    label: r.label,
-    assetName: r.assetName,
-    assetSpec: r.assetSpec,
-    assetNo: r.assetNo,
-    title: r.title,
-    desc: r.desc,
-    time: r.time,
-    code: r.id,
-    operator: r.operator
-  };
-  var param = encodeURIComponent(JSON.stringify(data));
-  location.href = 'success.html?data=' + param;
+  var tagCls = r.type === 'identity' ? 'tag-identity' : 'tag-ticket';
+  var labelMap = { identity:'身份权益', ticket:'次数权益' };
+  var h = '';
+  h += '<div class="detail-row"><span class="detail-label">核销编号</span><span class="detail-value" style="font-family:monospace;font-size:11px;color:#999">'+r.id+'</span></div>';
+  h += '<div class="detail-row"><span class="detail-label">用户</span><span class="detail-value"><strong>'+r.userName+'</strong> ('+r.user+')</span></div>';
+  h += '<div class="detail-row"><span class="detail-label">数字资产</span><span class="detail-value">'+r.assetName+(r.assetSpec?' · '+r.assetSpec:'')+' <span style="font-family:monospace;color:#999">'+r.assetNo+'</span></span></div>';
+  h += '<div class="detail-row"><span class="detail-label">权益名称</span><span class="detail-value">'+r.title+'</span></div>';
+  h += '<div class="detail-row"><span class="detail-label">权益类型</span><span class="detail-value"><span class="hi-tag '+r.type+'">'+(labelMap[r.type]||r.label)+'</span></span></div>';
+  h += '<div class="detail-row"><span class="detail-label">操作员</span><span class="detail-value">'+(r.operator||'-')+'</span></div>';
+  h += '<div class="detail-row"><span class="detail-label">核销时间</span><span class="detail-value">'+r.time+'</span></div>';
+  document.getElementById('detailBody').innerHTML = h;
+  document.getElementById('detailModal').classList.add('show');
+}
+function closeDetail(e){
+  if(e && e.target !== document.getElementById('detailModal')) return;
+  document.getElementById('detailModal').classList.remove('show');
 }
 
 // ── 筛选切换 ──

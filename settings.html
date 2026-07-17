@@ -5,33 +5,38 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>设置</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; flex-direction: column; align-items: center; }
-.page { max-width: 430px; min-height: 100vh; background: #f6f7fb; padding: 0; position: relative; width: 100%; }
+:root{--accent:#3F8B6D;--accent-contrast:#fff;--bg:#fff;--ink:#222;--ink-muted:#555;--ink-subtle:#888;--border:#e0e0e0;--page-bg:#F0F0F0;--radius-sm:7px;--radius-card:7px;--radius-pill:9999px;--font-display:"Helvetica Neue",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;--font-body:"Inter",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(--ink-muted);display:flex;justify-content:center;min-height:100%}
+.page{max-width:430px;width:100%;min-height:100vh;background:linear-gradient(180deg,#3F8B6D 0%,#a8c9bb 8%,#f0f0f0 20%);padding:0;padding-bottom:80px;position:relative;box-sizing:border-box}
+@media(max-width:430px){.page{max-width:100%}}
 
-/* ── 顶部导航 ── */
-.top-bar { display: flex; align-items: center; justify-content: center; padding: 12px 16px; background: #D70C1F; position: relative; }
-.nav-back { position: absolute; left: 16px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.nav-back svg { width: 20px; height: 20px; color: #fff; display: block; }
-.nav-title { font-size: 17px; font-weight: 600; color: #fff; }
+/* ── 顶部 ── */
+.top-bar{display:flex;align-items:center;justify-content:center;padding:12px 16px;position:relative}
+.nav-back{position:absolute;left:16px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(255,255,255,.2);border-radius:50%}
+.nav-back svg{width:20px;height:20px;color:#fff;display:block}
+.nav-title{font-size:17px;font-weight:700;color:#fff}
 
-/* ── 菜单列表 ── */
-.menu-group { background: #fff; margin: 12px 16px; border-radius: 12px; overflow: hidden; }
-.menu-item { display: flex; align-items: center; justify-content: space-between; padding: 16px; cursor: pointer; border-bottom: 1px solid #f5f5f7; transition: background 0.15s; }
-.menu-item:last-child { border-bottom: none; }
-.menu-item:active { background: #fafafa; }
-.menu-item .mi-name { font-size: 15px; color: #1a1a2e; }
-.menu-item .mi-arrow svg { width: 16px; height: 16px; color: #ccc; }
+/* ── 菜单 ── */
+.menu-group{background:var(--bg);margin:12px 16px;border-radius:var(--radius-card);overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.04)}
+.menu-item{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--page-bg);transition:background .12s}
+.menu-item:last-child{border-bottom:none}
+.menu-item:active{background:var(--page-bg)}
+.mi-name{font-size:14px;color:var(--ink)}
+.mi-name.danger{color:#e74c3c}
+.mi-arrow svg{width:16px;height:16px;color:#ccc;display:block}
 
-/* ── 退出登录 ── */
-.logout-btn { display: block; width: calc(100% - 32px); margin: 24px 16px; height: 48px; border: none; border-radius: 8px; background: #D70C1F; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
-.logout-btn:active { opacity: 0.9; }
+/* ── 退出按钮 ── */
+.logout-btn{display:block;width:calc(100% - 32px);margin:24px 16px;height:48px;border:none;border-radius:var(--radius-pill);background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s}
+.logout-btn:active{opacity:.85}
+
+/* ── 版本信息 ── */
+.version{text-align:center;padding:12px 0;font-size:11px;color:#ccc}
 </style>
 </head>
 <body>
 <div class="page">
 
-<!-- 顶部导航 -->
 <div class="top-bar">
   <div class="nav-back" onclick="history.back()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
@@ -39,48 +44,36 @@ body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC'
   <div class="nav-title">设置</div>
 </div>
 
-<!-- 设置菜单 -->
 <div class="menu-group">
   <div class="menu-item" onclick="window.location.href='profile.html'">
     <span class="mi-name">个人资料</span>
-    <div class="mi-arrow">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
+    <div class="mi-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
   </div>
   <div class="menu-item" onclick="alert('即将开放')">
     <span class="mi-name">隐私政策</span>
-    <div class="mi-arrow">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
+    <div class="mi-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
   </div>
   <div class="menu-item" onclick="alert('即将开放')">
     <span class="mi-name">用户协议</span>
-    <div class="mi-arrow">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
+    <div class="mi-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
   </div>
   <div class="menu-item" onclick="alert('即将开放')">
     <span class="mi-name">其他协议</span>
-    <div class="mi-arrow">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
+    <div class="mi-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
   </div>
   <div class="menu-item" onclick="alert('即将开放')">
     <span class="mi-name">关于我们</span>
-    <div class="mi-arrow">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
+    <div class="mi-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
   </div>
   <div class="menu-item" onclick="if(confirm('注销后账号数据将全部清除，确定要注销吗？')){ alert('账号已注销'); location.href='user-index.html'; }">
-    <span class="mi-name" style="color:#D70C1F">注销账号</span>
-    <div class="mi-arrow">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
+    <span class="mi-name danger">注销账号</span>
+    <div class="mi-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
   </div>
 </div>
 
-<!-- 退出登录 -->
-<button class="logout-btn" onclick="if(confirm('确定要退出登录吗？')){ alert('已退出登录'); window.location.href='user-index.html'; }">退出登录</button>
+<button class="logout-btn" onclick="if(confirm('确定要退出登录吗？')){ alert('已退出登录'); window.location.href='login.html'; }">退出登录</button>
+
+<div class="version">绍兴数资 v1.0.0</div>
 
 </div>
 

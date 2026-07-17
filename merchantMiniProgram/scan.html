@@ -26,6 +26,8 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
 /* ── 用户卡片 ── */
 .user-card{background:var(--bg);border-radius:var(--radius-card);padding:14px 16px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.04);display:flex;align-items:center;gap:12px}
 .user-avatar-wrap{position:relative;width:42px;height:42px;flex-shrink:0}
+.user-avatar-wrap.default{background:#e8e8e8;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px dashed #ccc}
+.user-avatar-wrap.default svg{width:18px;height:18px;color:#bbb;display:block}
 .user-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);display:block}
 .user-avatar-status{position:absolute;bottom:-1px;right:-1px;width:14px;height:14px;border-radius:50%;background:#52c41a;border:2px solid var(--bg);display:flex;align-items:center;justify-content:center}
 .user-avatar-status svg{width:7px;height:7px;color:#fff;display:block}
@@ -171,6 +173,7 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
 <div class="user-card">
   <div class="user-avatar-wrap">
     <img class="user-avatar" id="welcomeAvatar" src="../asset/绍兴兰亭logo.png" alt="" onerror="this.style.display='none'">
+    <svg class="default-avatar-icon" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     <div class="user-avatar-status">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
@@ -340,6 +343,16 @@ var DEMO_MERCHANT = { name:'绍兴兰亭', account:'admin', password:'888888' };
 (function(){
   var login = JSON.parse(localStorage.getItem('merchantLogin') || '{}');
   if(!login.account){
+    // 未登录：隐藏商家logo、头像、在线、已登录标签
+    document.querySelector('.merchant-logo').style.display = 'none';
+    document.querySelector('.merchant-name').style.display = 'none';
+    document.getElementById('welcomeAvatar').style.display = 'none';
+    document.querySelector('.default-avatar-icon').style.display = 'block';
+    document.querySelector('.user-avatar-wrap').classList.add('default');
+    document.querySelector('.user-avatar-status').style.display = 'none';
+    document.querySelector('.user-tag').style.display = 'none';
+    document.querySelector('.user-meta .divider').style.display = 'none';
+    document.querySelector('.user-meta span:last-child').style.display = 'none';
     document.getElementById('greetingText').textContent = '未登录，点击登录';
     document.getElementById('loginTime').textContent = '';
     return;

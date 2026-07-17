@@ -87,6 +87,11 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
 
 /* ── 动画 ── */
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── 3D鉴赏按钮 ── */
+.btn-3d{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:10px 22px;border:none;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.btn-3d:active{transform:scale(.96)}
+.btn-3d svg{width:18px;height:18px}
 </style>
 </head>
 <body>
@@ -148,6 +153,10 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
     <span class="tag-dark">兰亭文化</span>
     <span class="tag-dark">王羲之</span>
   </div>
+  <button class="btn-3d" onclick="window.location.href='3d_viewer.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    3D鉴赏
+  </button>
 </div>
 
 <!-- 横版时间轴 -->

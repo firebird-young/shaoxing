@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>3D鉴赏</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;background:#e8e8e8;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;display:flex;justify-content:center;min-height:100%}
+.page{max-width:430px;width:100%;min-height:100vh;background:#111;position:relative;overflow:hidden;display:flex;flex-direction:column}
+@media(max-width:430px){.page{max-width:100%}}
+
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:linear-gradient(rgba(0,0,0,.7),transparent);z-index:10;flex-shrink:0}
+.back-btn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.12);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0}
+.back-btn:active{background:rgba(255,255,255,.25)}
+.back-btn svg{width:18px;height:18px;display:block}
+.title{font-size:17px;font-weight:600;color:#fff;text-align:center;flex:1}
+.placeholder{width:34px;flex-shrink:0}
+
+.canvas-wrap{flex:1;width:100%;position:relative;overflow:hidden}
+.canvas-wrap canvas{display:block;width:100%!important;height:100%!important}
+
+.hint{text-align:center;padding:12px 16px;font-size:11px;color:rgba(255,255,255,.3);background:rgba(0,0,0,.5);flex-shrink:0}
+
+.loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-size:14px;z-index:5;background:#111}
+.loading.hide{display:none}
+.loading .spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.08);border-top-color:#8b5cf6;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <button class="back-btn" onclick="history.back()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    </button>
+    <span class="title">3D鉴赏</span>
+    <div class="placeholder"></div>
+  </div>
+  <div class="canvas-wrap" id="canvasWrap">
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <span id="loadingText">加载模型中...</span>
+    </div>
+  </div>
+  <div class="hint">↔ 左右拖动旋转 · 上下拖动翻转 · 双指缩放</div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+var wrap = document.getElementById('canvasWrap');
+var loading = document.getElementById('loading');
+var loadingText = document.getElementById('loadingText');
+var w = wrap.clientWidth;
+var h = wrap.clientHeight;
+
+var scene = new THREE.Scene();
+scene.background = new THREE.Color(0x111111);
+
+var camera = new THREE.PerspectiveCamera(35, w / h, 0.1, 1000);
+camera.position.set(3, 2, 5);
+
+// 灯光
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+var dl1 = new THREE.DirectionalLight(0xffffff, 1.2);
+dl1.position.set(5, 10, 7);
+scene.add(dl1);
+var dl2 = new THREE.DirectionalLight(0xffffff, 0.6);
+dl2.position.set(-5, 5, -5);
+scene.add(dl2);
+
+var renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(w, h);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.toneMapping = 3;
+renderer.toneMappingExposure = 1.2;
+wrap.appendChild(renderer.domElement);
+
+// 轨道控制
+var isDrag = false, px = 0, py = 0, theta = 0, phi = 0, radius = 5;
+var target = new THREE.Vector3(0, 0, 0);
+function updCam(){
+  camera.position.x = radius * Math.sin(theta) * Math.cos(phi);
+  camera.position.y = radius * Math.sin(phi);
+  camera.position.z = radius * Math.cos(theta) * Math.cos(phi);
+  camera.lookAt(target);
+}
+renderer.domElement.addEventListener('mousedown', function(e){ isDrag = true; px = e.clientX; py = e.clientY; });
+window.addEventListener('mousemove', function(e){ if(!isDrag) return; theta -= (e.clientX - px) * 0.01; phi += (e.clientY - py) * 0.01; phi = Math.max(-1.2, Math.min(1.2, phi)); updCam(); px = e.clientX; py = e.clientY; });
+window.addEventListener('mouseup', function(){ isDrag = false; });
+renderer.domElement.addEventListener('touchstart', function(e){ if(e.touches.length === 1){ isDrag = true; px = e.touches[0].clientX; py = e.touches[0].clientY; } });
+renderer.domElement.addEventListener('touchmove', function(e){ if(!isDrag || e.touches.length !== 1) return; theta -= (e.touches[0].clientX - px) * 0.01; phi += (e.touches[0].clientY - py) * 0.01; phi = Math.max(-1.2, Math.min(1.2, phi)); updCam(); px = e.touches[0].clientX; py = e.touches[0].clientY; });
+renderer.domElement.addEventListener('touchend', function(){ isDrag = false; });
+
+// 加载GLB
+var loader = new GLTFLoader();
+var xhr = new XMLHttpRequest();
+xhr.open('GET', 'asset/ChronographWatch.glb', true);
+xhr.overrideMimeType('text/plain; charset=x-user-defined');
+xhr.responseType = 'arraybuffer';
+xhr.onprogress = function(e){
+  if(e.lengthComputable){
+    var p = Math.round((e.loaded / e.total) * 100);
+    loadingText.textContent = '加载中 ' + p + '%';
+  }
+};
+xhr.onload = function(){
+  if(xhr.status === 0 || xhr.status === 200){
+    var data = xhr.response;
+    if(!data || data.byteLength < 50){
+      loadingText.textContent = '模型文件为空';
+      return;
+    }
+    loader.parse(data, '', function(gltf){
+      var model = gltf.scene;
+      var box = new THREE.Box3().setFromObject(model);
+      var size = box.getBoundingSphere(new THREE.Sphere()).radius;
+      var s = 3.5 / size;
+      model.scale.set(s, s, s);
+      var center = new THREE.Vector3();
+      box.getCenter(center);
+      model.position.sub(center.clone().multiplyScalar(s));
+      scene.add(model);
+      loading.classList.add('hide');
+
+      function animate(){
+        requestAnimationFrame(animate);
+        model.rotation.y += 0.006;
+        renderer.render(scene, camera);
+      }
+      animate();
+    }, undefined, function(err){
+      loadingText.textContent = '模型解析失败';
+      loading.querySelector('.spinner').style.display = 'none';
+      console.error('Parse error:', err);
+    });
+  } else {
+    loadingText.textContent = '加载失败，状态码: ' + xhr.status;
+  }
+};
+xhr.onerror = function(){
+  loadingText.textContent = '模型加载失败，请使用本地服务器访问';
+  loading.querySelector('.spinner').style.display = 'none';
+};
+xhr.send();
+
+window.addEventListener('resize', function(){
+  var nw = wrap.clientWidth, nh = wrap.clientHeight;
+  camera.aspect = nw / nh;
+  camera.updateProjectionMatrix();
+  renderer.setSize(nw, nh);
+});
+</script>
+</body>
+</html>

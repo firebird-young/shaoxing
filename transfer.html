@@ -5,87 +5,97 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>资产转赠</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; justify-content: center; }
-.page { max-width: 430px; min-height: 100vh; background: #f6f7fb; padding: 0 16px 90px; position: relative; width: 100%; }
+:root{--accent:#3F8B6D;--accent-contrast:#fff;--bg:#fff;--ink:#222;--ink-muted:#555;--ink-subtle:#888;--border:#e0e0e0;--page-bg:#F0F0F0;--radius-sm:7px;--radius-card:7px;--radius-pill:9999px;--font-display:"Helvetica Neue",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;--font-body:"Inter",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(--ink-muted);display:flex;justify-content:center;min-height:100%}
+.page{max-width:430px;width:100%;min-height:100vh;background:linear-gradient(180deg,#3F8B6D 0%,#a8c9bb 8%,#f0f0f0 20%);padding:0 16px 90px;position:relative;box-sizing:border-box}
+@media(max-width:430px){.page{max-width:100%}}
 
-.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; }
-.nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.nav-back svg { width: 20px; height: 20px; color: #333; display: block; }
-.nav-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:16px 0 8px}
+.nav-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(255,255,255,.2);border-radius:50%}
+.nav-back svg{width:20px;height:20px;color:#fff;display:block}
+.nav-title{font-size:16px;font-weight:700;color:#fff}
+.top-link{font-size:11px;color:rgba(255,255,255,.65);text-decoration:none;cursor:pointer}
+.top-link:active{color:#fff}
 
-.step { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0 14px; }
-.step-dot { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; background: #ddd; }
-.step-dot.on { background: #D70C1F; }
-.step-line { width: 32px; height: 2px; background: #eee; }
-.step-line.on { background: #D70C1F; }
-.step-label { font-size: 10px; color: #ccc; text-align: center; }
-.step-label.on { color: #D70C1F; font-weight: 600; }
+.step{display:flex;align-items:center;justify-content:center;gap:0;margin:12px 0 20px;padding:0 8px}
+.step-item{display:flex;flex-direction:column;align-items:center;position:relative;flex:1}
+.step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;background:rgba(255,255,255,.25);transition:all .3s;position:relative;z-index:2}
+.step-dot.on{background:var(--accent);box-shadow:0 2px 8px rgba(63,139,109,.35)}
+.step-dot.done{background:var(--accent)}
+.step-dot.done svg{width:14px;height:14px;color:#fff;display:block}
+.step-dot .dot-num{display:block}
+.step-dot.done .dot-num{display:none}
+.step-line{position:absolute;top:14px;left:calc(50% + 18px);right:calc(-50% + 18px);height:2px;background:rgba(255,255,255,.2);z-index:1}
+.step-line.done{background:var(--accent)}
+.step-label{font-size:11px;color:rgba(255,255,255,.5);text-align:center;margin-top:6px;white-space:nowrap;transition:color .3s}
+.step-label.on{color:#fff;font-weight:600}
 
-.filter-bar { display: flex; gap: 8px; margin-bottom: 12px; }
-.filter-bar input { flex: 1; height: 36px; border: 1px solid #e8e8ec; border-radius: 10px; padding: 0 12px; font-size: 13px; outline: none; background: #fff; color: #333; }
-.filter-bar input:focus { border-color: #D70C1F; }
-.filter-bar select { height: 36px; border: 1px solid #e8e8ec; border-radius: 10px; padding: 0 8px; font-size: 12px; outline: none; background: #fff; color: #666; max-width: 120px; }
+.filter-bar{display:flex;gap:8px;margin-bottom:12px}
+.filter-bar input{flex:1;height:36px;border:1px solid var(--border);border-radius:10px;padding:0 12px;font-size:13px;outline:none;background:var(--bg);color:var(--ink)}
+.filter-bar input:focus{border-color:var(--accent)}
+.filter-bar select{height:36px;border:1px solid var(--border);border-radius:10px;padding:0 8px;font-size:12px;outline:none;background:var(--bg);color:var(--ink-muted);max-width:120px}
 
-.card { background: #fff; border-radius: 16px; margin-bottom: 10px; box-shadow: 0 1px 6px rgba(0,0,0,.04); overflow: hidden; }
-.card-hdr { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; border-bottom: 1px solid #f5f5f7; }
-.card-hdr:active { background: #fafafa; }
-.series-thumb { width: 44px; height: 54px; border-radius: 8px; background-position: center; background-size: cover; flex-shrink: 0; }
-.series-info { flex: 1; margin: 0 10px; min-width: 0; }
-.series-name { font-size: 14px; font-weight: 600; color: #1a1a2e; }
-.series-tag { font-size: 10px; color: #999; background: #f5f5f7; padding: 1px 6px; border-radius: 3px; display: inline-block; margin-top: 2px; }
-.series-hold { font-size: 13px; font-weight: 700; color: #D70C1F; }
-.series-expand { width: 14px; flex-shrink: 0; }
-.series-expand svg { width: 14px; height: 14px; color: #ccc; transition: transform .25s; display: block; }
-.series-expand.open svg { transform: rotate(180deg); }
+.card{background:var(--bg);border-radius:var(--radius-card);margin-bottom:10px;box-shadow:0 1px 6px rgba(0,0,0,.04);overflow:hidden}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--page-bg)}
+.card-hdr:active{background:var(--page-bg)}
+.series-thumb{width:48px;height:48px;border-radius:8px;background-position:center;background-size:cover;flex-shrink:0}
+.series-info{flex:1;margin:0 10px;min-width:0}
+.series-name{font-size:14px;font-weight:600;color:var(--ink)}
+.series-tag{font-size:10px;color:var(--ink-subtle);background:var(--page-bg);padding:1px 6px;border-radius:3px;display:inline-block;margin-top:2px}
+.series-hold{font-size:13px;font-weight:700;color:var(--accent)}
+.series-expand{width:14px;flex-shrink:0}
+.series-expand svg{width:14px;height:14px;color:#ccc;transition:transform .25s;display:block}
+.series-expand.open svg{transform:rotate(180deg)}
+.instances{display:none;border-top:1px solid var(--page-bg)}
+.instances.show{display:block}
+.inst-item{display:flex;align-items:center;gap:10px;padding:12px 16px 12px 56px;cursor:pointer;transition:background .12s;border-bottom:1px solid #fafafc}
+.inst-item:last-child{border-bottom:none}
+.inst-item:active{background:var(--page-bg)}
+.inst-item.selected{background:rgba(63,139,109,.04)}
+.inst-thumb{width:38px;height:38px;border-radius:6px;background-position:center;background-size:cover;flex-shrink:0;background-color:var(--page-bg)}
+.inst-info{flex:1;min-width:0}
+.inst-num{font-size:13px;font-weight:700;color:var(--ink)}
+.inst-spec{font-size:11px;color:var(--ink-subtle)}
+.inst-check{width:20px;height:20px;border:2px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.inst-item.selected .inst-check{border-color:var(--accent);background:var(--accent)}
+.inst-check svg{width:12px;height:12px;color:#fff;display:none}
+.inst-item.selected .inst-check svg{display:block}
 
-.instances { display: none; border-top: 1px solid #f5f5f7; }
-.instances.show { display: block; }
-.inst-item { display: flex; align-items: center; gap: 10px; padding: 12px 16px 12px 56px; cursor: pointer; transition: background .12s; border-bottom: 1px solid #fafafc; }
-.inst-item:last-child { border-bottom: none; }
-.inst-item:active { background: #fafafa; }
-.inst-thumb { width: 38px; height: 46px; border-radius: 6px; background-position: center; background-size: cover; flex-shrink: 0; background-color: #f5f5f7; }
-.inst-info { flex: 1; min-width: 0; }
-.inst-num { font-size: 13px; font-weight: 700; color: #1a1a2e; }
-.inst-spec { font-size: 11px; color: #999; }
-.inst-check { width: 20px; height: 20px; border: 2px solid #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.inst-item.selected .inst-check { border-color: #D70C1F; background: #D70C1F; }
-.inst-check svg { width: 12px; height: 12px; color: #fff; display: none; }
-.inst-item.selected .inst-check svg { display: block; }
-.inst-item.selected { background: #FFF9F9; }
+.bottom-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--bg);border-top:1px solid var(--border);padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom));z-index:50;display:none}
+.bottom-bar.show{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.bb-info{font-size:12px;color:var(--ink-muted)}
+.bb-count{color:var(--accent);font-weight:700}
+.btn-next{height:44px;padding:0 32px;border:none;border-radius:22px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px}
+.btn-next:active{opacity:.85}
+.btn-next:disabled{background:#ccc;cursor:not-allowed}
+.btn-next svg{width:14px;height:14px}
 
-.selected-count { font-size: 12px; color: #D70C1F; font-weight: 600; text-align: center; padding: 8px 0; display: none; }
-.selected-count.show { display: block; }
+.input-label{font-size:14px;color:var(--ink);font-weight:600;margin-bottom:8px}
+.input-row{display:flex;gap:8px;margin-bottom:14px}
+.input-row input{flex:1;height:46px;border:1px solid var(--border);border-radius:12px;padding:0 14px;font-size:14px;outline:none;color:var(--ink)}
+.input-row input:focus{border-color:var(--accent)}
+.back-row{text-align:center;padding-top:8px}
+.back-row button{background:none;border:none;color:var(--ink-subtle);font-size:13px;cursor:pointer}
+.back-row button:active{color:var(--accent)}
 
-.bottom-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: #fff; border-top: 1px solid #eee; padding: 12px 16px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 50; display: none; }
-.bottom-bar.show { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.bottom-bar .bb-info { font-size: 12px; color: #666; }
-.bottom-bar .bb-count { color: #D70C1F; font-weight: 700; }
-.btn-next { height: 44px; padding: 0 32px; border: none; border-radius: 22px; background: #D70C1F; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; }
-.btn-next:active { opacity: .9; }
-.btn-next:disabled { background: #ccc; cursor: not-allowed; }
-.btn-next svg { width: 14px; height: 14px; }
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-mask.show{opacity:1;pointer-events:auto}
+.modal-box{width:300px;background:var(--bg);border-radius:18px;padding:24px 20px;text-align:center}
+.modal-box h3{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:12px}
+.modal-box p{font-size:13px;color:var(--ink-muted);margin-bottom:16px;line-height:1.6}
+.modal-box .addr{font-size:12px;color:var(--ink-subtle);padding:8px 12px;background:var(--page-bg);border-radius:8px;word-break:break-all;margin-bottom:16px}
+.modal-btns{display:flex;gap:10px}
+.modal-btns button{flex:1;height:42px;border:none;border-radius:21px;font-size:14px;font-weight:600;cursor:pointer}
+.btn-cancel{background:var(--page-bg);color:var(--ink-muted)}
+.btn-cancel:active{background:#e0e0e0}
+.btn-confirm{background:var(--accent);color:#fff}
+.btn-confirm:active{opacity:.85}
 
-/* step2 */
-.input-label { font-size: 12px; color: #666; margin-bottom: 6px; }
-.input-row { display: flex; gap: 8px; margin-bottom: 14px; }
-.input-row input { flex: 1; height: 46px; border: 1px solid #e8e8ec; border-radius: 12px; padding: 0 14px; font-size: 14px; outline: none; color: #333; }
-.input-row input:focus { border-color: #D70C1F; }
+.empty-tip{text-align:center;padding:40px 0;color:#ccc;font-size:13px}
 
-.back-row { text-align: center; padding-top: 8px; }
-.back-row button { background: none; border: none; color: #999; font-size: 13px; cursor: pointer; }
-.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .3s; }
-.modal-mask.show { opacity: 1; pointer-events: auto; }
-.modal-box { width: 300px; background: #fff; border-radius: 18px; padding: 24px 20px; text-align: center; }
-.modal-box h3 { font-size: 17px; font-weight: 700; margin-bottom: 12px; }
-.modal-box p { font-size: 13px; color: #666; margin-bottom: 16px; line-height: 1.6; }
-.modal-box .addr { font-size: 12px; color: #999; padding: 8px 12px; background: #f5f5f7; border-radius: 8px; word-break: break-all; margin-bottom: 16px; }
-.modal-btns { display: flex; gap: 10px; }
-.modal-btns button { flex: 1; height: 42px; border: none; border-radius: 21px; font-size: 14px; font-weight: 600; cursor: pointer; }
-.btn-cancel { background: #f5f5f7; color: #666; }
-.btn-confirm { background: #D70C1F; color: #fff; }
-
-.empty-tip { text-align: center; padding: 40px 0; color: #ccc; font-size: 13px; }
+.f-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(63,139,109,.15);border-radius:50%;border:none;color:#3F8B6D;font-size:16px;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,.1);position:fixed;top:12px;left:50%;margin-left:226px}
+.f-btn:active{background:rgba(63,139,109,.25)}
 </style>
 </head>
 <body>
@@ -96,13 +106,26 @@ body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC'
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
   </div>
   <div class="nav-title">资产转赠</div>
-  <a href="transfer_records.html" style="font-size:11px;color:#999;text-decoration:none">转赠记录</a>
+  <a class="top-link" href="transfer_records.html">转赠记录</a>
 </div>
 
+<button class="f-btn" onclick="toggleFuncModal()" title="功能说明">📖</button>
+
 <div class="step" id="stepBar">
-  <div><div class="step-dot on" id="d1">1</div><div class="step-label on" id="l1">选择资产</div></div>
-  <div class="step-line" id="line1"></div>
-  <div><div class="step-dot" id="d2">2</div><div class="step-label" id="l2">填写接收方</div></div>
+  <div class="step-item">
+    <div class="step-dot on" id="d1"><span class="dot-num">1</span></div>
+    <div class="step-label on" id="l1">选择资产</div>
+    <div class="step-line" id="line1"></div>
+  </div>
+  <div class="step-item">
+    <div class="step-dot" id="d2"><span class="dot-num">2</span></div>
+    <div class="step-label" id="l2">填写接收方</div>
+    <div class="step-line" id="line2"></div>
+  </div>
+  <div class="step-item">
+    <div class="step-dot" id="d3"><span class="dot-num">3</span></div>
+    <div class="step-label" id="l3">转赠完成</div>
+  </div>
 </div>
 
 <div class="filter-bar" id="filterBar">
@@ -110,7 +133,6 @@ body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC'
   <select id="issuerSelect" onchange="renderStep1()"><option value="">全部发行方</option></select>
 </div>
 
-<div class="selected-count" id="selCount"></div>
 <div id="listArea"></div>
 
 <div class="bottom-bar" id="bottomBar">
@@ -132,43 +154,58 @@ body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC'
   </div>
 </div>
 
+<!-- 功能说明 -->
+<div class="fm-overlay" id="fmOverlay" onclick="toggleFuncModal()"></div>
+<div class="f-modal" id="funcModal" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:92%;max-width:500px;max-height:85vh;overflow-y:auto;background:#fff;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.2);z-index:10000;padding:20px;display:none">
+  <div class="fm-title" style="font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;cursor:grab;padding-bottom:10px;border-bottom:1px solid #eee">
+    <span>📖 功能说明</span>
+    <button class="fm-close" style="width:28px;height:28px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:#666;border:none" onclick="toggleFuncModal()">✕</button>
+  </div>
+  <div class="fm-body" style="font-size:12px;color:#555;line-height:1.7">
+    <h4 style="font-size:13px;font-weight:700;color:#1a1a2e;margin:16px 0 6px">一、选择资产（Step 1）</h4>
+    <ul style="padding-left:16px;margin:0 0 10px">
+      <li>顶部展示"资产转赠"标题，左侧返回按钮，右侧"转赠记录"链接</li>
+      <li>搜索栏可按资产名称搜索，下拉可选择发行方筛选</li>
+      <li>点击系列卡片展开查看该系列下的具体数字资产实例</li>
+      <li>勾选需要转赠的资产实例，底部显示已选数量和"下一步"按钮</li>
+    </ul>
+    <h4 style="font-size:13px;font-weight:700;color:#1a1a2e;margin:16px 0 6px">二、填写接收方（Step 2）</h4>
+    <ul style="padding-left:16px;margin:0 0 10px">
+      <li>展示已选资产列表</li>
+      <li>输入接收方手机号或区块链地址</li>
+      <li>点击"确认转赠"弹出确认弹窗，确认后完成转赠</li>
+    </ul>
+  </div>
+</div>
+
 <script>
 var data = [
-  { series:'茅台1935·时光窖藏', issuer:'贵州茅台', hold:3, img:'茅台1935.png',
+  { series:'兰亭雅集', issuer:'绍兴兰亭产业数资', hold:3, img:'asset/兰亭雅集封面图.png',
     items:[
-      { id:'#54', spec:'凝时', img:'凝时.png', time:'2025-06-15 14:32', hash:'0x7a3e8f2b1c9d...1a2b' },
-      { id:'#77', spec:'守岁', img:'守岁.png', time:'2025-08-22 09:15', hash:'0x9c2d1e8f5a3b...3e4f' },
-      { id:'#102', spec:'溯年', img:'溯年.png', time:'2026-03-10 11:20', hash:'0xd5f8a3c2e7b1...9a6c' }
+      { id:'#0101', spec:'优享版', img:'asset/兰亭雅集封面图.png', time:'2026-06-15 14:32', hash:'0x7a3e8f2b1c9d...1a2b' },
+      { id:'#0102', spec:'优享版', img:'asset/兰亭雅集封面图.png', time:'2026-07-10 09:15', hash:'0x9c2d1e8f5a3b...3e4f' },
+      { id:'#0103', spec:'畅行版', img:'asset/兰亭雅集封面图.png', time:'2026-07-12 11:20', hash:'0xd5f8a3c2e7b1...9a6c' }
     ]
   },
-  { series:'飞天茅台·元宇宙酒票', issuer:'贵州茅台', hold:1, img:'飞天茅台·元宇宙酒票.png',
+  { series:'兰亭碑刻', issuer:'绍兴兰亭产业数资', hold:2, img:'asset/兰亭碑刻封面图.png',
     items:[
-      { id:'#28', spec:'典藏版', img:'飞天茅台·元宇宙酒票.png', time:'2025-08-22 09:15', hash:'0x3b5c9d1e8f2a...7d8e' }
+      { id:'#0201', spec:'标准版', img:'asset/兰亭碑刻封面图.png', time:'2026-07-01 10:00', hash:'0x3b5c9d1e8f2a...7d8e' },
+      { id:'#0202', spec:'珍藏版', img:'asset/兰亭碑刻封面图.png', time:'2026-07-05 14:30', hash:'0xae1c3f5b8d2e...9f0a' }
     ]
   },
-  { series:'国酒·数字徽章', issuer:'贵州茅台', hold:1, img:'国酒·数字徽章.png',
+  { series:'兰亭春禊', issuer:'绍兴兰亭产业数资', hold:1, img:'asset/兰亭春禊封面图.png',
     items:[
-      { id:'#08', spec:'标准款', img:'国酒·数字徽章.png', time:'2025-04-10 15:00', hash:'0xae1c3f5b8d2e...9f0a' }
+      { id:'#0301', spec:'学韵版', img:'asset/兰亭春禊封面图.png', time:'2026-06-20 15:00', hash:'0x1f8c7d3a5b6e...2d4c' }
     ]
   },
-  { series:'巴拿马金奖·复刻', issuer:'贵州茅台', hold:1, img:'巴拿马金奖·复刻.png',
+  { series:'曲水流觞', issuer:'古越龙山', hold:1, img:'asset/曲水流觞封面图.png',
     items:[
-      { id:'#03', spec:'典藏款', img:'巴拿马金奖·复刻.png', time:'2025-03-05 10:00', hash:'0x1f8c7d3a5b6e...2d4c' }
+      { id:'#0401', spec:'基础版', img:'asset/曲水流觞封面图.png', time:'2026-07-08 12:00', hash:'0xb2e4d8c1a5f7...3e6d' }
     ]
   },
-  { series:'茅台生肖兔·典藏', issuer:'贵州茅台', hold:1, img:'茅台生肖兔·典藏.png',
+  { series:'兰亭诗韵', issuer:'诸暨珠宝', hold:1, img:'asset/兰亭诗韵封面图.png',
     items:[
-      { id:'#12', spec:'兔年限定', img:'茅台生肖兔·典藏.png', time:'2026-01-15 12:00', hash:'0xb2e4d8c1a5f7...3e6d' }
-    ]
-  },
-  { series:'鬼吹灯·数字资产', issuer:'鬼吹灯', hold:1, img:'鬼吹灯.png',
-    items:[
-      { id:'#36', spec:'标准款', img:'鬼吹灯.png', time:'2026-05-10 10:00', hash:'0x7c8d9e0f1a...2b3c4d' }
-    ]
-  },
-  { series:'三体·数字资产', issuer:'三体', hold:1, img:'三体.png',
-    items:[
-      { id:'#42', spec:'标准款', img:'三体.png', time:'2026-06-01 14:00', hash:'0x8e0f1a2b3c...4d5e6f' }
+      { id:'#0501', spec:'基础版', img:'asset/兰亭诗韵封面图.png', time:'2026-07-03 10:00', hash:'0x7c8d9e0f1a...2b3c4d' }
     ]
   }
 ];
@@ -183,13 +220,10 @@ function renderStep1(){
   var list = data.slice();
   if(keyword) list = list.filter(function(s){ return s.series.toLowerCase().indexOf(keyword)>=0; });
   if(issuerFilter) list = list.filter(function(s){ return s.issuer === issuerFilter; });
-
-  // 更新发行方下拉
   var iss = []; data.forEach(function(s){ if(iss.indexOf(s.issuer)<0) iss.push(s.issuer); });
   var selIss = document.getElementById('issuerSelect');
   selIss.innerHTML = '<option value="">全部发行方</option>';
   iss.forEach(function(v){ selIss.innerHTML += '<option value="'+v+'"'+(v===issuerFilter?' selected':'')+'>'+v+'</option>'; });
-
   var h = '';
   if(!list.length){ h = '<div class="empty-tip">没有匹配的资产</div>'; }
   else {
@@ -205,27 +239,22 @@ function renderStep1(){
       h += '<div class="instances" id="inst_'+si+'">';
       s.items.forEach(function(it, ii){
         var ks = si+'_'+ii;
-        var sel = selected[ks] ? ' selected' : '';
-        var chk = selected[ks] ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : '';
-        h += '<div class="inst-item'+sel+'" onclick="toggleItem('+si+','+ii+',event)">';
+        h += '<div class="inst-item'+(selected[ks]?' selected':'')+'" onclick="toggleItem('+si+','+ii+',event)">';
         h += '<div class="inst-thumb" style="background-image:url(\''+it.img+'\')"></div>';
         h += '<div class="inst-info"><div class="inst-num">'+it.id+'</div><div class="inst-spec">'+it.spec+' · '+it.time+'</div></div>';
-        h += '<div class="inst-check">'+chk+'</div>';
+        h += '<div class="inst-check">'+(selected[ks]?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</div>';
         h += '</div>';
       });
       h += '</div></div>';
     });
   }
   document.getElementById('listArea').innerHTML = h;
-
   Object.keys(expanded).forEach(function(si){
     var el=document.getElementById('inst_'+si),ex=document.getElementById('exp_'+si);
     if(el)el.classList.add('show');if(ex)ex.classList.add('open');
   });
-
   var cnt = Object.keys(selected).length;
-  var bb = document.getElementById('bottomBar');
-  bb.className = 'bottom-bar show';
+  document.getElementById('bottomBar').className = 'bottom-bar show';
   document.getElementById('bbCount').textContent = cnt;
   document.getElementById('btnNext1').disabled = cnt === 0;
   document.getElementById('filterBar').style.display = '';
@@ -251,11 +280,10 @@ function goStep2(){
     var parts = ks.split('_');
     return data[parseInt(parts[0])].items[parseInt(parts[1])];
   });
-  var h = '<div style="padding:6px 0 10px"><div class="input-label">已选资产</div>';
-  h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">';
-  list.forEach(function(it){ h += '<div style="display:flex;align-items:center;gap:4px;background:#FFF2F3;border-radius:8px;padding:4px 10px;font-size:11px;color:#D70C1F">'+it.spec+' '+it.id+'</div>'; });
-  h += '</div></div>';
-  h += '<div class="card"><div style="padding:16px">';
+  var h = '<div class="card"><div style="padding:16px">';
+  h += '<div class="input-label">已选资产</div><div class="selected-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">';
+  list.forEach(function(it){ h += '<div style="display:flex;align-items:center;gap:4px;background:rgba(63,139,109,.1);border-radius:8px;padding:4px 10px;font-size:11px;color:var(--accent)">'+it.spec+' '+it.id+'</div>'; });
+  h += '</div>';
   h += '<div class="input-label">接收方手机号 / 区块链地址</div>';
   h += '<div class="input-row"><input type="text" id="recipient" placeholder="手机号 或 0x...地址" oninput="checkRecipient()"></div>';
   h += '<button class="btn-next" id="btnNext2" onclick="doTransfer()" disabled>确认转赠 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>';
@@ -277,11 +305,21 @@ function checkRecipient(){
 function goBack(){ step = 1; renderStep1(); updateStepBar(); }
 
 function updateStepBar(){
-  document.getElementById('d1').className = 'step-dot on';
-  document.getElementById('l1').className = 'step-label on';
-  document.getElementById('d2').className = 'step-dot' + (step===2?' on':'');
-  document.getElementById('l2').className = 'step-label' + (step===2?' on':'');
-  document.getElementById('line1').className = 'step-line' + (step===2?' on':'');
+  var d1 = document.getElementById('d1'), l1 = document.getElementById('l1');
+  var d2 = document.getElementById('d2'), l2 = document.getElementById('l2');
+  var d3 = document.getElementById('d3'), l3 = document.getElementById('l3');
+  var line1 = document.getElementById('line1'), line2 = document.getElementById('line2');
+  d1.className = 'step-dot' + (step>=1?' on':'');
+  l1.className = 'step-label' + (step>=1?' on':'');
+  d2.className = 'step-dot' + (step>=2?' on':'');
+  l2.className = 'step-label' + (step>=2?' on':'');
+  d3.className = 'step-dot' + (step>=3?' done':'');
+  l3.className = 'step-label' + (step>=3?' on':'');
+  line1.className = 'step-line' + (step>=2?' done':'');
+  line2.className = 'step-line' + (step>=3?' done':'');
+  // step3 显示勾号
+  if(step>=3) d3.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  else d3.innerHTML = '<span class="dot-num">3</span>';
   document.getElementById('bottomBar').className = step===1 ? 'bottom-bar show' : 'bottom-bar';
 }
 
@@ -313,14 +351,25 @@ function confirmTransfer(){
     s.hold--;
     if(s.hold <= 0) data.splice(x.si, 1);
   });
-  selected = {}; expanded = {}; step = 1;
-  renderStep1(); updateStepBar();
-  alert('转赠成功！');
+  // 显示 step3 转赠完成
+  step = 3;
+  updateStepBar();
+  document.getElementById('listArea').innerHTML = '<div class="card" style="text-align:center;padding:40px 20px"><div style="width:56px;height:56px;border-radius:50%;background:rgba(63,139,109,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 12px"><svg viewBox="0 0 24 24" fill="none" stroke="#3F8B6D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div style="font-size:17px;font-weight:700;color:var(--ink);margin-bottom:4px">转赠成功</div><div style="font-size:13px;color:var(--ink-subtle);margin-bottom:20px">数字资产已成功转赠给接收方</div><button class="btn-next" onclick="goBack()" style="margin:0 auto">继续转赠 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button></div>';
+  document.getElementById('filterBar').style.display = 'none';
+  selected = {}; expanded = {};
 }
 
 function closeModal(e){
   if(e && e.target !== document.getElementById('modal')) return;
   document.getElementById('modal').classList.remove('show');
+}
+
+// 功能说明
+function toggleFuncModal(){
+  var m = document.getElementById('funcModal');
+  var o = document.getElementById('fmOverlay');
+  m.classList.toggle('show');
+  o.classList.toggle('show');
 }
 
 renderStep1();

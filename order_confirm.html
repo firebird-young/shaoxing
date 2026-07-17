@@ -79,6 +79,20 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
 .btn-submit:active{opacity:.9}
 .btn-submit:disabled{background:#ccc;cursor:not-allowed}
 
+/* ── 限额弹窗 ── */
+.limit-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:center;justify-content:center}
+.limit-overlay.show{display:flex}
+.limit-box{background:#fff;border-radius:16px;width:300px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.18)}
+.limit-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid #f0f0f0}
+.limit-title{font-size:16px;font-weight:700;color:#222}
+.limit-close{width:28px;height:28px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:#999;border:none}
+.limit-body{padding:16px 20px 20px}
+.limit-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f5f5f5}
+.limit-item:last-child{border-bottom:none}
+.limit-label{font-size:14px;color:#666}
+.limit-value{font-size:15px;font-weight:600;color:#1a6b4c}
+.limit-note{padding:10px 20px 16px;font-size:11px;color:#bbb;text-align:center;border-top:1px solid #f5f5f5}
+
 .toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;opacity:0;pointer-events:none;transition:all .3s;z-index:999}
 .toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 </style>
@@ -115,7 +129,7 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
     <div class="pay-icon hf">汇</div>
     <div class="pay-info">
       <div class="pay-name">汇付钱包<span class="pay-status disabled">服务维护中</span></div>
-      <div class="pay-limit">查看限额</div>
+      <div class="pay-limit" onclick="event.stopPropagation(); showLimitModal('hf')">查看限额</div>
     </div>
     <div class="pay-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
   </div>
@@ -123,7 +137,7 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
     <div class="pay-icon zj">中</div>
     <div class="pay-info">
       <div class="pay-name">中金钱包</div>
-      <div class="pay-limit">查看限额</div>
+      <div class="pay-limit" onclick="event.stopPropagation(); showLimitModal('zj')">查看限额</div>
     </div>
     <div class="pay-check active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
   </div>
@@ -149,6 +163,18 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
     <span class="total-value"><small>¥</small><span id="totalPrice">199</span></span>
   </div>
   <button class="btn-submit" id="submitBtn" onclick="submitOrder()">提交订单</button>
+</div>
+
+<!-- 限额弹窗 -->
+<div class="limit-overlay" id="limitModal" onclick="closeLimitModal(event)">
+  <div class="limit-box" onclick="event.stopPropagation()">
+    <div class="limit-header">
+      <span class="limit-title" id="limitModalTitle">限额说明</span>
+      <button class="limit-close" onclick="closeLimitModal()">✕</button>
+    </div>
+    <div class="limit-body" id="limitBody"></div>
+    <div class="limit-note">*以上限额为单笔支付限额，实际以银行/支付机构规定为准</div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -189,6 +215,42 @@ function toggleAgreement(){
 function submitOrder(){
   if(!agreementChecked){ showToast('请同意购买协议'); return; }
   location.href = 'pay_success.html?qty='+qty+'&pay='+encodeURIComponent(selectedPay)+'&total='+total+'&spec='+encodeURIComponent(specName)+'&series='+encodeURIComponent(series);
+}
+
+function showLimitModal(type){
+  var limits = {
+    hf: {
+      title: '汇付钱包 - 限额说明',
+      items: [
+        { label: '单笔限额', value: '5,000元' },
+        { label: '每日限额', value: '50,000元' },
+        { label: '每月限额', value: '200,000元' },
+        { label: '单日笔数', value: '10笔' },
+        { label: '支持银行', value: '工商银行、建设银行、农业银行等' }
+      ]
+    },
+    zj: {
+      title: '中金钱包 - 限额说明',
+      items: [
+        { label: '单笔限额', value: '10,000元' },
+        { label: '每日限额', value: '100,000元' },
+        { label: '每月限额', value: '500,000元' },
+        { label: '单日笔数', value: '20笔' },
+        { label: '支持银行', value: '中国银行、交通银行、招商银行等' }
+      ]
+    }
+  };
+  var data = limits[type] || limits.zj;
+  document.getElementById('limitModalTitle').textContent = data.title;
+  document.getElementById('limitBody').innerHTML = data.items.map(function(item){
+    return '<div class="limit-item"><span class="limit-label">'+item.label+'</span><span class="limit-value">'+item.value+'</span></div>';
+  }).join('');
+  document.getElementById('limitModal').classList.add('show');
+}
+
+function closeLimitModal(e){
+  if(e && e.target !== document.getElementById('limitModal')) return;
+  document.getElementById('limitModal').classList.remove('show');
 }
 
 function showToast(msg){

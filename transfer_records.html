@@ -5,39 +5,56 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>转赠记录</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #333; display: flex; justify-content: center; }
-.page { max-width: 430px; min-height: 100vh; background: #f6f7fb; padding: 0 16px 20px; position: relative; width: 100%; }
+:root{--accent:#3F8B6D;--accent-contrast:#fff;--bg:#fff;--ink:#222;--ink-muted:#555;--ink-subtle:#888;--border:#e0e0e0;--page-bg:#F0F0F0;--radius-sm:7px;--radius-card:7px;--radius-pill:9999px;--font-display:"Helvetica Neue",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;--font-body:"Inter",-apple-system,'PingFang SC','Microsoft YaHei',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(--ink-muted);display:flex;justify-content:center;min-height:100%}
+.page{max-width:430px;width:100%;min-height:100vh;background:linear-gradient(180deg,#3F8B6D 0%,#a8c9bb 8%,#f0f0f0 20%);padding:0 16px 80px;position:relative;box-sizing:border-box}
+@media(max-width:430px){.page{max-width:100%}}
 
-.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; background: #f6f7fb; }
-.nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.nav-back svg { width: 20px; height: 20px; color: #333; display: block; }
-.nav-title { flex: 1; text-align: center; font-size: 16px; font-weight: 600; color: #1a1a2e; }
-.nav-placeholder { width: 32px; }
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.nav-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(255,255,255,.2);border-radius:50%}
+.nav-back svg{width:20px;height:20px;color:#fff;display:block}
+.nav-title{flex:1;text-align:center;font-size:16px;font-weight:700;color:#fff}
+.nav-placeholder{width:32px}
 
-.tabs { display: flex; background: #fff; border-radius: 12px; padding: 4px; margin: 10px 0 14px; }
-.tab { flex: 1; text-align: center; padding: 8px 0; font-size: 13px; color: #999; cursor: pointer; border-radius: 10px; transition: all .2s; font-weight: 500; }
-.tab.on { background: #D70C1F; color: #fff; font-weight: 600; }
+.tabs{display:flex;background:var(--bg);border-radius:12px;padding:4px;margin:4px 0 12px}
+.tab{flex:1;text-align:center;padding:9px 0;font-size:12px;color:var(--ink-subtle);cursor:pointer;border-radius:10px;font-weight:500;transition:all .2s}
+.tab.on{background:var(--accent);color:#fff;font-weight:600}
 
-.record-list { display: flex; flex-direction: column; gap: 10px; }
-.rec-card { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.03); }
-.rec-status { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.rec-badge { font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
-.badge-out { background: #FFF2F3; color: #D70C1F; }
-.badge-in { background: #E6F9F0; color: #00b894; }
-.rec-time { font-size: 11px; color: #bbb; }
+.record-list{display:flex;flex-direction:column;gap:8px}
+.rec-card{background:var(--bg);border-radius:var(--radius-card);padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.03)}
+.rec-status{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.rec-badge{font-size:10px;padding:3px 10px;border-radius:20px;font-weight:600}
+.badge-out{background:rgba(63,139,109,.1);color:var(--accent)}
+.badge-in{background:rgba(102,126,234,.1);color:#667eea}
+.rec-time{font-size:11px;color:#bbb}
 
-.rec-asset { display: flex; align-items: center; gap: 10px; }
-.rec-thumb { width: 40px; height: 48px; border-radius: 8px; background-position: center; background-size: cover; flex-shrink: 0; background-color: #f5f5f7; }
-.rec-info { flex: 1; min-width: 0; }
-.rec-name { font-size: 13px; font-weight: 600; color: #1a1a2e; }
-.rec-spec { font-size: 11px; color: #999; margin-top: 2px; }
-.rec-counterparty { display: flex; align-items: center; gap: 4px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f5f5f7; font-size: 11px; color: #999; }
-.rec-counterparty .dir { font-size: 10px; color: #ccc; }
-.rec-hash { font-size: 10px; color: #bbb; font-family: 'SF Mono',Menlo,Consolas,monospace; cursor: pointer; word-break: break-all; }
-.rec-hash:active { color: #D70C1F; }
+.rec-asset{display:flex;align-items:center;gap:10px}
+.rec-thumb{width:40px;height:40px;border-radius:8px;background-position:center;background-size:cover;flex-shrink:0;background-color:var(--page-bg)}
+.rec-info{flex:1;min-width:0}
+.rec-name{font-size:13px;font-weight:600;color:var(--ink)}
+.rec-spec{font-size:11px;color:var(--ink-subtle);margin-top:1px}
+.rec-counterparty{display:flex;align-items:center;gap:4px;margin-top:8px;padding-top:8px;border-top:1px solid var(--page-bg);font-size:11px;color:var(--ink-subtle)}
+.rec-counterparty .dir{font-size:11px;color:#ccc;font-weight:600}
+.rec-hash{font-size:10px;color:#bbb;font-family:'SF Mono',Menlo,Consolas,monospace;cursor:pointer;word-break:break-all;margin-top:4px;display:inline-block}
+.rec-hash:active{color:var(--accent)}
 
-.empty { text-align: center; padding: 60px 0; color: #ccc; font-size: 13px; }
+.empty{text-align:center;padding:60px 0;color:#ccc;font-size:13px}
+
+/* ── 链上浏览器弹窗 ── */
+.browser-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;align-items:flex-end;justify-content:center}
+.browser-overlay.show{display:flex}
+.browser-box{background:var(--bg);border-radius:16px 16px 0 0;width:100%;max-width:430px;height:85vh;display:flex;flex-direction:column;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.browser-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--page-bg);flex-shrink:0}
+.browser-title{font-size:14px;font-weight:600;color:var(--ink)}
+.browser-close{width:28px;height:28px;border-radius:50%;background:var(--page-bg);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none}
+.browser-close svg{width:14px;height:14px;color:var(--ink-subtle)}
+.browser-body{flex:1;overflow:hidden;position:relative}
+.browser-body iframe{width:100%;height:100%;border:none}
+.browser-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:1}
+.browser-loading .spinner{width:32px;height:32px;border:3px solid var(--page-bg);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -62,12 +79,12 @@ body { margin: 0; background: #2c2c2e; font-family: -apple-system, 'PingFang SC'
 </div>
 
 <script>
-// ═══ 模拟转赠记录（后续可接KV持久化） ═══
 var records = [
-  { type:'out', date:'2026-06-10 14:22', series:'茅台1935·时光窖藏', spec:'凝时', id:'#54', img:'凝时.png', person:'张三', addr:'0xa1b2...c3d4', hash:'0x3f1a8b2c9d...7e6f' },
-  { type:'in',  date:'2026-06-08 10:15', series:'国酒·数字徽章', spec:'标准款', id:'#88', img:'国酒·数字徽章.png', person:'李四', addr:'0xe5f6...a7b8', hash:'0x9c4d5e6f1a...3b2c' },
-  { type:'out', date:'2026-05-20 16:30', series:'飞天茅台·元宇宙酒票', spec:'典藏版', id:'#28', img:'飞天茅台·元宇宙酒票.png', person:'王五', addr:'0xc9d0...e1f2', hash:'0x7a3b6c5d4e...1f9a' },
-  { type:'in',  date:'2026-05-12 09:00', series:'茅台生肖兔·典藏', spec:'兔年限定', id:'#09', img:'茅台生肖兔·典藏.png', person:'赵六', addr:'0x8b7c6d...5e4f', hash:'0x2d1e0f3a4b...6c7d' },
+  { type:'out', date:'2026-07-10 14:22', series:'兰亭雅集', spec:'优享版', id:'#0101', img:'asset/兰亭雅集封面图.png', phone:'138****5678', addr:'0xa1b2...c3d4', hash:'0x3f1a8b2c9d...7e6f' },
+  { type:'in',  date:'2026-07-08 10:15', series:'兰亭碑刻', spec:'珍藏版', id:'#0202', img:'asset/兰亭碑刻封面图.png', phone:'139****1234', addr:'0xe5f6...a7b8', hash:'0x9c4d5e6f1a...3b2c' },
+  { type:'out', date:'2026-06-28 16:30', series:'兰亭春禊', spec:'学韵版', id:'#0301', img:'asset/兰亭春禊封面图.png', phone:'135****4321', addr:'0xc9d0...e1f2', hash:'0x7a3b6c5d4e...1f9a' },
+  { type:'in',  date:'2026-06-20 09:00', series:'曲水流觞', spec:'基础版', id:'#0401', img:'asset/曲水流觞封面图.png', phone:'136****8765', addr:'0x8b7c6d...5e4f', hash:'0x2d1e0f3a4b...6c7d' },
+  { type:'out', date:'2026-06-15 11:45', series:'兰亭诗韵', spec:'基础版', id:'#0501', img:'asset/兰亭诗韵封面图.png', phone:'158****6789', addr:'0xf1e2...d3c4', hash:'0x5a6b7c8d9e...0f1a' }
 ];
 
 var currentTab = 'all';
@@ -85,7 +102,6 @@ function renderRecords(){
   if(currentTab === 'out') list = list.filter(function(r){ return r.type === 'out'; });
   if(currentTab === 'in')  list = list.filter(function(r){ return r.type === 'in'; });
   list.sort(function(a,b){ return b.date.localeCompare(a.date); });
-
   if(!list.length){
     document.getElementById('recordList').innerHTML = '<div class="empty">暂无转赠记录</div>';
     return;
@@ -104,10 +120,10 @@ function renderRecords(){
     h += '</div>';
     h += '<div class="rec-counterparty">';
     h += '<span class="dir">'+(isOut?'→':'←')+'</span>';
-    h += '<span>'+r.person+'</span>';
+    h += '<span>'+r.phone+'</span>';
     h += '<span style="margin-left:8px;font-size:10px;color:#ccc">'+r.addr+'</span>';
     h += '</div>';
-    h += '<div style="margin-top:6px"><span class="rec-hash" onclick="copyIt(\''+r.hash+'\')">TxHash: '+r.hash+'</span></div>';
+    h += '<div><span class="rec-hash" onclick="openBrowser(\''+r.hash+'\')">TxHash: '+r.hash+'</span></div>';
     h += '</div>';
   });
   document.getElementById('recordList').innerHTML = h;
@@ -118,6 +134,35 @@ function copyIt(txt){
 }
 
 renderRecords();
+</script>
+
+<!-- 链上浏览器弹窗 -->
+<div class="browser-overlay" id="browserOverlay">
+  <div class="browser-box">
+    <div class="browser-header">
+      <div class="browser-title">区块链浏览器</div>
+      <button class="browser-close" onclick="closeBrowser()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="browser-body">
+      <div class="browser-loading" id="browserLoading"><div class="spinner"></div></div>
+      <iframe id="browserIframe" onload="document.getElementById('browserLoading').style.display='none'"></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+function openBrowser(hash){
+  var url = 'https://can.ihaichain.com/item?params=0x82a595e8c7d3b479ce9af9b797cbc9224656ec4d&token_id=' + (Math.floor(Math.random()*50)+1);
+  document.getElementById('browserLoading').style.display = 'flex';
+  document.getElementById('browserIframe').src = url;
+  document.getElementById('browserOverlay').classList.add('show');
+}
+function closeBrowser(){
+  document.getElementById('browserOverlay').classList.remove('show');
+  document.getElementById('browserIframe').src = '';
+}
 </script>
 
 </body>

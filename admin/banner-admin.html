@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title>Banner管理 - 元宇宙商城后台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f0f2f5; color: #333; }
+
+    .header { background: linear-gradient(135deg, #D70C1F, #F12B3D); color: #fff; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .header-title { font-size: 18px; font-weight: 600; }
+    .header-user { font-size: 14px; }
+
+    .main-container { display: flex; min-height: calc(100vh - 60px); }
+    .sidebar { width: 200px; background: #fff; border-right: 1px solid #e8e8e8; padding: 16px 0; }
+    .sidebar-group-title { padding: 8px 24px; font-size: 12px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .sidebar-item { padding: 10px 24px 10px 48px; font-size: 14px; color: #666; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 8px; }
+    .sidebar-item:hover { background: #f5f5f5; color: #D70C1F; }
+    .sidebar-item.active { background: rgba(215,12,31,.1); color: #D70C1F; font-weight: 600; }
+    .sidebar-item svg { width: 14px; height: 14px; }
+
+    .content { flex: 1; padding: 24px; overflow-y: auto; }
+    .content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .content-title { font-size: 20px; font-weight: 700; color: #1a1a2e; }
+
+    .card { background: #fff; border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    .btn { padding: 8px 18px; border-radius: 8px; font-size: 14px; cursor: pointer; border: none; transition: all .2s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary { background: #D70C1F; color: #fff; }
+    .btn-primary:hover { opacity: .9; }
+    .btn-sm { padding: 4px 10px; font-size: 12px; border-radius: 6px; }
+    .btn-outline { background: #fff; color: #666; border: 1px solid #ddd; }
+    .btn-outline:hover { background: #f5f5f5; }
+    .btn-danger { background: #fff5f5; color: #e74c3c; border: 1px solid #ffcccc; }
+    .btn-danger:hover { background: #ffeaea; }
+    .btn-success { background: rgba(7,193,96,.1); color: #07c160; border: 1px solid rgba(7,193,96,.3); }
+    .btn-success:hover { background: rgba(7,193,96,.15); }
+    .btn-warning { background: #fff7e6; color: #fa8c16; border: 1px solid rgba(250,140,22,.3); }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 14px; font-weight: 600; color: #555; margin-bottom: 8px; }
+    .form-input { width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; }
+    .form-input:focus { border-color: #D70C1F; }
+    .form-select { width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; }
+    .form-select:focus { border-color: #D70C1F; }
+
+    .radio-group { display: flex; gap: 20px; }
+    .radio-item { display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
+    .radio-item input { accent-color: #D70C1F; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal-overlay.show { display: flex; }
+    .modal-box { background: #fff; border-radius: 16px; width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #f0f0f0; }
+    .modal-title { font-size: 16px; font-weight: 600; }
+    .modal-close { width: 30px; height: 30px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; }
+    .modal-body { padding: 20px; }
+    .modal-footer { padding: 16px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px; }
+
+    .banner-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .banner-card { background: #fafafa; border-radius: 12px; overflow: hidden; border: 1px solid #eee; position: relative; transition: box-shadow .2s; }
+    .banner-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+    .banner-preview { width: 100%; height: 140px; object-fit: cover; display: block; background: #e8e8e8; }
+    .banner-card-body { padding: 12px 14px 14px; }
+    .banner-card-title { font-size: 14px; font-weight: 600; color: #222; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .banner-card-desc { font-size: 12px; color: #999; margin-bottom: 10px; word-break: break-all; }
+    .banner-card-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .banner-order { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,.6); color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: 600; }
+    .banner-status-tag { position: absolute; top: 8px; right: 8px; font-size: 11px; padding: 2px 10px; border-radius: 10px; font-weight: 600; }
+    .banner-status-tag.on { background: rgba(7,193,96,.85); color: #fff; }
+    .banner-status-tag.off { background: rgba(153,153,153,.85); color: #fff; }
+
+    .upload-area { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed #ddd; border-radius: 10px; padding: 30px 20px; cursor: pointer; transition: all .2s; }
+    .upload-area:hover { border-color: #D70C1F; background: rgba(215,12,31,.02); }
+    .upload-area.dragover { border-color: #D70C1F; background: rgba(215,12,31,.06); }
+    .upload-area svg { width: 40px; height: 40px; color: #ccc; margin-bottom: 8px; }
+    .upload-area .upload-text { font-size: 14px; color: #999; }
+    .upload-area .upload-hint { font-size: 12px; color: #ccc; margin-top: 4px; }
+    .upload-preview { max-width: 100%; max-height: 180px; border-radius: 8px; margin-top: 10px; display: none; object-fit: contain; }
+
+    .empty-state { padding: 80px 0; text-align: center; color: #ccc; }
+    .empty-state svg { width: 60px; height: 60px; margin-bottom: 12px; }
+    .empty-state p { font-size: 14px; }
+
+    .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); padding: 12px 20px; border-radius: 8px; font-size: 14px; z-index: 2000; animation: slideIn .3s ease; color: #fff; }
+    .toast.success { background: rgba(7,193,96,.9); }
+    .toast.error { background: rgba(231,76,60,.9); }
+    @keyframes slideIn { from { transform: translateX(-50%) translateY(-20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-title">元宇宙商城 - 后台管理</div>
+    <div class="header-user">管理员</div>
+  </div>
+
+  <div class="main-container">
+    <div class="sidebar">
+      <div class="sidebar-group-title">元宇宙管理</div>
+      <div class="sidebar-item" onclick="navigateTo('hotspot-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>场景和热区</div>
+      <div class="sidebar-item" onclick="navigateTo('path-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="12 19 19 12 12 5 5 12"/><circle cx="12" cy="12" r="3"/></svg>跳转路径</div>
+      <div class="sidebar-item" onclick="navigateTo('map-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3 9 12 15 21 9"/></svg>主地图管理</div>
+      <div class="sidebar-item" onclick="navigateTo('space-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>商家元宇宙空间管理</div>
+      <div class="sidebar-item" onclick="navigateTo('role-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>角色管理</div>
+      <div class="sidebar-item" onclick="navigateTo('dashboard-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>元宇宙看板</div>
+      <div class="sidebar-item" onclick="navigateTo('dice-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><text x="12" y="17" text-anchor="middle" font-size="10">?</text></svg>🎲 骰子游戏</div>
+      <div class="sidebar-group-title">数字资产</div>
+      <div class="sidebar-item" onclick="navigateTo('asset-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>数字资产管理</div>
+      <div class="sidebar-item" onclick="navigateTo('digital-asset-detail.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>数字资产详情</div>
+      <div class="sidebar-item" onclick="navigateTo('order-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>订单管理</div>
+      <div class="sidebar-group-title">会员管理</div>
+      <div class="sidebar-item" onclick="navigateTo('user-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>用户管理</div>
+      <div class="sidebar-item" onclick="navigateTo('merchant-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>商家管理</div>
+      <div class="sidebar-group-title">审核管理</div>
+      <div class="sidebar-item" onclick="navigateTo('cert-review.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>商家审核管理</div>
+      <div class="sidebar-item" onclick="navigateTo('story-review.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>文化故事审核</div>
+      <div class="sidebar-group-title">内容管理</div>
+      <div class="sidebar-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Banner管理</div>
+      <div class="sidebar-item" onclick="navigateTo('message-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>消息管理</div>
+      <div class="sidebar-group-title">系统管理</div>
+      <div class="sidebar-item" onclick="navigateTo('wallet-admin.html')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>钱包管理</div>
+    </div>
+
+    <div class="content">
+      <div class="content-header">
+        <div class="content-title">🖼 Banner管理</div>
+        <button class="btn btn-primary" onclick="openBannerModal()">+ 新建Banner</button>
+      </div>
+
+      <div class="card">
+        <div style="font-size:12px;color:#999;margin-bottom:12px">排序说明：拖拽排序暂不支持，请使用排序数值调整（数值越小越靠前）</div>
+        <div class="banner-grid" id="bannerGrid"></div>
+        <div class="empty-state" id="emptyState">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <p>暂无Banner，点击上方按钮新建</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 编辑弹窗 -->
+  <div class="modal-overlay" id="bannerModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="bannerModalTitle">新建Banner</div>
+        <div class="modal-close" onclick="closeBannerModal()">✕</div>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="bannerEditId">
+        <div class="form-group">
+          <label class="form-label">Banner标题</label>
+          <input class="form-input" id="bannerTitle" placeholder="输入Banner标题（选填）">
+        </div>
+        <div class="form-group">
+          <label class="form-label">上传图片 <span style="color:#e74c3c">*</span></label>
+          <div class="upload-area" id="uploadArea" onclick="document.getElementById('bannerImageInput').click()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <div class="upload-text">点击上传图片</div>
+            <div class="upload-hint">支持 JPG、PNG、GIF，建议尺寸 750×300px</div>
+            <img class="upload-preview" id="uploadPreview" src="">
+          </div>
+          <input type="file" id="bannerImageInput" accept="image/*" onchange="handleBannerImage(event)" style="display:none">
+        </div>
+        <div class="form-group">
+          <label class="form-label">跳转类型</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="linkType" value="none" checked onchange="toggleLinkType()"> 不跳转</label>
+            <label class="radio-item"><input type="radio" name="linkType" value="h5" onchange="toggleLinkType()"> H5页面（外部链接）</label>
+            <label class="radio-item"><input type="radio" name="linkType" value="internal" onchange="toggleLinkType()"> 内部页面</label>
+          </div>
+        </div>
+        <div class="form-group" id="h5LinkGroup" style="display:none">
+          <label class="form-label">H5链接地址</label>
+          <input class="form-input" id="h5Link" placeholder="https://example.com/page">
+        </div>
+        <div class="form-group" id="internalLinkGroup" style="display:none">
+          <label class="form-label">内部页面地址</label>
+          <input class="form-input" id="internalLink" placeholder="例如: user-index.html">
+        </div>
+        <div class="form-group">
+          <label class="form-label">排序权重</label>
+          <input class="form-input" id="bannerOrder" type="number" value="0" min="0" style="width:120px">
+          <div style="font-size:11px;color:#bbb;margin-top:4px">数值越小越靠前显示</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">状态</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="bannerStatus" value="on" checked> 启用</label>
+            <label class="radio-item"><input type="radio" name="bannerStatus" value="off"> 停用</label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeBannerModal()">取消</button>
+        <button class="btn btn-primary" onclick="saveBanner()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var STORAGE = 'adminBanners';
+    var banners = [];
+
+    function navigateTo(url) { window.location.href = url; }
+
+    // ── 加载数据 ──
+    function loadBanners() {
+      var saved = localStorage.getItem(STORAGE);
+      if (saved) { try { banners = JSON.parse(saved); } catch(e) { banners = []; } }
+      if (!banners.length) {
+        // 默认示例数据
+        banners = [
+          { id: 'b1', title: '数字资产市场火热上线', image: '../asset/banner.png', linkType: 'internal', link: 'asset_market.html', order: 0, status: 'on' },
+          { id: 'b2', title: '绍兴文旅数字藏品', image: '../asset/banner1.png', linkType: 'h5', link: 'https://example.com/shaoxing', order: 1, status: 'on' },
+        ];
+        saveData();
+      }
+      renderBanners();
+    }
+
+    function saveData() { localStorage.setItem(STORAGE, JSON.stringify(banners)); }
+
+    // ── 渲染 ──
+    function renderBanners() {
+      var sorted = banners.slice().sort(function(a, b) { return a.order - b.order; });
+      var container = document.getElementById('bannerGrid');
+      var empty = document.getElementById('emptyState');
+      if (sorted.length === 0) { container.innerHTML = ''; empty.style.display = 'block'; return; }
+      empty.style.display = 'none';
+
+      container.innerHTML = sorted.map(function(b) {
+        var linkLabel = '';
+        if (b.linkType === 'none') linkLabel = '🚫 不跳转';
+        else if (b.linkType === 'h5') linkLabel = '🌐 ' + (b.link || '—');
+        else linkLabel = '📱 ' + (b.link || '—');
+        var imgHtml = b.image ? '<img class="banner-preview" src="' + b.image + '" alt="">' : '<div class="banner-preview" style="display:flex;align-items:center;justify-content:center;color:#ccc;font-size:13px">暂无图片</div>';
+        var statusLabel = b.status === 'on' ? '启用' : '停用';
+        return '<div class="banner-card">' +
+          '<div class="banner-order">#' + b.order + '</div>' +
+          '<span class="banner-status-tag ' + b.status + '">' + statusLabel + '</span>' +
+          imgHtml +
+          '<div class="banner-card-body">' +
+          '<div class="banner-card-title">' + (b.title || '未命名') + '</div>' +
+          '<div class="banner-card-desc">' + linkLabel + '</div>' +
+          '<div class="banner-card-actions">' +
+          '<button class="btn btn-sm btn-outline" onclick="openBannerModal(\'' + b.id + '\')">编辑</button>' +
+          '<button class="btn btn-sm ' + (b.status === 'on' ? 'btn-warning' : 'btn-success') + '" onclick="toggleBanner(\'' + b.id + '\')">' + (b.status === 'on' ? '停用' : '启用') + '</button>' +
+          '<button class="btn btn-sm btn-danger" onclick="deleteBanner(\'' + b.id + '\')">删除</button>' +
+          '</div></div></div>';
+      }).join('');
+    }
+
+
+    // ── 弹窗 ──
+    function openBannerModal(id) {
+      document.getElementById('bannerEditId').value = '';
+      document.getElementById('bannerTitle').value = '';
+      document.getElementById('h5Link').value = '';
+      document.getElementById('internalLink').value = '';
+      document.getElementById('bannerOrder').value = '0';
+      document.querySelector('input[name="linkType"][value="none"]').checked = true;
+      document.querySelector('input[name="bannerStatus"][value="on"]').checked = true;
+      document.getElementById('uploadPreview').style.display = 'none';
+      document.getElementById('uploadPreview').src = '';
+      document.getElementById('h5LinkGroup').style.display = 'none';
+      document.getElementById('internalLinkGroup').style.display = 'none';
+      document.getElementById('bannerModalTitle').textContent = '新建Banner';
+
+      if (id) {
+        var b = banners.find(function(x) { return x.id === id; });
+        if (!b) return;
+        document.getElementById('bannerEditId').value = id;
+        document.getElementById('bannerTitle').value = b.title || '';
+        document.getElementById('bannerOrder').value = b.order || 0;
+        document.querySelector('input[name="linkType"][value="' + b.linkType + '"]').checked = true;
+        document.querySelector('input[name="bannerStatus"][value="' + b.status + '"]').checked = true;
+        if (b.linkType === 'h5') {
+          document.getElementById('h5Link').value = b.link || '';
+        } else if (b.linkType === 'internal') {
+          document.getElementById('internalLink').value = b.link || '';
+        }
+        if (b.image) {
+          document.getElementById('uploadPreview').src = b.image;
+          document.getElementById('uploadPreview').style.display = 'block';
+        }
+        toggleLinkType();
+        document.getElementById('bannerModalTitle').textContent = '编辑Banner';
+      }
+      document.getElementById('bannerModal').classList.add('show');
+    }
+
+    function closeBannerModal() { document.getElementById('bannerModal').classList.remove('show'); }
+
+    function toggleLinkType() {
+      var val = document.querySelector('input[name="linkType"]:checked').value;
+      document.getElementById('h5LinkGroup').style.display = val === 'h5' ? 'block' : 'none';
+      document.getElementById('internalLinkGroup').style.display = val === 'internal' ? 'block' : 'none';
+    }
+
+    // ── 图片上传 ──
+    function handleBannerImage(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        var img = document.getElementById('uploadPreview');
+        img.src = ev.target.result;
+        img.style.display = 'block';
+        // 更新上传区文字
+        document.querySelector('.upload-text').textContent = '已选择图片，点击可更换';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ── 拖拽上传 ──
+    (function() {
+      var area = document.getElementById('uploadArea');
+      area.addEventListener('dragover', function(e) { e.preventDefault(); area.classList.add('dragover'); });
+      area.addEventListener('dragleave', function() { area.classList.remove('dragover'); });
+      area.addEventListener('drop', function(e) {
+        e.preventDefault();
+        area.classList.remove('dragover');
+        var file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+          var reader = new FileReader();
+          reader.onload = function(ev) {
+            var img = document.getElementById('uploadPreview');
+            img.src = ev.target.result;
+            img.style.display = 'block';
+            document.querySelector('.upload-text').textContent = '已选择图片，点击可更换';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    })();
+
+    // ── 保存 ──
+    function saveBanner() {
+      var editId = document.getElementById('bannerEditId').value;
+      var title = document.getElementById('bannerTitle').value.trim();
+      var order = parseInt(document.getElementById('bannerOrder').value) || 0;
+      var linkType = document.querySelector('input[name="linkType"]:checked').value;
+      var link = '';
+      if (linkType === 'h5') link = document.getElementById('h5Link').value.trim();
+      else if (linkType === 'internal') link = document.getElementById('internalLink').value.trim();
+      var status = document.querySelector('input[name="bannerStatus"]:checked').value;
+      var image = document.getElementById('uploadPreview').src || '';
+
+      if (!image || image === '' || image === window.location.href) {
+        showToast('请上传Banner图片', 'error');
+        return;
+      }
+      if (linkType !== 'none' && !link) {
+        showToast('请填写跳转链接', 'error');
+        return;
+      }
+
+      if (editId) {
+        var b = banners.find(function(x) { return x.id === editId; });
+        if (b) {
+          b.title = title;
+          b.image = image;
+          b.linkType = linkType;
+          b.link = link;
+          b.order = order;
+          b.status = status;
+        }
+        showToast('Banner已更新', 'success');
+      } else {
+        banners.push({
+          id: 'banner' + Date.now(),
+          title: title,
+          image: image,
+          linkType: linkType,
+          link: link,
+          order: order,
+          status: status
+        });
+        showToast('Banner已创建', 'success');
+      }
+      saveData();
+      closeBannerModal();
+      renderBanners();
+    }
+
+    // ── 启用/停用 ──
+    function toggleBanner(id) {
+      var b = banners.find(function(x) { return x.id === id; });
+      if (!b) return;
+      b.status = b.status === 'on' ? 'off' : 'on';
+      saveData();
+      renderBanners();
+      showToast(b.status === 'on' ? '已启用' : '已停用', 'success');
+    }
+
+    // ── 删除 ──
+    function deleteBanner(id) {
+      if (!confirm('确定删除该Banner？')) return;
+      banners = banners.filter(function(b) { return b.id !== id; });
+      saveData();
+      renderBanners();
+      showToast('已删除', 'success');
+    }
+
+    function showToast(msg, type) {
+      var t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg;
+      document.body.appendChild(t); setTimeout(function() { t.remove(); }, 2000);
+    }
+
+    loadBanners();
+  </script>
+</body>
+</html>

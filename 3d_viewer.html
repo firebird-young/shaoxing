@@ -81,10 +81,14 @@ scene.add(dl2);
 
 var renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(w, h);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 3));
 renderer.toneMapping = 3;
 renderer.toneMappingExposure = 1.2;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 wrap.appendChild(renderer.domElement);
+
+// 先渲染一帧空场景，确保 WebGL 上下文激活
+renderer.render(scene, camera);
 
 // 轨道控制
 var isDrag = false, px = 0, py = 0, theta = 0, phi = 0, radius = 5;

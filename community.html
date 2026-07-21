@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>社区</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#2c2c2e;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;color:#333;display:flex;flex-direction:column;align-items:center}
+.page{max-width:430px;min-height:100vh;background:linear-gradient(180deg,#1a6b4c 0%,#3f9b7a 20%,#e8f5ee 40%,#f5f5f5 100%);padding-bottom:80px;position:relative;width:100%}
+@media(max-width:430px){.page{max-width:100%}}
+
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;gap:12px}
+.top-bar .back-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.25);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.top-bar .back-btn:active{background:rgba(255,255,255,.4)}
+.top-bar .back-btn svg{width:18px;height:18px;display:block}
+.top-bar .title{font-size:18px;font-weight:700;color:#fff;text-align:center;flex:1;letter-spacing:1px}
+
+/* ── 精选动态 - 三个Tab ── */
+.subtab-bar{display:flex;margin:0 16px 8px;gap:4px}
+.subtab-btn{padding:5px 14px;border-radius:999px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid rgba(255,255,255,.3);background:transparent;color:rgba(255,255,255,.7);transition:all .2s;white-space:nowrap}
+.subtab-btn:active{opacity:.7}
+.subtab-btn.on{background:#fff;color:#1a6b4c;border-color:#fff;font-weight:600}
+
+/* ── 我的关注入口 ── */
+.follow-entry{display:flex;align-items:center;justify-content:space-between;margin:0 16px 12px;padding:12px 14px;background:#fff;border-radius:12px;cursor:pointer;box-shadow:0 1px 6px rgba(26,107,76,.06)}
+.follow-entry:active{background:#f5f5f5}
+.follow-info{display:flex;align-items:center;gap:10px}
+.follow-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#1a6b4c,#3f9b7a);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:700}
+.follow-text{font-size:13px;font-weight:600;color:#222}
+.follow-count{font-size:11px;color:#999;margin-top:2px}
+.follow-arrow{color:#ccc;width:14px;height:14px}
+
+/* ── 帖子卡片 ── */
+.posts-wrap{padding:0 16px}
+.post-card{background:#fff;border-radius:14px;margin-bottom:14px;overflow:hidden;box-shadow:0 2px 12px rgba(26,107,76,.06)}
+.post-header{display:flex;align-items:center;gap:10px;padding:14px 14px 0}
+.post-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1a6b4c,#3f9b7a);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0;overflow:hidden}
+.post-avatar img{width:100%;height:100%;object-fit:cover}
+.post-user{flex:1;min-width:0}
+.post-username{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:#222}
+.post-username .post-tag-inline{padding:1px 6px;border-radius:3px;font-size:9px;font-weight:600;flex-shrink:0;line-height:1.5}
+.post-time{font-size:10px;color:#bbb;margin-top:2px}
+.post-tag{padding:2px 8px;border-radius:4px;font-size:9px;font-weight:600;background:#E8F4FD;color:#2980b9;flex-shrink:0}
+.post-content{padding:12px 14px;font-size:13px;color:#444;line-height:1.6}
+.post-images{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:0 14px 12px}
+.post-images .img-item{aspect-ratio:1;border-radius:8px;overflow:hidden;background:#f0f0f0;position:relative}
+.post-images .img-item img{width:100%;height:100%;object-fit:cover;display:block}
+.post-images.col2{grid-template-columns:repeat(2,1fr)}
+.post-images.col1{grid-template-columns:1fr}
+.post-images.col1 .img-item{aspect-ratio:16/9}
+
+/* ── 引用数字资产卡片 ── */
+.ref-asset{display:flex;align-items:center;gap:10px;margin:0 14px 12px;padding:10px;background:#f8faf8;border-radius:10px;border:1px solid #e8f0ea;cursor:pointer;transition:background .15s}
+.ref-asset:active{background:#edf5ef}
+.ref-asset-img{width:48px;height:48px;border-radius:8px;object-fit:cover;background:#e8e8e8;flex-shrink:0}
+.ref-asset-info{flex:1;min-width:0}
+.ref-asset-name{font-size:13px;font-weight:600;color:#222}
+.ref-asset-issuer{font-size:10px;color:#999;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ref-asset-price{font-size:11px;color:#1a6b4c;font-weight:600;margin-top:2px}
+.ref-asset-arrow{color:#bbb;width:14px;height:14px;flex-shrink:0}
+
+/* ── 互动区 ── */
+.post-actions{display:flex;align-items:center;padding:10px 14px 14px;gap:20px;border-top:1px solid #f5f5f5}
+.post-action{display:flex;align-items:center;gap:4px;font-size:11px;color:#bbb;cursor:pointer;border:none;background:none;padding:2px 4px;transition:color .2s}
+.post-action:active{color:#1a6b4c}
+.post-action svg{width:16px;height:16px;display:block}
+.post-action.on{color:#e74c3c}
+
+/* ── 发帖按钮 ── */
+.post-btn{position:fixed;bottom:80px;right:calc(50% - 215px + 16px);z-index:50;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#1a6b4c,#3f9b7a);color:#fff;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(26,107,76,.35);display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.post-btn:active{transform:scale(.9)}
+.post-btn svg{width:22px;height:22px;display:block}
+@media(max-width:430px){.post-btn{right:16px}}
+
+/* ── 底部导航 ── */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:64px;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid rgba(0,0,0,.06);display:flex;align-items:center;justify-content:space-between;padding:0 16px;padding-bottom:env(safe-area-inset-bottom,4px);z-index:100;box-sizing:border-box}
+.bnav .ni{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;border:none;background:none;padding:4px 10px;font-size:10px;color:#bbb;transition:color .2s}
+.bnav .ni .ico{width:22px;height:22px;transition:transform .15s}
+.bnav .ni .ico svg{display:block;width:100%;height:100%}
+.bnav .ni:active .ico{transform:scale(.8)}
+.bnav .ni.on{color:#1a6b4c}
+.bnav .ni.on .ico{transform:scale(1.05)}
+.bnav .ni span:last-child{font-size:10px;display:block}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="top-bar">
+  <button class="back-btn" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </button>
+  <span class="title">社区</span>
+  <div style="width:32px"></div>
+  <div style="width:32px"></div>
+</div>
+
+<!-- 我的关注入口 -->
+<div class="follow-entry" onclick="window.location.href='my-profile.html'">
+  <div class="follow-info">
+    <div class="follow-avatar"><img src="头像.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display='none';this.parentElement.textContent='兰'"></div>
+    <div>
+      <div class="follow-text">我的主页</div>
+      <div class="follow-count">查看个人主页和帖子</div>
+    </div>
+  </div>
+  <svg class="follow-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+</div>
+
+<!-- 精选动态Tab -->
+<div class="subtab-bar" id="feedTabs" style="margin-bottom:10px">
+  <button class="subtab-btn on" data-sub="hot" onclick="switchTab('hot')">🔥 热门</button>
+  <button class="subtab-btn" data-sub="follow" onclick="switchTab('follow')">关注</button>
+  <button class="subtab-btn" data-sub="discover" onclick="switchTab('discover')">发现</button>
+</div>
+
+<!-- 帖子列表 -->
+<div class="posts-wrap" id="postsContainer"></div>
+
+</div>
+
+<!-- 发帖按钮 -->
+<button class="post-btn" onclick="window.location.href='post-create.html'">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+</button>
+
+<!-- 底部导航 -->
+<div class="bnav">
+  <button class="ni" onclick="window.location.href='user-index.html'">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+    <span>首页</span>
+  </button>
+  <button class="ni" onclick="window.location.href='asset_market.html'">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="20"/><line x1="6" y1="16" x2="6" y2="20"/><line x1="10" y1="12" x2="10" y2="20"/><line x1="14" y1="8" x2="14" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/></svg></span>
+    <span>市场</span>
+  </button>
+  <button class="ni on">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+    <span>社区</span>
+  </button>
+  <button class="ni" onclick="window.location.href='my.html'">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+    <span>我的</span>
+  </button>
+</div>
+
+<script>
+// ═══ 帖子数据（含数字资产引用）═══
+var postsData = {
+  hot: [
+    {
+      user:'绍兴兰亭产业数资', tag:'商家', time:'2小时前',
+      content:'兰亭雅集数字藏品正式上线！限量666份，每一份都带有王羲之《兰亭集序》的经典元素，快来收藏吧～',
+      images:['asset/兰亭雅集封面图.png','asset/兰亭碑刻封面图.png','asset/兰亭春禊封面图.png'],
+      asset:{ name:'兰亭雅集', price:'¥399', issuer:'绍兴兰亭产业数资', img:'asset/兰亭雅集产品图.png' },
+      likes:128, comments:36
+    },
+    {
+      user:'古越龙山', tag:'商家', time:'5小时前',
+      content:'曲水流觞系列数字资产即将发售，每一份都对应一坛真实黄酒，可在线下门店兑换！',
+      images:['asset/曲水流觞封面图.png','asset/兰亭诗韵封面图.png'],
+      likes:86, comments:22
+    },
+    {
+      user:'数字收藏家', level:'LV6', time:'1天前',
+      content:'今天去绍兴兰亭景区实地打卡，买了数字资产后扫码领取了实体纪念品，体验太棒了！景区环境清幽，曲水流觞的意境真的让人流连忘返。推荐大家一定要去线下看看～',
+      images:['asset/兰亭雅集封面图.png','asset/兰亭雅集产品图.png','asset/兰亭碑刻封面图.png'],
+      likes:67, comments:14
+    },
+    {
+      user:'元宇宙探险家', level:'LV4', time:'1天前',
+      content:'终于抢到了兰亭碑刻的数字资产！实物质感太棒了，分享给大家看看 👇',
+      images:['asset/兰亭碑刻封面图.png','asset/兰亭春禊封面图.png'],
+      asset:{ name:'兰亭碑刻', price:'¥299', issuer:'绍兴兰亭产业数资', img:'asset/兰亭碑刻封面图.png' },
+      likes:52, comments:8
+    },
+    {
+      user:'诸暨珠宝', tag:'商家', time:'8小时前',
+      content:'诸暨珠宝联名数字资产上线！珍珠之乡的璀璨之作，每份可兑换线下珠宝饰品 💎',
+      images:['asset/兰亭诗韵封面图.png','asset/越窑青瓷封面图.png'],
+      asset:{ name:'兰亭诗韵', price:'¥459', issuer:'诸暨珠宝', img:'asset/兰亭诗韵封面图.png' },
+      likes:73, comments:19
+    },
+  ],
+  follow: [
+    {
+      user:'绍兴兰亭产业数资', tag:'商家', time:'3小时前',
+      content:'绍兴兰亭景区数字导览已上线，扫码即可体验AR效果，感受王羲之笔下的曲水流觞 🏯',
+      images:['asset/兰亭雅集产品图.png','asset/兰亭春禊封面图.png'],
+      asset:{ name:'兰亭雅集', price:'¥399', issuer:'绍兴兰亭产业数资', img:'asset/兰亭雅集产品图.png' },
+      likes:45, comments:10
+    },
+    {
+      user:'数字收藏家', level:'LV6', time:'8小时前',
+      content:'入手了兰亭春禊数字资产，买2件还有9折优惠，太划算了！',
+      images:['asset/兰亭春禊封面图.png'],
+      likes:38, comments:7
+    },
+    {
+      user:'贵州村超', tag:'商家', time:'1天前',
+      content:'贵州村超联名数字藏品发布！足球+文化的碰撞，每份附带线下观赛权益 ⚽',
+      images:['asset/贵州村超建筑.png'],
+      asset:{ name:'贵州村超·联名藏品', price:'¥99', issuer:'贵州村超', img:'asset/贵州村超建筑.png' },
+      likes:61, comments:14
+    },
+  ],
+  discover: [
+    {
+      user:'新锐设计师', level:'LV3', time:'1天前',
+      content:'分享一组我自己设计的数字藏品概念图，主题是"江南水乡"系列，希望大家喜欢🎨',
+      images:['asset/兰亭雅集封面图.png','asset/曲水流觞封面图.png'],
+      likes:72, comments:19
+    },
+    {
+      user:'区块链爱好者', level:'LV5', time:'2天前',
+      content:'数字资产的未来：从收藏到实用价值。最近发现很多数字资产都可以兑换线下实物和服务，这才是真正的价值所在！',
+      images:['asset/兰亭碑刻封面图.png'],
+      likes:55, comments:24
+    },
+    {
+      user:'摄影达人', level:'LV2', time:'3天前',
+      content:'实拍绍兴兰亭景区，秋天的兰亭美不胜收！买了数字资产的朋友一定要去线下看看 📷',
+      images:['asset/兰亭雅集产品图.png','asset/兰亭雅集封面图.png'],
+      asset:{ name:'兰亭雅集', price:'¥399', issuer:'绍兴兰亭产业数资', img:'asset/兰亭雅集产品图.png' },
+      likes:41, comments:6
+    },
+    {
+      user:'杜甫草堂', tag:'官方', time:'4天前',
+      content:'杜甫草堂·文旅数字藏品全新上线，集齐系列可兑换杜甫草堂实体门票+文创礼盒 🎁',
+      images:['asset/杜甫草堂·文旅数字藏品.png','asset/杜甫草堂建筑.png'],
+      asset:{ name:'杜甫草堂·文旅数字藏品', price:'¥129', issuer:'杜甫草堂', img:'asset/杜甫草堂·文旅数字藏品.png' },
+      likes:77, comments:20
+    },
+  ]
+};
+
+var currentTab = 'hot';
+
+function switchTab(tab){
+  currentTab = tab;
+  document.querySelectorAll('.subtab-btn').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelector('.subtab-btn[data-sub="'+tab+'"]').classList.add('on');
+  renderPosts(tab);
+}
+
+function renderPosts(key){
+  var list = postsData[key] || [];
+  var container = document.getElementById('postsContainer');
+  if(!list.length){
+    container.innerHTML = '<div style="padding:80px 0;text-align:center;color:#999;font-size:14px">暂无内容</div>';
+    return;
+  }
+  container.innerHTML = list.map(function(p){
+    var avatarHtml = p.avatar ? '<img src="'+p.avatar+'">' : p.user.charAt(0);
+    var imgHtml = '';
+    if(p.images && p.images.length){
+      var cls = 'col'+Math.min(p.images.length,3);
+      imgHtml = '<div class="post-images '+cls+'">';
+      p.images.forEach(function(src,i){
+        imgHtml += '<div class="img-item"><img src="'+src+'" onerror="this.parentElement.style.display=\'none\'"></div>';
+      });
+      imgHtml += '</div>';
+    }
+    // 引用数字资产卡片
+    var assetHtml = '';
+    if(p.asset){
+      assetHtml = '<div class="ref-asset" onclick="window.location.href=\'product_maotai1935.html\'">'+
+        '<img class="ref-asset-img" src="'+p.asset.img+'" onerror="this.style.display=\'none\'">'+
+        '<div class="ref-asset-info"><div class="ref-asset-name">'+p.asset.name+'</div><div class="ref-asset-issuer">'+p.asset.issuer+'</div><div class="ref-asset-price">'+p.asset.price+'</div></div>'+
+        '<svg class="ref-asset-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>'+
+        '</div>';
+    }
+    // 标签紧挨名称
+    var inlineTag = '';
+    if(p.tag === '官方' || p.tag === '商家'){
+      var tb = p.tag === '官方' ? '#FFF3E0' : '#E8F5E9';
+      var tc = p.tag === '官方' ? '#e65100' : '#2e7d32';
+      inlineTag = '<span class="post-tag-inline" style="background:'+tb+';color:'+tc+'">'+p.tag+'</span>';
+    } else if(p.level){
+      inlineTag = '<span class="post-tag-inline" style="background:#1a6b4c;color:#fff">'+p.level+'</span>';
+    }
+    return '<div class="post-card">'+
+      '<div class="post-header">'+
+        '<div class="post-avatar">'+avatarHtml+'</div>'+
+        '<div class="post-user"><div class="post-username"><span>'+p.user+'</span>'+inlineTag+'</div><div class="post-time">'+p.time+'</div></div>'+
+        '<span class="post-tag" style="display:none"></span>'+
+      '</div>'+
+      (p.content ? '<div class="post-content">'+p.content+'</div>' : '')+
+      imgHtml+
+      assetHtml+
+      '<div class="post-actions">'+
+        '<button class="post-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg> <span>'+p.likes+'</span></button>'+
+        '<button class="post-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> <span>'+p.comments+'</span></button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function showToast(msg){
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:10px;font-size:14px;z-index:9999;animation:fadeIn .2s';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.remove(); }, 2000);
+}
+
+renderPosts('hot');
+</script>
+</body>
+</html>

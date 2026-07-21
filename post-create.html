@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>发布帖子</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#2c2c2e;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;color:#333;display:flex;flex-direction:column;align-items:center}
+.page{max-width:430px;min-height:100vh;background:#f5f5f5;position:relative;width:100%}
+@media(max-width:430px){.page{max-width:100%}}
+
+/* ── 顶部 ── */
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fff;border-bottom:1px solid #f0f0f0}
+.top-bar .back-btn{width:32px;height:32px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#666;flex-shrink:0;font-size:16px}
+.top-bar .title{font-size:17px;font-weight:700;color:#222;text-align:center;flex:1}
+.top-bar .publish-btn{padding:6px 18px;border:none;border-radius:8px;background:linear-gradient(135deg,#1a6b4c,#3f9b7a);color:#fff;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0}
+.top-bar .publish-btn:active{opacity:.85}
+.top-bar .publish-btn.disabled{background:#ccc;cursor:default}
+
+/* ── 输入区 ── */
+.editor-wrap{background:#fff;margin-top:0;padding:16px}
+.editor-textarea{width:100%;min-height:160px;border:none;outline:none;font-size:15px;color:#222;line-height:1.7;resize:none;font-family:inherit;padding:0}
+.editor-textarea::placeholder{color:#ccc}
+
+/* ── 图片选择 ── */
+.image-section{padding:0 16px 16px;background:#fff}
+.image-section .section-label{font-size:13px;font-weight:600;color:#666;margin-bottom:10px}
+.image-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.image-item{aspect-ratio:1;border-radius:8px;overflow:hidden;background:#f0f0f0;position:relative;border:1px dashed #ddd}
+.image-item img{width:100%;height:100%;object-fit:cover;display:block}
+.image-item .del-btn{position:absolute;top:-4px;right:-4px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2}
+.image-add{aspect-ratio:1;border-radius:8px;border:1px dashed #ddd;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:#fafafa;color:#bbb;transition:all .2s}
+.image-add:active{background:#f0f0f0}
+.image-add svg{width:22px;height:22px;margin-bottom:2px}
+.image-add span{font-size:10px}
+
+/* ── 选择商品卡片 ── */
+.asset-section{padding:0 16px 16px;background:#fff}
+.asset-section .section-label{font-size:13px;font-weight:600;color:#666;margin-bottom:10px}
+.selected-asset{display:flex;align-items:center;gap:10px;padding:10px;background:#f8faf8;border-radius:10px;border:1px solid #e8f0ea;margin-bottom:10px}
+.selected-asset-img{width:44px;height:44px;border-radius:6px;object-fit:cover;background:#e8e8e8;flex-shrink:0}
+.selected-asset-info{flex:1;min-width:0}
+.selected-asset-name{font-size:13px;font-weight:600;color:#222}
+.selected-asset-price{font-size:11px;color:#3F8B6D;margin-top:2px}
+.selected-asset-remove{padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;border:1px solid #ffcccc;background:#fff5f5;color:#e74c3c;flex-shrink:0}
+.asset-select-btn{width:100%;padding:10px;border:1px dashed #ddd;border-radius:10px;background:#fafafa;color:#999;font-size:13px;cursor:pointer;text-align:center}
+.asset-select-btn:active{background:#f0f0f0}
+
+/* ── 商品选择弹窗 ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-box{background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:430px;max-height:70vh;overflow-y:auto}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:16px 16px 12px;border-bottom:1px solid #f0f0f0;position:sticky;top:0;background:#fff;z-index:2}
+.modal-title{font-size:15px;font-weight:700;color:#222}
+.modal-close{width:28px;height:28px;border:none;background:#f5f5f5;border-radius:50%;cursor:pointer;font-size:14px;color:#999;display:flex;align-items:center;justify-content:center}
+.modal-search{margin:10px 16px;padding:8px 12px;border:1px solid #e0e0e0;border-radius:8px;font-size:13px;outline:none;width:calc(100% - 32px)}
+.modal-search:focus{border-color:#1a6b4c}
+.modal-asset-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px 16px}
+.modal-asset-card{background:#f8faf8;border-radius:10px;overflow:hidden;cursor:pointer;border:1px solid #e8f0ea;transition:all .15s}
+.modal-asset-card:active{background:#edf5ef;border-color:#1a6b4c}
+.modal-asset-card img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#e8e8e8}
+.modal-asset-card-body{padding:6px 8px 8px}
+.modal-asset-card-name{font-size:11px;font-weight:600;color:#222;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.modal-asset-card-issuer{font-size:9px;color:#999;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.modal-asset-card-price{font-size:10px;color:#3F8B6D;font-weight:600;margin-top:2px}
+.modal-empty{padding:40px 0;text-align:center;color:#ccc;font-size:13px}
+
+/* ── Toast ── */
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:10px;font-size:14px;z-index:9999;opacity:0;pointer-events:none;transition:all .3s}
+.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="top-bar">
+  <button class="back-btn" onclick="history.back()">←</button>
+  <span class="title">发布帖子</span>
+  <button class="publish-btn" id="publishBtn" onclick="publishPost()">发布</button>
+</div>
+
+<!-- 文本编辑 -->
+<div class="editor-wrap">
+  <textarea class="editor-textarea" id="postContent" placeholder="分享你的数字资产故事..." maxlength="500"></textarea>
+</div>
+
+<!-- 图片选择 -->
+<div class="image-section">
+  <div class="section-label">添加图片（最多9张）</div>
+  <div class="image-grid" id="imageGrid"></div>
+  <input type="file" id="imageInput" accept="image/*" multiple style="display:none" onchange="handleImages(event)">
+</div>
+
+<!-- 关联商品 -->
+<div class="asset-section">
+  <div class="section-label">关联数字资产（选填）</div>
+  <div id="selectedAssetWrap"></div>
+  <button class="asset-select-btn" onclick="showAssetPicker()">+ 选择关联的数字资产</button>
+</div>
+
+</div>
+
+<!-- 商品选择弹窗 -->
+<div class="modal-overlay" id="assetModal" onclick="closeAssetPicker(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">选择数字资产</span>
+      <button class="modal-close" onclick="closeAssetPicker()">✕</button>
+    </div>
+    <input class="modal-search" id="assetSearch" placeholder="搜索资产名称或发行方..." oninput="renderAssetGrid(this.value)">
+    <div id="assetPickerList"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══ 可选资产列表（仅兰亭数资）═══
+var assetList = [
+  { name:'兰亭雅集', price:'¥399', img:'asset/兰亭雅集产品图.png', issuer:'绍兴兰亭产业数资' },
+  { name:'兰亭碑刻', price:'¥299', img:'asset/兰亭碑刻封面图.png', issuer:'绍兴兰亭产业数资' },
+  { name:'兰亭春禊', price:'¥199', img:'asset/兰亭春禊封面图.png', issuer:'绍兴兰亭产业数资' },
+  { name:'曲水流觞', price:'¥259', img:'asset/曲水流觞封面图.png', issuer:'古越龙山' },
+  { name:'兰亭诗韵', price:'¥459', img:'asset/兰亭诗韵封面图.png', issuer:'诸暨珠宝' },
+];
+
+var selectedImages = [];
+var selectedAsset = null;
+
+// ── 图片管理 ──
+function renderImageGrid(){
+  var grid = document.getElementById('imageGrid');
+  var html = '';
+  selectedImages.forEach(function(src, i){
+    html += '<div class="image-item"><img src="'+src+'"><button class="del-btn" onclick="removeImage('+i+')">✕</button></div>';
+  });
+  if(selectedImages.length < 9){
+    html += '<div class="image-add" onclick="document.getElementById(\'imageInput\').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>'+selectedImages.length+'/9</span></div>';
+  }
+  grid.innerHTML = html;
+}
+
+function handleImages(e){
+  var files = Array.from(e.target.files);
+  var remaining = 9 - selectedImages.length;
+  files.slice(0, remaining).forEach(function(file){
+    if(!file.type.startsWith('image/')) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){ selectedImages.push(ev.target.result); renderImageGrid(); };
+    reader.readAsDataURL(file);
+  });
+  e.target.value = '';
+}
+
+function removeImage(i){ selectedImages.splice(i, 1); renderImageGrid(); }
+
+// ── 商品选择 ──
+function renderSelectedAsset(){
+  var wrap = document.getElementById('selectedAssetWrap');
+  if(!selectedAsset){
+    wrap.innerHTML = '';
+    return;
+  }
+  wrap.innerHTML = '<div class="selected-asset">'+
+    '<img class="selected-asset-img" src="'+selectedAsset.img+'" onerror="this.style.display=\'none\'">'+
+    '<div class="selected-asset-info"><div class="selected-asset-name">'+selectedAsset.name+'</div><div class="selected-asset-price">'+selectedAsset.price+'</div></div>'+
+    '<button class="selected-asset-remove" onclick="removeAsset()">移除</button>'+
+    '</div>';
+}
+
+function showAssetPicker(){
+  document.getElementById('assetModal').classList.add('show');
+  renderAssetGrid('');
+  setTimeout(function(){ document.getElementById('assetSearch').focus(); }, 300);
+}
+
+function renderAssetGrid(query){
+  var list = document.getElementById('assetPickerList');
+  var filtered = query ? assetList.filter(function(a){ return a.name.includes(query) || a.issuer.includes(query); }) : assetList;
+  if(!filtered.length){
+    list.innerHTML = '<div class="modal-empty">未找到匹配的数字资产</div>';
+    return;
+  }
+  list.innerHTML = '<div class="modal-asset-grid">' + filtered.map(function(a){
+    return '<div class="modal-asset-card" onclick="selectAsset(\''+a.name+'\')">'+
+      '<img src="'+a.img+'" onerror="this.style.display=\'none\'">'+
+      '<div class="modal-asset-card-body">'+
+      '<div class="modal-asset-card-name">'+a.name+'</div>'+
+      '<div class="modal-asset-card-issuer">'+a.issuer+'</div>'+
+      '<div class="modal-asset-card-price">'+a.price+'</div>'+
+      '</div></div>';
+  }).join('') + '</div>';
+}
+
+function selectAsset(name){
+  var a = assetList.find(function(x){ return x.name === name; });
+  if(a){ selectedAsset = a; renderSelectedAsset(); }
+  document.getElementById('assetModal').classList.remove('show');
+}
+
+function removeAsset(){ selectedAsset = null; renderSelectedAsset(); }
+
+function closeAssetPicker(e){
+  if(e && e.target !== document.getElementById('assetModal')) return;
+  document.getElementById('assetModal').classList.remove('show');
+}
+
+// ── 发布 ──
+function publishPost(){
+  var content = document.getElementById('postContent').value.trim();
+  if(!content && !selectedImages.length){
+    showToast('请输入内容或添加图片');
+    return;
+  }
+  var post = { content: content, images: selectedImages.slice(), asset: selectedAsset, time: '刚刚', likes: 0, comments: 0 };
+  var myPosts = JSON.parse(localStorage.getItem('myPosts') || '[]');
+  myPosts.unshift(post);
+  localStorage.setItem('myPosts', JSON.stringify(myPosts));
+  showToast('发布成功！');
+  setTimeout(function(){ history.back(); }, 1200);
+}
+
+function showToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2000);
+}
+
+renderImageGrid();
+renderSelectedAsset();
+</script>
+</body>
+</html>

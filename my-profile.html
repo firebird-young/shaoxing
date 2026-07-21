@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>我的主页</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#2c2c2e;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;color:#333;display:flex;flex-direction:column;align-items:center}
+.page{max-width:430px;min-height:100vh;background:linear-gradient(180deg,#1a6b4c 0%,#3f9b7a 20%,#e8f5ee 40%,#f5f5f5 100%);padding-bottom:80px;position:relative;width:100%}
+@media(max-width:430px){.page{max-width:100%}}
+
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+.top-bar .back-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.25);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.top-bar .back-btn:active{background:rgba(255,255,255,.4)}
+.top-bar .back-btn svg{width:18px;height:18px;display:block}
+.top-bar .title{font-size:18px;font-weight:700;color:#fff;flex:1;text-align:center}
+
+/* ── 用户信息卡 ── */
+.profile-card{text-align:center;padding:10px 16px 20px}
+.profile-avatar{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,#1a6b4c,#3f9b7a);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;font-weight:700;border:3px solid rgba(255,255,255,.4)}
+.profile-name{font-size:20px;font-weight:700;color:#fff;margin-bottom:2px;text-shadow:0 1px 4px rgba(0,0,0,.1)}
+.profile-level{font-size:12px;color:rgba(255,255,255,.7);margin-bottom:14px}
+.profile-stats{display:flex;justify-content:center;gap:24px}
+.profile-stats .stat{text-align:center;cursor:pointer}
+.profile-stats .stat-num{font-size:18px;font-weight:800;color:#fff}
+.profile-stats .stat-label{font-size:11px;color:rgba(255,255,255,.6);margin-top:2px}
+
+/* ── Tab切换 ── */
+.tab-bar{display:flex;margin:0 16px 10px;background:rgba(255,255,255,.2);border-radius:10px;padding:3px}
+.tab-btn{flex:1;text-align:center;padding:8px 0;font-size:13px;font-weight:500;color:rgba(255,255,255,.7);border:none;background:transparent;cursor:pointer;border-radius:8px;transition:all .25s}
+.tab-btn.on{background:#fff;color:#1a6b4c;font-weight:600}
+
+/* ── 帖子列表（复用社区样式） ── */
+.posts-wrap{padding:0 16px}
+.post-card{background:#fff;border-radius:14px;margin-bottom:14px;overflow:hidden;box-shadow:0 2px 12px rgba(26,107,76,.06)}
+.post-header{display:flex;align-items:center;gap:10px;padding:14px 14px 0}
+.post-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1a6b4c,#3f9b7a);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0;overflow:hidden}
+.post-avatar img{width:100%;height:100%;object-fit:cover}
+.post-user{flex:1;min-width:0}
+.post-username{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:#222}
+.post-username .post-tag-inline{padding:1px 6px;border-radius:3px;font-size:9px;font-weight:600;flex-shrink:0;line-height:1.5}
+.post-time{font-size:10px;color:#bbb;margin-top:2px}
+.post-content{padding:12px 14px;font-size:13px;color:#444;line-height:1.6}
+.post-images{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:0 14px 12px}
+.post-images .img-item{aspect-ratio:1;border-radius:8px;overflow:hidden;background:#f0f0f0}
+.post-images .img-item img{width:100%;height:100%;object-fit:cover;display:block}
+.post-images.col2{grid-template-columns:repeat(2,1fr)}
+.post-images.col1{grid-template-columns:1fr}
+.post-images.col1 .img-item{aspect-ratio:16/9}
+.ref-asset{display:flex;align-items:center;gap:10px;margin:0 14px 12px;padding:10px;background:#f8faf8;border-radius:10px;border:1px solid #e8f0ea;cursor:pointer}
+.ref-asset:active{background:#edf5ef}
+.ref-asset-img{width:48px;height:48px;border-radius:8px;object-fit:cover;background:#e8e8e8;flex-shrink:0}
+.ref-asset-info{flex:1;min-width:0}
+.ref-asset-name{font-size:13px;font-weight:600;color:#222}
+.ref-asset-issuer{font-size:10px;color:#999;margin-top:1px}
+.ref-asset-price{font-size:11px;color:#1a6b4c;font-weight:600;margin-top:2px}
+.ref-asset-arrow{color:#bbb;width:14px;height:14px;flex-shrink:0}
+.post-actions{display:flex;align-items:center;padding:10px 14px 14px;gap:20px;border-top:1px solid #f5f5f5}
+.post-action{display:flex;align-items:center;gap:4px;font-size:11px;color:#bbb;cursor:pointer;border:none;background:none;padding:2px 4px}
+.post-action svg{width:16px;height:16px;display:block}
+
+.empty-state{padding:60px 0;text-align:center;color:rgba(255,255,255,.4);font-size:14px}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="top-bar">
+  <button class="back-btn" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </button>
+  <span class="title">我的主页</span>
+  <div style="width:32px"></div>
+</div>
+
+<div class="profile-card">
+  <div class="profile-avatar"><img src="头像.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display='none'"></div>
+  <div class="profile-name">兰亭泼墨人</div>
+  <div class="profile-level">LV6 · 数字资产爱好者</div>
+  <div class="profile-stats">
+    <div class="stat" onclick="window.location.href='follow-list.html?tab=follow'">
+      <div class="stat-num" id="statFollow">8</div>
+      <div class="stat-label">关注</div>
+    </div>
+    <div class="stat" onclick="window.location.href='follow-list.html?tab=mutual'">
+      <div class="stat-num" id="statMutual">3</div>
+      <div class="stat-label">互关</div>
+    </div>
+    <div class="stat" onclick="window.location.href='follow-list.html?tab=fan'">
+      <div class="stat-num" id="statFan">15</div>
+      <div class="stat-label">粉丝</div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn on" data-tab="mypost" onclick="switchTab('mypost')">我的帖子</button>
+  <button class="tab-btn" data-tab="saved" onclick="switchTab('saved')">收藏的帖子</button>
+</div>
+
+<div class="posts-wrap" id="postsContainer"></div>
+
+</div>
+
+<script>
+// ═══ 模拟帖子数据 ═══
+var myPosts = [
+  {
+    user:'数字收藏家', level:'LV6', time:'刚刚',
+    content:'入手了兰亭春禊数字资产，买2件还有9折优惠，太划算了！',
+    images:['asset/兰亭春禊封面图.png'],
+    likes:3, comments:1
+  },
+  {
+    user:'数字收藏家', level:'LV6', time:'1天前',
+    content:'今天去绍兴兰亭景区实地打卡，买了数字资产后扫码领取了实体纪念品，体验太棒了！景区环境清幽，曲水流觞的意境真的让人流连忘返。推荐大家一定要去线下看看～',
+    images:['asset/兰亭雅集封面图.png','asset/兰亭雅集产品图.png','asset/兰亭碑刻封面图.png'],
+    likes:12, comments:4
+  },
+  {
+    user:'数字收藏家', level:'LV6', time:'3天前',
+    content:'终于抢到了兰亭碑刻的数字资产！实物质感太棒了，分享给大家看看 👇',
+    images:['asset/兰亭碑刻封面图.png','asset/兰亭春禊封面图.png'],
+    asset:{ name:'兰亭碑刻', price:'¥299', issuer:'绍兴兰亭产业数资', img:'asset/兰亭碑刻封面图.png' },
+    likes:8, comments:2
+  },
+];
+
+var savedPosts = [
+  {
+    user:'绍兴兰亭产业数资', tag:'商家', time:'2小时前',
+    content:'兰亭雅集数字藏品正式上线！限量666份，每一份都带有王羲之《兰亭集序》的经典元素，快来收藏吧～',
+    images:['asset/兰亭雅集封面图.png','asset/兰亭碑刻封面图.png','asset/兰亭春禊封面图.png'],
+    asset:{ name:'兰亭雅集', price:'¥399', issuer:'绍兴兰亭产业数资', img:'asset/兰亭雅集产品图.png' },
+    likes:128, comments:36
+  },
+  {
+    user:'摄影达人', level:'LV2', time:'3天前',
+    content:'实拍绍兴兰亭景区，秋天的兰亭美不胜收！买了数字资产的朋友一定要去线下看看 📷',
+    images:['asset/兰亭雅集产品图.png','asset/兰亭雅集封面图.png'],
+    asset:{ name:'兰亭雅集', price:'¥399', issuer:'绍兴兰亭产业数资', img:'asset/兰亭雅集产品图.png' },
+    likes:41, comments:6
+  },
+];
+
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelector('.tab-btn[data-tab="'+tab+'"]').classList.add('on');
+  renderPosts(tab === 'mypost' ? myPosts : savedPosts);
+}
+
+function renderPosts(list){
+  var container = document.getElementById('postsContainer');
+  if(!list.length){
+    container.innerHTML = '<div class="empty-state">暂无内容</div>';
+    return;
+  }
+  container.innerHTML = list.map(function(p){
+    var avatarHtml = p.avatar ? '<img src="'+p.avatar+'">' : p.user.charAt(0);
+    var imgHtml = '';
+    if(p.images && p.images.length){
+      var cls = 'col'+Math.min(p.images.length,3);
+      imgHtml = '<div class="post-images '+cls+'">';
+      p.images.forEach(function(src){
+        imgHtml += '<div class="img-item"><img src="'+src+'" onerror="this.parentElement.style.display=\'none\'"></div>';
+      });
+      imgHtml += '</div>';
+    }
+    var inlineTag = '';
+    if(p.tag === '官方' || p.tag === '商家'){
+      var tb = p.tag === '官方' ? '#FFF3E0' : '#E8F5E9';
+      var tc = p.tag === '官方' ? '#e65100' : '#2e7d32';
+      inlineTag = '<span class="post-tag-inline" style="background:'+tb+';color:'+tc+'">'+p.tag+'</span>';
+    } else if(p.level){
+      inlineTag = '<span class="post-tag-inline" style="background:#1a6b4c;color:#fff">'+p.level+'</span>';
+    }
+    var assetHtml = '';
+    if(p.asset){
+      assetHtml = '<div class="ref-asset" onclick="window.location.href=\'product_maotai1935.html\'">'+
+        '<img class="ref-asset-img" src="'+p.asset.img+'" onerror="this.style.display=\'none\'">'+
+        '<div class="ref-asset-info"><div class="ref-asset-name">'+p.asset.name+'</div><div class="ref-asset-issuer">'+p.asset.issuer+'</div><div class="ref-asset-price">'+p.asset.price+'</div></div>'+
+        '<svg class="ref-asset-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>';
+    }
+    return '<div class="post-card">'+
+      '<div class="post-header">'+
+        '<div class="post-avatar">'+avatarHtml+'</div>'+
+        '<div class="post-user"><div class="post-username"><span>'+p.user+'</span>'+inlineTag+'</div><div class="post-time">'+p.time+'</div></div>'+
+      '</div>'+
+      (p.content ? '<div class="post-content">'+p.content+'</div>' : '')+
+      imgHtml+assetHtml+
+      '<div class="post-actions">'+
+        '<button class="post-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg> <span>'+p.likes+'</span></button>'+
+        '<button class="post-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> <span>'+p.comments+'</span></button>'+
+      '</div></div>';
+  }).join('');
+}
+
+switchTab('mypost');
+</script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>关注列表</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#2c2c2e;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;color:#333;display:flex;flex-direction:column;align-items:center}
+.page{max-width:430px;min-height:100vh;background:linear-gradient(180deg,#1a6b4c 0%,#3f9b7a 20%,#e8f5ee 40%,#f5f5f5 100%);padding-bottom:80px;position:relative;width:100%}
+@media(max-width:430px){.page{max-width:100%}}
+
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+.top-bar .back-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.25);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.top-bar .back-btn:active{background:rgba(255,255,255,.4)}
+.top-bar .back-btn svg{width:18px;height:18px;display:block}
+.top-bar .title{font-size:18px;font-weight:700;color:#fff;flex:1;text-align:center}
+.top-bar .count{font-size:12px;color:rgba(255,255,255,.6);flex-shrink:0}
+
+.tab-bar{display:flex;margin:0 16px 10px;background:rgba(255,255,255,.2);border-radius:10px;padding:3px}
+.tab-btn{flex:1;text-align:center;padding:8px 0;font-size:13px;font-weight:500;color:rgba(255,255,255,.7);border:none;background:transparent;cursor:pointer;border-radius:8px;transition:all .25s}
+.tab-btn.on{background:#fff;color:#1a6b4c;font-weight:600}
+
+.search-bar{margin:0 16px 10px}
+.search-input{width:100%;height:38px;border:none;border-radius:10px;padding:0 14px;font-size:13px;outline:none;background:rgba(255,255,255,.85)}
+.search-input::placeholder{color:#bbb}
+
+.follow-list{padding:0 16px}
+.follow-item{display:flex;align-items:center;gap:12px;background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 6px rgba(26,107,76,.04)}
+.follow-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#1a6b4c,#3f9b7a);display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px;font-weight:700;flex-shrink:0;overflow:hidden}
+.follow-avatar img{width:100%;height:100%;object-fit:cover}
+.follow-info{flex:1;min-width:0}
+.follow-name{font-size:14px;font-weight:600;color:#222;display:flex;align-items:center;gap:4px}
+.follow-tag{font-size:9px;padding:1px 6px;border-radius:3px;font-weight:600}
+.follow-tag.mutual{background:#E8F5E9;color:#2e7d32}
+.follow-desc{font-size:11px;color:#999;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.follow-btn{padding:6px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .2s;flex-shrink:0}
+.follow-btn.on{background:#E8F5E9;color:#2e7d32;border:1px solid #A5D6A7}
+.follow-btn.on:active{background:#C8E6C9}
+.follow-btn.off{background:#f5f5f5;color:#999;border:1px solid #e0e0e0}
+.follow-btn.off:active{background:#eee}
+.follow-btn.followed{background:#E3F2FD;color:#1565C0;border:1px solid #90CAF9}
+
+.empty-state{padding:80px 0;text-align:center;color:rgba(255,255,255,.4);font-size:14px}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="top-bar">
+  <button class="back-btn" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </button>
+  <span class="title" id="pageTitle">关注</span>
+  <span class="count" id="totalCount">0人</span>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn" data-tab="follow" onclick="switchTab('follow')">关注</button>
+  <button class="tab-btn" data-tab="mutual" onclick="switchTab('mutual')">互关</button>
+  <button class="tab-btn" data-tab="fan" onclick="switchTab('fan')">粉丝</button>
+</div>
+
+<div class="search-bar">
+  <input class="search-input" id="searchInput" placeholder="搜索..." oninput="renderList()">
+</div>
+
+<div class="follow-list" id="followList"></div>
+</div>
+
+<script>
+var allUsers = [
+  { id:'u1', name:'绍兴兰亭产业数资', desc:'绍兴市文化旅游官方账号', tag:'商家', avatar:'' },
+  { id:'u2', name:'数字收藏家', desc:'数字资产收藏爱好者，分享藏品故事', level:'LV6', avatar:'' },
+  { id:'u3', name:'古越龙山', desc:'绍兴黄酒品牌 · 数字资产发行方', tag:'商家', avatar:'' },
+  { id:'u4', name:'贵州村超', desc:'贵州村超联名数字藏品官方', tag:'商家', avatar:'' },
+  { id:'u5', name:'元宇宙探险家', desc:'探索数字资产新世界', level:'LV4', avatar:'' },
+  { id:'u6', name:'杜甫草堂', desc:'杜甫草堂博物馆官方账号', tag:'官方', avatar:'' },
+  { id:'u7', name:'摄影达人', desc:'数字藏品摄影爱好者', level:'LV2', avatar:'' },
+  { id:'u8', name:'区块链爱好者', desc:'区块链技术研究者', level:'LV5', avatar:'' },
+  { id:'u9', name:'诸暨珠宝', desc:'诸暨珠宝联名数字资产发行方', tag:'商家', avatar:'' },
+  { id:'u10', name:'新锐设计师', desc:'数字藏品概念设计师', level:'LV3', avatar:'' },
+  { id:'u11', name:'曲水流觞文化', desc:'绍兴文化推广账号', tag:'商家', avatar:'' },
+  { id:'u12', name:'越窑青瓷', desc:'越窑青瓷文化传承', tag:'商家', avatar:'' },
+];
+
+// 我关注的
+var myFollow = ['u1','u2','u3','u4','u5','u6','u9','u11'];
+// 关注我的（粉丝）
+var myFans = ['u1','u2','u5','u7','u8','u10','u12','u3','u4','u6','u9','u11'];
+// 互关 = 我关注 ∩ 关注我
+var myMutual = myFollow.filter(function(id){ return myFans.indexOf(id) >= 0; });
+
+var currentTab = getQueryParam('tab') || 'follow';
+var followingIds = JSON.parse(localStorage.getItem('followList') || JSON.stringify(myFollow));
+
+function getQueryParam(name){
+  var m = location.search.match(new RegExp('[?&]'+name+'=([^&]*)'));
+  return m ? decodeURIComponent(m[1]) : null;
+}
+
+function saveFollow(){ localStorage.setItem('followList', JSON.stringify(followingIds)); }
+
+function toggleFollow(id){
+  var idx = followingIds.indexOf(id);
+  if(idx >= 0){ followingIds.splice(idx, 1); }
+  else { followingIds.push(id); }
+  saveFollow();
+  renderList();
+}
+
+function getListData(tab){
+  var ids = tab === 'follow' ? myFollow : tab === 'mutual' ? myMutual : myFans;
+  return ids.map(function(id){ return allUsers.find(function(u){ return u.id === id; }); }).filter(Boolean);
+}
+
+function renderList(){
+  var q = document.getElementById('searchInput').value.trim().toLowerCase();
+  var list = getListData(currentTab);
+  if(q) list = list.filter(function(u){ return u.name.includes(q) || u.desc.includes(q); });
+
+  document.getElementById('pageTitle').textContent = { follow:'关注', mutual:'互关', fan:'粉丝' }[currentTab];
+  document.getElementById('totalCount').textContent = list.length + '人';
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelector('.tab-btn[data-tab="'+currentTab+'"]').classList.add('on');
+
+  var container = document.getElementById('followList');
+  if(!list.length){
+    container.innerHTML = '<div class="empty-state">暂无用户</div>';
+    return;
+  }
+  container.innerHTML = list.map(function(u){
+    var avatarHtml = u.avatar ? '<img src="'+u.avatar+'">' : u.name.charAt(0);
+    var tagHtml = '';
+    if(u.tag) tagHtml = '<span class="follow-tag" style="background:'+(u.tag==='官方'?'#FFF3E0':'#E8F5E9')+';color:'+(u.tag==='官方'?'#e65100':'#2e7d32')+'">'+u.tag+'</span>';
+    else if(u.level) tagHtml = '<span class="follow-tag" style="background:#1a6b4c;color:#fff">'+u.level+'</span>';
+
+    var isFollow = followingIds.indexOf(u.id) >= 0;
+    var isMutual = myMutual.indexOf(u.id) >= 0;
+    var btnClass = isFollow ? 'on' : 'off';
+    var btnText = isFollow ? (isMutual ? '已互关' : '已关注') : '+ 关注';
+    if(isFollow && isMutual) btnClass = 'followed';
+
+    return '<div class="follow-item">'+
+      '<div class="follow-avatar">'+avatarHtml+'</div>'+
+      '<div class="follow-info"><div class="follow-name"><span>'+u.name+'</span>'+tagHtml+'</div><div class="follow-desc">'+u.desc+'</div></div>'+
+      '<button class="follow-btn '+btnClass+'" onclick="toggleFollow(\''+u.id+'\')">'+btnText+'</button></div>';
+  }).join('');
+}
+
+function switchTab(tab){
+  currentTab = tab;
+  document.getElementById('searchInput').value = '';
+  renderList();
+}
+
+// 初始化
+renderList();
+</script>
+</body>
+</html>

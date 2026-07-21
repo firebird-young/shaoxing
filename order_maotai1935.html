@@ -79,6 +79,10 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
 .btn-submit:active{opacity:.9}
 .btn-submit:disabled{background:#ccc;cursor:not-allowed}
 
+/* ── 数量提示 ── */
+.qty-hint{margin-top:12px;font-size:12px;color:#D97706;display:flex;align-items:center;gap:4px;padding:6px 10px;background:#FFFBEB;border-radius:6px;border:1px solid #FDE68A}
+.qty-hint::before{content:'⚠';font-size:12px}
+
 /* ── Toast ── */
 .toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.78);color:#fff;font-size:14px;padding:12px 24px;border-radius:8px;z-index:200;opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap}
 .toast.show{opacity:1}
@@ -117,6 +121,7 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
       <button onclick="changeQty(1)" id="btnPlus">+</button>
     </div>
   </div>
+  <div class="qty-hint" id="qtyHint">当前购买权益剩余 5</div>
 </div>
 
 </div>

@@ -44,6 +44,21 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
 .banner-dots span{width:5px;height:5px;border-radius:50%;background:#ddd;transition:all .3s;cursor:pointer}
 .banner-dots span.on{width:18px;border-radius:3px;background:var(--accent)}
 
+/* ── 消息走马灯 ── */
+.marquee-wrap{margin-top:14px;background:#fff;border-radius:var(--radius-card);padding:12px 14px;display:flex;align-items:center;gap:10px;animation:fadeUp .4s ease-out .12s both;box-shadow:0 1px 6px rgba(0,0,0,.04)}
+.marquee-icon{width:20px;height:20px;flex-shrink:0;color:var(--accent)}
+.marquee-icon svg{display:block;width:100%;height:100%}
+.marquee-track{flex:1;overflow:hidden;height:46px;position:relative}
+.marquee-list{position:absolute;left:0;top:0;width:100%;transition:transform .5s cubic-bezier(.25,.46,.45,.94)}
+.marquee-item{height:23px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-muted);overflow:hidden;cursor:pointer;padding:0}
+.marquee-tag{flex-shrink:0;font-size:9px;padding:1px 7px;border-radius:3px;font-weight:600;white-space:nowrap}
+.marquee-tag.platform{background:#E8F4FD;color:#2980b9}
+.marquee-tag.activity{background:#FFF3E0;color:#e65100}
+.marquee-item .mt-text{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;line-height:23px;color:#666}
+.marquee-item:hover .mt-text{color:var(--accent)}
+.marquee-more{flex-shrink:0;font-size:11px;color:#bbb;cursor:pointer;white-space:nowrap;transition:color .2s}
+.marquee-more:active{color:var(--accent)}
+
 /* ── 区块标题 ── */
 .section{margin-top:24px;animation:fadeUp .4s ease-out .16s both}
 .section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
@@ -158,6 +173,17 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
       <span class="on"></span>
       <span></span>
     </div>
+  </div>
+
+  <!-- 消息走马灯 -->
+  <div class="marquee-wrap" onclick="window.location.href='messages.html'">
+    <div class="marquee-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    </div>
+    <div class="marquee-track" id="marqueeTrack">
+      <div class="marquee-list" id="marqueeList"></div>
+    </div>
+    <span class="marquee-more">更多</span>
   </div>
 
   <!-- 发售日历 -->
@@ -348,6 +374,36 @@ function closeCalendar(e){
 })();
 
 renderCalendarPreview();
+
+// ═══ 消息走马灯 ═══
+var msgData = [
+  { tag: 'platform', label: '平台消息', text: '系统版本更新通知：数字资产平台 V3.2.0 已正式上线' },
+  { tag: 'activity', label: '活动消息', text: '兰亭雅集优先购资格通知：恭喜您获得优先购资格' },
+  { tag: 'platform', label: '平台消息', text: '支付通道维护公告：7月16日凌晨暂停支付服务' },
+  { tag: 'activity', label: '活动消息', text: '兰亭碑刻优先购活动：限量888份优先购即将开启' },
+  { tag: 'activity', label: '活动消息', text: '曲水流觞首发预告：古越龙山携手推出数字资产' },
+  { tag: 'activity', label: '活动消息', text: '兰亭春禊限时优惠：满2件享9折优惠' },
+  { tag: 'platform', label: '平台消息', text: '平台周年庆活动预告：7月25日-7月31日' }
+];
+
+(function(){
+  var list = document.getElementById('marqueeList');
+  var items = msgData.slice(0, 4);
+  // 复制一份末尾拼接第一组用于无缝循环
+  var doubled = items.concat(items.slice(0, 2));
+  var html = '';
+  doubled.forEach(function(m){
+    var tagClass = m.tag === 'platform' ? 'platform' : 'activity';
+    html += '<div class="marquee-item"><span class="marquee-tag '+tagClass+'">'+m.label+'</span><span class="mt-text">'+m.text+'</span></div>';
+  });
+  list.innerHTML = html;
+  var idx = 0, total = items.length;
+  var itemH = 22;
+  setInterval(function(){
+    idx = (idx + 2) % total;
+    list.style.transform = 'translateY(-' + (idx * itemH) + 'px)';
+  }, 4000);
+})();
 </script>
 
 <script>

@@ -47,17 +47,17 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
 .htimeline .stl-title{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:16px;display:flex;align-items:center;gap:6px;padding-left:4px}
 .htimeline .stl-title::before{content:'';width:4px;height:16px;background:var(--accent);border-radius:2px}
 .htimeline-track{display:inline-flex;gap:0;padding:0 8px 0 4px;align-items:flex-start}
-.htimeline-node{display:flex;flex-direction:column;align-items:center;width:80px;flex-shrink:0;position:relative;padding-top:10px}
+.htimeline-node{display:flex;flex-direction:column;align-items:center;width:90px;flex-shrink:0;position:relative}
+.htimeline-label{font-size:11px;color:var(--ink-subtle);text-align:center;white-space:nowrap;line-height:1.4;padding-bottom:8px;height:30px;display:flex;align-items:flex-end;justify-content:center}
+.htimeline-label.active{color:var(--accent);font-weight:600}
 .htimeline-top{display:flex;align-items:center;width:100%;position:relative}
 .htimeline-dot{width:12px;height:12px;border-radius:50%;background:#d0d0d0;flex-shrink:0;position:relative;z-index:1;margin:0 auto}
 .htimeline-dot.active{background:var(--accent);box-shadow:0 0 0 4px rgba(63,139,109,.18)}
 .htimeline-dot.done{background:var(--accent)}
-.htimeline-conn{position:absolute;top:5px;left:calc(50% + 6px);width:74px;height:2px;background:#e0e0e0;pointer-events:none}
+.htimeline-conn{position:absolute;top:5px;left:calc(50% + 6px);width:84px;height:2px;background:#e0e0e0;pointer-events:none}
 .htimeline-conn.done{background:var(--accent)}
 .htimeline-node:last-child .htimeline-conn{display:none}
-.htimeline-label{font-size:11px;color:var(--ink-subtle);text-align:center;margin-top:10px;white-space:nowrap;line-height:1.3}
-.htimeline-label.active{color:var(--accent);font-weight:600}
-.htimeline-time{font-size:10px;color:#999;text-align:center;margin-top:3px;white-space:nowrap}
+.htimeline-time{font-size:11px;color:#999;text-align:center;padding-top:4px;white-space:nowrap}
 
 /* ── 区块标题 ── */
 .sec-title{display:flex;align-items:center;gap:8px;padding:16px 16px 10px}
@@ -85,6 +85,21 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
 .btn-buy:active{opacity:.9}
 .btn-buy svg{width:18px;height:18px}
 
+/* ── 底部提示栏（购买栏上方） ── */
+.status-tip-bar{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom,4px));left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:99;padding:6px 16px;text-align:center;font-size:12px;color:#fff;background:linear-gradient(135deg,#3F8B6D,#4FA889);box-sizing:border-box;display:none}
+.status-tip-bar .tip-icon{display:inline-block;margin-right:4px}
+@media(max-width:430px){.status-tip-bar{max-width:100%}}
+
+/* ── 状态按钮（手机框外右下角） ── */
+.status-side{position:fixed;z-index:999;display:flex;flex-direction:column;gap:3px;bottom:calc(76px + env(safe-area-inset-bottom,4px));left:50%;margin-left:calc(215px + 8px)}
+@media(max-width:640px){.status-side{left:auto;right:6px;bottom:80px;margin-left:0}}
+.status-sbtn{padding:5px 10px;border-radius:4px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid #ddd;background:#fff;color:#666;transition:all .2s;text-align:center;white-space:nowrap;min-width:72px;line-height:1.4}
+.status-sbtn:active{opacity:.7}
+.status-sbtn.on{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 6px rgba(63,139,109,.25)}
+.status-sbtn.sub{font-size:10px;padding:3px 8px;min-width:56px}
+.sub-side{position:fixed;z-index:998;left:50%;margin-left:calc(215px + 8px + 96px);bottom:calc(76px + env(safe-area-inset-bottom,4px) + 52px);display:flex;flex-direction:column;gap:4px}
+@media(max-width:640px){.sub-side{left:auto;right:80px;bottom:80px}}
+
 /* ── 动画 ── */
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
@@ -95,6 +110,20 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
 </style>
 </head>
 <body>
+<!-- 状态按钮（手机框外右下角） -->
+  <div class="status-side pos1">
+  <button class="status-sbtn" data-mode="presale" onclick="switchStatus('presale')">抽签预约中</button>
+  <button class="status-sbtn" data-mode="prebuy" onclick="togglePrebuy()">抽签购买中</button>
+  <div class="sub-side" id="subSide" style="display:none">
+    <button class="status-sbtn sub" data-mode="unwin" onclick="switchStatus('unwin')">未中签</button>
+    <button class="status-sbtn sub" data-mode="won" onclick="switchStatus('won')">已中签</button>
+  </div>
+  <button class="status-sbtn" data-mode="equity" onclick="switchStatus('equity')">权益投放中</button>
+  <button class="status-sbtn" data-mode="equitybuy" onclick="switchStatus('equitybuy')">权益购买中</button>
+  <button class="status-sbtn" data-mode="public" onclick="switchStatus('public')">全民购买中</button>
+  <button class="status-sbtn" data-mode="none" onclick="switchStatus('none')">未命中</button>
+</div>
+
 <div class="page" style="position:relative">
 
 <!-- 顶部导航（覆盖在图片上） -->
@@ -161,62 +190,62 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
 
 <!-- 横版时间轴 -->
 <div class="htimeline">
-  <div class="stl-title">发售时间轴</div>
+  <div class="stl-title" style="position:sticky;left:0;z-index:2;background:var(--bg)">发售时间轴</div>
   <div class="htimeline-track">
     <div class="htimeline-node">
-      <div class="htimeline-top">
-        <div class="htimeline-dot done"></div>
-        <div class="htimeline-conn done"></div>
-      </div>
       <div class="htimeline-label">抽签预约</div>
-      <div class="htimeline-time">06/01</div>
-    </div>
-    <div class="htimeline-node">
       <div class="htimeline-top">
         <div class="htimeline-dot done"></div>
         <div class="htimeline-conn done"></div>
       </div>
-      <div class="htimeline-label">预约结束<br>及抽签</div>
-      <div class="htimeline-time">06/05</div>
+      <div class="htimeline-time">06/01 10:00</div>
     </div>
     <div class="htimeline-node">
+      <div class="htimeline-label">预约结束及抽签</div>
       <div class="htimeline-top">
         <div class="htimeline-dot done"></div>
         <div class="htimeline-conn done"></div>
       </div>
-      <div class="htimeline-label">优先购<br>开始</div>
-      <div class="htimeline-time">06/06</div>
+      <div class="htimeline-time">06/05 18:00</div>
     </div>
     <div class="htimeline-node">
+      <div class="htimeline-label">优先购开始</div>
       <div class="htimeline-top">
         <div class="htimeline-dot done"></div>
         <div class="htimeline-conn done"></div>
       </div>
-      <div class="htimeline-label">优先购<br>结束</div>
-      <div class="htimeline-time">06/07</div>
+      <div class="htimeline-time">06/06 10:00</div>
     </div>
     <div class="htimeline-node">
+      <div class="htimeline-label">优先购结束</div>
+      <div class="htimeline-top">
+        <div class="htimeline-dot done"></div>
+        <div class="htimeline-conn done"></div>
+      </div>
+      <div class="htimeline-time">06/07 18:00</div>
+    </div>
+    <div class="htimeline-node">
+      <div class="htimeline-label active">抽签购开始</div>
       <div class="htimeline-top">
         <div class="htimeline-dot active"></div>
         <div class="htimeline-conn"></div>
       </div>
-      <div class="htimeline-label active">抽签购<br>开始</div>
-      <div class="htimeline-time">06/08</div>
+      <div class="htimeline-time">06/08 10:00</div>
     </div>
     <div class="htimeline-node">
+      <div class="htimeline-label">抽签购结束</div>
       <div class="htimeline-top">
         <div class="htimeline-dot"></div>
         <div class="htimeline-conn"></div>
       </div>
-      <div class="htimeline-label">抽签购<br>结束</div>
-      <div class="htimeline-time">06/09</div>
+      <div class="htimeline-time">06/09 10:00</div>
     </div>
     <div class="htimeline-node">
+      <div class="htimeline-label">全民购开始</div>
       <div class="htimeline-top">
         <div class="htimeline-dot"></div>
       </div>
-      <div class="htimeline-label">全民购<br>开始</div>
-      <div class="htimeline-time">06/10</div>
+      <div class="htimeline-time">06/10 10:00</div>
     </div>
   </div>
 </div>
@@ -259,15 +288,21 @@ html,body{margin:0;background:#fff;font-family:var(--font-body);color:var(--ink-
 
 <div style="height:20px"></div>
 
+<!-- 底部时间段提示栏 -->
+<div class="status-tip-bar" id="statusTipBar">
+  <span class="tip-icon">🕐</span>
+  <span id="statusTipText">抽签预约：06/01 10:00 - 06/05 18:00</span>
+</div>
+
 <!-- 底部购买栏 -->
 <div class="buy-bar">
   <button class="btn-collect" id="btnCollect" onclick="toggleCollect()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
     <span id="collectText">收藏</span>
   </button>
-  <button class="btn-buy" onclick="window.location.href='order_maotai1935.html'">
+  <button class="btn-buy" id="buyBtn" onclick="window.location.href='order_maotai1935.html'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2L6 22H18L15 2H9Z"/><line x1="7" y1="6" x2="17" y2="6"/></svg>
-    立即参与 ¥399
+    <span id="buyBtnText">立即参与 ¥399</span>
   </button>
 </div>
 
@@ -315,6 +350,108 @@ function toggleCollect(){
     if (t) t.textContent = "已收藏";
   }
 })();
+
+// ═══ 状态切换 ═══
+var statusConfig = {
+  presale:  { text: '立即预约 ¥399', color: '#D97706', href: '', tip: '预约成功后等待抽签结果', timeLabel: '抽签预约：06/01 10:00 - 06/05 18:00' },
+  prebuy:   { text: '立即抽签购买 ¥399', color: '#8B5CF6', href: 'order_maotai1935.html', tip: '支付后参与抽签，中签即得', timeLabel: '抽签购买：06/05 18:00 - 06/07 18:00' },
+  unwin:    { text: '未中签，无法购买', color: '#bbb', href: '', tip: '很遗憾未中签，感谢参与', timeLabel: '抽签购买：06/05 18:00 - 06/07 18:00' },
+  won:      { text: '立即购买 ¥399', color: '#3F8B6D', href: 'order_maotai1935.html', tip: '恭喜中签！立即购买', timeLabel: '抽签购买：06/05 18:00 - 06/07 18:00' },
+  equity:   { text: '权益投放中', color: '#0891B2', href: '', tip: '权益投放中，参与即可获得', timeLabel: '权益投放：06/07 18:00 - 06/08 10:00' },
+  equitybuy:{ text: '立即购买 ¥399', color: '#3F8B6D', href: 'order_maotai1935.html', tip: '权益购买中，限量抢购', timeLabel: '权益购买：06/08 10:00 - 06/09 10:00' },
+  public:   { text: '立即购买 ¥399', color: '#3F8B6D', href: 'order_maotai1935.html', tip: '全民购买中，先到先得', timeLabel: '', hideTip: true },
+  none:     { text: '敬请期待', color: '#bbb', href: '', tip: '敬请期待', timeLabel: '' }
+};
+
+var prebuyExpanded = false;
+
+function togglePrebuy(){
+  var prebuyBtn = document.querySelector('.status-sbtn[data-mode="prebuy"]');
+  var subSide = document.getElementById('subSide');
+  prebuyExpanded = !prebuyExpanded;
+  if(prebuyExpanded){
+    subSide.style.display = 'flex';
+    prebuyBtn.classList.add('on');
+    // 默认选中未中签
+    switchStatus('unwin');
+  } else {
+    subSide.style.display = 'none';
+    document.querySelectorAll('.status-sbtn.sub').forEach(function(b){ b.classList.remove('on'); });
+    prebuyBtn.classList.remove('on');
+    var defaultBtn = document.querySelector('.status-sbtn.on');
+    if(!defaultBtn) switchStatus('presale');
+  }
+}
+
+function switchStatus(mode){
+  var isSub = (mode === 'unwin' || mode === 'won');
+  if(isSub){
+    // 子按钮切换：父按钮保持高亮，其他主按钮取消，子按钮间互斥
+    document.querySelectorAll('.status-sbtn:not(.sub)').forEach(function(b){ b.classList.remove('on'); });
+    document.querySelectorAll('.status-sbtn.sub').forEach(function(b){ b.classList.remove('on'); });
+    var parentBtn = document.querySelector('.status-sbtn[data-mode="prebuy"]');
+    if(parentBtn) parentBtn.classList.add('on');
+    var btn = document.querySelector('.status-sbtn[data-mode="'+mode+'"]');
+    if(btn) btn.classList.add('on');
+  } else {
+    document.querySelectorAll('.status-sbtn').forEach(function(b){ b.classList.remove('on'); });
+    var btn = document.querySelector('.status-sbtn[data-mode="'+mode+'"]');
+    if(btn) btn.classList.add('on');
+    // 收起子按钮
+    prebuyExpanded = false;
+    document.getElementById('subSide').style.display = 'none';
+    document.querySelectorAll('.status-sbtn.sub').forEach(function(b){ b.classList.remove('on'); });
+  }
+
+  var cfg = statusConfig[mode] || statusConfig.none;
+  // 控制底部提示栏
+  var tipBar = document.getElementById('statusTipBar');
+  var tipText = document.getElementById('statusTipText');
+  if(mode === 'none' || cfg.hideTip){
+    tipBar.style.display = 'none';
+  } else {
+    tipBar.style.display = 'block';
+    tipText.textContent = cfg.timeLabel || '';
+  }
+  var buyBtn = document.getElementById('buyBtn');
+  var buyText = document.getElementById('buyBtnText');
+  buyText.textContent = cfg.text;
+  buyBtn.style.background = cfg.color;
+  if(cfg.href){
+    buyBtn.onclick = function(){ window.location.href = cfg.href; };
+    buyBtn.style.opacity = 1;
+    buyBtn.style.cursor = 'pointer';
+  } else if(mode === 'presale'){
+    buyBtn.onclick = function(){
+      buyText.textContent = '已预约';
+      buyBtn.style.background = '#bbb';
+      buyBtn.style.opacity = 1;
+      buyBtn.style.cursor = 'default';
+      buyBtn.onclick = function(){};
+      var t = document.createElement('div');
+      t.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:14px 24px;border-radius:10px;font-size:14px;z-index:9999;animation:fadeIn .2s';
+      t.textContent = '✅ 预约成功，请等待抽签结果';
+      document.body.appendChild(t);
+      setTimeout(function(){ t.remove(); }, 2500);
+    };
+    buyBtn.style.opacity = 1;
+    buyBtn.style.cursor = 'pointer';
+  } else if(mode === 'unwin'){
+    buyBtn.onclick = function(){};
+    buyBtn.style.opacity = 0.5;
+    buyBtn.style.cursor = 'default';
+  } else if(mode === 'won'){
+    buyBtn.onclick = function(){ window.location.href = 'order_maotai1935.html'; };
+    buyBtn.style.opacity = 1;
+    buyBtn.style.cursor = 'pointer';
+  } else {
+    buyBtn.onclick = function(){};
+    buyBtn.style.opacity = 0.5;
+    buyBtn.style.cursor = 'default';
+  }
+}
+// 默认选中第一个
+switchStatus('presale');
 </script>
 
 </body>

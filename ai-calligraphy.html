@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>AI书童</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#2c2c2e;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;color:#333;display:flex;flex-direction:column;align-items:center}
+.page{max-width:430px;min-height:100vh;background:linear-gradient(180deg,#1a6b4c 0%,#3f9b7a 20%,#e8f5ee 40%,#f5f5f5 100%);padding-bottom:40px;position:relative;width:100%}
+@media(max-width:430px){.page{max-width:100%}}
+
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+.top-bar .back-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.25);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.top-bar .back-btn:active{background:rgba(255,255,255,.4)}
+.top-bar .back-btn svg{width:18px;height:18px;display:block}
+.top-bar .title{font-size:18px;font-weight:700;color:#fff;flex:1;text-align:center;letter-spacing:1px}
+.top-bar .placeholder{width:32px}
+
+/* ── 步骤指示器 ── */
+.steps{display:flex;align-items:center;justify-content:center;gap:0;padding:0 16px 16px}
+.step{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.4)}
+.step .num{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:rgba(255,255,255,.4)}
+.step.on .num{background:#fff;color:#1a6b4c}
+.step.on{color:#fff;font-weight:600}
+.step-line{width:24px;height:1px;background:rgba(255,255,255,.15);margin:0 4px}
+
+/* ── 步骤内容 ── */
+.step-content{display:none;padding:0 16px}
+.step-content.active{display:block}
+
+/* ── 步骤1：选择字帖 ── */
+.category-title{font-size:14px;font-weight:700;color:#fff;margin:16px 0 8px;padding:0 4px;display:flex;align-items:center;gap:6px}
+.category-title::before{content:'';width:3px;height:14px;background:rgba(255,255,255,.5);border-radius:2px}
+.script-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.script-card{background:#fff;border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:0 2px 12px rgba(26,107,76,.06);border:2px solid transparent;transition:all .2s}
+.script-card:active{transform:scale(.96)}
+.script-card.on{border-color:#1a6b4c;box-shadow:0 0 0 3px rgba(26,107,76,.15)}
+.script-card img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#e8e8e8}
+.script-card-body{padding:8px 10px 10px;text-align:center}
+.script-card-name{font-size:12px;font-weight:600;color:#222}
+.script-card-author{font-size:10px;color:#999;margin-top:2px}
+.script-card-dynasty{font-size:9px;color:#bbb;margin-top:1px}
+.script-select-hint{margin-top:16px;text-align:center;font-size:13px;color:rgba(255,255,255,.5)}
+
+/* ── 步骤2：拍照/上传 ── */
+.capture-area{margin-top:12px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.capture-preview{width:100%;aspect-ratio:3/4;background:#f0f0f0;border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center;border:2px dashed rgba(255,255,255,.3);position:relative}
+.capture-preview img{width:100%;height:100%;object-fit:contain;display:block}
+.capture-placeholder{text-align:center;color:#ccc;font-size:13px}
+.capture-placeholder svg{width:40px;height:40px;margin-bottom:8px;color:#ddd}
+.capture-btns{display:flex;gap:12px;width:100%}
+.capture-btn{flex:1;height:44px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s}
+.capture-btn.photo{background:#fff;color:#333}
+.capture-btn.photo:active{background:#f0f0f0}
+.capture-btn.upload{background:#fff;color:#1a6b4c;border:1px solid #1a6b4c}
+.capture-btn.upload:active{background:#f0f0f0}
+.capture-btn svg{width:18px;height:18px}
+
+/* ── 步骤3：AI分析中 ── */
+.analyzing{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 0;gap:16px}
+.analyzing .spinner{width:48px;height:48px;border:4px solid rgba(255,255,255,.15);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.analyzing .text{font-size:15px;color:#fff;text-align:center}
+.analyzing .sub{font-size:12px;color:rgba(255,255,255,.4);text-align:center}
+
+/* ── 步骤4：AI点评结果 ── */
+.result-section{margin-top:12px}
+.result-compare{display:flex;gap:8px;margin-bottom:14px}
+.result-img{flex:1;border-radius:10px;overflow:hidden;background:#f0f0f0}
+.result-img img{width:100%;display:block}
+.result-img .label{text-align:center;font-size:10px;color:#999;padding:4px 0;background:#f5f5f5}
+.result-score{text-align:center;padding:16px;background:#fff;border-radius:14px;margin-bottom:14px;box-shadow:0 2px 12px rgba(26,107,76,.06)}
+.result-score .score-num{font-size:36px;font-weight:800;color:#1a6b4c}
+.result-score .score-label{font-size:12px;color:#999;margin-top:4px}
+.result-score .score-bar{width:100%;height:6px;background:#e8e8e8;border-radius:3px;margin-top:10px;overflow:hidden}
+.result-score .score-bar-inner{height:100%;border-radius:3px;background:linear-gradient(90deg,#1a6b4c,#4fa889);transition:width 1s ease}
+
+.result-detail{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(26,107,76,.06)}
+.result-detail-title{font-size:14px;font-weight:700;color:#222;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.result-detail-title::before{content:'';width:3px;height:14px;background:#1a6b4c;border-radius:2px}
+.detail-item{padding:8px 0;border-bottom:1px solid #f5f5f5}
+.detail-item:last-child{border-bottom:none}
+.detail-item .d-label{font-size:11px;color:#999;margin-bottom:4px}
+.detail-item .d-value{font-size:13px;color:#444;line-height:1.6}
+.detail-item .d-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;margin:2px 2px 2px 0}
+.d-tag.good{background:#E8F5E9;color:#2e7d32}
+.d-tag.medium{background:#FFF3E0;color:#e65100}
+.d-tag.bad{background:#FFEBEE;color:#c62828}
+
+.result-actions{display:flex;gap:10px;margin-top:14px}
+.result-actions button{flex:1;height:44px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.btn-retry{background:#fff;color:#1a6b4c;border:1px solid #1a6b4c!important}
+.btn-retry:active{background:#f0f0f0}
+.btn-share{background:#fff;color:#1a6b4c}
+.btn-share:active{background:#f0f0f0}
+
+/* ── 技术路线图（手机框外右侧） ── */
+.tech-side{position:fixed;z-index:50;right:calc(50% - 215px - 320px);top:50%;transform:translateY(-50%);cursor:pointer;transition:transform .2s}
+.tech-side:active{transform:translateY(-50%) scale(.95)}
+.tech-side img{width:auto;max-width:300px;height:auto;max-height:70vh;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.15);display:block}
+.tech-side .tech-label{text-align:center;font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;white-space:nowrap}
+@media(max-width:700px){.tech-side{display:none}}
+
+/* ── Toast ── */
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:10px;font-size:14px;z-index:9999;opacity:0;pointer-events:none;transition:all .3s}
+.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+</style>
+</head>
+<body>
+<!-- 技术路线图（手机框外右侧） -->
+<div class="tech-side" onclick="showToast('AI书童技术路线图')">
+  <img src="asset/AI书童技术路线.png" onerror="this.parentElement.style.display='none'">
+  <div class="tech-label">技术路线</div>
+</div>
+
+<div class="page">
+
+<div class="top-bar">
+  <button class="back-btn" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </button>
+  <span class="title">AI书童</span>
+  <div class="placeholder"></div>
+</div>
+
+<!-- 步骤指示器 -->
+<div class="steps" id="stepsBar">
+  <div class="step on"><span class="num">1</span>选字帖</div>
+  <div class="step-line"></div>
+  <div class="step"><span class="num">2</span>拍照</div>
+  <div class="step-line"></div>
+  <div class="step"><span class="num">3</span>AI分析</div>
+  <div class="step-line"></div>
+  <div class="step"><span class="num">4</span>点评</div>
+</div>
+
+<!-- 步骤1：选择字帖 -->
+<div class="step-content active" id="step1">
+  <div style="text-align:center;color:rgba(255,255,255,.7);font-size:13px;padding:4px 0 2px">请选择您临摹的字帖范本</div>
+  <div class="script-grid" id="scriptGrid"></div>
+  <div class="script-select-hint">👆 点击选择字帖后进入拍照</div>
+</div>
+
+<!-- 步骤2：拍照/上传 -->
+<div class="step-content" id="step2">
+  <div style="text-align:center;color:rgba(255,255,255,.7);font-size:13px;padding:4px 0 2px">请拍摄或上传您写的字</div>
+  <div class="capture-area">
+    <div class="capture-preview" id="capturePreview">
+      <div class="capture-placeholder" id="capturePlaceholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <div>点击下方按钮上传或拍照</div>
+      </div>
+    </div>
+    <div class="capture-btns">
+      <button class="capture-btn photo" onclick="showToast('拍照功能需要设备授权')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        拍照
+      </button>
+      <button class="capture-btn upload" onclick="document.getElementById('uploadInput').click()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        上传图片
+      </button>
+      <input type="file" id="uploadInput" accept="image/*" style="display:none" onchange="handleUpload(event)">
+    </div>
+  </div>
+</div>
+
+<!-- 步骤3：AI分析中 -->
+<div class="step-content" id="step3">
+  <div class="analyzing">
+    <div class="spinner"></div>
+    <div class="text">AI书童正在分析您的作品...</div>
+    <div class="sub" id="analyzeStatus">正在识别笔画结构...</div>
+  </div>
+</div>
+
+<!-- 步骤4：点评结果 -->
+<div class="step-content" id="step4">
+  <div class="result-section" id="resultSection"></div>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══ 字帖分类数据 ═══
+var categories = [
+  {
+    name:'草书',
+    list:[
+      { name:'十七帖', author:'王羲之', dynasty:'东晋', img:'asset/十七贴.png' },
+      { name:'古诗四帖', author:'张旭', dynasty:'唐代', img:'asset/古诗四帖.png' },
+    ]
+  },
+  {
+    name:'行书',
+    list:[
+      { name:'兰亭序', author:'王羲之', dynasty:'东晋', img:'asset/兰亭序.png' },
+      { name:'祭侄文稿', author:'颜真卿', dynasty:'唐代', img:'asset/祭侄文稿.png' },
+    ]
+  },
+  {
+    name:'楷书',
+    list:[
+      { name:'黄庭经', author:'王羲之', dynasty:'东晋', img:'asset/黄庭经.png' },
+      { name:'洛神赋十三行', author:'王献之', dynasty:'东晋', img:'asset/洛神赋十三行.png' },
+    ]
+  }
+];
+
+var currentStep = 1;
+var selectedScript = null;
+var uploadedImage = null;
+
+// ═══ AI点评数据（模拟） ═══
+var aiReviews = {
+  '十七帖': {
+    score: 75,
+    dimensions: [
+      { label:'笔画结构', value:'草书笔画连绵流畅，对王羲之的"今草"风格有一定把握。但部分笔画连接处略显生硬，缺少"草贵流而畅"的圆转之美。', tag:'medium' },
+      { label:'字形准确度', value:'草书字形简省基本到位，对十七帖的结字规律有所理解。部分字的草法符号不够规范，建议加强对草书字法的学习。', tag:'medium' },
+      { label:'章法布局', value:'行气贯通，字与字之间的呼应关系处理得当。草书特有的"字群结构"有意识运用，但整体节奏可更加丰富。', tag:'good' },
+      { label:'用笔技法', value:'用笔较为大胆，有草书的气势。但转折处的换锋不够干净利落，建议加强对使转技法的训练。', tag:'medium' },
+    ],
+    suggestions: [
+      '建议系统学习草书字法，掌握常用草书符号',
+      '注意草书的"使转"用笔，加强转折处的换锋训练',
+      '临摹时可先慢后快，先求形似再追神似',
+      '多读王羲之《十七帖》墨迹本，体会其笔势变化',
+    ],
+    totalText: '您的草书临摹已初步掌握十七帖的风格特征，行笔流畅自然。建议在草书字法的准确性和用笔的精纯度上继续打磨，特别是使转技法的运用，会让您的草书更上层楼。'
+  },
+  '兰亭序': {
+    score: 78,
+    dimensions: [
+      { label:'笔画结构', value:'整体笔画流畅，但部分横画起笔力度不足，与王羲之原帖的"锥画沙"笔意尚有差距。捺画较为舒展，有几分兰亭韵味。', tag:'medium' },
+      { label:'字形准确度', value:'字形结构大体正确，对原帖的结体规律有所把握。"之"字各异的处理有意识模仿，但变化不够丰富。左右结构字形的比例关系可进一步推敲。', tag:'good' },
+      { label:'章法布局', value:'行气连贯性较好，字距疏密有致。但整体节奏感与原帖相比略显平直，缺少王羲之那种"似欹反正"的微妙变化。', tag:'medium' },
+      { label:'用笔技法', value:'中锋用笔基本稳定，但提按变化不够明显。转折处的方圆转换略显生硬，建议加强对笔锋的调控训练。', tag:'medium' },
+    ],
+    suggestions: [
+      '建议重点练习"横"画的起笔和收笔，注意藏锋与露锋的变化',
+      '临摹时可放慢速度，体会王羲之笔势的连绵与节奏感',
+      '注意字与字之间的呼应关系，增强行气的贯通',
+      '可尝试放大临摹，先把握整体结构再追求细节精到',
+    ],
+    totalText: '您的临摹作品已经具备一定基础，对兰亭序的整体风格把握较好。建议在笔法的精微变化和章法的节奏感上多下功夫，多读帖、多揣摩，定能更上一层楼。'
+  },
+  '黄庭经': {
+    score: 73,
+    dimensions: [
+      { label:'笔画结构', value:'楷书笔画工整规范，起收笔动作清晰。但线条的力度和质感尚有提升空间，与王羲之小楷的"绵里裹针"相比略显单薄。', tag:'medium' },
+      { label:'字形准确度', value:'字形结构端正，对黄庭经的结体规律有较好把握。上下结构字形的重心稳定，但左右结构字的宽窄比例可进一步调整。', tag:'good' },
+      { label:'章法布局', value:'整体章法整齐有序，行距字距均匀。小楷特有的"疏朗"气息有所体现，但字与字之间的气息可更加连贯。', tag:'medium' },
+      { label:'用笔技法', value:'用笔干净利落，笔画交代清楚。但提按变化不够丰富，横画的起伏变化可更加细腻，以增强线条的韵律感。', tag:'medium' },
+    ],
+    suggestions: [
+      '小楷用笔需更加精到，注意笔尖的细微变化',
+      '建议加强横画的起笔和收笔训练，追求"一波三折"的韵味',
+      '注意字内空间的疏密对比，增强结体的灵动感',
+      '可尝试用更小的字练习，锻炼对笔锋的精准控制',
+    ],
+    totalText: '您的楷书基础扎实，对黄庭经的风格把握较好。小楷讲究"精微"二字，建议在笔法的细腻度和线条的质感上继续精进，多体会王羲之小楷中"力透纸背"的笔意。'
+  },
+  '古诗四帖': {
+    score: 76,
+    dimensions: [
+      { label:'笔画结构', value:'狂草笔画奔放流畅，对张旭"颠张醉素"的风格有所领会。线条的粗细变化有致，但部分连绵笔画的控制力可进一步加强。', tag:'medium' },
+      { label:'字形准确度', value:'草书字形的简省和夸张处理得当，体现了狂草的自由精神。但个别字的草法可更加规范，避免过于随意。', tag:'medium' },
+      { label:'章法布局', value:'整体章法气势磅礴，行与行之间的穿插避让处理较好。狂草特有的"满纸烟云"的视觉效果有所呈现。', tag:'good' },
+      { label:'用笔技法', value:'用笔大胆豪放，有狂草的气势。但线条的质感和力度变化可更加丰富，建议加强中锋用笔的稳定性训练。', tag:'medium' },
+    ],
+    suggestions: [
+      '狂草需"狂而不乱"，建议先稳后放',
+      '加强中锋用笔的训练，增强线条的力度感',
+      '注意墨色变化，追求"润含春雨，干裂秋风"的效果',
+      '多读张旭《古诗四帖》原帖，体会其笔势的节奏变化',
+    ],
+    totalText: '您的狂草临摹已有一定气势，对张旭的风格有所把握。建议在保持奔放风格的同时，注重线条质感的提升和字法的规范性，做到"狂而有法"。'
+  },
+  '祭侄文稿': {
+    score: 74,
+    dimensions: [
+      { label:'笔画结构', value:'行书笔画苍劲有力，对颜真卿"屋漏痕"的笔意有所体现。线条的枯涩变化自然，与原帖的情感基调较为契合。', tag:'good' },
+      { label:'字形准确度', value:'字形结构把握较好，对祭侄文稿欹侧跌宕的结体特征有所理解。字势的俯仰变化丰富，情感表达强烈。', tag:'good' },
+      { label:'章法布局', value:'章法疏密有致，行气跌宕起伏。但与原帖相比，情感的层次变化可更加丰富，从悲愤到激昂的过渡可更自然。', tag:'medium' },
+      { label:'用笔技法', value:'用笔率意自然，枯笔运用得当。但部分笔画的控制可更加精准，特别是圆转处的用笔可更加饱满。', tag:'medium' },
+    ],
+    suggestions: [
+      '体会颜真卿书写时的情感变化，以情驭笔',
+      '注意枯笔与润笔的对比，增强作品的节奏感',
+      '加强圆转用笔的训练，使转折更加饱满有力',
+      '可结合颜真卿的生平背景理解作品的情感内涵',
+    ],
+    totalText: '您的临摹已经抓住了祭侄文稿的核心情感基调，用笔苍劲有力。建议在保持情感表达的同时，加强对笔法的精微控制，使作品更加耐人寻味。'
+  },
+  '洛神赋十三行': {
+    score: 71,
+    dimensions: [
+      { label:'笔画结构', value:'小楷笔画清秀工整，对王献之"玉版十三行"的秀美风格有所表现。起收笔动作干净，但线条的力度稍显不足。', tag:'medium' },
+      { label:'字形准确度', value:'字形结构端正秀丽，对原帖的结体规律有较好理解。但部分字形的疏密对比不够鲜明，可更加夸张一些。', tag:'medium' },
+      { label:'章法布局', value:'整体章法清朗疏朗，行距字距控制得当。小楷特有的"行行分明，字字独立"的特征有所体现。', tag:'good' },
+      { label:'用笔技法', value:'用笔细腻，笔画交代清楚。但线条的弹性可进一步加强，建议在笔尖的弹性运用上多下功夫，使笔画更有生机。', tag:'medium' },
+    ],
+    suggestions: [
+      '小楷贵在"精到"，建议加强笔尖的控制训练',
+      '注意笔画之间的呼应，增强字内的气息贯通',
+      '可尝试在生宣上练习，锻炼对墨色的控制能力',
+      '多读王献之原帖，体会"二王"一脉的用笔精髓',
+    ],
+    totalText: '您的临摹已具王献之小楷的秀美风格，用笔细腻。建议在线条的力度和弹性上继续加强，使作品在秀美之外更添骨力，达到"秀而有骨"的境界。'
+  },
+  'default': {
+    score: 72,
+    dimensions: [
+      { label:'笔画结构', value:'笔画基本规范，起收笔动作完整。部分点画略显犹豫，建议加强笔势的连贯性训练。撇捺的舒展度较好。', tag:'medium' },
+      { label:'字形准确度', value:'字形结构基本准确，对原帖的特征有所把握。部分字的重心不够稳定，建议加强对单字结体的练习。', tag:'medium' },
+      { label:'章法布局', value:'整体章法较为整齐，行距字距控制得当。建议进一步注意字与字之间的气息贯通。', tag:'good' },
+      { label:'用笔技法', value:'中锋用笔较为稳定，但提按、转折的变化可更丰富。建议加强线条质感的训练。', tag:'medium' },
+    ],
+    suggestions: [
+      '建议从基本笔画入手，夯实用笔基础',
+      '临摹时注意观察原帖的笔画形态和走向',
+      '可先单字精临，再逐步过渡到整篇临摹',
+      '保持每日练习，量变终将带来质变',
+    ],
+    totalText: '您的书法练习已初见成效，基本功扎实。建议在保持现有水平的基础上，加强对原帖的观察和体会，逐步提高作品的艺术表现力。'
+  }
+};
+
+// ═══ 初始化字帖 ═══
+function initScripts(){
+  var grid = document.getElementById('scriptGrid');
+  grid.innerHTML = '';
+  categories.forEach(function(cat){
+    grid.innerHTML += '<div class="category-title">'+cat.name+'</div>';
+    grid.innerHTML += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;grid-column:1/-1">' +
+      cat.list.map(function(s){
+        return '<div class="script-card" data-name="'+s.name+'" onclick="selectScript(\''+s.name+'\')">'+
+          '<img src="'+s.img+'" onerror="this.parentElement.style.display=\'none\'">'+
+          '<div class="script-card-body">'+
+          '<div class="script-card-name">'+s.name+'</div>'+
+          '<div class="script-card-author">'+s.author+'</div>'+
+          '<div class="script-card-dynasty">'+s.dynasty+'</div>'+
+          '</div></div>';
+      }).join('') +
+      '</div>';
+  });
+}
+
+function selectScript(name){
+  selectedScript = name;
+  document.querySelectorAll('.script-card').forEach(function(c){ c.classList.remove('on'); });
+  document.querySelector('.script-card[data-name="'+name+'"]').classList.add('on');
+  setTimeout(function(){ goToStep(2); }, 400);
+}
+
+// ═══ 步骤切换 ═══
+function goToStep(n){
+  currentStep = n;
+  document.querySelectorAll('.step-content').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('step'+n).classList.add('active');
+  document.querySelectorAll('.step').forEach(function(el, i){ el.classList.toggle('on', i < n); });
+  if(n === 3) startAnalyze();
+}
+
+// ═══ 上传图片 ═══
+function handleUpload(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    uploadedImage = ev.target.result;
+    var preview = document.getElementById('capturePreview');
+    var placeholder = document.getElementById('capturePlaceholder');
+    placeholder.style.display = 'none';
+    preview.innerHTML = '<img src="'+uploadedImage+'">';
+    setTimeout(function(){ goToStep(3); }, 600);
+  };
+  reader.readAsDataURL(file);
+}
+
+// ═══ AI分析模拟 ═══
+function startAnalyze(){
+  var statusText = document.getElementById('analyzeStatus');
+  var steps = [
+    '正在识别笔画结构...',
+    '正在比对标准字库...',
+    '正在分析章法布局...',
+    '正在生成专业点评...',
+  ];
+  var i = 0;
+  var timer = setInterval(function(){
+    i++;
+    if(i < steps.length){
+      statusText.textContent = steps[i];
+    } else {
+      clearInterval(timer);
+      showResult();
+    }
+  }, 1200);
+}
+
+function showResult(){
+  var review = aiReviews[selectedScript] || aiReviews['default'];
+  var section = document.getElementById('resultSection');
+
+  var tagMap = { good:'优秀', medium:'良好', bad:'待加强' };
+  var colorMap = { good:'#2e7d32', medium:'#e65100', bad:'#c62828' };
+
+  var selectedCat = null;
+  categories.forEach(function(c){ c.list.forEach(function(s){ if(s.name === selectedScript) selectedCat = s; }); });
+  section.innerHTML =
+    '<div class="result-compare">'+
+      '<div class="result-img"><img src="'+(selectedCat?.img || '')+'" onerror="this.style.display=\'none\'"><div class="label">📜 标准字帖 · '+selectedScript+'</div></div>'+
+      '<div class="result-img"><img src="'+uploadedImage+'" onerror="this.style.display=\'none\'"><div class="label">✍️ 您的临摹</div></div>'+
+    '</div>'+
+    '<div class="result-score">'+
+      '<div class="score-num">'+review.score+'</div>'+
+      '<div class="score-label">综合评分</div>'+
+      '<div class="score-bar"><div class="score-bar-inner" style="width:'+review.score+'%"></div></div>'+
+    '</div>'+
+    '<div class="result-detail">'+
+      '<div class="result-detail-title">维度分析</div>'+
+      review.dimensions.map(function(d){
+        return '<div class="detail-item"><div class="d-label">'+d.label+' <span class="d-tag '+d.tag+'">'+tagMap[d.tag]+'</span></div><div class="d-value">'+d.value+'</div></div>';
+      }).join('')+
+    '</div>'+
+    '<div class="result-detail">'+
+      '<div class="result-detail-title">AI综合点评</div>'+
+      '<div class="detail-item"><div class="d-value">'+review.totalText+'</div></div>'+
+    '</div>'+
+    '<div class="result-detail">'+
+      '<div class="result-detail-title">改进建议</div>'+
+      review.suggestions.map(function(s, i){
+        return '<div class="detail-item"><div class="d-label">建议'+(i+1)+'</div><div class="d-value">'+s+'</div></div>';
+      }).join('')+
+    '</div>'+
+    '<div class="result-actions">'+
+      '<button class="btn-retry" onclick="goToStep(1)">重新评测</button>'+
+      '<button class="btn-share" onclick="showToast(\'分享功能即将上线\')">分享点评</button>'+
+    '</div>';
+
+  goToStep(4);
+}
+
+function showToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2000);
+}
+
+initScripts();
+</script>
+</body>
+</html>

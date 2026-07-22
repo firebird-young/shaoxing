@@ -368,6 +368,16 @@ var DB = {
         ]
       }
     ]
+  },
+  lantingshiyun: {
+    name:'兰亭诗韵', img:'asset/兰亭诗韵封面图.png', n:'×1', url:'product_maotai1935.html',
+    list:[
+      { id:'#D01', t:'2026-06-01 10:00', h:'0x9b3e7a1d5f8c...2a4e', spec:'雅韵版', img:'asset/兰亭诗韵封面图.png',
+        bf:[
+          { n:'AI书童', type:'identity', eff:'2026-06-01', exp:'2027-12-31', total:999, used:0, desc:'拍照评测书法作品，AI智能比对标准字库，输出专业点评和改进建议。支持兰亭序、十七帖、黄庭经等字帖比对。', aiLink:'ai-calligraphy.html' }
+        ]
+      }
+    ]
   }
 };
 
@@ -498,6 +508,11 @@ function onBenefit(idx, bi){
   var st = B_STA[s] || B_STA.unused;
   var modal = document.getElementById('modalMask');
   var content = document.getElementById('modalContent');
+
+  if(bf.aiLink){
+    window.location.href = bf.aiLink;
+    return;
+  }
 
   if(bf.type === 'identity'){
     content.innerHTML =

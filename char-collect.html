@@ -404,7 +404,7 @@ function generateRubbing(chars){
     if(v){
       html += '<div class="rubbing-img"><img src="'+v.img+'" onerror="this.style.display=\'none\'"></div>';
     }
-    html += '<div class="rubbing-char">'+c+'</div></div>';
+    html += '</div>';
   });
   for(var i = cells.length; i < 16; i++){
     html += '<div class="rubbing-cell"><div class="cell-bg '+currentGrid+'"></div></div>';

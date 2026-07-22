@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>集字工具</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#2c2c2e;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;color:#333;display:flex;flex-direction:column;align-items:center}
+.page{max-width:430px;min-height:100vh;background:linear-gradient(180deg,#1a6b4c 0%,#3f9b7a 20%,#e8f5ee 40%,#f5f5f5 100%);padding-bottom:40px;position:relative;width:100%}
+@media(max-width:430px){.page{max-width:100%}}
+
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+.top-bar .back-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.25);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.top-bar .back-btn:active{background:rgba(255,255,255,.4)}
+.top-bar .back-btn svg{width:18px;height:18px;display:block}
+.top-bar .title{font-size:18px;font-weight:700;color:#fff;flex:1;text-align:center}
+.top-bar .top-link{font-size:11px;padding:5px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);cursor:pointer;flex-shrink:0;white-space:nowrap}
+.top-bar .top-link:active{background:rgba(255,255,255,.2)}
+.top-bar .placeholder{width:32px}
+
+/* ── 输入区 ── */
+.input-section{background:#fff;margin:0 16px;border-radius:14px;padding:16px;box-shadow:0 2px 12px rgba(26,107,76,.06)}
+.input-section .label{font-size:12px;color:#999;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.input-row{display:flex;gap:10px}
+.input-row input{flex:1;height:44px;border:1px solid #e0e0e0;border-radius:10px;padding:0 14px;font-size:16px;outline:none;transition:border-color .2s}
+.input-row input:focus{border-color:#1a6b4c}
+.input-row input::placeholder{color:#ccc;font-size:14px}
+.input-row .search-btn{height:44px;padding:0 20px;border:none;border-radius:10px;background:#1a6b4c;color:#fff;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.input-row .search-btn:active{opacity:.85}
+
+/* ── 字体风格选择 ── */
+.style-section{margin:12px 16px 0}
+.style-title{font-size:12px;font-weight:600;color:rgba(255,255,255,.7);margin-bottom:8px}
+.style-options{display:flex;gap:8px}
+.style-btn{padding:8px 0;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;flex:1;text-align:center;transition:all .2s}
+.style-btn.caoshu{background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.15)}
+.style-btn.caoshu.on{background:#fff;color:#1a6b4c;border-color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.style-btn.xingshu{background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.15)}
+.style-btn.xingshu.on{background:#fff;color:#1a6b4c;border-color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.style-btn.kaishu{background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.15)}
+.style-btn.kaishu.on{background:#fff;color:#1a6b4c;border-color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+
+/* ── 结果区 ── */
+.result-section{display:none;margin:14px 16px 0}
+.result-section.show{display:block}
+.result-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+
+/* ── 字符卡片 ── */
+.char-card{background:#fff;border-radius:12px;margin-bottom:10px;overflow:hidden;box-shadow:0 2px 8px rgba(26,107,76,.04)}
+.char-header{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #f5f5f5}
+.char-char{font-size:20px;font-weight:800;color:#1a6b4c;width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:#f0faf5;border-radius:6px;flex-shrink:0}
+.char-source{font-size:11px;color:#999;flex:1}
+.char-source .src-name{color:#222;font-weight:600}
+.char-source .src-author{color:#bbb}
+.char-nav{display:flex;gap:4px;flex-shrink:0}
+.char-nav-btn{padding:3px 8px;border-radius:4px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid #e0e0e0;background:#fff;color:#666;transition:all .15s}
+.char-nav-btn:active{background:#f0f0f0}
+.char-nav-btn.on{background:#1a6b4c;color:#fff;border-color:#1a6b4c}
+.char-preview{padding:12px;display:flex;justify-content:center}
+.char-preview-img{width:120px;height:120px;background:#fafafa;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1px solid #eee}
+.char-preview-img img{width:100%;height:100%;object-fit:contain;transition:opacity .2s}
+
+/* ── 排版预览 ── */
+.layout-section{margin:14px 16px 0;display:none}
+.layout-section.show{display:block}
+.layout-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.layout-title{font-size:13px;font-weight:700;color:#1a6b4c;display:flex;align-items:center;gap:6px}
+.layout-actions{display:flex;gap:6px}
+.layout-btn{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.layout-btn.outline{background:#fff;color:#1a6b4c;border:1px solid #1a6b4c}
+.layout-btn.outline:active{background:#f0f0f0}
+
+/* ── 格子选择 ── */
+.grid-select{display:flex;gap:6px;margin-bottom:10px}
+.grid-btn{padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #ddd;background:#fff;color:#666;transition:all .2s}
+.grid-btn:active{opacity:.7}
+.grid-btn.on{background:#fff;color:#1a6b4c;border-color:#fff;font-weight:700}
+
+/* ── 描红预览 ── */
+.rubbing-preview{background:#fff;border-radius:12px;padding:12px;box-shadow:0 2px 8px rgba(26,107,76,.04)}
+.rubbing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.rubbing-cell{aspect-ratio:1;position:relative;border-radius:4px;overflow:hidden}
+.rubbing-cell .cell-bg{position:absolute;inset:0}
+.rubbing-cell .cell-bg.mizi{border:1px solid #d0d0d0}
+.rubbing-cell .cell-bg.mizi::before,.rubbing-cell .cell-bg.mizi::after{content:'';position:absolute;top:0;left:50%;width:1px;height:100%;background:#e0e0e0;transform:translateX(-50%)}
+.rubbing-cell .cell-bg.mizi::after{top:50%;left:0;width:100%;height:1px;background:#e0e0e0;transform:translateY(-50%)}
+.rubbing-cell .cell-bg.tian{border:1px solid #d0d0d0}
+.rubbing-cell .cell-bg.tian::before{content:'';position:absolute;top:50%;left:0;width:100%;height:1px;background:#e0e0e0;transform:translateY(-50%)}
+.rubbing-cell .cell-bg.tian::after{content:'';position:absolute;top:0;left:50%;width:1px;height:100%;background:#e0e0e0;transform:translateX(-50%)}
+.rubbing-cell .cell-bg.jiu{border:1px solid #d0d0d0}
+.rubbing-cell .cell-bg.jiu::before{content:'';position:absolute;top:50%;left:0;width:100%;height:1px;background:#e0e0e0;transform:translateY(-50%)}
+.rubbing-cell .cell-bg.jiu::after{content:'';position:absolute;top:0;left:50%;width:1px;height:100%;background:#e0e0e0;transform:translateX(-50%)}
+.rubbing-cell .cell-bg.hui{border:1px solid #d0d0d0}
+.rubbing-cell .cell-bg.hui::before{content:'';position:absolute;top:50%;left:0;width:100%;height:1px;background:#e0e0e0;transform:translateY(-50%)}
+.rubbing-cell .cell-bg.hui::after{content:'';position:absolute;top:0;left:50%;width:1px;height:100%;background:#e0e0e0;transform:translateX(-50%)}
+.rubbing-cell .rubbing-img{position:absolute;inset:3px;display:flex;align-items:center;justify-content:center;z-index:1}
+.rubbing-cell .rubbing-img img{width:85%;height:85%;object-fit:contain;opacity:.2;filter:grayscale(1)}
+.rubbing-cell .rubbing-char{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:300;color:#333;z-index:2;pointer-events:none}
+
+/* ── 缺失提示 ── */
+.missing-notice{padding:10px 14px;background:rgba(255,255,255,.1);border-radius:8px;font-size:12px;color:rgba(255,255,255,.5);text-align:center;margin:10px 0}
+
+/* ── Toast ── */
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:10px;font-size:14px;z-index:9999;opacity:0;pointer-events:none;transition:all .3s}
+.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="top-bar">
+  <button class="back-btn" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </button>
+  <span class="title">集字工具</span>
+  <div class="placeholder"></div>
+</div>
+
+<!-- 输入区 -->
+<div class="input-section">
+  <div class="label">📝 输入文字</div>
+  <div class="input-row">
+    <input id="textInput" placeholder="输入要集字的文字，如：春风得意" maxlength="20" onkeydown="if(event.key==='Enter')searchText()">
+    <button class="search-btn" onclick="searchText()">集字</button>
+  </div>
+</div>
+
+<!-- 字体风格 -->
+<div class="style-section">
+  <div class="style-title">🎨 选择字体风格</div>
+  <div class="style-options">
+    <button class="style-btn caoshu" data-style="caoshu" onclick="selectStyle('caoshu')">🌿 草书</button>
+    <button class="style-btn xingshu on" data-style="xingshu" onclick="selectStyle('xingshu')">✍️ 行书</button>
+    <button class="style-btn kaishu" data-style="kaishu" onclick="selectStyle('kaishu')">📐 楷书</button>
+  </div>
+</div>
+
+<!-- 结果区 -->
+<div class="result-section" id="resultSection">
+  <div class="result-title">🔍 集字结果</div>
+  <div id="charResults"></div>
+</div>
+
+<!-- 缺失提示 -->
+<div id="missingNotice" style="display:none"></div>
+
+<!-- 排版预览 -->
+<div class="layout-section" id="layoutSection">
+  <div class="layout-header">
+    <div class="layout-title">🖼 描红排版</div>
+    <div class="layout-actions">
+      <button class="layout-btn outline" onclick="showToast('导出功能开发中')">导出</button>
+    </div>
+  </div>
+  <div class="grid-select">
+    <button class="grid-btn on" data-grid="mizi" onclick="selectGrid('mizi')">米字格</button>
+    <button class="grid-btn" data-grid="tian" onclick="selectGrid('tian')">田字格</button>
+    <button class="grid-btn" data-grid="jiu" onclick="selectGrid('jiu')">九宫格</button>
+    <button class="grid-btn" data-grid="hui" onclick="selectGrid('hui')">回宫格</button>
+  </div>
+  <div class="rubbing-preview" id="rubbingPreview"></div>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══ 字库数据：每个字包含各风格的写法 ═══
+var charDB = {
+  '春': {
+    caoshu:[{ version:'唐寅自书词·唐寅', img:'asset/春-唐寅自书词.png' }],
+    xingshu:[{ version:'杜牧张好好诗·杜牧', img:'asset/春-杜牧张好好诗.png' },{ version:'赵孟頫洛神赋·赵孟頫', img:'asset/春—赵孟頫洛神赋.png' }],
+    kaishu:[]
+  },
+  '风': {
+    xingshu:[{ version:'集王圣教序·王羲之', img:'asset/风-集旺圣教序.png' }]
+  },
+  '得': {
+    xingshu:[{ version:'赵孟頫·赵孟頫', img:'asset/得-赵孟頫.png' }]
+  },
+  '意': {
+    xingshu:[{ version:'王羲之·王羲之', img:'asset/意-王羲之.png' }]
+  },
+  '之': {
+    caoshu:[{ version:'十七帖·王羲之', img:'asset/十七贴.png' }],
+    xingshu:[{ version:'兰亭序·王羲之', img:'asset/兰亭序.png' },{ version:'祭侄文稿·颜真卿', img:'asset/祭侄文稿.png' }],
+    kaishu:[{ version:'黄庭经·王羲之', img:'asset/黄庭经.png' },{ version:'洛神赋十三行·王献之', img:'asset/洛神赋十三行.png' }]
+  },
+  '人': {
+    caoshu:[{ version:'十七帖·王羲之', img:'asset/十七贴.png' }],
+    xingshu:[{ version:'兰亭序·王羲之', img:'asset/兰亭序.png' }],
+    kaishu:[{ version:'黄庭经·王羲之', img:'asset/黄庭经.png' },{ version:'洛神赋十三行·王献之', img:'asset/洛神赋十三行.png' }]
+  },
+  '天': {
+    caoshu:[{ version:'古诗四帖·张旭', img:'asset/古诗四帖.png' }],
+    xingshu:[{ version:'兰亭序·王羲之', img:'asset/兰亭序.png' },{ version:'祭侄文稿·颜真卿', img:'asset/祭侄文稿.png' }],
+    kaishu:[{ version:'黄庭经·王羲之', img:'asset/黄庭经.png' }]
+  },
+  '不': {
+    caoshu:[{ version:'十七帖·王羲之', img:'asset/十七贴.png' },{ version:'古诗四帖·张旭', img:'asset/古诗四帖.png' }],
+    xingshu:[{ version:'兰亭序·王羲之', img:'asset/兰亭序.png' },{ version:'祭侄文稿·颜真卿', img:'asset/祭侄文稿.png' }],
+    kaishu:[{ version:'洛神赋十三行·王献之', img:'asset/洛神赋十三行.png' }]
+  },
+  '一': {
+    caoshu:[{ version:'十七帖·王羲之', img:'asset/十七贴.png' }],
+    xingshu:[{ version:'兰亭序·王羲之', img:'asset/兰亭序.png' },{ version:'祭侄文稿·颜真卿', img:'asset/祭侄文稿.png' }],
+    kaishu:[{ version:'黄庭经·王羲之', img:'asset/黄庭经.png' },{ version:'洛神赋十三行·王献之', img:'asset/洛神赋十三行.png' }]
+  },
+  '水': {
+    caoshu:[{ version:'古诗四帖·张旭', img:'asset/古诗四帖.png' }],
+    xingshu:[{ version:'兰亭序·王羲之', img:'asset/兰亭序.png' }],
+    kaishu:[{ version:'黄庭经·王羲之', img:'asset/黄庭经.png' }]
+  },
+  '山': {
+    caoshu:[{ version:'十七帖·王羲之', img:'asset/十七贴.png' }],
+    xingshu:[{ version:'兰亭序·王羲之', img:'asset/兰亭序.png' }],
+    kaishu:[{ version:'洛神赋十三行·王献之', img:'asset/洛神赋十三行.png' }]
+  },
+  '大': {
+    caoshu:[{ version:'古诗四帖·张旭', img:'asset/古诗四帖.png' }],
+    xingshu:[{ version:'兰亭序·王羲之', img:'asset/兰亭序.png' },{ version:'祭侄文稿·颜真卿', img:'asset/祭侄文稿.png' }],
+    kaishu:[{ version:'黄庭经·王羲之', img:'asset/黄庭经.png' }]
+  },
+  '年': {
+    caoshu:[{ version:'十七帖·王羲之', img:'asset/十七贴.png' }],
+    xingshu:[{ version:'兰亭序·王羲之', img:'asset/兰亭序.png' },{ version:'祭侄文稿·颜真卿', img:'asset/祭侄文稿.png' }],
+    kaishu:[{ version:'黄庭经·王羲之', img:'asset/黄庭经.png' }]
+  },
+  '无': {
+    caoshu:[{ version:'古诗四帖·张旭', img:'asset/古诗四帖.png' }],
+    xingshu:[{ version:'兰亭序·王羲之', img:'asset/兰亭序.png' }],
+    kaishu:[{ version:'洛神赋十三行·王献之', img:'asset/洛神赋十三行.png' }]
+  },
+  '心': {
+    caoshu:[{ version:'十七帖·王羲之', img:'asset/十七贴.png' }],
+    xingshu:[{ version:'祭侄文稿·颜真卿', img:'asset/祭侄文稿.png' }],
+    kaishu:[{ version:'黄庭经·王羲之', img:'asset/黄庭经.png' }]
+  },
+  '中': {
+    caoshu:[{ version:'古诗四帖·张旭', img:'asset/古诗四帖.png' }],
+    xingshu:[{ version:'兰亭序·王羲之', img:'asset/兰亭序.png' }],
+    kaishu:[{ version:'洛神赋十三行·王献之', img:'asset/洛神赋十三行.png' }]
+  },
+  '也': {
+    caoshu:[{ version:'十七帖·王羲之', img:'asset/十七贴.png' }],
+    xingshu:[{ version:'兰亭序·王羲之', img:'asset/兰亭序.png' }],
+    kaishu:[{ version:'黄庭经·王羲之', img:'asset/黄庭经.png' }]
+  },
+  '于': {
+    caoshu:[{ version:'古诗四帖·张旭', img:'asset/古诗四帖.png' }],
+    xingshu:[{ version:'兰亭序·王羲之', img:'asset/兰亭序.png' }],
+    kaishu:[{ version:'洛神赋十三行·王献之', img:'asset/洛神赋十三行.png' }]
+  },
+  '其': {
+    caoshu:[{ version:'十七帖·王羲之', img:'asset/十七贴.png' }],
+    xingshu:[{ version:'祭侄文稿·颜真卿', img:'asset/祭侄文稿.png' }],
+    kaishu:[{ version:'黄庭经·王羲之', img:'asset/黄庭经.png' }]
+  },
+  '日': {
+    caoshu:[{ version:'古诗四帖·张旭', img:'asset/古诗四帖.png' }],
+    xingshu:[{ version:'兰亭序·王羲之', img:'asset/兰亭序.png' }],
+    kaishu:[{ version:'洛神赋十三行·王献之', img:'asset/洛神赋十三行.png' }]
+  },
+  '月': {
+    caoshu:[{ version:'十七帖·王羲之', img:'asset/十七贴.png' }],
+    xingshu:[{ version:'兰亭序·王羲之', img:'asset/兰亭序.png' },{ version:'祭侄文稿·颜真卿', img:'asset/祭侄文稿.png' }],
+    kaishu:[{ version:'黄庭经·王羲之', img:'asset/黄庭经.png' }]
+  },
+  '上': {
+    caoshu:[{ version:'古诗四帖·张旭', img:'asset/古诗四帖.png' }],
+    xingshu:[{ version:'兰亭序·王羲之', img:'asset/兰亭序.png' }],
+    kaishu:[{ version:'洛神赋十三行·王献之', img:'asset/洛神赋十三行.png' }]
+  },
+  '下': {
+    caoshu:[{ version:'十七帖·王羲之', img:'asset/十七贴.png' }],
+    xingshu:[{ version:'兰亭序·王羲之', img:'asset/兰亭序.png' },{ version:'祭侄文稿·颜真卿', img:'asset/祭侄文稿.png' }],
+    kaishu:[{ version:'黄庭经·王羲之', img:'asset/黄庭经.png' }]
+  }
+};
+
+var currentStyle = 'xingshu';
+var currentGrid = 'mizi';
+var charVersions = {}; // 记录每个字当前选中的版本索引
+
+// ═══ 风格选择 ═══
+function selectStyle(style){
+  currentStyle = style;
+  document.querySelectorAll('.style-btn').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelector('.style-btn[data-style="'+style+'"]').classList.add('on');
+  var text = document.getElementById('textInput').value.trim();
+  if(text) searchText();
+}
+
+// ═══ 搜索 ═══
+function searchText(){
+  var text = document.getElementById('textInput').value.trim();
+  if(!text){ showToast('请输入文字'); return; }
+
+  var chars = text.split('');
+  var resultHtml = '';
+  var missing = [];
+  var allFound = [];
+
+  chars.forEach(function(c){
+    var found = charDB[c];
+    if(found){
+      // 收集该字所有风格的版本
+      var allVersions = [];
+      ['caoshu','xingshu','kaishu'].forEach(function(style){
+        if(found[style]) found[style].forEach(function(v){ allVersions.push(v); });
+      });
+      if(allVersions.length){
+        allFound.push(c);
+        if(!charVersions[c]) charVersions[c] = 0;
+        if(charVersions[c] >= allVersions.length) charVersions[c] = 0;
+        resultHtml += renderCharCard(c, allVersions);
+      } else {
+        missing.push(c);
+      }
+    } else {
+      missing.push(c);
+    }
+  });
+
+  document.getElementById('charResults').innerHTML = resultHtml;
+  document.getElementById('resultSection').classList.add('show');
+
+  var notice = document.getElementById('missingNotice');
+  if(missing.length){
+    notice.style.display = 'block';
+    notice.innerHTML = '<div class="missing-notice">⚠️ 当前风格中未收录：'+missing.join('、')+'，请切换其他风格试试</div>';
+  } else {
+    notice.style.display = 'none';
+  }
+
+  generateRubbing(allFound);
+
+  setTimeout(function(){ document.querySelector('.result-section').scrollIntoView({ behavior:'smooth', block:'start' }); }, 200);
+}
+
+function renderCharCard(c, versions){
+  var v = versions[charVersions[c]] || versions[0];
+  var parts = v.version.split('·');
+  var scriptName = parts[0] || '';
+  var authorName = parts[1] || '';
+  var html = '<div class="char-card">'+
+    '<div class="char-header">'+
+      '<div class="char-char">'+c+'</div>'+
+      '<div class="char-source"><span class="src-name">'+scriptName+'</span> <span class="src-author">· '+authorName+'</span></div>'+
+      '<div class="char-nav">';
+  versions.forEach(function(v2, i){
+    html += '<button class="char-nav-btn'+(i===charVersions[c]?' on':'')+'" onclick="switchVersion(\''+c+'\','+i+')">'+(i+1)+'</button>';
+  });
+  html += '</div></div>'+
+    '<div class="char-preview">'+
+      '<div class="char-preview-img"><img src="'+v.img+'" onerror="this.parentElement.innerHTML=\'<span style=color:#ccc;font-size:18px>'+c+'</span>\'"></div>'+
+    '</div></div>';
+  return html;
+}
+
+function switchVersion(c, idx){
+  charVersions[c] = idx;
+  searchText();
+}
+
+// ═══ 格子选择 ═══
+function selectGrid(type){
+  currentGrid = type;
+  document.querySelectorAll('.grid-btn').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelector('.grid-btn[data-grid="'+type+'"]').classList.add('on');
+  var chars = document.getElementById('textInput').value.trim().split('');
+  generateRubbing(chars.filter(function(c){ return charDB[c] && charDB[c][currentStyle] && charDB[c][currentStyle].length; }));
+}
+
+// ═══ 描红排版 ═══
+function generateRubbing(chars){
+  if(!chars || !chars.length){
+    document.getElementById('layoutSection').classList.remove('show');
+    return;
+  }
+  document.getElementById('layoutSection').classList.add('show');
+
+  var grid = document.getElementById('rubbingPreview');
+  var cells = chars.slice(0, 16);
+  var html = '<div class="rubbing-grid">';
+  cells.forEach(function(c){
+    var found = charDB[c];
+    var v = null;
+    if(found){
+      var allVersions = [];
+      ['caoshu','xingshu','kaishu'].forEach(function(s){
+        if(found[s]) found[s].forEach(function(v2){ allVersions.push(v2); });
+      });
+      if(allVersions.length){
+        var idx = charVersions[c] || 0;
+        if(idx >= allVersions.length) idx = 0;
+        v = allVersions[idx];
+      }
+    }
+    html += '<div class="rubbing-cell">'+
+      '<div class="cell-bg '+currentGrid+'"></div>';
+    if(v){
+      html += '<div class="rubbing-img"><img src="'+v.img+'" onerror="this.style.display=\'none\'"></div>';
+    }
+    html += '<div class="rubbing-char">'+c+'</div></div>';
+  });
+  for(var i = cells.length; i < 16; i++){
+    html += '<div class="rubbing-cell"><div class="cell-bg '+currentGrid+'"></div></div>';
+  }
+  html += '</div>';
+  grid.innerHTML = html;
+}
+
+function showToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2000);
+}
+</script>
+</body>
+</html>

@@ -102,12 +102,142 @@ body{margin:0;background:#2c2c2e;font-family:-apple-system,'PingFang SC','Micros
 .tech-side .tech-label{text-align:center;font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;white-space:nowrap}
 @media(max-width:700px){.tech-side{display:none}}
 
+/* ── 功能说明（手机框外左侧） ── */
+.info-side{position:fixed;z-index:50;left:calc(50% - 215px - 360px);top:50%;transform:translateY(-50%);width:330px;cursor:default}
+@media(max-width:1100px){.info-side{display:none}}
+.info-side .info-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.info-side .info-card{background:rgba(255,255,255,.1);backdrop-filter:blur(8px);border-radius:12px;padding:14px 16px;margin-bottom:10px;border:1px solid rgba(255,255,255,.08);transition:background .2s}
+.info-side .info-card:hover{background:rgba(255,255,255,.15)}
+.info-side .info-rank{display:inline-block;font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700;margin-bottom:6px}
+.info-side .rank-1{background:rgba(255,77,79,.2);color:#ff6b6b}
+.info-side .rank-2{background:rgba(250,140,22,.2);color:#f5a623}
+.info-side .rank-3{background:rgba(7,193,96,.2);color:#07c160}
+.info-side .info-card-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:4px}
+.info-side .info-card-desc{font-size:11px;color:rgba(255,255,255,.6);line-height:1.5}
+.info-side .info-stars{font-size:10px;color:rgba(255,255,255,.4);margin-top:4px}
+
 /* ── Toast ── */
 .toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);background:rgba(0,0,0,.8);color:#fff;padding:12px 24px;border-radius:10px;font-size:14px;z-index:9999;opacity:0;pointer-events:none;transition:all .3s}
 .toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 </style>
 </head>
 <body>
+<!-- 功能说明（手机框外左侧） -->
+<div class="info-side">
+  <div class="info-title">📋 三大功能 · 研发难度排序</div>
+
+  <div style="background:rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:11px;color:rgba(255,255,255,.5);line-height:1.6">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+      <span style="background:rgba(255,255,255,.1);padding:2px 8px;border-radius:4px;font-size:10px;color:rgba(255,255,255,.4)">AR</span>
+      <span style="background:rgba(255,255,255,.1);padding:2px 8px;border-radius:4px;font-size:10px;color:rgba(255,255,255,.4)">AI</span>
+      <span style="background:rgba(255,255,255,.1);padding:2px 8px;border-radius:4px;font-size:10px;color:rgba(255,255,255,.4)">集字</span>
+    </div>
+    <div>1️⃣ AR实时笔迹引导 · 2️⃣ AI书法点评 · 3️⃣ 集字工具</div>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:10px;align-items:flex-end;padding:0 4px">
+    <div style="flex:1;text-align:center">
+      <div style="height:80px;background:linear-gradient(to top,rgba(255,77,79,.3),rgba(255,77,79,.1));border-radius:6px 6px 0 0;position:relative">
+        <div style="position:absolute;bottom:4px;left:0;right:0;font-size:9px;color:rgba(255,255,255,.5)">9.5</div>
+      </div>
+      <div style="font-size:9px;color:rgba(255,255,255,.5);margin-top:4px">AR</div>
+    </div>
+    <div style="flex:1;text-align:center">
+      <div style="height:60px;background:linear-gradient(to top,rgba(250,140,22,.3),rgba(250,140,22,.1));border-radius:6px 6px 0 0;position:relative">
+        <div style="position:absolute;bottom:4px;left:0;right:0;font-size:9px;color:rgba(255,255,255,.5)">7.5</div>
+      </div>
+      <div style="font-size:9px;color:rgba(255,255,255,.5);margin-top:4px">AI点评</div>
+    </div>
+    <div style="flex:1;text-align:center">
+      <div style="height:30px;background:linear-gradient(to top,rgba(7,193,96,.3),rgba(7,193,96,.1));border-radius:6px 6px 0 0;position:relative">
+        <div style="position:absolute;bottom:4px;left:0;right:0;font-size:9px;color:rgba(255,255,255,.5)">3.0</div>
+      </div>
+      <div style="font-size:9px;color:rgba(255,255,255,.5);margin-top:4px">集字</div>
+    </div>
+  </div>
+
+  <!-- 排名第一 -->
+  <div class="info-card">
+    <div class="info-rank rank-1">⭐⭐⭐⭐⭐ ① 难度第一</div>
+    <div class="info-card-title">AR实时笔迹引导</div>
+    <div class="info-card-desc">AR技术实时追踪笔迹，以王羲之笔法路径引导练习</div>
+    <div class="info-stars">AR + OpenCV + YOLO + 轨迹算法 + 实时渲染 · ★★★★★</div>
+    <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)">
+      <div style="font-size:10px;color:rgba(255,255,255,.4);line-height:1.5">
+        <b style="color:rgba(255,255,255,.6)">难点：</b>AR定位纸张 · 30FPS识别笔尖 · 轨迹实时计算 · 延迟&lt;100ms
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px">开发周期：MVP 2~3月 / 完整产品 6月+</div>
+    </div>
+  </div>
+
+  <!-- 排名第二 -->
+  <div class="info-card">
+    <div class="info-rank rank-2">⭐⭐⭐⭐ ② 难度第二</div>
+    <div class="info-card-title">AI书法点评</div>
+    <div class="info-card-desc">AI书童：手机拍摄习作，AI基于《兰亭序》笔法分析给出即时反馈</div>
+    <div class="info-stars">OCR + 图像分析 + AI大模型/RAG + 笔画特征提取 · ★★★★☆</div>
+    <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)">
+      <div style="font-size:10px;color:rgba(255,255,255,.4);line-height:1.5">
+        <b style="color:rgba(255,255,255,.6)">分析维度：</b>起笔 · 收笔 · 中锋 · 结构 · 重心 · 相似度
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px">开发周期：MVP 1~2月 / 完整版 3~5月</div>
+    </div>
+  </div>
+
+  <!-- 排名第三 -->
+  <div class="info-card">
+    <div class="info-rank rank-3">⭐⭐ ③ 难度第三</div>
+    <div class="info-card-title">集字工具</div>
+    <div class="info-card-desc">输入汉字，即刻查看《兰亭序》各摹本写法，自动生成描红练习页</div>
+    <div class="info-stars">字库 + 数据库检索 + 图片排版 · ★★☆☆☆</div>
+    <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)">
+      <div style="font-size:10px;color:rgba(255,255,255,.4);line-height:1.5">
+        <b style="color:rgba(255,255,255,.6)">流程：</b>输入 → 数据库查询 → 返回各摹本写法 → 生成描红PDF
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px">开发周期：MVP 2~4周 / 完整版 1~2月</div>
+    </div>
+  </div>
+
+  <!-- 技术门槛排序图 -->
+  <div style="margin-top:10px;padding:12px 14px;background:rgba(255,255,255,.06);border-radius:10px">
+    <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:8px;text-align:center">技术门槛排序</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:10px;font-family:monospace;color:rgba(255,255,255,.4);line-height:1.4">
+      <div style="color:#ff6b6b">AR实时笔迹引导 <span style="float:right">▲ ★★★★★</span></div>
+      <div style="border-left:1px solid rgba(255,255,255,.1);margin-left:8px;padding-left:8px;color:#f5a623">AI书法点评 <span style="float:right">★★★★</span></div>
+      <div style="border-left:1px solid rgba(255,255,255,.1);margin-left:16px;padding-left:8px;color:#07c160">集字工具 <span style="float:right">★★ ▼</span></div>
+    </div>
+  </div>
+
+  <!-- 开发建议 -->
+  <div style="margin-top:10px;padding:12px 14px;background:linear-gradient(135deg,rgba(63,139,109,.15),rgba(26,107,76,.1));border-radius:10px;border:1px solid rgba(63,139,109,.2)">
+    <div style="font-size:12px;font-weight:600;color:#4fa889;margin-bottom:6px">💡 创业开发顺序建议</div>
+    <div style="font-size:10px;color:rgba(255,255,255,.5);line-height:1.7">
+      <div><b style="color:#4fa889">第一阶段</b> ✅ 集字工具 + AI点评（基础版）</div>
+      <div><b style="color:#f5a623">第二阶段</b> 🔄 AI点评升级（笔画级分析）</div>
+      <div><b style="color:#ff6b6b">第三阶段</b> 🚀 AR实时笔迹引导</div>
+    </div>
+    <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)">
+      先验证产品价值 → 积累字库和数据 → 再投入高研发资源
+    </div>
+  </div>
+
+  <!-- 综合评分 -->
+  <div style="margin-top:10px;display:flex;gap:6px">
+    <div style="flex:1;text-align:center;padding:8px 4px;background:rgba(255,77,79,.1);border-radius:8px">
+      <div style="font-size:16px;font-weight:700;color:#ff6b6b">9.5</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.4)">AR</div>
+    </div>
+    <div style="flex:1;text-align:center;padding:8px 4px;background:rgba(250,140,22,.1);border-radius:8px">
+      <div style="font-size:16px;font-weight:700;color:#f5a623">7.5</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.4)">AI点评</div>
+    </div>
+    <div style="flex:1;text-align:center;padding:8px 4px;background:rgba(7,193,96,.1);border-radius:8px">
+      <div style="font-size:16px;font-weight:700;color:#07c160">3.0</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.4)">集字</div>
+    </div>
+  </div>
+</div>
+
 <!-- 技术路线图（手机框外右侧） -->
 <div class="tech-side" onclick="showToast('AI书童技术路线图')">
   <img src="asset/AI书童技术路线.png" onerror="this.parentElement.style.display='none'">

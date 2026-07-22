@@ -175,15 +175,15 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
 // ── 模拟核销记录数据 ──
 var allRecords = [
   { id:'WO20260713001', user:'U20240001', userName:'兰亭泼墨人', type:'identity', label:'身份权益', assetName:'兰亭雅集', assetSpec:'优享版', assetNo:'#0001', title:'景区VIP通行权', desc:'鹅池碑、御碑亭、曲水流觞、兰亭江', time:'2026-07-13 17:26', status:'success', tagText:'已核销', operator:'admin' },
-  { id:'WO20260713002', user:'U20240003', userName:'江南游客', type:'ticket', label:'次数权益', assetName:'兰亭雅集', assetSpec:'畅行版', assetNo:'#0002', title:'研学课程 · 第1次', desc:'书法研学体验', time:'2026-07-13 16:52', status:'success', tagText:'已核销', operator:'admin' },
-  { id:'WO20260713003', user:'U20240005', userName:'文化收藏家', type:'identity', label:'身份权益', assetName:'兰亭春禊', assetSpec:'学韵版', assetNo:'#0003', title:'跨城特权', desc:'绍兴、杭州、上海三地优先入场', time:'2026-07-13 15:30', status:'success', tagText:'已核销', operator:'admin' },
-  { id:'WO20260712001', user:'U20240001', userName:'兰亭泼墨人', type:'ticket', label:'次数权益', assetName:'兰亭雅集', assetSpec:'优享版', assetNo:'#0001', title:'研学课程 · 第2次', desc:'拓印体验', time:'2026-07-12 14:10', status:'success', tagText:'已核销', operator:'张三' },
-  { id:'WO20260712002', user:'U20240002', userName:'墨韵书生', type:'identity', label:'身份权益', assetName:'兰亭碑刻', assetSpec:'珍藏版', assetNo:'#0004', title:'景区VIP通行权', desc:'鹅池碑、御碑亭', time:'2026-07-12 11:05', status:'success', tagText:'已核销', operator:'张三' },
-  { id:'WO20260711001', user:'U20240001', userName:'兰亭泼墨人', type:'ticket', label:'次数权益', assetName:'兰亭雅集', assetSpec:'优享版', assetNo:'#0001', title:'研学课程 · 第3次', desc:'非遗手作体验', time:'2026-07-11 09:30', status:'success', tagText:'已核销', operator:'李四' },
-  { id:'WO20260710001', user:'U20240004', userName:'越地旅人', type:'identity', label:'身份权益', assetName:'兰亭春禊', assetSpec:'畅行版', assetNo:'#0005', title:'景区VIP通行权', desc:'曲水流觞、兰亭江', time:'2026-07-10 16:20', status:'success', tagText:'已核销', operator:'李四' },
-  { id:'WO20260709001', user:'U20240003', userName:'江南游客', type:'ticket', label:'次数权益', assetName:'兰亭雅集', assetSpec:'畅行版', assetNo:'#0002', title:'研学课程 · 第2次', desc:'书法研学体验', time:'2026-07-09 13:45', status:'success', tagText:'已核销', operator:'admin' },
-  { id:'WO20260708001', user:'U20240006', userName:'书法爱好者', type:'identity', label:'身份权益', assetName:'兰亭诗韵', assetSpec:'基础版', assetNo:'#0006', title:'跨城特权', desc:'绍兴、杭州优先入场', time:'2026-07-08 10:00', status:'success', tagText:'已核销', operator:'张三' },
-  { id:'WO20260705001', user:'U20240005', userName:'文化收藏家', type:'ticket', label:'次数权益', assetName:'兰亭春禊', assetSpec:'学韵版', assetNo:'#0003', title:'研学课程 · 第1次', desc:'书法研学体验', time:'2026-07-05 14:30', status:'success', tagText:'已核销', operator:'李四' }
+  { id:'WO20260713002', user:'U20240003', userName:'江南游客', type:'ticket', label:'次数权益', assetName:'兰亭雅集', assetSpec:'畅行版', assetNo:'#0002', title:'研学课程', desc:'书法研学体验', time:'2026-07-13 16:52', status:'success', tagText:'已核销', operator:'admin', usedCount:1, totalCount:3 },
+  { id:'WO20260713003', user:'U20240005', userName:'文化收藏家', type:'identity', label:'身份权益', assetName:'兰亭春禊', assetSpec:'学韵版', assetNo:'#0003', title:'跨城特权', desc:'绍兴、杭州、上海三地优先入场', time:'2026-07-13 15:30', status:'success', tagText:'已核销', operator:'admin', usedCount:1, totalCount:1 },
+  { id:'WO20260712001', user:'U20240001', userName:'兰亭泼墨人', type:'ticket', label:'次数权益', assetName:'兰亭雅集', assetSpec:'优享版', assetNo:'#0001', title:'研学课程', desc:'拓印体验', time:'2026-07-12 14:10', status:'success', tagText:'已核销', operator:'张三', usedCount:2, totalCount:3 },
+  { id:'WO20260712002', user:'U20240002', userName:'墨韵书生', type:'identity', label:'身份权益', assetName:'兰亭碑刻', assetSpec:'珍藏版', assetNo:'#0004', title:'景区VIP通行权', desc:'鹅池碑、御碑亭', time:'2026-07-12 11:05', status:'success', tagText:'已核销', operator:'张三', usedCount:1, totalCount:1 },
+  { id:'WO20260711001', user:'U20240001', userName:'兰亭泼墨人', type:'ticket', label:'次数权益', assetName:'兰亭雅集', assetSpec:'优享版', assetNo:'#0001', title:'研学课程', desc:'非遗手作体验', time:'2026-07-11 09:30', status:'success', tagText:'已核销', operator:'李四', usedCount:3, totalCount:3 },
+  { id:'WO20260710001', user:'U20240004', userName:'越地旅人', type:'identity', label:'身份权益', assetName:'兰亭春禊', assetSpec:'畅行版', assetNo:'#0005', title:'景区VIP通行权', desc:'曲水流觞、兰亭江', time:'2026-07-10 16:20', status:'success', tagText:'已核销', operator:'李四', usedCount:1, totalCount:2 },
+  { id:'WO20260709001', user:'U20240003', userName:'江南游客', type:'ticket', label:'次数权益', assetName:'兰亭雅集', assetSpec:'畅行版', assetNo:'#0002', title:'研学课程', desc:'书法研学体验', time:'2026-07-09 13:45', status:'success', tagText:'已核销', operator:'admin', usedCount:2, totalCount:3 },
+  { id:'WO20260708001', user:'U20240006', userName:'书法爱好者', type:'identity', label:'身份权益', assetName:'兰亭诗韵', assetSpec:'基础版', assetNo:'#0006', title:'跨城特权', desc:'绍兴、杭州优先入场', time:'2026-07-08 10:00', status:'success', tagText:'已核销', operator:'张三', usedCount:1, totalCount:3 },
+  { id:'WO20260705001', user:'U20240005', userName:'文化收藏家', type:'ticket', label:'次数权益', assetName:'兰亭春禊', assetSpec:'学韵版', assetNo:'#0003', title:'研学课程', desc:'书法研学体验', time:'2026-07-05 14:30', status:'success', tagText:'已核销', operator:'李四', usedCount:1, totalCount:3 }
 ];
 
 var currentFilter = 'all';
@@ -266,7 +266,7 @@ function renderList(){
         '<div class="hi-info">'+
           '<div class="hi-name">'+r.title+'</div>'+
           '<div class="hi-time">'+r.assetName+' ('+r.assetNo+') <span class="dot"></span> '+formatTime(r.time)+'</div>'+
-          '<div class="hi-time" style="margin-top:1px">'+r.userName+' ('+r.user+')</div>'+
+          '<div class="hi-time" style="margin-top:1px">'+r.userName+' ('+r.user+') <span class="dot"></span> 核销 '+(r.type==='identity'?(r.usedCount||1)+'次':(r.usedCount||1)+'/'+(r.totalCount||1))+'</div>'+
           '<div class="hi-time" style="margin-top:1px;color:#bbb;font-size:9px">操作员：'+r.operator+'</div>'+
         '</div>'+
         '<span class="hi-tag '+r.type+'">'+r.label+'</span>'+
@@ -314,6 +314,7 @@ function viewDetail(id){
   h += '<div class="detail-row"><span class="detail-label">数字资产</span><span class="detail-value">'+r.assetName+(r.assetSpec?' · '+r.assetSpec:'')+' <span style="font-family:monospace;color:#999">'+r.assetNo+'</span></span></div>';
   h += '<div class="detail-row"><span class="detail-label">权益名称</span><span class="detail-value">'+r.title+'</span></div>';
   h += '<div class="detail-row"><span class="detail-label">权益类型</span><span class="detail-value"><span class="hi-tag '+r.type+'">'+(labelMap[r.type]||r.label)+'</span></span></div>';
+  h += '<div class="detail-row"><span class="detail-label">核销次数</span><span class="detail-value">'+(r.type==='identity'?(r.usedCount||1)+'次':(r.usedCount||1)+'/'+(r.totalCount||1))+'</span></div>';
   h += '<div class="detail-row"><span class="detail-label">操作员</span><span class="detail-value">'+(r.operator||'-')+'</span></div>';
   h += '<div class="detail-row"><span class="detail-label">核销时间</span><span class="detail-value">'+r.time+'</span></div>';
   document.getElementById('detailBody').innerHTML = h;

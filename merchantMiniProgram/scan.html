@@ -84,9 +84,7 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
 .recent-list{display:flex;flex-direction:column;gap:6px}
 .recent-item{background:var(--bg);border-radius:var(--radius-card);padding:10px 12px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.03);cursor:pointer;transition:background .12s}
 .recent-item:active{background:var(--page-bg)}
-.ri-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.ri-dot.green{background:var(--accent)}
-.ri-dot.purple{background:#8A5CFF}
+.ri-icon{width:36px;height:36px;border-radius:6px;flex-shrink:0;overflow:hidden;background:#e8e8e8}
 .ri-info{flex:1;min-width:0}
 .ri-name{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:1px}
 .ri-meta{font-size:10px;color:var(--ink-subtle);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
@@ -231,44 +229,64 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
 </div>
 <div class="recent-list">
   <div class="recent-item" onclick="simulateScan()">
-    <span class="ri-dot green"></span>
+    <div class="ri-icon"><img src="../asset/兰亭雅集封面图.png" style="width:100%;height:100%;object-fit:cover"></div>
     <div class="ri-info">
+      <div class="ri-time" style="font-size:11px;color:#e67e22;font-weight:500;margin-bottom:1px">10分钟前</div>
       <div class="ri-name">景区VIP通行权</div>
-      <div class="ri-meta">10分钟前 <span class="dot"></span> 138****5678</div>
+      <div class="ri-meta">兰亭雅集 (#0001) <span class="dot"></span> 138****5678</div>
     </div>
-    <span class="ri-tag">已核销</span>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0">
+      <span class="ri-tag">已核销</span>
+      <span style="font-size:9px;color:#bbb">admin</span>
+    </div>
   </div>
   <div class="recent-item" onclick="simulateScan()">
-    <span class="ri-dot purple"></span>
+    <div class="ri-icon"><img src="../asset/兰亭雅集封面图.png" style="width:100%;height:100%;object-fit:cover"></div>
     <div class="ri-info">
-      <div class="ri-name">研学课程 · 第2次</div>
-      <div class="ri-meta">35分钟前 <span class="dot"></span> 139****1234</div>
+      <div class="ri-time" style="font-size:11px;color:#e67e22;font-weight:500;margin-bottom:1px">35分钟前</div>
+      <div class="ri-name">研学课程</div>
+      <div class="ri-meta">兰亭雅集 (#0002) <span class="dot"></span> 139****1234 <span class="dot"></span> 核销 1/3</div>
     </div>
-    <span class="ri-tag">已核销</span>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0">
+      <span class="ri-tag">已核销</span>
+      <span style="font-size:9px;color:#bbb">admin</span>
+    </div>
   </div>
   <div class="recent-item" onclick="simulateScan()">
-    <span class="ri-dot green"></span>
+    <div class="ri-icon"><img src="../asset/兰亭春禊封面图.png" style="width:100%;height:100%;object-fit:cover"></div>
     <div class="ri-info">
+      <div class="ri-time" style="font-size:11px;color:#e67e22;font-weight:500;margin-bottom:1px">1小时前</div>
       <div class="ri-name">跨城特权</div>
-      <div class="ri-meta">1小时前 <span class="dot"></span> 137****9012</div>
+      <div class="ri-meta">兰亭春禊 (#0003) <span class="dot"></span> 137****9012</div>
     </div>
-    <span class="ri-tag">已核销</span>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0">
+      <span class="ri-tag">已核销</span>
+      <span style="font-size:9px;color:#bbb">admin</span>
+    </div>
   </div>
   <div class="recent-item" onclick="simulateScan()">
-    <span class="ri-dot purple"></span>
+    <div class="ri-icon"><img src="../asset/兰亭雅集封面图.png" style="width:100%;height:100%;object-fit:cover"></div>
     <div class="ri-info">
-      <div class="ri-name">研学课程 · 第1次</div>
-      <div class="ri-meta">2小时前 <span class="dot"></span> 139****1234</div>
+      <div class="ri-time" style="font-size:11px;color:#e67e22;font-weight:500;margin-bottom:1px">2小时前</div>
+      <div class="ri-name">研学课程</div>
+      <div class="ri-meta">兰亭雅集 (#0001) <span class="dot"></span> 139****1234 <span class="dot"></span> 核销 2/3</div>
     </div>
-    <span class="ri-tag">已核销</span>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0">
+      <span class="ri-tag">已核销</span>
+      <span style="font-size:9px;color:#bbb">张三</span>
+    </div>
   </div>
   <div class="recent-item" onclick="simulateScan()">
-    <span class="ri-dot green"></span>
+    <div class="ri-icon"><img src="../asset/兰亭春禊封面图.png" style="width:100%;height:100%;object-fit:cover"></div>
     <div class="ri-info">
+      <div class="ri-time" style="font-size:11px;color:#e67e22;font-weight:500;margin-bottom:1px">3小时前</div>
       <div class="ri-name">景区VIP通行权</div>
-      <div class="ri-meta">3小时前 <span class="dot"></span> 135****4321</div>
+      <div class="ri-meta">兰亭春禊 (#0005) <span class="dot"></span> 135****4321</div>
     </div>
-    <span class="ri-tag">已核销</span>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0">
+      <span class="ri-tag">已核销</span>
+      <span style="font-size:9px;color:#bbb">李四</span>
+    </div>
   </div>
 </div>
 
@@ -404,18 +422,20 @@ var _pendingWriteoffData = null;
 
 function simulateScan(){
   var data = {
-    user: 'U20240001',
-    name: '兰亭泼墨人',
+    phone: '138****5678',
     type: 'identity',
     label: '身份权益',
     assetName: '兰亭雅集',
     assetSpec: '优享版',
     assetNo: '#0001',
+    assetImg: '../asset/兰亭雅集封面图.png',
     title: '景区VIP通行权',
     desc: '鹅池碑、御碑亭、曲水流觞、兰亭江',
     time: '2026-07-13 17:26',
     code: '28294756',
-    operator: 'admin'
+    operator: 'admin',
+    eff: '2026-01-01',
+    exp: '2026-12-31'
   };
   showConfirm(data);
 }
@@ -424,14 +444,25 @@ function showConfirm(d){
   _pendingWriteoffData = d;
   var typeMap = { identity:['身份权益','identity'], ticket:['次数权益','ticket'] };
   var tp = typeMap[d.type] || typeMap.identity;
+  var imgSrc = d.assetImg || '../asset/兰亭雅集封面图.png';
   var h = '';
-  h += '<div class="mi-row"><span class="mi-label">用户</span><span class="mi-value">'+d.name+' ('+d.user+')</span></div>';
-  h += '<div class="mi-row"><span class="mi-label">数字资产</span><span class="mi-value">'+d.assetName+(d.assetSpec?' · '+d.assetSpec:'')+' <span style="font-family:monospace;color:#999">'+d.assetNo+'</span></span></div>';
-  h += '<div class="mi-row"><span class="mi-label">权益名称</span><span class="mi-value" style="font-weight:600;color:var(--accent)">'+d.title+'</span></div>';
-  h += '<div class="mi-row"><span class="mi-label">权益描述</span><span class="mi-value" style="font-size:11px;color:#999">'+d.desc+'</span></div>';
-  h += '<div class="mi-row"><span class="mi-label">权益类型</span><span class="mi-value"><span class="mi-tag '+tp[1]+'">'+tp[0]+'</span></span></div>';
-  h += '<div class="mi-row"><span class="mi-label">有效期至</span><span class="mi-value">'+(d.exp||'2026-12-31')+'</span></div>';
-  h += '<div class="mi-row"><span class="mi-label">状态</span><span class="mi-value"><span style="display:inline-flex;align-items:center;gap:4px;color:#52c41a;font-weight:600"><span style="width:6px;height:6px;border-radius:50%;background:#52c41a;display:inline-block"></span>未使用</span></span></div>';
+  h += '<div style="display:flex;gap:14px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #f0f0f0">'+
+    '<img src="'+imgSrc+'" style="width:80px;height:80px;border-radius:10px;object-fit:cover;flex-shrink:0;background:#e8e8e8;box-shadow:0 2px 8px rgba(0,0,0,.08)" onerror="this.style.display=\'none\'">'+
+    '<div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center">'+
+      '<div style="font-size:16px;font-weight:700;color:#222">'+d.assetName+'</div>'+
+      '<div style="font-size:12px;color:#999;margin-top:4px">'+(d.assetSpec||'')+' <span style="font-family:monospace">'+d.assetNo+'</span></div>'+
+      '<div style="display:flex;align-items:center;gap:6px;margin-top:6px">'+
+        '<span class="mi-tag '+tp[1]+'" style="font-size:10px;padding:1px 8px">'+tp[0]+'</span>'+
+        '<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:#52c41a;font-weight:600"><span style="width:5px;height:5px;border-radius:50%;background:#52c41a;display:inline-block"></span>未使用</span>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+  h += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">'+
+    '<div style="display:flex;align-items:center;gap:8px;font-size:13px"><span style="width:16px;height:16px;border-radius:50%;background:rgba(63,139,109,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="#3F8B6D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span style="color:#666">用户：</span><span style="color:#222;font-weight:500">'+d.phone+'</span></div>'+
+    '<div style="display:flex;align-items:center;gap:8px;font-size:13px"><span style="width:16px;height:16px;border-radius:50%;background:rgba(63,139,109,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="#3F8B6D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span style="color:#666">有效期：</span><span style="color:#222;font-weight:500">'+(d.eff||'2026-01-01')+' ~ '+(d.exp||'2026-12-31')+'</span></div>'+
+    '<div style="display:flex;align-items:center;gap:8px;font-size:13px"><span style="width:16px;height:16px;border-radius:50%;background:rgba(63,139,109,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="#3F8B6D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><span style="color:#666">权益：</span><span style="color:#222;font-weight:600">'+d.title+'</span></div>'+
+    (d.desc ? '<div style="display:flex;align-items:flex-start;gap:8px;font-size:12px"><span style="width:16px;height:16px;border-radius:50%;background:rgba(63,139,109,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px"><svg viewBox="0 0 24 24" fill="none" stroke="#3F8B6D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span><span style="color:#999;flex:1">'+d.desc+'</span></div>' : '')+
+  '</div>';
   document.getElementById('confirmInfo').innerHTML = h;
   document.getElementById('confirmModal').classList.add('show');
 }
@@ -450,7 +481,7 @@ function showSuccess(d){
   var typeMap = { identity:['身份权益','identity'], ticket:['次数权益','ticket'] };
   var tp = typeMap[d.type] || typeMap.identity;
   var h = '';
-  h += '<div class="mi-row"><span class="mi-label">用户</span><span class="mi-value">'+d.name+' ('+d.user+')</span></div>';
+  h += '<div class="mi-row"><span class="mi-label">用户</span><span class="mi-value">'+d.phone+'</span></div>';
   h += '<div class="mi-row"><span class="mi-label">数字资产</span><span class="mi-value">'+d.assetName+(d.assetSpec?' · '+d.assetSpec:'')+' <span style="font-family:monospace;color:#999">'+d.assetNo+'</span></span></div>';
   h += '<div class="mi-row"><span class="mi-label">权益</span><span class="mi-value">'+d.title+'</span></div>';
   h += '<div class="mi-row"><span class="mi-label">类型</span><span class="mi-value"><span class="mi-tag '+tp[1]+'">'+tp[0]+'</span></span></div>';

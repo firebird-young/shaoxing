@@ -295,6 +295,25 @@ body{margin:0;width:100%;background:#fff;font-family:var(--font-body);color:var(
   </button>
 </div>
 
+<!-- ====== 核销确认浮层（扫码后先展示） ====== -->
+<div class="modal-mask" id="confirmModal">
+  <div class="modal-box" style="text-align:left">
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="width:48px;height:48px;border-radius:50%;background:rgba(63,139,109,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 8px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3F8B6D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <div style="font-size:16px;font-weight:700;color:#222">核销确认</div>
+      <div style="font-size:12px;color:#999;margin-top:4px">请确认以下核销信息</div>
+    </div>
+    <div class="modal-info" id="confirmInfo"></div>
+    <button class="modal-btn primary" onclick="doConfirmWriteoff()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      确认核销
+    </button>
+    <button class="modal-btn outline" onclick="closeConfirm()">取消</button>
+  </div>
+</div>
+
 <!-- ====== 核销成功浮层 ====== -->
 <div class="modal-mask" id="successModal">
   <div class="modal-box">
@@ -371,6 +390,8 @@ function goLogin(){
   location.href = 'login.html';
 }
 
+var _pendingWriteoffData = null;
+
 function simulateScan(){
   var data = {
     user: 'U20240001',
@@ -386,7 +407,33 @@ function simulateScan(){
     code: '28294756',
     operator: 'admin'
   };
-  showSuccess(data);
+  showConfirm(data);
+}
+
+function showConfirm(d){
+  _pendingWriteoffData = d;
+  var typeMap = { identity:['身份权益','identity'], ticket:['次数权益','ticket'] };
+  var tp = typeMap[d.type] || typeMap.identity;
+  var h = '';
+  h += '<div class="mi-row"><span class="mi-label">用户</span><span class="mi-value">'+d.name+' ('+d.user+')</span></div>';
+  h += '<div class="mi-row"><span class="mi-label">数字资产</span><span class="mi-value">'+d.assetName+(d.assetSpec?' · '+d.assetSpec:'')+' <span style="font-family:monospace;color:#999">'+d.assetNo+'</span></span></div>';
+  h += '<div class="mi-row"><span class="mi-label">权益名称</span><span class="mi-value" style="font-weight:600;color:var(--accent)">'+d.title+'</span></div>';
+  h += '<div class="mi-row"><span class="mi-label">权益描述</span><span class="mi-value" style="font-size:11px;color:#999">'+d.desc+'</span></div>';
+  h += '<div class="mi-row"><span class="mi-label">权益类型</span><span class="mi-value"><span class="mi-tag '+tp[1]+'">'+tp[0]+'</span></span></div>';
+  h += '<div class="mi-row"><span class="mi-label">有效期至</span><span class="mi-value">'+(d.exp||'2026-12-31')+'</span></div>';
+  h += '<div class="mi-row"><span class="mi-label">状态</span><span class="mi-value"><span style="display:inline-flex;align-items:center;gap:4px;color:#52c41a;font-weight:600"><span style="width:6px;height:6px;border-radius:50%;background:#52c41a;display:inline-block"></span>未使用</span></span></div>';
+  document.getElementById('confirmInfo').innerHTML = h;
+  document.getElementById('confirmModal').classList.add('show');
+}
+
+function closeConfirm(){
+  document.getElementById('confirmModal').classList.remove('show');
+  _pendingWriteoffData = null;
+}
+
+function doConfirmWriteoff(){
+  closeConfirm();
+  if(_pendingWriteoffData) showSuccess(_pendingWriteoffData);
 }
 
 function showSuccess(d){

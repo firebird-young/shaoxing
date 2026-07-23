@@ -30,17 +30,23 @@ body{margin:0;background:#2c2c2e;font-family:-apple-system,'PingFang SC','Micros
 .step-content.active{display:block}
 
 /* ── 步骤1：选择字帖 ── */
-.category-title{font-size:14px;font-weight:700;color:#fff;margin:16px 0 8px;padding:0 4px;display:flex;align-items:center;gap:6px}
-.category-title::before{content:'';width:3px;height:14px;background:rgba(255,255,255,.5);border-radius:2px}
+.category-title{font-size:15px;font-weight:700;margin:16px 0 8px;padding:0 4px;display:flex;align-items:center;gap:6px}
+.category-title::before{content:'';width:3px;height:14px;border-radius:2px}
+.category-title[data-cat="caoshu"]{color:#e67e22}
+.category-title[data-cat="caoshu"]::before{background:#e67e22}
+.category-title[data-cat="xingshu"]{color:#2980b9}
+.category-title[data-cat="xingshu"]::before{background:#2980b9}
+.category-title[data-cat="kaishu"]{color:#8e44ad}
+.category-title[data-cat="kaishu"]::before{background:#8e44ad}
 .script-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .script-card{background:#fff;border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:0 2px 12px rgba(26,107,76,.06);border:2px solid transparent;transition:all .2s}
 .script-card:active{transform:scale(.96)}
 .script-card.on{border-color:#1a6b4c;box-shadow:0 0 0 3px rgba(26,107,76,.15)}
 .script-card img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#e8e8e8}
-.script-card-body{padding:8px 10px 10px;text-align:center}
-.script-card-name{font-size:12px;font-weight:600;color:#222}
-.script-card-author{font-size:10px;color:#999;margin-top:2px}
-.script-card-dynasty{font-size:9px;color:#bbb;margin-top:1px}
+.script-card-body{padding:10px 10px 12px;text-align:center}
+.script-card-name{font-size:14px;font-weight:700;color:#111}
+.script-card-author{font-size:12px;color:#444;margin-top:3px}
+.script-card-dynasty{font-size:11px;color:#666;margin-top:2px}
 .script-select-hint{margin-top:16px;text-align:center;font-size:13px;color:rgba(255,255,255,.5)}
 
 /* ── 步骤2：拍照/上传 ── */
@@ -465,7 +471,8 @@ function initScripts(){
   var grid = document.getElementById('scriptGrid');
   grid.innerHTML = '';
   categories.forEach(function(cat){
-    grid.innerHTML += '<div class="category-title">'+cat.name+'</div>';
+    var catKey = cat.name === '草书' ? 'caoshu' : cat.name === '行书' ? 'xingshu' : 'kaishu';
+    grid.innerHTML += '<div class="category-title" data-cat="'+catKey+'">'+cat.name+'</div>';
     grid.innerHTML += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;grid-column:1/-1">' +
       cat.list.map(function(s){
         return '<div class="script-card" data-name="'+s.name+'" onclick="selectScript(\''+s.name+'\')">'+
